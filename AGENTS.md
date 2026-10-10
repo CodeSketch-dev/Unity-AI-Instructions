@@ -39,6 +39,7 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 
 - Avoid unnecessary per-frame allocations, repeated `Find`/`GetComponent` calls in hot paths, excessive GameObject instantiation, and unmeasured physics/rendering work.
 - Prefer profiling evidence before promising FPS, memory, draw-call, or batching improvements.
+- Treat low-end Android as the default performance target. Follow "Low-end mobile performance (default target)" below for collision dispatch, culling, batching, UI, and pooling rules.
 - Respect Unity serialization, prefab overrides, assembly definitions, domain reload behavior, and Unity main-thread API restrictions.
 - Keep material/shader changes compatible with the project's actual render pipeline and target platforms.
 - For level design, reuse existing art assets; establish composition, scale, walkability, object grouping, and camera readability; verify layout in the Editor rather than only describing it.
@@ -175,6 +176,57 @@ Assets/
 - Every operation whose owner can be disabled, destroyed, replaced, or restarted must have a cancellation strategy. Reuse the project's `CancelToken` wrapper or Unity/C# `CancellationToken`, cancel the previous operation before replacing it, and cancel/dispose owned tokens on teardown.
 - Pass cancellation tokens into delays, waits, loops, and external operations. Avoid polling every frame when an event or `WaitUntil` with cancellation expresses the lifecycle more clearly.
 - Unity object access remains on the main thread unless a proven API is thread-safe. Do not use `Task.Run` for Unity gameplay work.
+
+### Low-end mobile performance (default target)
+
+Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project says otherwise. CPU time (physics callbacks, `Update`, GC) and draw calls/overdraw usually matter more than raw polygon count. These rules come from `monkey-escape` and `knife-tower`; inspect the installed framework before using any named API, because namespaces differ (`CodeSketch.Optimize` vs the SketchEngine equivalent).
+
+**Collision and trigger dispatch (`ICharacterCollidable` + `OptCollisionRegister`)**
+
+- Do not give every platform, pickup, checkpoint or zone its own `OnTriggerEnter`/`OnCollisionEnter` that calls `GetComponent` on the other collider. Route contacts through the registry instead.
+- The actor that moves (for example `Character`) is the single physics-callback owner. It derives from the installed `OptCollisionSensor<T>` / `OptCollisionSensorFast<T>` and forwards each event to the target: `OnCollisionEnterFunc(T target) => target.OnCollisionEnterFunc(this)`.
+- World objects derive from `OptCollisionRegister<ICharacterCollidable>` and implement `ICharacterCollidable` (`OnCollisionEnterFunc`, `OnCollisionExitFunc`, `OnTriggerEnterFunc`, `OnTriggerExitFunc`, each taking the `Character`). They register their colliders in `OnEnable` and unregister in `OnDisable`; colliders are collected in `Awake`/`OnValidate`. Lookup is one dictionary read keyed by `Collider.GetInstanceID()` with zero `GetComponent` and zero allocation. For an owner that must answer to two or three interface families, use `OptCollisionRegister2<T1, T2>` or `OptCollisionRegister<T1, T2, T3>` (CodeSketch) instead of inventing a second registration path; check the installed package first.
+- Keep callback bodies tiny and leave unused callbacks empty. Create a separate interface per actor family (for example `IEnemyCollidable`) instead of type-casting inside callbacks.
+- If a callback needs captured context, use the struct-based `OptCollisionLookup.ForEach<T, TAction>(collider, ref action)` overload, and cache any `Action<T>` delegate once instead of creating a lambda per event.
+- A world object with several colliders registers them all. Do not assume one collider per owner. Do not add a second registration path beside the framework one.
+- Reset static collections used by zones/triggers with `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` so domain-reload-off Editor sessions and scene reloads stay correct.
+
+**Physics queries and settings**
+
+- Use `Physics.*NonAlloc` with reusable buffers, explicit layer masks and an explicit `QueryTriggerInteraction`. Keep buffers sized for the realistic maximum.
+- Cache a query result for the frame (compare `Time.frameCount`) when several systems ask the same thing. Throttle pathing/target updates with a squared-distance threshold instead of recomputing every frame.
+- Compare distances with `sqrMagnitude`. Disable `Physics.autoSyncTransforms`, keep `reuseCollisionCallbacks` on, keep solver iterations at the engine default or lower, and keep colliders simple (primitives over mesh colliders). Verify these in `ProjectSettings/DynamicsManager.asset` rather than assuming.
+- Keep the physics layer collision matrix tight: a layer pair that never needs contact must be disabled.
+
+**Per-frame work**
+
+- Avoid `Update`/`FixedUpdate` on large populations. Prefer events, `UniTask` waits, a single manager that ticks many entities, or the framework's `Tick`/`FixedTick` hooks if the installed `MonoCached` base dispatches them.
+- When something does not need to run every frame, throttle by interval or stagger by index, and set `enabled = false` on idle or out-of-range components instead of early-returning inside `Update`.
+- Avoid `Camera.main` in hot paths (cache it), per-call `new WaitForSeconds` (use `UniTask` delays or a cached instance), string building, LINQ and boxing.
+
+**Visibility, culling and batching**
+
+- Use event-driven distance culling with `CullingGroup`: set bounding spheres and distance bands once, subscribe to `onStateChanged`, and toggle `Renderer.enabled`/`TMP_Text.enabled` there. Do not loop over objects every frame measuring distance. Use this for sprites, world-space text and small props, and exclude indicators that must always be visible (for example countdown text). Dispose the group and unsubscribe in `OnDestroy`.
+- Use per-zone camera far-clip trigger zones (`CameraFarDistanceZone` style) so enclosed areas render less. When zones overlap, choose the zone the player is deepest inside.
+- Combine static meshes by material (`MeshSceneCombiner` style): bake renderer groups in the Editor, call `CombineMeshes` at load or under a per-frame millisecond budget, exclude dynamic/animated objects, and disable `LODGroup` after combining. Do not combine anything that moves, fades, toggles or is destroyed at runtime.
+- Prefer SRP Batcher-compatible shaders and shared materials, and use GPU Instancing for large identical populations. `MaterialPropertyBlock` avoids material duplication but takes that renderer out of the SRP Batcher, so use it for a few per-instance values and measure before applying it to hundreds of renderers.
+- Keep transparent surfaces, full-screen effects and particle counts small to limit overdraw. Prefer atlased textures and compressed formats (ASTC) with mipmaps on 3D textures.
+- URP baseline for low-end: SRP Batcher on, single shadow cascade, small shadow map (512–1024), short shadow distance, no soft shadows, minimal additional lights, depth/opaque texture only when a feature needs them, MSAA off or 2x, HDR off unless required. The reference projects ship a Mobile URP asset and a PC URP asset with per-tier Quality levels; reuse the same split and never enable PC-grade settings on the mobile tier.
+
+**UI**
+
+- Split static and frequently-changing UI into separate canvases, turn off `Raycast Target` on non-interactive graphics, and avoid rebuilding TMP text every frame (only set text when the value changes).
+- For layout groups that only need to lay out once, enable them, wait the needed frame(s), then disable them (the `OptCanvasLayout` pattern) so they stop triggering rebuilds.
+
+**Memory and instantiation**
+
+- Pool anything spawned repeatedly (VFX, projectiles, pickups, floating text) with the project's pool (`PoolManager`/LeanPool). Do not `Instantiate`/`Destroy` in gameplay loops, and return pooled objects on disable.
+- Load heavy content through the project's existing loading flow (Addressables or loader screen), and pay one-time costs such as mesh combining behind a loading screen.
+
+**Verification**
+
+- Do not claim a performance improvement without evidence. Use the Unity Profiler (or the `ivanmurzak` profiler tools such as rendering/script stats) on a representative scene, and say plainly when a change was not measured on a low-end device.
+- Prefer a simple, measurable change over a clever one: remove work first, then batch it, then cache it, then optimize it.
 
 ### Implementation and verification rules for this house style
 
