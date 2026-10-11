@@ -53,6 +53,12 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - Do not commit, push, merge, or create branches unless requested. Preserve any existing user changes.
 - Do not expose secrets, tokens, keystores, signing credentials, or private configuration in output or logs.
 
+## Feedback notes
+
+- During the conversation, always summarise important user feedback (corrections, preferences, design decisions, rejected approaches, and standing rules) and save it to a notes file, `docs/feedback-notes.md` in the project root (create it if missing).
+- Append concise dated bullet entries grouped by topic; update an existing entry instead of duplicating it. Record the why when the user gave one.
+- Update the notes as feedback arrives, not only at the end, so the information survives context compaction. Read the file at the start of a session before continuing work.
+
 ## Communication
 
 - Communicate in concise Vietnamese. For long tasks, give short progress updates when useful.
