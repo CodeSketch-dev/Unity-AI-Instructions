@@ -185,9 +185,13 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 
 - Do not give every platform, pickup, checkpoint or zone its own `OnTriggerEnter`/`OnCollisionEnter` that calls `GetComponent` on the other collider. Route contacts through the registry instead.
 - The actor that moves (for example `Character`) is the single physics-callback owner. It derives from the installed `OptCollisionSensor<T>` / `OptCollisionSensorFast<T>` and forwards each event to the target: `OnCollisionEnterFunc(T target) => target.OnCollisionEnterFunc(this)`.
-- World objects derive from `OptCollisionRegister<ICharacterCollidable>` and implement `ICharacterCollidable` (`OnCollisionEnterFunc`, `OnCollisionExitFunc`, `OnTriggerEnterFunc`, `OnTriggerExitFunc`, each taking the `Character`). They register their colliders in `OnEnable` and unregister in `OnDisable`; colliders are collected in `Awake`/`OnValidate`. Lookup is one dictionary read keyed by `Collider.GetInstanceID()` with zero `GetComponent` and zero allocation. For an owner that must answer to two or three interface families, use `OptCollisionRegister2<T1, T2>` or `OptCollisionRegister<T1, T2, T3>` (CodeSketch) instead of inventing a second registration path; check the installed package first.
+- World objects derive from the framework's `OptCollisionRegister` base and implement `ICharacterCollidable` (`OnCollisionEnterFunc`, `OnCollisionExitFunc`, `OnTriggerEnterFunc`, `OnTriggerExitFunc`, each taking the `Character`). They register their colliders in `OnEnable` and unregister in `OnDisable`; colliders are collected in `Awake`/`OnValidate`. Lookup is a dictionary read keyed by the collider's instance ID with zero `GetComponent` and zero allocation.
+- The two frameworks differ here, so read the installed package before writing code:
+  - **SketchEngine** (newer): `OptCollisionRegister` is NOT generic. An owner implements any number of interface families (`ICharacterCollidable`, `IMonsterCollidable`, ...), and the sensor `OptCollisionSensorFast<T>` filters owners with `owner is T`. Override `OnDisable`/`Awake` with `protected override` and call `base`.
+  - **CodeSketch** (older): `OptCollisionRegister<T>` is generic, with `OptCollisionRegister2<T1, T2>` and `OptCollisionRegister<T1, T2, T3>` variants for several interface families.
+  Never invent a second registration path beside the framework one.
 - Keep callback bodies tiny and leave unused callbacks empty. Create a separate interface per actor family (for example `IEnemyCollidable`) instead of type-casting inside callbacks.
-- If a callback needs captured context, use the struct-based `OptCollisionLookup.ForEach<T, TAction>(collider, ref action)` overload, and cache any `Action<T>` delegate once instead of creating a lambda per event.
+- If a callback needs captured context in CodeSketch, use the struct-based `OptCollisionLookup.ForEach<T, TAction>(collider, ref action)` overload, and cache any `Action<T>` delegate once instead of creating a lambda per event. In SketchEngine, query with `OptCollisionLookup.TryFindFirst<T>` / `TryGetAll<T>`.
 - A world object with several colliders registers them all. Do not assume one collider per owner. Do not add a second registration path beside the framework one.
 - Reset static collections used by zones/triggers with `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` so domain-reload-off Editor sessions and scene reloads stay correct.
 
@@ -235,3 +239,9 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - Prefer `ivanmurzak` MCP for Unity Editor work and verification. Do not use Unity AI Assistant unless explicitly requested. Discover the available `ivanmurzak` tools and connection first; use read-only inspection before mutation.
 - After file changes, refresh/compile through Unity when available, inspect Console errors, verify created assets and serialized references, and run relevant EditMode/PlayMode tests. A successful external C# build alone is not proof that Unity serialization, scenes, or prefabs are correct.
 - When Unity MCP is unavailable or connected to a different project, make only safe file-based changes, state exactly what was not Editor-verified, and never claim scene/prefab/Console validation occurred.
+
+## Unity prefab and ready-to-play workflow
+
+- Follow the full workflow: plan, implement, wire, save, compile, and test. Never report a gameplay feature complete after only creating scripts.
+- When a target is a prefab instance or appears under Prefab Mode in Context, modify the source prefab asset and apply/save it. Do not leave a scene-only override unless explicitly requested.
+- After wiring, inspect the source prefab and a scene instance, verify serialized references, refresh/compile Unity, and test the relevant Play Mode path before reporting completion.
