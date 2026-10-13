@@ -1,0 +1,27 @@
+# Copy to the game project root and edit. Overrides skill defaults.
+# Values are design rules, not engine constants.
+
+platform:
+  targets: [android, ios]
+  deviceTier: low-end-first   # low-end-first | mid | high
+
+ui:
+  orientation: landscape
+  referenceResolution: [1920, 1080]   # e.g. [1280, 720] for lighter games
+  rootCanvas:
+    renderMode: ScreenSpaceOverlay
+    sortOrder: 30000         # just "very high"; existing projects may use e.g. 25060, keep it
+    viewContainer: ViewContainer
+    popupRoot: PopupRoot
+
+  canvasScaler: ScaleWithScreenSize
+  matchMode: Expand
+  safeArea: true
+
+  joystick:
+    type: FloatingJoystick   # existing project prefab, do not recreate
+    anchor: bottom-left
+    touchRegion: [0, 0, 0.35, 0.6]   # normalized anchors (xMin, yMin, xMax, yMax); max is left half [0,0,0.5,1]
+
+  banner:
+    reservedHeight: 200      # reference units; always kept clear at the bottom (monetize banner)

@@ -73,6 +73,39 @@ $claudePath = Join-Path $env:USERPROFILE ".claude\CLAUDE.md"
 Install-InstructionFile -DestinationPath $codexPath
 Install-InstructionFile -DestinationPath $claudePath
 
+function Install-Skills
+{
+    param(
+        [Parameter(Mandatory)]
+        [string] $DestinationRoot
+    )
+
+    $skillsSource = Join-Path $repoRoot "skills"
+
+    if (-not (Test-Path -LiteralPath $skillsSource))
+    {
+        return
+    }
+
+    # Chi ghi de cac skill co trong repo; khong dong vao folder "synced" cua app.
+    foreach ($skill in Get-ChildItem -LiteralPath $skillsSource -Directory)
+    {
+        $target = Join-Path $DestinationRoot $skill.Name
+
+        if (Test-Path -LiteralPath $target)
+        {
+            Remove-Item -LiteralPath $target -Recurse -Force
+        }
+
+        New-Item -ItemType Directory -Path $DestinationRoot -Force | Out-Null
+        Copy-Item -LiteralPath $skill.FullName -Destination $target -Recurse -Force
+        Write-Host "Đã cập nhật skill: $target"
+    }
+}
+
+Install-Skills -DestinationRoot (Join-Path $env:USERPROFILE ".claude\skills")
+Install-Skills -DestinationRoot (Join-Path $env:USERPROFILE ".agents\skills")
+
 Write-Host ""
 Write-Host "Hoàn tất đồng bộ Codex và Claude."
 Write-Host "Hãy mở session mới để instructions được nạp lại."
