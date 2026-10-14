@@ -1,0 +1,11 @@
+/Library/
+/Temp/
+/obj/
+/Build/
+/Builds/
+/Logs/
+/UserSettings/
+*.keystore
+*.jks
+*.aab
+*.apk

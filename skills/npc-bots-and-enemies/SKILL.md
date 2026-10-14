@@ -1,6 +1,6 @@
 ---
 name: npc-bots-and-enemies
-description: Bots that act like other players plus enemy/boss AI for single-player clones: shared character systems, tiers, wander/chase, cheap pathing, population. Use when the reference is multiplayer or adding rivals/bosses.
+description: "Bots that act like other players plus enemy/boss AI for single-player clones: shared character systems, tiers, wander/chase, cheap pathing, population. Use when the reference is multiplayer or adding rivals/bosses."
 ---
 
 # NPC bots and enemies

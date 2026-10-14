@@ -1,0 +1,17 @@
+id: PAT-rebirth
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/rebirth
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, not_ready]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 0], size: [1146, 754], container: true}
+  - {n: 2, name: Title, anchor: center, pos: [0, 300], size: [700, 90]}
+  - {n: 3, name: Btn_Close, anchor: center, pos: [510, 320], size: [97, 93], behaviour: close}
+  - {n: 4, name: Card_Before, anchor: center, pos: [-229, 110], size: [242, 178]}
+  - {n: 5, name: Swap, anchor: center, pos: [0, 110], size: [149, 135]}
+  - {n: 6, name: Card_After, anchor: center, pos: [229, 110], size: [242, 178]}
+  - {n: 7, name: Progress_Bar, anchor: center, pos: [0, -108], size: [834, 83]}
+  - {n: 8, name: Btn_Rebirth, anchor: center, pos: [-210, -260], size: [380, 100], behaviour: rebirth}
+  - {n: 9, name: Btn_Cancel, anchor: center, pos: [210, -260], size: [380, 100], behaviour: close}

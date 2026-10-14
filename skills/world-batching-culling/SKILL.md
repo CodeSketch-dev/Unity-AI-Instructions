@@ -1,6 +1,6 @@
 ---
 name: world-batching-culling
-description: Make big static worlds cheap on low-end mobile: bake meshes/materials, chunked distance culling, parity and render-stat checks. Use when a map has thousands of renderers, high draw calls, or on "optimize the map".
+description: "Make big static worlds cheap on low-end mobile: bake meshes/materials, chunked distance culling, parity and render-stat checks. Use when a map has thousands of renderers, high draw calls, or on \"optimize the map\"."
 ---
 
 # World batching and culling

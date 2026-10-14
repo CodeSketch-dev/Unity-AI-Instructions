@@ -1,6 +1,6 @@
 ---
 name: game-clone-recon
-description: Start-of-clone recon: feature inventory, system breakdown, reference map, fidelity labels, staged build order before any code. Use on "clone game X", "make a game like X", or shared reference screenshots/videos.
+description: "Start-of-clone recon: feature inventory, system breakdown, reference map, fidelity labels, staged build order before any code. Use on \"clone game X\", \"make a game like X\", or shared reference screenshots/videos."
 ---
 
 # Game clone recon

@@ -1,6 +1,6 @@
 ---
 name: clone-pipeline
-description: Entry point for cloning a Roblox-style game to Unity mobile: maps phase -> skills -> gates, and holds the per-game docs/clone-plan.md. Use at project start, "what's next", or when unsure which skill applies.
+description: "Entry point for cloning a Roblox-style game to Unity mobile: maps phase -> skills -> gates, and holds the per-game docs/clone-plan.md. Use at project start, \"what's next\", or when unsure which skill applies."
 ---
 
 # Clone pipeline

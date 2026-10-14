@@ -1,0 +1,7 @@
+{
+  "size": { "max_mb": 150, "target_mb": 80, "max_regression_pct": 5 },
+  "startup": { "cold_start_target_s": 6, "cold_start_hard_s": 8, "measured_on": "device only" },
+  "perf": { "note": "structural counters from qa-playmode-smoke are compared with qa/perf-baseline.json; Editor values are indicative" },
+  "tests": { "editmode": "all pass", "playmode_smoke": "no exceptions" },
+  "static": { "qa_static_errors": 0 }
+}

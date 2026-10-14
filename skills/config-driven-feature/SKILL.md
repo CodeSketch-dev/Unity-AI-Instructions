@@ -1,6 +1,6 @@
 ---
 name: config-driven-feature
-description: Build a feature end to end data-driven: persistent data, config assets, factory/registry, events, runtime consumer, wiring. Use when adding any system with tunable values, saved state or many entries ("add X system").
+description: "Build a feature end to end data-driven: persistent data, config assets, factory/registry, events, runtime consumer, wiring. Use when adding any system with tunable values, saved state or many entries (\"add X system\")."
 ---
 
 # Config-driven feature

@@ -1,0 +1,66 @@
+// UNCOMPILED TEMPLATE (design: report 17 sec 5.4, mirrors the thunder-break-egg Dev_UiCapture idea). Copy to
+// Assets/_Game/Scripts/Editor/Qa_Capture.cs, compile via Unity MCP, run for ONE prefab first and look at the PNG.
+// Renders a prefab under a ScreenSpace-Camera canvas into a RenderTexture of the exact pixel size and writes a lossless PNG.
+// Overlay canvases only render in the Game view, so a clone on a camera canvas is used. Entrance animations: call the
+// screen's own "show instantly" API in the settle callback; do not rely on wall-clock waits alone.
+#if UNITY_EDITOR
+using System;
+using System.IO;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Game.Qa
+{
+    public static class Qa_Capture
+    {
+        // Entry for Unity MCP. sizes like "1920x1080,2400x1080,1600x1200". Returns the written files, one per line.
+        public static string CaptureAll(string prefabPath, string outDir, string sizes = "1920x1080,2400x1080,1600x1200", Action<GameObject> settle = null)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null) return "FAIL prefab not found: " + prefabPath;
+            Directory.CreateDirectory(outDir);
+            var written = new StringBuilder();
+            foreach (var token in sizes.Split(','))
+            {
+                var wh = token.ToLower().Split('x');
+                int w = int.Parse(wh[0]), h = int.Parse(wh[1]);
+                var camGo = new GameObject("QaCam", typeof(Camera));
+                var cam = camGo.GetComponent<Camera>();
+                cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 1f);
+                cam.orthographic = true;
+                var rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+                cam.targetTexture = rt;
+                var cgo = new GameObject("QaCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+                var canvas = cgo.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceCamera; canvas.worldCamera = cam; canvas.planeDistance = 1f;
+                var scaler = cgo.GetComponent<CanvasScaler>();
+                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1920, 1080);
+                scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+                var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab, cgo.transform);
+                try
+                {
+                    settle?.Invoke(inst);
+                    Canvas.ForceUpdateCanvases();
+                    cam.Render();
+                    var prev = RenderTexture.active; RenderTexture.active = rt;
+                    var tex = new Texture2D(w, h, TextureFormat.RGB24, false);
+                    tex.ReadPixels(new Rect(0, 0, w, h), 0, 0); tex.Apply();
+                    RenderTexture.active = prev;
+                    var file = Path.Combine(outDir, $"{prefab.name}_{w}x{h}.png");
+                    File.WriteAllBytes(file, tex.EncodeToPNG());
+                    written.AppendLine(file);
+                    UnityEngine.Object.DestroyImmediate(tex);
+                }
+                finally
+                {
+                    UnityEngine.Object.DestroyImmediate(cgo); UnityEngine.Object.DestroyImmediate(camGo);
+                    rt.Release(); UnityEngine.Object.DestroyImmediate(rt);
+                }
+            }
+            return written.ToString();
+        }
+    }
+}
+#endif

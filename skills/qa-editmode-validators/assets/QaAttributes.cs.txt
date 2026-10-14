@@ -1,0 +1,26 @@
+// TEMPLATE (uncompiled). Copy to Assets/_Game/Scripts/Core/QaAttributes.cs through the Editor/MCP (drop the .txt suffix).
+using System;
+
+namespace Game
+{
+    // Field may stay null in a prefab or scene. Use sparingly and say why in a comment.
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class QaOptionalAttribute : Attribute { }
+
+    // Numeric config field must stay inside [Min, Max].
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class QaRangeAttribute : Attribute
+    {
+        public readonly double Min;
+        public readonly double Max;
+        public QaRangeAttribute(double min, double max) { Min = min; Max = max; }
+    }
+
+    // Numeric config field must not be zero (cooldowns, prices, durations).
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class QaNonZeroAttribute : Attribute { }
+
+    // String field is an identifier: unique inside its asset type, non-empty.
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class QaIdAttribute : Attribute { }
+}

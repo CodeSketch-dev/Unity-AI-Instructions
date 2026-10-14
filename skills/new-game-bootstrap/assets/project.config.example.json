@@ -1,0 +1,11 @@
+{
+  "company": "CodeSketch",
+  "product": "My Game",
+  "bundleId": "com.codesketch.mygame",
+  "version": "0.1.0",
+  "unity": "6000.3.22f1",
+  "orientation": "portrait",
+  "rootNamespace": "Game",
+  "defines": ["USE_MAX"],
+  "android": { "minSdk": 24, "targetArchitectures": "ARM64", "appBundle": true }
+}

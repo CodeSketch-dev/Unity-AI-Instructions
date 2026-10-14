@@ -1,6 +1,6 @@
 ---
 name: monetization-integration
-description: Monetization hooks behind interfaces: rewarded/interstitial ads, IAP, daily reward, offline earnings, consent/ATT/GDPR, kids constraints, Editor mocks. Use when adding ads, IAP, shop, boosters or store compliance.
+description: "Monetization hooks behind interfaces: rewarded/interstitial ads, IAP, daily reward, offline earnings, consent/ATT/GDPR, kids constraints, Editor mocks. Use when adding ads, IAP, shop, boosters or store compliance."
 ---
 
 # Monetization integration

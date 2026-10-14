@@ -1,6 +1,6 @@
 ---
 name: spec-then-plan
-description: Workflow for non-trivial work: clarify, compare approaches, spec, task plan with verification, review, execute with checkpoints. Use before any multi-step or risky feature, or on "plan"/"spec". Skip for small edits.
+description: "Workflow for non-trivial work: clarify, compare approaches, spec, task plan with verification, review, execute with checkpoints. Use before any multi-step or risky feature, or on \"plan\"/\"spec\". Skip for small edits."
 ---
 
 # Spec, then plan, then execute

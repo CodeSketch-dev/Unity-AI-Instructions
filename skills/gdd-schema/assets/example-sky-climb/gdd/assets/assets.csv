@@ -1,0 +1,3 @@
+id,kind,name,source,path_or_prompt,used_by,license
+A-021,icon,coin_icon,own,Assets/_Game/Art/UI/coin.png,UI-00-hud,internal
+A-022,icon,gem_icon,own,Assets/_Game/Art/UI/gem.png,UI-00-hud,internal

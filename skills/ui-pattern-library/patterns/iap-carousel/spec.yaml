@@ -1,0 +1,13 @@
+id: PAT-iap-carousel
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/iap-carousel
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, owned]
+elements:
+  - {n: 1, name: Scroll_Packs, anchor: center, pos: [0, 0], size: [1920, 631], container: true}
+  - {n: 2, name: Card_1, anchor: center, pos: [-640, 0], size: [520, 560], behaviour: buy}
+  - {n: 3, name: Card_2, anchor: center, pos: [0, 0], size: [520, 560], behaviour: buy}
+  - {n: 4, name: Card_3, anchor: center, pos: [640, 0], size: [520, 560], behaviour: buy}
+  - {n: 5, name: Btn_Close, anchor: center, pos: [705, 375], size: [100, 100], behaviour: close}

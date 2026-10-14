@@ -1,6 +1,6 @@
 ---
 name: unity-ui
-description: Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab.
+description: "Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab."
 ---
 
 # Unity UI
@@ -14,6 +14,8 @@ Mobile landscape (Android/iOS, incl. low-end). Values: project `project-config.y
 - Persistent HUD lives under `SafeArea` (stretch RectTransform + `UISafeArea`, Conform X/Y on). Full-screen backgrounds/dim layers: stretch.
 - `ViewContainer` object carries the `ViewContainer` component; `PopupRoot` object carries `PopupRootSetter` (registers itself as `PopupManager` root). Add these to the objects; don't invent other scripts.
 - Popups = anything a button opens. Own prefab, stretch-full root, `Popup` script if present, spawned with `PopupManager.Create(prefab)` (SketchEngine; adds it under `PopupRoot`). Never `Instantiate` into a Canvas, never nest in a view.
+
+What the reference projects do (canvas table, sort orders, safe area, joystick): `references/canvas-reference.md`.
 
 ## Reuse (framework-first)
 Before writing any UI helper/prefab (`UISafeArea`, `FloatingJoystick`, `PopupManager`, `Popup`, buttons, bars, sprites, fonts, TMP styles) search the open project only (its `Assets/`, `Packages/` and `Library/PackageCache/`, since git packages such as `com.sketchengine` live in the cache; never parent folders or sibling projects) and use it. Match existing art style. If none exists (other teams' projects): create the smallest project-side equivalent with the same name, say so in the report. Never edit framework/package code. Existing prefabs may predate these rules (AI-generated projects): reuse their parts (sprites, headers, buttons, styles) but this skill's structure rules win over copying their layout, and never switch their text component (e.g. UniText vs TMP) on your own.

@@ -32,3 +32,5 @@ Roblox games share a movement feel: blocky avatar, predictable constant-speed ru
 
 ## Verify
 Compare a video frame of the reference and a screenshot of ours at the same situation (camera distance, avatar size relative to props). Walk across stairs, edges, thin platforms and slopes; jump onto a ledge; rapidly rotate the camera; check there is no sliding when idle.
+
+Reference-project numbers (gravity 30, jump 11 m/s, FOV 40-50, 6.7 m orbit, zero damping) differ from the generic Roblox defaults above: pick one set per game. See `kcc-character-controller` (feel table) and `freelook-third-person-camera`.

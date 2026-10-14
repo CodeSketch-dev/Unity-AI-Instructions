@@ -1,6 +1,6 @@
 ---
 name: done-means-wired
-description: Definition of done for Unity features: wired in scene/prefab, configs created, refs assigned, compiled, exercised in Play Mode. Use before reporting any feature done, or when "can't click / not showing" after delivery.
+description: "Definition of done for Unity features: wired in scene/prefab, configs created, refs assigned, compiled, exercised in Play Mode. Use before reporting any feature done, or when \"can't click / not showing\" after delivery."
 ---
 
 # Done means wired and verified

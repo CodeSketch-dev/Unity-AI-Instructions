@@ -1,6 +1,6 @@
 ---
 name: economy-progression-design
-description: Design/tune economy and progression: cost curves, income, payback, drop tables, rebirth, zone gating, FTUE pacing, with a simulation script. Use for prices, "too grindy/fast", balance or drop rates.
+description: "Design/tune economy and progression: cost curves, income, payback, drop tables, rebirth, zone gating, FTUE pacing, with a simulation script. Use for prices, \"too grindy/fast\", balance or drop rates."
 ---
 
 # Economy and progression design

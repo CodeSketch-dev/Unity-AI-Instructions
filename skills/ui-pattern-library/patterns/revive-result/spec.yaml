@@ -1,0 +1,15 @@
+id: PAT-revive-result
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/revive-result
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, free_revive, ad_revive]
+elements:
+  - {n: 1, name: Scale, anchor: center, pos: [0, 0], size: [748, 725], container: true}
+  - {n: 2, name: Board, anchor: center, pos: [0, 0], size: [665, 512], container: true}
+  - {n: 3, name: Title, anchor: center, pos: [0, 200], size: [500, 60]}
+  - {n: 4, name: Text_Desc, anchor: center, pos: [0, 135], size: [525, 50]}
+  - {n: 5, name: Countdown, anchor: center, pos: [0, 30], size: [147, 147]}
+  - {n: 6, name: Btn_Revive, anchor: center, pos: [0, -100], size: [275, 105], behaviour: revive}
+  - {n: 7, name: Btn_NoThanks, anchor: center, pos: [0, -305], size: [275, 85], behaviour: decline}

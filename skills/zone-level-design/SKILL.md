@@ -1,6 +1,6 @@
 ---
 name: zone-level-design
-description: Lay out zones, bases, hubs and levels for Roblox-style mobile games: progression gating, scale, walkability, landmarks, kit reuse, performance budgets. Use when building a map/zone or when the layout is cramped, empty or off-scale.
+description: "Lay out zones, bases, hubs and levels for Roblox-style mobile games: progression gating, scale, walkability, landmarks, kit reuse, performance budgets. Use when building a map/zone or when the layout is cramped, empty or off-scale."
 ---
 
 # Zone and level design

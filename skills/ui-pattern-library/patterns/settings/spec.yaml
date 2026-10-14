@@ -1,0 +1,17 @@
+id: PAT-settings
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/settings
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, language]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 0], size: [800, 650], container: true}
+  - {n: 2, name: Title, anchor: center, pos: [0, 259], size: [500, 100]}
+  - {n: 3, name: Btn_Close, anchor: center, pos: [350, 270], size: [65, 87], behaviour: close}
+  - {n: 4, name: Row_Music, anchor: center, pos: [0, 100], size: [635, 80]}
+  - {n: 5, name: Row_Sound, anchor: center, pos: [0, -8], size: [635, 80]}
+  - {n: 6, name: Row_Vibration, anchor: center, pos: [0, -116], size: [635, 80]}
+  - {n: 7, name: Btn_Language, anchor: center, pos: [-190, -240], size: [330, 100], behaviour: open_language}
+  - {n: 8, name: Btn_Home, anchor: center, pos: [190, -240], size: [330, 100], behaviour: go_home}
+  - {n: 9, name: Language_Panel, anchor: center, pos: [0, 0], size: [780, 630], container: true, state: language}

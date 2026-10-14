@@ -1,0 +1,14 @@
+id: PAT-rating
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/rating
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default]
+elements:
+  - {n: 1, name: Block, anchor: stretch, rect: {top: 0, left: 0, right: 0, bottom: 0}, container: true}
+  - {n: 2, name: Board, anchor: center, pos: [0, 0], size: [525, 370], container: true}
+  - {n: 3, name: Title, anchor: center, pos: [0, 150], size: [440, 60]}
+  - {n: 4, name: Text_Body, anchor: center, pos: [0, 40], size: [440, 110]}
+  - {n: 5, name: Btn_Bad, anchor: center, pos: [-121, -99], size: [210, 100], behaviour: dismiss}
+  - {n: 6, name: Btn_Good, anchor: center, pos: [121, -99], size: [210, 100], behaviour: store_review}

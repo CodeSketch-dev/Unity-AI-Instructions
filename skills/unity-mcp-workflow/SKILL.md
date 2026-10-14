@@ -1,6 +1,6 @@
 ---
 name: unity-mcp-workflow
-description: Drive the Unity Editor through MCP safely: discover tools, inspect read-only first, edit prefab assets not scene overrides, batch, save, compile, read Console, screenshot, fallback. Use for any scene/prefab/asset/Play Mode/Console task.
+description: "Drive the Unity Editor through MCP safely: discover tools, inspect read-only first, edit prefab assets not scene overrides, batch, save, compile, read Console, screenshot, fallback. Use for any scene/prefab/asset/Play Mode/Console task."
 ---
 
 # Unity MCP workflow

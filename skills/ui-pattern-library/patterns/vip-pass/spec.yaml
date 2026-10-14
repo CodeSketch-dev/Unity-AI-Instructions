@@ -1,0 +1,14 @@
+id: PAT-vip-pass
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/vip-pass
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, subscribed]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 0], size: [1432, 743], container: true}
+  - {n: 2, name: Art_Left, anchor: center, pos: [-400, 40], size: [603, 346]}
+  - {n: 3, name: Title, anchor: center, pos: [330, 245], size: [450, 190]}
+  - {n: 4, name: Benefits, anchor: center, pos: [270, 10], size: [667, 230]}
+  - {n: 5, name: Btn_Buy, anchor: center, pos: [230, -250], size: [525, 135], behaviour: buy}
+  - {n: 6, name: Btn_Close, anchor: center, pos: [650, 330], size: [100, 100], behaviour: close}

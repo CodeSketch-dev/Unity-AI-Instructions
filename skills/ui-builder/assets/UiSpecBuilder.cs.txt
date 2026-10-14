@@ -1,0 +1,70 @@
+// UNCOMPILED TEMPLATE (design from report 21 + 07). Copy to Assets/_Game/Scripts/Editor/UiSpecBuilder.cs, fix
+// namespaces for the installed framework, compile via Unity MCP and run the idempotence check before trusting it.
+// Reads the JSON produced by `ui_spec_tool.py build`. Keyed by element name: running twice changes nothing.
+#if UNITY_EDITOR
+using System;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Game
+{
+    public static class UiSpecBuilder
+    {
+        [Serializable] class Rect2 { public float[] anchorMin, anchorMax, pivot, anchoredPosition, sizeDelta, offsetMin, offsetMax; }
+        [Serializable] class TextSpec { public string key; public bool auto_size; }
+        [Serializable] class ElementSpec { public int n; public string name, anchor, behaviour, sprite; public Rect2 rect; public TextSpec text; public string[] children; }
+        [Serializable] class ScreenSpec { public string id, type, kind; public float scale; public ElementSpec[] elements; }
+
+        [MenuItem("Tools/UI/Build From Spec...")]
+        static void Menu()
+        {
+            var json = EditorUtility.OpenFilePanel("ui-spec.json", "Assets", "json");
+            if (!string.IsNullOrEmpty(json)) Build(json, $"Assets/_Game/Prefabs/UI/{Path.GetFileNameWithoutExtension(json)}.prefab");
+        }
+
+        // Entry callable from Unity MCP. Returns a count report string (created/updated/skipped).
+        public static string Build(string jsonPath, string prefabPath)
+        {
+            var spec = JsonUtility.FromJson<ScreenSpec>(File.ReadAllText(jsonPath));
+            var existing = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            var root = existing != null ? PrefabUtility.LoadPrefabContents(prefabPath) : NewRoot(spec.id);
+            int created = 0, updated = 0;
+            try
+            {
+                var board = Find(root.transform, "Root") ?? Create(root.transform, "Root", ref created);
+                Stretch(board);
+                foreach (var e in spec.elements)                       // flat list, keyed by name under Root
+                {
+                    var t = Find(board, e.name) ?? Create(board, e.name, ref created);
+                    Apply(t, e.rect);
+                    if (e.text != null && !string.IsNullOrEmpty(e.text.key)) EnsureLabel(t, e.text);
+                    else if (!t.TryGetComponent<Graphic>(out _)) { var img = t.gameObject.AddComponent<Image>(); img.raycastTarget = e.behaviour != null; }
+                    updated++;
+                }
+                PrefabUtility.SaveAsPrefabAsset(root, prefabPath);     // never leave a scene-only override
+            }
+            finally { if (existing != null) PrefabUtility.UnloadPrefabContents(root); else UnityEngine.Object.DestroyImmediate(root); }
+            return $"{spec.id}: created {created}, applied {updated} -> {prefabPath}";
+        }
+
+        static GameObject NewRoot(string name) { var go = new GameObject(name, typeof(RectTransform)); Stretch(go.transform as RectTransform); return go; }
+        static RectTransform Find(Transform parent, string name) => parent.Find(name) as RectTransform;
+        static RectTransform Create(Transform parent, string name, ref int created) { var go = new GameObject(name, typeof(RectTransform)); go.transform.SetParent(parent, false); created++; return (RectTransform)go.transform; }
+        static void Stretch(Transform t) { var r = (RectTransform)t; r.anchorMin = Vector2.zero; r.anchorMax = Vector2.one; r.offsetMin = r.offsetMax = Vector2.zero; }
+        static Vector2 V(float[] a) => new Vector2(a[0], a[1]);
+        static void Apply(RectTransform t, Rect2 r)
+        {
+            t.anchorMin = V(r.anchorMin); t.anchorMax = V(r.anchorMax); t.pivot = V(r.pivot);
+            if (r.offsetMin != null && r.offsetMin.Length == 2) { t.offsetMin = V(r.offsetMin); t.offsetMax = V(r.offsetMax); }
+            else { t.sizeDelta = V(r.sizeDelta); t.anchoredPosition = V(r.anchoredPosition); }
+        }
+        static void EnsureLabel(RectTransform parent, TextSpec text)
+        {
+            // Create the project's text component here (TMP or UniText) through the shared text factory; set the
+            // localization key from text.key, autosize from text.auto_size. Left to the project (see ui-text-tmp).
+        }
+    }
+}
+#endif

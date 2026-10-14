@@ -1,0 +1,8 @@
+{
+  "_note": "Soft defaults from report 18 section 11. NOT measured on a device; anchors: thunder-break-egg 93 batches and ~52k verts in the Editor. Override per project with a stated reason.",
+  "tiers": {
+    "Low":  {"batches": 60,  "verts": 80000,  "tris": 120000, "active_chunks": 20, "materials": 1, "shadow_casters": 5,  "particles": 200,  "bots": 8},
+    "Mid":  {"batches": 100, "verts": 150000, "tris": 250000, "active_chunks": 40, "materials": 1, "shadow_casters": 12, "particles": 500,  "bots": 16},
+    "High": {"batches": 150, "verts": 300000, "tris": 500000, "active_chunks": 70, "materials": 2, "shadow_casters": 24, "particles": 1000, "bots": 24}
+  }
+}

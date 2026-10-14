@@ -1,0 +1,47 @@
+// UNCOMPILED TEMPLATE (design: report 19 sec 3.5). Put on the RawImage that shows the preview RenderTexture.
+// Rotates the stage pivot with touch drag, with inertia and a snap-back. Does not block the item list: it only handles drags that start on this rect.
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace Game
+{
+    public sealed class PreviewStageDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
+        [SerializeField] Transform _pivot;
+        [SerializeField] float _degreesPerPixel = 0.4f, _inertiaDamping = 6f, _snapBackDelay = 2f, _snapBackSpeed = 4f;
+        float _velocity, _lastInputTime;
+        bool _dragging;
+        float _homeY;
+
+        void Awake() { if (_pivot != null) _homeY = _pivot.localEulerAngles.y; }
+        void OnEnable() { _velocity = 0f; _dragging = false; }
+
+        public void OnBeginDrag(PointerEventData e) { _dragging = true; _velocity = 0f; _lastInputTime = Time.unscaledTime; }
+        public void OnDrag(PointerEventData e)
+        {
+            if (_pivot == null) return;
+            float delta = -e.delta.x * _degreesPerPixel;
+            _pivot.Rotate(0f, delta, 0f, Space.World);
+            _velocity = delta / Mathf.Max(Time.unscaledDeltaTime, 0.001f);
+            _lastInputTime = Time.unscaledTime;
+        }
+        public void OnEndDrag(PointerEventData e) => _dragging = false;
+
+        void Update()                                    // enabled only while the preview is visible
+        {
+            if (_pivot == null || _dragging) return;
+            if (Mathf.Abs(_velocity) > 0.5f)
+            {
+                _pivot.Rotate(0f, _velocity * Time.unscaledDeltaTime, 0f, Space.World);
+                _velocity = Mathf.Lerp(_velocity, 0f, 1f - Mathf.Exp(-_inertiaDamping * Time.unscaledDeltaTime));
+                _lastInputTime = Time.unscaledTime;
+            }
+            else if (Time.unscaledTime - _lastInputTime > _snapBackDelay)
+            {
+                var e = _pivot.localEulerAngles;
+                e.y = Mathf.LerpAngle(e.y, _homeY, 1f - Mathf.Exp(-_snapBackSpeed * Time.unscaledDeltaTime));
+                _pivot.localEulerAngles = e;
+            }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+// TEMPLATE (uncompiled). Implement on pickups, targets and zones so the input bot can make real progress.
+using UnityEngine;
+
+namespace Game
+{
+    public interface IQaGoal
+    {
+        bool IsActive { get; }            // still worth going to
+        Vector3 QaPosition { get; }       // where the bot should walk
+        void QaInteract();                // press the contextual action when close (can be empty)
+    }
+}

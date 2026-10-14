@@ -1,0 +1,100 @@
+// TEMPLATE (uncompiled, not Editor-verified). Place at Assets/_Game/Scripts/Editor/Build/BuildCli.cs (drop .txt) in a project
+// whose Editor assembly is Editor-only. Invoked by build_cmd.py through -executeMethod.
+// Arguments: -buildVersion x.y.z -buildNumber N -outputDir Builds [-development]
+// Signing: environment variables KEYSTORE_PATH, KEYSTORE_PASS, KEY_ALIAS, KEY_PASS. Values are set in memory only and never logged.
+using System;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.Build.Reporting;
+using UnityEngine;
+
+namespace Game.EditorTools
+{
+    public static class BuildCli
+    {
+        public static void Bootstrap()
+        {
+            try { BuildSettingsApplier.Apply(); EditorApplication.Exit(0); }
+            catch (Exception e) { Debug.LogError("Bootstrap failed: " + e.Message); EditorApplication.Exit(1); }
+        }
+
+        public static void BuildAndroidAab() => Build(apk: false);
+        public static void BuildAndroidApk() => Build(apk: true);
+
+        static void Build(bool apk)
+        {
+            try
+            {
+                var args = Environment.GetCommandLineArgs();
+                var version = Arg(args, "-buildVersion") ?? PlayerSettings.bundleVersion;
+                var number = int.Parse(Arg(args, "-buildNumber") ?? PlayerSettings.Android.bundleVersionCode.ToString());
+                var outDir = Arg(args, "-outputDir") ?? "Builds";
+                var development = args.Contains("-development");
+
+                BuildSettingsApplier.Apply();
+                PlayerSettings.bundleVersion = version;
+                PlayerSettings.Android.bundleVersionCode = number;
+                EditorUserBuildSettings.buildAppBundle = !apk;
+                EditorUserBuildSettings.androidCreateSymbols = AndroidCreateSymbols.Public;   // symbols zip beside the artifact
+                if (!development && !apk) ApplySigningFromEnvironment();
+
+                Directory.CreateDirectory(outDir);
+                var name = $"{Slug(PlayerSettings.productName)}-{version}-{number}.{(apk ? "apk" : "aab")}";
+                var options = new BuildPlayerOptions
+                {
+                    scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray(),
+                    locationPathName = Path.Combine(outDir, name),
+                    target = BuildTarget.Android,
+                    options = development ? BuildOptions.Development : BuildOptions.None
+                };
+                var report = BuildPipeline.BuildPlayer(options);
+                WriteReport(report, outDir);
+                EditorApplication.Exit(report.summary.result == BuildResult.Succeeded ? 0 : 1);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Build failed: " + e.Message);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        static void ApplySigningFromEnvironment()
+        {
+            var path = Environment.GetEnvironmentVariable("KEYSTORE_PATH");
+            var pass = Environment.GetEnvironmentVariable("KEYSTORE_PASS");
+            var alias = Environment.GetEnvironmentVariable("KEY_ALIAS");
+            var keyPass = Environment.GetEnvironmentVariable("KEY_PASS");
+            if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(pass) || string.IsNullOrEmpty(alias) || string.IsNullOrEmpty(keyPass))
+                throw new InvalidOperationException("signing environment variables are not set");
+            PlayerSettings.Android.useCustomKeystore = true;
+            PlayerSettings.Android.keystoreName = path;
+            PlayerSettings.Android.keystorePass = pass;
+            PlayerSettings.Android.keyaliasName = alias;
+            PlayerSettings.Android.keyaliasPass = keyPass;
+        }
+
+        static void WriteReport(BuildReport r, string outDir)
+        {
+            var top = r.packedAssets.SelectMany(p => p.contents).OrderByDescending(c => c.packedSize).Take(30)
+                .Select(c => new Entry { path = c.sourceAssetPath, mb = c.packedSize / 1048576f }).ToArray();
+            var data = new Summary
+            {
+                result = r.summary.result.ToString(), totalMb = r.summary.totalSize / 1048576f, errors = r.summary.totalErrors,
+                warnings = r.summary.totalWarnings, seconds = (float)r.summary.totalTime.TotalSeconds, topAssets = top
+            };
+            File.WriteAllText(Path.Combine(outDir, "build-report.json"), JsonUtility.ToJson(data, true));
+        }
+
+        static string Arg(string[] args, string name)
+        {
+            var i = Array.IndexOf(args, name);
+            return i >= 0 && i + 1 < args.Length ? args[i + 1] : null;
+        }
+
+        static string Slug(string s) => new string(s.Where(char.IsLetterOrDigit).ToArray());
+
+        [Serializable] class Entry { public string path; public float mb; }
+        [Serializable] class Summary { public string result; public float totalMb, seconds; public int errors, warnings; public Entry[] topAssets; }
+    }
+}

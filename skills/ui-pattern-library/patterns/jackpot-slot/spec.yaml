@@ -1,0 +1,16 @@
+id: PAT-jackpot-slot
+type: ui_screen
+kind: popup_fullscreen
+fidelity: faithful
+pattern: ui-pattern-library/jackpot-slot
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [idle, spinning, result, paytable]
+elements:
+  - {n: 1, name: Machine, anchor: center, pos: [0, 76], size: [1413, 814], container: true}
+  - {n: 2, name: Slot_Window, anchor: center, pos: [0, 146], size: [821, 413]}
+  - {n: 3, name: Spin_Button, anchor: center, pos: [0, -130], size: [275, 110], behaviour: spin}
+  - {n: 4, name: Btn_Paytable, anchor: center, pos: [-600, 100], size: [91, 103], behaviour: toggle_paytable}
+  - {n: 5, name: Lever, anchor: center, pos: [640, -20], size: [133, 260], behaviour: spin}
+  - {n: 6, name: Btn_Close, anchor: center, pos: [860, 440], size: [135, 135], behaviour: close}
+  - {n: 7, name: Paytable_Panel, anchor: center, pos: [-800, -40], size: [286, 480], container: true, state: paytable}
+  - {n: 8, name: Result_Overlay, anchor: center, pos: [0, 146], size: [821, 413], container: true, state: result}

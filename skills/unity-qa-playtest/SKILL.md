@@ -1,6 +1,6 @@
 ---
 name: unity-qa-playtest
-description: Plan and run QA for a feature or build: test matrix, Play Mode via MCP, aspect ratios, fresh/saved data, interruptions, perf sanity, bug reports. Use on "test it", "QA this", before milestones or human playtests.
+description: "Plan and run QA for a feature or build: test matrix, Play Mode via MCP, aspect ratios, fresh/saved data, interruptions, perf sanity, bug reports. Use on \"test it\", \"QA this\", before milestones or human playtests."
 ---
 
 # Unity QA playtest

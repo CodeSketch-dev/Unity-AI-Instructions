@@ -1,0 +1,39 @@
+# Unity generated
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/UserSettings/
+/MemoryCaptures/
+*.csproj
+*.sln
+*.slnx
+*.lscache
+*.pidb
+*.suo
+*.user
+.vs/
+.idea/
+.vscode/
+
+# Build outputs and symbols
+*.apk
+*.aab
+*.unitypackage
+*.symbols.zip
+*.app
+
+# Secrets and per-app identity files: never tracked (see qa/secrets.example.json)
+*.keystore
+*.jks
+secrets.local.json
+/Upstore/
+google-services.json
+GoogleService-Info.plist
+
+# QA artifacts (reports stay tracked)
+/docs/qa/artifacts/
+
+# NOTE: ProjectSettings/ProjectVersion.txt and Packages/packages-lock.json MUST stay tracked.

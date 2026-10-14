@@ -1,0 +1,62 @@
+// TEMPLATE (uncompiled, not Editor-verified). Place at Assets/_Game/Scripts/Editor/Build/BuildSettingsApplier.cs (drop .txt).
+// Applies project.config.json and the mobile baseline idempotently and logs every change. API names follow Unity 6; compile it
+// first and adjust to the installed version. Settings stored in other managers (physics, quality) are checked, not guessed:
+// read ProjectSettings with projectsettings-baseline (projectsettings_audit.py) after running this.
+using System;
+using System.IO;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEngine;
+
+namespace Game.EditorTools
+{
+    public static class BuildSettingsApplier
+    {
+        [Serializable] class AndroidConfig { public int minSdk = 24; public string targetArchitectures = "ARM64"; public bool appBundle = true; }
+        [Serializable] class Config
+        {
+            public string company, product, bundleId, version, orientation = "portrait";
+            public string[] defines = new string[0];
+            public AndroidConfig android = new AndroidConfig();
+        }
+
+        static int _changes;
+
+        static void Log(string what) { _changes++; Debug.Log("[BuildSettingsApplier] " + what); }
+
+        public static void Apply()
+        {
+            _changes = 0;
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "project.config.json");
+            if (!File.Exists(path)) throw new FileNotFoundException("project.config.json not found", path);
+            var cfg = JsonUtility.FromJson<Config>(File.ReadAllText(path));
+            if (string.IsNullOrEmpty(cfg.bundleId) || cfg.bundleId.Contains("__")) throw new InvalidOperationException("bundleId is not set");
+
+            var android = NamedBuildTarget.Android;
+            if (PlayerSettings.companyName != cfg.company) { PlayerSettings.companyName = cfg.company; Log("companyName"); }
+            if (PlayerSettings.productName != cfg.product) { PlayerSettings.productName = cfg.product; Log("productName"); }
+            if (PlayerSettings.GetApplicationIdentifier(android) != cfg.bundleId) { PlayerSettings.SetApplicationIdentifier(android, cfg.bundleId); Log("bundleId"); }
+            if (PlayerSettings.bundleVersion != cfg.version) { PlayerSettings.bundleVersion = cfg.version; Log("bundleVersion"); }
+
+            if (PlayerSettings.GetScriptingBackend(android) != ScriptingImplementation.IL2CPP) { PlayerSettings.SetScriptingBackend(android, ScriptingImplementation.IL2CPP); Log("IL2CPP"); }
+            if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64) { PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64; Log("ARM64 only"); }
+            var min = (AndroidSdkVersions)cfg.android.minSdk;
+            if (PlayerSettings.Android.minSdkVersion != min) { PlayerSettings.Android.minSdkVersion = min; Log("minSdk " + cfg.android.minSdk); }
+            if (PlayerSettings.Android.targetSdkVersion != AndroidSdkVersions.AndroidApiLevelAuto) { PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto; Log("targetSdk auto (verify the Play requirement)"); }
+            if (PlayerSettings.GetManagedStrippingLevel(android) != ManagedStrippingLevel.Medium) { PlayerSettings.SetManagedStrippingLevel(android, ManagedStrippingLevel.Medium); Log("stripping Medium"); }
+            if (!PlayerSettings.gcIncremental) { PlayerSettings.gcIncremental = true; Log("incremental GC"); }
+            if (EditorUserBuildSettings.buildAppBundle != cfg.android.appBundle) { EditorUserBuildSettings.buildAppBundle = cfg.android.appBundle; Log("app bundle"); }
+
+            var orientation = cfg.orientation == "landscape" ? UIOrientation.LandscapeLeft : cfg.orientation == "auto" ? UIOrientation.AutoRotation : UIOrientation.Portrait;
+            if (PlayerSettings.defaultInterfaceOrientation != orientation) { PlayerSettings.defaultInterfaceOrientation = orientation; Log("orientation"); }
+
+            var defines = string.Join(";", cfg.defines);
+            PlayerSettings.GetScriptingDefineSymbols(android, out var current);
+            var want = string.Join(";", cfg.defines);
+            if (string.Join(";", current) != want) { PlayerSettings.SetScriptingDefineSymbols(android, cfg.defines); Log("define symbols " + defines); }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log("[BuildSettingsApplier] done, " + _changes + " change(s)");
+        }
+    }
+}

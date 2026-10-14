@@ -1,6 +1,6 @@
 ---
 name: token-efficient-workflow
-description: Rules that cut tokens and time: read less, query indexes, batch calls, small outputs, delegate wide search, avoid rework, clean hand-off. Use at the start of long Unity/clone sessions or when slow/costly.
+description: "Rules that cut tokens and time: read less, query indexes, batch calls, small outputs, delegate wide search, avoid rework, clean hand-off. Use at the start of long Unity/clone sessions or when slow/costly."
 ---
 
 # Token- and time-efficient workflow

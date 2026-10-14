@@ -1,6 +1,6 @@
 ---
 name: unity-debugging
-description: Systematic Unity debugging: reproduce, read first error, classify (null refs, prefab overrides, serialization, order, static state, events, raycast blocking, layers, timeScale, async) and fix the root cause. Use when something does nothing or errors.
+description: "Systematic Unity debugging: reproduce, read first error, classify (null refs, prefab overrides, serialization, order, static state, events, raycast blocking, layers, timeScale, async) and fix the root cause. Use when something does nothing or errors."
 ---
 
 # Unity debugging

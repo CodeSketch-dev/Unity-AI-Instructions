@@ -1,0 +1,29 @@
+# TEMPLATE. Copy into a Unity game repository and set the two local paths below.
+# Runs QA and a normal Unity mobile build on this machine. It does not use a cloud service,
+# deploy anywhere, publish artifacts, or submit to a store.
+[CmdletBinding()]
+param(
+    [ValidateSet('Verify', 'AndroidAab', 'AndroidApk')]
+    [string]$Mode = 'Verify',
+    [string]$Project = '.',
+    [string]$Version = '0.1.0',
+    [int]$BuildNumber = 1
+)
+
+$ErrorActionPreference = 'Stop'
+$Skills = 'C:\Users\REPLACE_ME\.claude\skills'
+$Python = 'py'
+
+& $Python -I "$Skills\new-game-bootstrap\scripts\project_preflight.py" --project $Project
+& $Python -I "$Skills\qa-static-checks\scripts\qa_run.py" static --project $Project --scope full
+& $Python -I "$Skills\qa-batch-and-fallbacks\scripts\qa_unity_batch.py" run --project $Project --platform EditMode --yes
+& $Python -I "$Skills\qa-batch-and-fallbacks\scripts\qa_unity_batch.py" run --project $Project --platform PlayMode --filter Qa_Smoke --yes
+
+if ($Mode -eq 'Verify') { exit 0 }
+
+$BuildArgs = @('--project', $Project, '--version', $Version, '--number', $BuildNumber, '--yes')
+if ($Mode -eq 'AndroidApk') { $BuildArgs += '--apk' }
+& $Python -I "$Skills\unity-batch-build\scripts\build_cmd.py" @BuildArgs
+
+$Artifact = if ($Mode -eq 'AndroidApk') { 'Builds\game.apk' } else { 'Builds\game.aab' }
+& $Python -I "$Skills\unity-batch-build\scripts\size_report.py" --artifact $Artifact --gates 'qa\gates.json' --out 'Builds\size.json'

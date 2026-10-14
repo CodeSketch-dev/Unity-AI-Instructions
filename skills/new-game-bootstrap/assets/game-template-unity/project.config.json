@@ -1,0 +1,11 @@
+{
+ "company": "__COMPANY__",
+ "product": "__PRODUCT__",
+ "bundleId": "__BUNDLE_ID__",
+ "version": "__VERSION__",
+ "unity": "6000.3.22f1",
+ "orientation": "portrait",
+ "rootNamespace": "__NAMESPACE__",
+ "defines": [],
+ "android": {"minSdk": 24, "targetArchitectures": "ARM64", "appBundle": true}
+}

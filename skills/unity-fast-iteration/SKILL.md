@@ -1,6 +1,6 @@
 ---
 name: unity-fast-iteration
-description: Shorten the Unity edit-compile-test loop: Enter Play Mode options, asmdefs, batched refresh, fewer reimports. Use when compile/Play is slow, MCP times out after script edits, or when setting up a project for fast iteration.
+description: "Shorten the Unity edit-compile-test loop: Enter Play Mode options, asmdefs, batched refresh, fewer reimports. Use when compile/Play is slow, MCP times out after script edits, or when setting up a project for fast iteration."
 ---
 
 # Unity fast iteration

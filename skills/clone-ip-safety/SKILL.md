@@ -1,6 +1,6 @@
 ---
 name: clone-ip-safety
-description: Asset provenance and IP hygiene for clones: track asset origin, flag ripped/trademarked content, store-safe naming. Use when importing from a reference game, naming the game, or before a public build/store listing.
+description: "Asset provenance and IP hygiene for clones: track asset origin, flag ripped/trademarked content, store-safe naming. Use when importing from a reference game, naming the game, or before a public build/store listing."
 ---
 
 # Clone IP safety

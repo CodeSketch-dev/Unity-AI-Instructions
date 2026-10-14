@@ -1,0 +1,76 @@
+// UNCOMPILED TEMPLATE (design: report 19 sec 3.4). Copy to Assets/_Game/Scripts/Editor/Character_Skin_Importer.cs, adapt the
+// project types (Character_Skin, Character_Skin_Asset, Character_Rig_Asset, Factory_Character), compile via Unity MCP, run on ONE skin first.
+// Deterministic and idempotent; returns a JSON report and a non-pass blocks registration. Batch: -executeMethod Game.Editor.Character_Skin_Importer.RunBatch
+#if UNITY_EDITOR
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
+
+namespace Game.Editor
+{
+    public static class Character_Skin_Importer
+    {
+        struct Finding { public string level, code, message; }
+
+        [MenuItem("Tools/Character/Validate Selected Skin Prefab")]
+        static void Menu()
+        {
+            var go = Selection.activeObject as GameObject;
+            if (go == null) { Debug.LogWarning("Select a skin prefab asset."); return; }
+            Debug.Log(Validate(AssetDatabase.GetAssetPath(go), "Assets/_Game/Configs/Character/Rig_Humanoid.asset", "bot", writeFixes: false));
+        }
+
+        // Entry for Unity MCP / local batch runner. Returns JSON {pass, findings[]} and writes Library/CharacterImport/<name>.json.
+        public static string Validate(string prefabPath, string rigAssetPath, string role, bool writeFixes)
+        {
+            var findings = new List<Finding>();
+            var prefab = PrefabUtility.LoadPrefabContents(prefabPath);
+            try
+            {
+                var rig = AssetDatabase.LoadAssetAtPath<ScriptableObject>(rigAssetPath);   // Character_Rig_Asset
+                var animators = prefab.GetComponentsInChildren<Animator>(true);
+                if (animators.Length != 1) Add(findings, "FAIL", "animator-count", $"expected 1 Animator, found {animators.Length}");
+                else if (role == "bot" && animators[0].cullingMode != AnimatorCullingMode.CullCompletely) Add(findings, "WARN", "bot-culling", "bots use CullCompletely");
+                if (prefab.GetComponentsInChildren<Rigidbody>(true).Length > 0) Add(findings, "FAIL", "baked-ragdoll", "use the shared pooled ragdoll prefab");
+                if (prefab.GetComponentsInChildren<Camera>(true).Length + prefab.GetComponentsInChildren<Light>(true).Length > 0) Add(findings, "FAIL", "camera-or-light", "remove Camera/Light");
+                foreach (var smr in prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                {
+                    var bones = smr.bones.Select(b => b != null ? b.name : "?").ToArray();
+                    // compare with rig.RequiredBones (read through SerializedObject); on mismatch try SkinnedMesh_Bone_Binder-style rebind by name or fail with the diff
+                    if (smr.sharedMaterials.Length > (role == "bot" ? 1 : 2)) Add(findings, "FAIL", "too-many-materials", smr.name);
+                    if (role == "bot" && smr.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.Off) { Add(findings, "WARN", "bot-shadows", smr.name); if (writeFixes) smr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; }
+                    smr.updateWhenOffscreen = false;                                       // auto-fix; set localBounds from the mesh instead
+                    var mesh = smr.sharedMesh;
+                    if (mesh != null) { /* triangles: mesh.triangles.Length / 3 against the budget; mesh.isReadable should be false */ }
+                }
+                if (writeFixes) PrefabUtility.SaveAsPrefabAsset(prefab, prefabPath);       // refs (Animator, SMR, slots) are written into Character_Skin here
+            }
+            finally { PrefabUtility.UnloadPrefabContents(prefab); }
+            bool pass = findings.All(f => f.level != "FAIL");
+            string json = ToJson(pass, findings);
+            Directory.CreateDirectory("Library/CharacterImport");
+            File.WriteAllText($"Library/CharacterImport/{Path.GetFileNameWithoutExtension(prefabPath)}.json", json);
+            return json;
+        }
+
+        public static void RunBatch()      // -executeMethod: validate every skin prefab under the character folder; exit code 1 on any FAIL
+        {
+            bool allPass = true;
+            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Game/Prefabs/Character/Skin" }))
+                allPass &= Validate(AssetDatabase.GUIDToAssetPath(guid), "Assets/_Game/Configs/Character/Rig_Humanoid.asset", "bot", false).Contains("\"pass\":true");
+            EditorApplication.Exit(allPass ? 0 : 1);
+        }
+
+        static void Add(List<Finding> l, string level, string code, string msg) => l.Add(new Finding { level = level, code = code, message = msg });
+        static string ToJson(bool pass, List<Finding> f)
+        {
+            var sb = new StringBuilder($"{{\"pass\":{(pass ? "true" : "false")},\"findings\":[");
+            sb.Append(string.Join(",", f.Select(x => $"{{\"level\":\"{x.level}\",\"code\":\"{x.code}\",\"message\":\"{x.message}\"}}")));
+            return sb.Append("]}").ToString();
+        }
+    }
+}
+#endif

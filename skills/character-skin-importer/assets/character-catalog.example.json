@@ -1,0 +1,35 @@
+{
+  "_note": "Example catalog (DATA). Numbers are INFERRED starting budgets (report 19 sec 4), not measured on a device. Replace rigs, skins and budgets per game.",
+  "skin_types": ["Normal", "Squid", "VIP", "Event"],
+  "rigs": {
+    "humanoid": {
+      "controller": "Character_Humanoid",
+      "generic": true,
+      "root_bone": "Hips",
+      "required_bones": ["Hips", "Spine", "Chest", "Neck", "Head", "LeftUpperArm", "LeftLowerArm", "LeftHand", "RightUpperArm", "RightLowerArm", "RightHand", "LeftUpperLeg", "LeftLowerLeg", "LeftFoot", "RightUpperLeg", "RightLowerLeg", "RightFoot"],
+      "max_bones": 25,
+      "slots": [
+        {"id": "head_top", "bone": "Head"},
+        {"id": "hand_r", "bone": "RightHand"},
+        {"id": "back", "bone": "Chest"},
+        {"id": "nametag", "bone": "Head"}
+      ],
+      "required_params": [
+        {"name": "Speed", "type": "float"}, {"name": "IsGrounded", "type": "bool"}, {"name": "IsJumping", "type": "bool"},
+        {"name": "IsClimbing", "type": "bool"}, {"name": "TriggerHit", "type": "trigger"}
+      ],
+      "emotes": ["wave", "dance", "sit"]
+    }
+  },
+  "skins": [
+    {"id": "Character_Skin_Boy", "type": "Normal", "rig": "humanoid", "unlock": "Free", "price": 0, "iap_id": null, "order": 1},
+    {"id": "Character_Skin_Girl", "type": "Normal", "rig": "humanoid", "unlock": "Gem", "price": 100, "iap_id": null, "order": 2},
+    {"id": "Character_Skin_Knight", "type": "VIP", "rig": "humanoid", "unlock": "IAP", "price": 0, "iap_id": "skin_knight", "order": 3}
+  ],
+  "allowed_types_per_mode": {"obby": ["Normal", "VIP"], "event": ["Normal"]},
+  "budgets": {
+    "player": {"tris": 3000, "bones": 25, "materials": 2, "texture": 512},
+    "bot": {"tris": 1500, "bones": 20, "materials": 1, "texture": 256}
+  },
+  "bot_names": ["Alex", "Sam", "Riley", "Jordan", "Casey", "Taylor", "Morgan", "Quinn"]
+}

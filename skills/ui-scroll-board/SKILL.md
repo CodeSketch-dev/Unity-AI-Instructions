@@ -1,6 +1,6 @@
 ---
 name: ui-scroll-board
-description: Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview.
+description: "Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview."
 ---
 
 # UI scroll boards and list + preview popups

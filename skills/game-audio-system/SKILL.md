@@ -1,6 +1,6 @@
 ---
 name: game-audio-system
-description: Mobile audio layer: BGM crossfade, pooled SFX, config assets, factory, event-driven sounds, volume channels, provenance. Use when the game lacks sound, adding BGM/SFX, or audio causes memory/perf issues.
+description: "Mobile audio layer: BGM crossfade, pooled SFX, config assets, factory, event-driven sounds, volume channels, provenance. Use when the game lacks sound, adding BGM/SFX, or audio causes memory/perf issues."
 ---
 
 # Game audio system

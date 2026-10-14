@@ -1,0 +1,641 @@
+{
+  "schemaVersion": 1,
+  "claudeVersion": "2.1.296",
+  "startedAt": "2026-10-14T19:13:48.214Z",
+  "durationSeconds": 69,
+  "costUsd": 0,
+  "partial": false,
+  "suite": {
+    "root": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+    "ablation": "none",
+    "threshold": 1,
+    "concurrency": 1,
+    "plugins": [
+      {
+        "name": "unity-game-pipeline",
+        "version": "0.1.0",
+        "path": "C:\\Unity\\GitProject\\Unity-AI-Instructions"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "trigger-build",
+      "dir": "evals\\trigger-build",
+      "source": "prose",
+      "promptMarkdown": "Make a release AAB from the command line and tell me the size.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `unity-batch-build` skill (Skill tool or reading its SKILL.md) before acting, and then uses unity-batch-build scripts, pinned Editor, signing from environment names only, no upload. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `unity-batch-build` skill (Skill tool or reading its SKILL.md) before acting, and then uses unity-batch-build scripts, pinned Editor, signing from environment names only, no upload. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 7,
+            "startedAt": "2026-10-14T19:13:48.454Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-kVETm5\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-collision",
+      "dir": "evals\\trigger-collision",
+      "source": "prose",
+      "promptMarkdown": "Add a coin pickup the character collects by touching it. Keep it cheap on low-end Android.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `collision-registry` skill (Skill tool or reading its SKILL.md) before acting, and then routes contacts through the collision registry, no per-object OnTriggerEnter with GetComponent. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `collision-registry` skill (Skill tool or reading its SKILL.md) before acting, and then routes contacts through the collision registry, no per-object OnTriggerEnter with GetComponent. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:13:55.122Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-WZXYrT\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-config-factory",
+      "dir": "evals\\trigger-config-factory",
+      "source": "prose",
+      "promptMarkdown": "Add a new item type with price and icon that the shop and inventory can use.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `config-and-factory-authoring` skill (Skill tool or reading its SKILL.md) before acting, and then uses config assets plus a factory registry, not hardcoded values. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `config-and-factory-authoring` skill (Skill tool or reading its SKILL.md) before acting, and then uses config assets plus a factory registry, not hardcoded values. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:00.825Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-Tcnb1Z\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-gdd-intake",
+      "dir": "evals\\trigger-gdd-intake",
+      "source": "prose",
+      "promptMarkdown": "I only have two gameplay videos and a few screenshots of a Roblox tycoon. Turn them into a GDD we can build from.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `gdd-intake` skill (Skill tool or reading its SKILL.md) before acting, and then uses the gdd-intake skill: batched questions with defaults, unseen values stay '?', no invented numbers. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `gdd-intake` skill (Skill tool or reading its SKILL.md) before acting, and then uses the gdd-intake skill: batched questions with defaults, unseen values stay '?', no invented numbers. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:06.395Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-h1KLyF\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-genre",
+      "dir": "evals\\trigger-genre",
+      "source": "prose",
+      "promptMarkdown": "The GDD says tower climb. Which systems does the clone need and which skills build them?",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `genre-playbooks` skill (Skill tool or reading its SKILL.md) before acting, and then uses genre-playbooks to list systems and skills and says the GDD stays the truth. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `genre-playbooks` skill (Skill tool or reading its SKILL.md) before acting, and then uses genre-playbooks to list systems and skills and says the GDD stays the truth. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 5,
+            "startedAt": "2026-10-14T19:14:12.275Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-Jp8t9O\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-mcp-down",
+      "dir": "evals\\trigger-mcp-down",
+      "source": "prose",
+      "promptMarkdown": "The Unity MCP server refuses connections. Verify my changes anyway.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `qa-ci-and-fallbacks` skill (Skill tool or reading its SKILL.md) before acting, and then drops to batch or static rung, states the rung, lists what is unverified. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `qa-ci-and-fallbacks` skill (Skill tool or reading its SKILL.md) before acting, and then drops to batch or static rung, states the rung, lists what is unverified. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:17.693Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-ypMewz\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-new-game",
+      "dir": "evals\\trigger-new-game",
+      "source": "prose",
+      "promptMarkdown": "Start a fresh game project called Sky Climb from our template.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `new-game-bootstrap` skill (Skill tool or reading its SKILL.md) before acting, and then asks before creating a Unity project, uses new-game-bootstrap, never edits ProjectSettings YAML by hand. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `new-game-bootstrap` skill (Skill tool or reading its SKILL.md) before acting, and then asks before creating a Unity project, uses new-game-bootstrap, never edits ProjectSettings YAML by hand. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:23.247Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-0mOy6g\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-orchestrator",
+      "dir": "evals\\trigger-orchestrator",
+      "source": "prose",
+      "promptMarkdown": "Here is my GDD folder gdd/ for a Roblox obby. Plan and run the whole clone in Unity end to end.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `game-orchestrator` skill (Skill tool or reading its SKILL.md) before acting, and then starts from the game-orchestrator procedure: lints the GDD, builds the task graph, asks only for the H1 approval. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `game-orchestrator` skill (Skill tool or reading its SKILL.md) before acting, and then starts from the game-orchestrator procedure: lints the GDD, builds the task graph, asks only for the H1 approval. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:28.885Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-7JsoHL\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-qa-loop",
+      "dir": "evals\\trigger-qa-loop",
+      "source": "prose",
+      "promptMarkdown": "Run the QA gate for this phase and keep fixing until it passes.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `qa-fix-retest-loop` skill (Skill tool or reading its SKILL.md) before acting, and then uses qa-fix-retest-loop: cheapest stages first, evidence per stage, signature caps, never edits game code in QA. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `qa-fix-retest-loop` skill (Skill tool or reading its SKILL.md) before acting, and then uses qa-fix-retest-loop: cheapest stages first, evidence per stage, signature caps, never edits game code in QA. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:34.588Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-EuvrCR\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-qa-verdicts",
+      "dir": "evals\\trigger-qa-verdicts",
+      "source": "prose",
+      "promptMarkdown": "The static scan is green, so tell me this feature is verified and done.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `rule-qa-verdicts` skill (Skill tool or reading its SKILL.md) before acting, and then refuses to say done: reports STATIC-PASS and lists compile, wiring and play as not verified. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `rule-qa-verdicts` skill (Skill tool or reading its SKILL.md) before acting, and then refuses to say done: reports STATIC-PASS and lists compile, wiring and play as not verified. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:40.396Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-rc3MiN\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-ui-builder",
+      "dir": "evals\\trigger-ui-builder",
+      "source": "prose",
+      "promptMarkdown": "Build the settings popup from this layout contract as a prefab, exactly, without me adjusting sizes.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `ui-builder` skill (Skill tool or reading its SKILL.md) before acting, and then uses ui-builder (spec, idempotent build, validator) rather than hand-placing rects. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `ui-builder` skill (Skill tool or reading its SKILL.md) before acting, and then uses ui-builder (spec, idempotent build, validator) rather than hand-placing rects. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 5,
+            "startedAt": "2026-10-14T19:14:46.070Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-3uWZ6m\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    },
+    {
+      "name": "trigger-ui-validator",
+      "dir": "evals\\trigger-ui-validator",
+      "source": "prose",
+      "promptMarkdown": "Check that every popup prefab has no overlapping buttons, nothing outside the safe area and no clipped text.",
+      "runsPerCase": 3,
+      "timeoutSeconds": 300,
+      "maxTurns": 8,
+      "graders": [
+        {
+          "name": "criteria",
+          "type": "llm",
+          "weight": 1,
+          "graderMarkdown": "The agent consults the `ui-validator` skill (Skill tool or reading its SKILL.md) before acting, and then uses ui-validator and its script, reports findings by rule id. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+          "config": {
+            "criteria": "The agent consults the `ui-validator` skill (Skill tool or reading its SKILL.md) before acting, and then uses ui-validator and its script, reports findings by rule id. It does not write files, call build tools or claim anything was verified in the Unity Editor.",
+            "focus": "last_message"
+          }
+        }
+      ],
+      "arms": {
+        "with": [
+          {
+            "score": 0,
+            "passed": false,
+            "turns": 1,
+            "costUsd": 0,
+            "judgeCostUsd": 0,
+            "durationSeconds": 6,
+            "startedAt": "2026-10-14T19:14:51.441Z",
+            "error": "exit 1: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+            "tracePath": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude-eval-0vO55d\\out\\trace.jsonl",
+            "skippedPaidGraders": false,
+            "graders": [
+              {
+                "name": "criteria",
+                "passed": false,
+                "weight": 1,
+                "explanation": "grader threw: judge call failed: You've hit your session limit · resets 5:10am (Asia/Bangkok)",
+                "withOnly": false,
+                "scored": true
+              }
+            ]
+          }
+        ]
+      },
+      "aggregates": {
+        "score": 0,
+        "passRate": 0
+      }
+    }
+  ],
+  "aggregates": {
+    "casesTotal": 12,
+    "casesPassed": 0,
+    "overallScore": 0,
+    "overallPassRate": 0
+  }
+}

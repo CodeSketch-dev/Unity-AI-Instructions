@@ -1,2 +1,17 @@
 # Pattern index (one line each; open only the one you need)
 - `skin-shop`: popup with scrollable item grid (left) + preview panel with name, stat and action button (right). Skins, characters, trails, pets, weapons, any equippable collection.
+- `settings`: popup with music/sound/vibration toggle rows, language sub-panel and Home/Language buttons.
+- `daily-login`: full page with horizontal reward cards (claimed / today / upcoming), auto-scroll to today and a scrollbar.
+- `gacha-box`: popup with a prize/odds scroll area and a big open button, plus a reveal state (name, equip, no-thanks).
+- `jackpot-slot`: slot-machine popup: reel window, free/paid spin slot, paytable side panel, lever, result overlay.
+- `rating`: small modal asking for a store rating with Good/Bad buttons and a full-screen blocker.
+- `revive-result`: revive / result popup with countdown ring, revive (ad) or free revive slot and a delayed No-thanks.
+- `mode-select-card`: mode/level selection card: thumbnail, title strip with name and status, selected frame, coming-soon overlay.
+- `side-tab-shop`: full page shop with a left tab strip (icon + label + dot) and stacked content panels toggled by a tab event.
+- `inventory`: windowed inventory popup: title, inset scroll grid of owned items, close, strong dim.
+- `iap-carousel`: borderless popup with a horizontal carousel of IAP pack cards and a centre-anchored close.
+- `vip-pass`: hero offer popup (subscription/VIP pass): left art, title, benefits list, a wide buy button, close.
+- `world-list`: list popup of worlds/zones to teleport to: title, inset vertical list with scrollbar, lock states.
+- `rebirth`: prestige popup comparing Before/After cards with a swap arrow, a progression bar and Rebirth/Cancel buttons.
+- `spin-wheel`: wheel popup: wheel with pointer, free/ad spin buttons, spin counter, close (no local reference; contract is a design).
+- `quests`: quest list popup: three rows with progress and claim, ad reroll, close (no local reference; contract is a design).

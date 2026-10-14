@@ -93,9 +93,9 @@ Treat these projects as reference implementations, not as files to copy blindly.
 ### Framework selection and portability
 
 - Inspect `Packages/manifest.json`, package source, existing `using` directives, asmdefs, and nearby code before choosing APIs or namespaces.
-- Existing projects may use CodeSketch; newer projects may use SketchEngine with equivalent concepts under different namespaces. Use the framework actually installed in the current project. Translate concepts and namespaces deliberately; never mass-replace `CodeSketch` with `SketchEngine` or invent an API based on the other framework.
+- CodeSketch and SketchEngine are one framework in two versions (v1 `com.codesketch`, v2 `com.sketchengine`, the optimized successor) with the same concepts under different namespaces and some renamed or reshaped APIs. Use the version actually installed in the current project. Translate concepts and namespaces deliberately; never mass-replace `CodeSketch` with `SketchEngine` or invent an API based on the other framework.
 - Reuse the installed implementations of `DataBlock<T>`, `DataValue<T>`, `StaticBus<TEvent>`, `IEvent`, `StateMachine<TState>`, `IStateMachine`, `ScriptableObjectSingleton<T>`, `SerializedScriptableObjectSingleton<T>`, `MonoCachedFast`, `MonoCachedHub<T>`, pooling, audio, popup, settings, and async utilities when present. Do not create parallel replacements.
-- Use UniTask when it is already installed and matches the surrounding code. Use the project's existing tween library; prefer PrimeTween when both PrimeTween and DOTween are available, unless the touched subsystem already relies on DOTween or the task requires it.
+- Use UniTask when it is already installed and matches the surrounding code. Use the project's existing tween library; prefer PrimeTween for new code when both PrimeTween and DOTween are available (the reference projects ship both side by side), unless the touched subsystem already relies on DOTween or the task requires it.
 - Vertx packages are optional project dependencies. Use their debugging/utility APIs only when installed, and keep editor-only visualization or diagnostics out of release hot paths where appropriate.
 
 ### Asset and folder layout
@@ -210,7 +210,7 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - Keep callback bodies tiny and leave unused callbacks empty. Create a separate interface per actor family (for example `IEnemyCollidable`) instead of type-casting inside callbacks.
 - If a callback needs captured context in CodeSketch, use the struct-based `OptCollisionLookup.ForEach<T, TAction>(collider, ref action)` overload, and cache any `Action<T>` delegate once instead of creating a lambda per event. In SketchEngine, query with `OptCollisionLookup.TryFindFirst<T>` / `TryGetAll<T>`.
 - A world object with several colliders registers them all. Do not assume one collider per owner. Do not add a second registration path beside the framework one.
-- Reset static collections used by zones/triggers with `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` so domain-reload-off Editor sessions and scene reloads stay correct.
+- Reset static collections used by zones/triggers with `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` so domain-reload-off Editor sessions and scene reloads stay correct. The framework's own collision maps and some older zone scripts do not do this yet; do not copy that gap, and reset them where you touch them.
 
 **Physics queries and settings**
 
@@ -230,9 +230,11 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - Use event-driven distance culling with `CullingGroup`: set bounding spheres and distance bands once, subscribe to `onStateChanged`, and toggle `Renderer.enabled`/`TMP_Text.enabled` there. Do not loop over objects every frame measuring distance. Use this for sprites, world-space text and small props, and exclude indicators that must always be visible (for example countdown text). Dispose the group and unsubscribe in `OnDestroy`.
 - Use per-zone camera far-clip trigger zones (`CameraFarDistanceZone` style) so enclosed areas render less. When zones overlap, choose the zone the player is deepest inside.
 - Combine static meshes by material (`MeshSceneCombiner` style): bake renderer groups in the Editor, call `CombineMeshes` at load or under a per-frame millisecond budget, exclude dynamic/animated objects, and disable `LODGroup` after combining. Do not combine anything that moves, fades, toggles or is destroyed at runtime.
+- Goal: one shared material for the whole world (Roblox-style vertex-color look), with per-family materials (map/decor, collectibles, tools) as the fallback when one material cannot render correctly. Character skins may keep their own shader (OmniShade). Custom shaders must be SRP Batcher compatible.
 - Prefer SRP Batcher-compatible shaders and shared materials, and use GPU Instancing for large identical populations. `MaterialPropertyBlock` avoids material duplication but takes that renderer out of the SRP Batcher, so use it for a few per-instance values and measure before applying it to hundreds of renderers.
 - Keep transparent surfaces, full-screen effects and particle counts small to limit overdraw. Prefer atlased textures and compressed formats (ASTC) with mipmaps on 3D textures.
-- URP baseline for low-end: SRP Batcher on, single shadow cascade, small shadow map (512–1024), short shadow distance, no soft shadows, minimal additional lights, depth/opaque texture only when a feature needs them, MSAA off or 2x, HDR off unless required. The reference projects ship a Mobile URP asset and a PC URP asset with per-tier Quality levels; reuse the same split and never enable PC-grade settings on the mobile tier.
+- URP baseline for low-end: SRP Batcher on, single shadow cascade, small shadow map (512–1024), short shadow distance, no soft shadows, minimal additional lights, depth/opaque texture only when a feature needs them, MSAA off or 2x, HDR off unless required. The reference projects ship a Mobile URP asset (and a PC one) but tier at runtime through a device policy (GPU + RAM) rather than many Quality levels; reuse that split and never enable PC-grade settings on the mobile tier. Their Mobile asset is looser than this baseline (HDR on, soft shadows, longer shadow distance), so treat this baseline as the target and the reference as an upper bound.
+- Cap the frame rate at 60 (vSync off, `Application.targetFrameRate = 60`) unless the project says otherwise; a higher cap costs battery and heat on low-end Android.
 
 **UI**
 
@@ -241,7 +243,7 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 
 **Memory and instantiation**
 
-- Pool anything spawned repeatedly (VFX, projectiles, pickups, floating text) with the project's pool (`PoolManager`/LeanPool). Do not `Instantiate`/`Destroy` in gameplay loops, and return pooled objects on disable.
+- Pool anything spawned repeatedly (VFX, projectiles, pickups, floating text) with the project's pool (the framework's `PoolPrefabGlobal` with `PoolPrefabConfig` assets and `Pool_Manager`; use LeanPool only if a project already depends on it). Do not `Instantiate`/`Destroy` in gameplay loops, and return pooled objects on disable.
 - Load heavy content through the project's existing loading flow (Addressables or loader screen), and pay one-time costs such as mesh combining behind a loading screen.
 
 **Verification**

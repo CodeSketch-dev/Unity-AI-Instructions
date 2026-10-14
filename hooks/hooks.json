@@ -1,0 +1,50 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session_start.py\"", "timeout": 10 }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/protect_files.py\"", "timeout": 5 }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/block_git_danger.py\"", "timeout": 5 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/mark_dirty.py\"", "timeout": 5 },
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/skill_lint_hook.py\"", "timeout": 30 },
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/qa_post_edit.py\"", "timeout": 15 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/stop_gate.py\"", "timeout": 10 }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          { "type": "command", "command": "py -I \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/precompact_note.py\"", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

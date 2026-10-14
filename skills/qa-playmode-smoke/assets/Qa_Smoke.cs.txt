@@ -1,0 +1,89 @@
+// TEMPLATE (uncompiled). PlayMode smoke: boot, enter each mode through its button, play N seconds, fail on exceptions.
+// Needs a PlayMode test asmdef. Reads qa/smoke.json:
+//   { "bootScene": "Boot", "ready": "Home", "allow": ["regex of known harmless log lines"],
+//     "modes": [ { "id": "obby", "button": "Canvas/Root/ViewContainer/Home/PlayObby", "scene": "Game_Obby", "playSeconds": 20 } ] }
+// Validity: run only at timeScale 1 from a known save (fresh or fixture). The project provides its own save reset.
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+using UnityEngine.UI;
+
+namespace Game.Tests
+{
+    [System.Serializable] public class SmokeMode { public string id, button, scene; public float playSeconds = 20f; }
+    [System.Serializable] public class SmokeConfig { public string bootScene, ready; public string[] allow; public SmokeMode[] modes; }
+
+    public class Qa_Smoke
+    {
+        readonly List<string> _errors = new List<string>();
+        Regex[] _allow;
+
+        void OnLog(string msg, string stack, LogType type)
+        {
+            if (type != LogType.Exception && type != LogType.Error) return;
+            foreach (var r in _allow) if (r.IsMatch(msg)) return;
+            _errors.Add(type + ": " + msg);
+        }
+
+        static Button FindButton(string path)
+        {
+            var go = GameObject.Find(path);
+            return go != null ? go.GetComponent<Button>() : null;
+        }
+
+        [UnityTest]
+        public IEnumerator Every_mode_runs_without_errors()
+        {
+            Assert.AreEqual(1f, Time.timeScale, "smoke verdicts need timeScale 1");
+            var cfg = JsonUtility.FromJson<SmokeConfig>(File.ReadAllText("qa/smoke.json"));
+            _allow = System.Array.ConvertAll(cfg.allow ?? new string[0], a => new Regex(a));
+            Application.logMessageReceived += OnLog;
+            try
+            {
+                yield return SceneManager.LoadSceneAsync(cfg.bootScene);
+                var t = 0f;
+                while (SceneManager.GetActiveScene().name != cfg.ready && t < 30f) { t += Time.unscaledDeltaTime; yield return null; }
+                Assert.AreEqual(cfg.ready, SceneManager.GetActiveScene().name, "game never reached the ready scene");
+
+                foreach (var mode in cfg.modes)
+                {
+                    var button = FindButton(mode.button);
+                    Assert.IsNotNull(button, $"mode {mode.id}: button {mode.button} not found");
+                    button.onClick.Invoke();                       // the same path a tap takes
+                    t = 0f;
+                    while (!string.IsNullOrEmpty(mode.scene) && SceneManager.GetActiveScene().name != mode.scene && t < 30f) { t += Time.unscaledDeltaTime; yield return null; }
+                    Assert.IsTrue(string.IsNullOrEmpty(mode.scene) || SceneManager.GetActiveScene().name == mode.scene, $"mode {mode.id}: scene {mode.scene} never loaded");
+                    var bot = new GameObject("Qa_InputBot").AddComponent<Qa_InputBot>();
+                    yield return new WaitForSeconds(mode.playSeconds);
+                    Object.Destroy(bot.gameObject);
+                    yield return SceneManager.LoadSceneAsync(cfg.ready);   // back home; the project may use its own back handler
+                    Assert.IsEmpty(_errors, $"mode {mode.id} logged errors:\n" + string.Join("\n", _errors));
+                }
+            }
+            finally { Application.logMessageReceived -= OnLog; }
+        }
+    }
+
+    // Minimal bot: finds the nearest active IQaGoal and interacts when close. Without goals it proves only "no exceptions".
+    public sealed class Qa_InputBot : MonoBehaviour
+    {
+        void Update()
+        {
+            IQaGoal best = null;
+            var bestD = float.MaxValue;
+            foreach (var mb in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))   // smoke code only, never gameplay
+            {
+                if (!(mb is IQaGoal g) || !g.IsActive) continue;
+                var d = (g.QaPosition - transform.position).sqrMagnitude;
+                if (d < bestD) { best = g; bestD = d; }
+            }
+            if (best != null && bestD < 4f) best.QaInteract();
+            // Movement is project specific: drive the game's own input abstraction toward best.QaPosition here.
+        }
+    }
+}

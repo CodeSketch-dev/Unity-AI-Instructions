@@ -1,0 +1,5 @@
+id,name,kind,currency,price,unlock,evidence,order
+skin_01,Classic,skin,coins,0,free,CAP-010@00:05,1
+skin_02,Ninja,skin,coins,60,free,CAP-010@00:05,2
+skin_03,Knight,skin,coins,400,free,CAP-010@00:05,3
+skin_09,Golden,skin,gems,150,iap_or_ad,CAP-011@00:05,9

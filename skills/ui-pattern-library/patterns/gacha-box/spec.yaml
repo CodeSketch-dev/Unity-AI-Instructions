@@ -1,0 +1,16 @@
+id: PAT-gacha-box
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/gacha-box
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, reveal]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 0], size: [1154, 769], container: true}
+  - {n: 2, name: Title, anchor: center, pos: [0, 330], size: [500, 80]}
+  - {n: 3, name: Btn_Close, anchor: center, pos: [507, 314], size: [97, 93], behaviour: close}
+  - {n: 4, name: Scroll_Bg, anchor: center, pos: [0, 20], size: [940, 454]}
+  - {n: 5, name: Btn_Gacha, anchor: center, pos: [0, -300], size: [347, 116], behaviour: open_box}
+  - {n: 6, name: Reveal_Overlay, anchor: stretch, rect: {top: 0, left: 0, right: 0, bottom: 0}, container: true, state: reveal}
+  - {n: 7, name: Btn_Equip, anchor: center, pos: [-180, -250], size: [300, 100], state: reveal, behaviour: equip}
+  - {n: 8, name: Btn_NoThanks, anchor: center, pos: [180, -250], size: [300, 100], state: reveal, behaviour: close_reveal}

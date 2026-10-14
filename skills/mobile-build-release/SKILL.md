@@ -1,6 +1,6 @@
 ---
 name: mobile-build-release
-description: Build and release checks for Android (APK/AAB) and iOS: versioning, signing safety, size, permissions, store checklist. Use when building, testing on device, uploading to stores, or a build fails/is too large.
+description: "Build and release checks for Android (APK/AAB) and iOS: versioning, signing safety, size, permissions, store checklist. Use when building, testing on device, uploading to stores, or a build fails/is too large."
 ---
 
 # Mobile build and release
@@ -18,13 +18,13 @@ Builds and uploads are outward-facing and hard to undo. Do not start a store sub
 
 ## Android
 - Debug: APK for device tests. Release: AAB for Google Play.
-- Signing: keystore and passwords are secrets. Never put them in the repo, logs or chat; configure through local, ignored settings or CI secrets. If missing, ask the human to provide the keystore locally.
+- Signing: keystore and passwords are secrets. Never put them in the repo, logs or chat; configure them through the local environment or ignored local settings. If missing, ask the human to provide the keystore locally.
 - Check target API against the current Google Play requirement and any 64-bit/16 KB page-size requirements for the engine/plugins version (verify the latest policy rather than relying on memory).
 - Shrinking: R8/minify with keep rules for the SDKs used.
 - Size: report AAB size; investigate largest assets via the build report; compress textures (ASTC), audio (Vorbis/AAC, streaming for music), strip unused shaders and mesh data.
 
 ## iOS
-- Build to Xcode project; signing via the team's provisioning, set in Xcode or CI; do not store certificates in the repo.
+- Build to Xcode project; signing via the team's provisioning, set in Xcode or local batch runner; do not store certificates in the repo.
 - Required usage strings and privacy manifest entries for the SDKs used; ATT prompt text if tracking is used.
 - Metal only; check frame rate caps and safe area on notch devices.
 
@@ -33,6 +33,9 @@ Install on at least one low-end and one modern device (human), run `unity-qa-pla
 
 ## Store readiness (hand to the human)
 Icons, screenshots, short/long description (original naming per `clone-ip-safety`), content rating, privacy policy URL, data safety form, target audience/ads declarations (`monetization-integration`), testing track first.
+
+## Automation and checklists
+Local headless builds and size gates: `unity-batch-build`. Full store checklist with the scriptable versus human split, Play App Signing, tracks and privacy points: `references/play-checklist.md`.
 
 ## Report
 Build output path, size, version numbers, settings changed, what was verified vs not, and the exact manual steps left for the human.

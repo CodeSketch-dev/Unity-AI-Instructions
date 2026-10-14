@@ -1,0 +1,12 @@
+id: PAT-inventory
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/inventory
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, empty, item_selected]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 50], size: [1154, 800], container: true}
+  - {n: 2, name: Title, anchor: center, pos: [0, 412], size: [400, 75]}
+  - {n: 3, name: Btn_Close, anchor: center, pos: [510, 380], size: [97, 93], behaviour: close}
+  - {n: 4, name: Scroll_Items, anchor: center, pos: [0, -12], size: [922, 560]}

@@ -1,6 +1,6 @@
 ---
 name: unity-code-templates
-description: Tested framework-free C# snippets: big-number formatter, duration formatter, pool, CullingGroup culler, FPS overlay, press feedback. Use when a task needs one and the project has no equivalent.
+description: "Tested framework-free C# snippets: big-number formatter, duration formatter, pool, CullingGroup culler, FPS overlay, press feedback. Use when a task needs one and the project has no equivalent."
 ---
 
 # Unity code templates

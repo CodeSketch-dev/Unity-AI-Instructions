@@ -1,0 +1,21 @@
+id: PAT-quests
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/quests
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, empty, all_claimed]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 0], size: [1100, 700], container: true}
+  - {n: 2, name: Title, anchor: center, pos: [0, 290], size: [500, 80]}
+  - {n: 3, name: Btn_Close, anchor: center, pos: [480, 300], size: [100, 100], behaviour: close}
+  - {n: 4, name: Row_1, anchor: center, pos: [0, 110], size: [960, 120], container: true}
+  - {n: 5, name: Progress_1, anchor: center, pos: [-170, 110], size: [560, 40]}
+  - {n: 6, name: Claim_1, anchor: center, pos: [360, 110], size: [200, 80], behaviour: claim}
+  - {n: 7, name: Row_2, anchor: center, pos: [0, -20], size: [960, 120], container: true}
+  - {n: 8, name: Progress_2, anchor: center, pos: [-170, -20], size: [560, 40]}
+  - {n: 9, name: Claim_2, anchor: center, pos: [360, -20], size: [200, 80], behaviour: claim}
+  - {n: 10, name: Row_3, anchor: center, pos: [0, -150], size: [960, 120], container: true}
+  - {n: 11, name: Progress_3, anchor: center, pos: [-170, -150], size: [560, 40]}
+  - {n: 12, name: Claim_3, anchor: center, pos: [360, -150], size: [200, 80], behaviour: claim}
+  - {n: 13, name: Btn_Reroll, anchor: center, pos: [0, -270], size: [300, 80], behaviour: reroll_ad}

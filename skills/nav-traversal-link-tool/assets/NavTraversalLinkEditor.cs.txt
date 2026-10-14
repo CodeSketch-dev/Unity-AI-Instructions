@@ -1,0 +1,64 @@
+// UNCOMPILED TEMPLATE (design: knife-tower/monkey-escape NavTraversalLinkEditor, report 04 sec 5.4).
+// Copy to Assets/_Game/Scripts/Editor/NavTraversalLinkEditor.cs, set GroundMask to the project's layers, compile via Unity MCP.
+// Requires the NavMeshComponents package (NavMeshLink). Idempotent: the link name encodes the two snapped positions.
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
+using Unity.AI.Navigation;
+
+namespace Game.Editor
+{
+    public class NavTraversalLinkEditor : EditorWindow
+    {
+        [SerializeField] LayerMask _groundMask = ~0;
+        [SerializeField] float _width = 1f, _snapRayHeight = 5f;
+        [SerializeField] bool _bidirectional = true;
+        Vector3? _first;
+
+        [MenuItem("Tools/Navigation/Traversal Link Authoring")]
+        static void Open() => GetWindow<NavTraversalLinkEditor>("Nav Links");
+
+        void OnEnable() => SceneView.duringSceneGui += OnScene;
+        void OnDisable() => SceneView.duringSceneGui -= OnScene;
+
+        void OnGUI()
+        {
+            _groundMask = EditorGUILayout.MaskField("Ground mask", _groundMask, UnityEditorInternal.InternalEditorUtility.layers);
+            _width = EditorGUILayout.FloatField("Width", _width);
+            _bidirectional = EditorGUILayout.Toggle("Bidirectional", _bidirectional);
+            EditorGUILayout.HelpBox(_first.HasValue ? "Click the END point in the Scene view." : "Click the START point in the Scene view.", MessageType.Info);
+            if (GUILayout.Button("Cancel")) _first = null;
+        }
+
+        void OnScene(SceneView view)
+        {
+            var e = Event.current;
+            if (e.type != EventType.MouseDown || e.button != 0 || e.alt) return;
+            var ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+            if (!Physics.Raycast(ray, out var hit, 1000f, _groundMask, QueryTriggerInteraction.Ignore)) return;
+            e.Use();
+            var p = hit.point;
+            if (!_first.HasValue) { _first = p; return; }
+            Create(_first.Value, p);
+            _first = null;
+        }
+
+        void Create(Vector3 a, Vector3 b)
+        {
+            string name = $"NavLink_{Mathf.RoundToInt(a.x)}_{Mathf.RoundToInt(a.z)}__{Mathf.RoundToInt(b.x)}_{Mathf.RoundToInt(b.z)}";
+            var container = GameObject.Find("NavLinks") ?? new GameObject("NavLinks");
+            var existing = container.transform.Find(name);
+            var go = existing != null ? existing.gameObject : new GameObject(name);
+            if (existing == null) { Undo.RegisterCreatedObjectUndo(go, "Create nav link"); go.transform.SetParent(container.transform); }
+            go.transform.position = a;
+            var link = go.GetComponent<NavMeshLink>() ?? Undo.AddComponent<NavMeshLink>(go);
+            link.startPoint = Vector3.zero;
+            link.endPoint = go.transform.InverseTransformPoint(b);
+            link.width = _width;
+            link.bidirectional = _bidirectional;
+            EditorUtility.SetDirty(go);
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(go.scene);
+        }
+    }
+}
+#endif

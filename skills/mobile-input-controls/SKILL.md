@@ -1,6 +1,6 @@
 ---
 name: mobile-input-controls
-description: Touch input for Unity mobile: floating joystick, camera drag, action buttons, multi-touch separation, UI-vs-world blocking. Use when adding/fixing movement or camera controls or porting PC/Roblox controls.
+description: "Touch input for Unity mobile: floating joystick, camera drag, action buttons, multi-touch separation, UI-vs-world blocking. Use when adding/fixing movement or camera controls or porting PC/Roblox controls."
 ---
 
 # Mobile input controls
@@ -28,3 +28,5 @@ On a phone the player has two thumbs and no mouse. Everything depends on assigni
 
 ## Verify
 Test with two simultaneous touches (joystick + camera drag + button) on a device or the Device Simulator; confirm no stuck movement after a popup opens, after an interruption, and after scene reload. Layout checks belong to `mobile-hud-layout`.
+
+How knife-tower/monkey-escape wire joystick, look drag, edge-triggered jump and pinch: `references/kt-me-input.md`. Camera values: `freelook-third-person-camera`.

@@ -1,0 +1,16 @@
+id: PAT-side-tab-shop
+type: ui_screen
+kind: popup_fullscreen
+fidelity: faithful
+pattern: ui-pattern-library/side-tab-shop
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default]
+elements:
+  - {n: 1, name: Title_Bar, anchor: stretch-top, rect: {top: 0, left: 0, right: 0, bottom: 905}, container: true}
+  - {n: 2, name: Btn_Back, anchor: top-left, pos: [98, -87], size: [103, 107], behaviour: close}
+  - {n: 3, name: Text_Title, anchor: top-center, pos: [0, -87], size: [300, 60], text: {key: ui.shop.title, auto_size: true}}
+  - {n: 4, name: Tab_Strip, anchor: top-left, pos: [147.5, -565], size: [285, 740], container: true}
+  - {n: 5, name: Tab_1, anchor: top-left, pos: [147.5, -250], size: [222, 82], behaviour: select_tab}
+  - {n: 6, name: Tab_2, anchor: top-left, pos: [147.5, -350], size: [222, 82], behaviour: select_tab}
+  - {n: 7, name: Tab_3, anchor: top-left, pos: [147.5, -450], size: [222, 82], behaviour: select_tab}
+  - {n: 8, name: Content, anchor: top-left, pos: [1095, -565], size: [1570, 740]}

@@ -1,6 +1,6 @@
 ---
 name: unity-project-bootstrap
-description: Set up a new Unity 6 mobile project: packages, folders, asmdefs, URP tiers, platform settings, scene flow, git ignore/LFS, first compile check. Use when starting a game or "init the project".
+description: "Set up a new Unity 6 mobile project: packages, folders, asmdefs, URP tiers, platform settings, scene flow, git ignore/LFS, first compile check. Use when starting a game or \"init the project\"."
 ---
 
 # Unity project bootstrap
@@ -21,6 +21,9 @@ Do the boring foundations once and correctly: everything later (perf, builds, MC
 8. **Git**: Unity `.gitignore`, `.gitattributes` with LFS for large binaries (fbx, psd, wav, mp4), meta files visible, keystores and keys excluded.
 9. **Logging and debug**: a thin logging wrapper, a debug overlay (FPS, memory) for devices, cheat menu behind a define for fast testing.
 10. **Verify**: refresh/compile, zero Console errors, open `Boot` and press Play, build a development APK/IPA only when the user asks.
+
+## Automation
+For a new game use `new-game-bootstrap` (scripted token replace, settings applier, repo preflight) instead of repeating these steps by hand.
 
 ## Output
 `docs/project-setup.md`: decisions taken (packages, tiers, settings) so the next agent does not re-derive them.

@@ -1,6 +1,6 @@
 ---
 name: reference-port
-description: Port or match a feature from a reference project/screenshot faithfully: inspect first, compare side by side, adapt not blind-copy. Use on "like the reference", "match 100%", or "ours looks different".
+description: "Port or match a feature from a reference project/screenshot faithfully: inspect first, compare side by side, adapt not blind-copy. Use on \"like the reference\", \"match 100%\", or \"ours looks different\"."
 ---
 
 # Reference port

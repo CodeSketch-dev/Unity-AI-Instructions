@@ -1,0 +1,13 @@
+id: PAT-world-list
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/world-list
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, locked_entry]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 22], size: [1146, 754], container: true}
+  - {n: 2, name: Title, anchor: center, pos: [0, 331], size: [700, 90]}
+  - {n: 3, name: Btn_Close, anchor: center, pos: [510, 365], size: [97, 93], behaviour: close}
+  - {n: 4, name: Scroll_Worlds, anchor: center, pos: [0, -30], size: [988, 487]}
+  - {n: 5, name: Scrollbar, anchor: center, pos: [535, -30], size: [15, 440]}

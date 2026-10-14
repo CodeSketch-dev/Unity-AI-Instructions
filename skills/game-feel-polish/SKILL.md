@@ -1,6 +1,6 @@
 ---
 name: game-feel-polish
-description: Juice for mobile games: reward fly-to-HUD, floating numbers, count-up, shake, hit-stop, haptics, rarity VFX, UI tweens. Use after the core loop works or when the game feels flat or dead.
+description: "Juice for mobile games: reward fly-to-HUD, floating numbers, count-up, shake, hit-stop, haptics, rarity VFX, UI tweens. Use after the core loop works or when the game feels flat or dead."
 ---
 
 # Game feel polish
@@ -35,3 +35,5 @@ Feel comes from immediate, proportional feedback to every meaningful event. Do i
 
 ## Verify
 Record or capture a short Play Mode sequence of the event and compare it with the reference clip at the same timing; confirm no leaked objects after 100 repeats and no Console errors.
+
+Combat numbers (shake, punches, damage text, hit-stop proposal): `references/combat-feel.md`.

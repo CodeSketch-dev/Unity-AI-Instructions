@@ -1,0 +1,63 @@
+// TEMPLATE (uncompiled). Samples structural counters for a window and writes JSON for qa_perf_compare.py.
+// Editor and development builds only. Numbers measured in the Editor are labelled "editor", never "device".
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using Unity.Profiling;
+using UnityEngine;
+
+namespace Game
+{
+    public sealed class Qa_PerfProbe : MonoBehaviour
+    {
+        public string Scenario = "scenario";
+        public float WindowSeconds = 20f;
+        public int WarmupFrames = 60;
+        public string OutputPath = "docs/qa/artifacts/perf-capture.json";
+
+        ProfilerRecorder _batches, _setPass, _gc, _memory;
+        readonly List<float> _frames = new List<float>(2048);
+        float _elapsed;
+        int _frame;
+        long _gcTotal, _batchesMax, _setPassMax;
+
+        void OnEnable()
+        {
+            _batches = ProfilerRecorder.StartNew(ProfilerCategory.Render, "Batches Count");
+            _setPass = ProfilerRecorder.StartNew(ProfilerCategory.Render, "SetPass Calls Count");
+            _gc = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Allocated In Frame");
+            _memory = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "Total Used Memory");
+        }
+
+        void OnDisable() { _batches.Dispose(); _setPass.Dispose(); _gc.Dispose(); _memory.Dispose(); }
+
+        void Update()
+        {
+            if (Time.timeScale != 1f) { enabled = false; Debug.LogError("Qa_PerfProbe: timeScale must be 1"); return; }
+            if (++_frame <= WarmupFrames) return;
+            _elapsed += Time.unscaledDeltaTime;
+            _frames.Add(Time.unscaledDeltaTime * 1000f);
+            _gcTotal += _gc.LastValue;
+            if (_batches.LastValue > _batchesMax) _batchesMax = _batches.LastValue;
+            if (_setPass.LastValue > _setPassMax) _setPassMax = _setPass.LastValue;
+            if (_elapsed >= WindowSeconds) Write();
+        }
+
+        void Write()
+        {
+            _frames.Sort();
+            var p95 = _frames[Mathf.Min(_frames.Count - 1, (int)(_frames.Count * 0.95f))];
+            var inv = CultureInfo.InvariantCulture;
+            var json = "{\"measured_on\":\"" + (Application.isEditor ? "editor" : "build") + "\",\"scenarios\":{\"" + Scenario + "\":{"
+                + "\"batches\":" + _batchesMax + ",\"setpass\":" + _setPassMax
+                + ",\"gc_bytes_per_frame\":" + (_gcTotal / Mathf.Max(1, _frames.Count))
+                + ",\"frame_p95_ms\":" + p95.ToString("F2", inv)
+                + ",\"memory_mb\":" + (_memory.LastValue / (1024 * 1024))
+                + "}}}";
+            Directory.CreateDirectory(Path.GetDirectoryName(OutputPath));
+            File.WriteAllText(OutputPath, json);
+            Debug.Log("Qa_PerfProbe wrote " + OutputPath);
+            enabled = false;
+        }
+    }
+}

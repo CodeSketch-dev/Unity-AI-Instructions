@@ -1,0 +1,89 @@
+// TEMPLATE (uncompiled). EditMode test for prefab and scene wiring. Same placement as Qa_Config_Tests.
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using NUnit.Framework;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace Game.Tests
+{
+    public class Qa_Wiring_Tests
+    {
+        const string PREFAB_ROOT = "Assets/_Game/Prefabs";
+        const string SCENE_ROOT = "Assets/_Game/Scenes";
+
+        static FieldInfo FindField(Type t, string name)
+        {
+            for (; t != null; t = t.BaseType)
+            {
+                var f = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                if (f != null) return f;
+            }
+            return null;
+        }
+
+        static void CheckObject(GameObject go, string where, List<string> bad)
+        {
+            if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(go) > 0)
+                bad.Add($"{where}/{go.name}: missing script");
+            foreach (var c in go.GetComponents<Component>())
+            {
+                if (c == null) continue;
+                var so = new SerializedObject(c);
+                var it = so.GetIterator();
+                for (bool enter = true; it.NextVisible(enter); enter = false)
+                {
+                    if (it.propertyType != SerializedPropertyType.ObjectReference || it.name.StartsWith("m_")) continue;
+                    if (it.objectReferenceValue != null) continue;
+                    if (it.objectReferenceInstanceIDValue != 0) { bad.Add($"{where}/{go.name}/{c.GetType().Name}.{it.name}: reference to a missing object"); continue; }
+                    var f = FindField(c.GetType(), it.name);
+                    if (f != null && f.GetCustomAttribute<QaOptionalAttribute>() == null)
+                        bad.Add($"{where}/{go.name}/{c.GetType().Name}.{it.name}: not assigned");
+                }
+            }
+        }
+
+        [Test]
+        public void Prefabs_have_no_missing_scripts_or_unassigned_fields()
+        {
+            var bad = new List<string>();
+            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", new[] { PREFAB_ROOT }))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var root = PrefabUtility.LoadPrefabContents(path);
+                try { foreach (var t in root.GetComponentsInChildren<Transform>(true)) CheckObject(t.gameObject, path, bad); }
+                finally { PrefabUtility.UnloadPrefabContents(root); }
+            }
+            Assert.IsEmpty(bad, string.Join("\n", bad));
+        }
+
+        [Test]
+        public void Scenes_have_event_system_single_listener_and_no_missing_scripts()
+        {
+            var bad = new List<string>();
+            foreach (var guid in AssetDatabase.FindAssets("t:Scene", new[] { SCENE_ROOT }))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+                try
+                {
+                    int listeners = 0, canvases = 0, eventSystems = 0;
+                    foreach (var root in scene.GetRootGameObjects())
+                    {
+                        foreach (var t in root.GetComponentsInChildren<Transform>(true)) CheckObject(t.gameObject, path, bad);
+                        listeners += root.GetComponentsInChildren<AudioListener>(true).Length;
+                        canvases += root.GetComponentsInChildren<Canvas>(true).Length;
+                        eventSystems += root.GetComponentsInChildren<EventSystem>(true).Length;
+                    }
+                    if (canvases > 0 && eventSystems == 0) bad.Add($"{path}: UI present but no EventSystem (fine only if another scene provides it)");
+                    if (listeners > 1) bad.Add($"{path}: {listeners} AudioListeners");
+                }
+                finally { EditorSceneManager.CloseScene(scene, true); }
+            }
+            Assert.IsEmpty(bad, string.Join("\n", bad));
+        }
+    }
+}

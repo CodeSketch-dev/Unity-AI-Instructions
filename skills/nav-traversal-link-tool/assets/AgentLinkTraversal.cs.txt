@@ -1,0 +1,34 @@
+// UNCOMPILED TEMPLATE (design: Character_AgentLinkTraversal, report 04 sec 5.4). The agent backend API differs by package
+// (NavMeshAgent offMeshLink data, ProjectDawn Agents Navigation LinkTraversal=Custom): adapt Begin/Complete to the installed one.
+// Rules: duration = distance / speed; no arc up to 5 m; else apex = v^2/(2g) + 0.01 * distance; ease in-out; clear AI input meanwhile.
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+
+namespace Game
+{
+    public static class AgentLinkTraversal
+    {
+        public const float NoArcDistance = 5f, ArcDistanceBonus = 0.01f;
+
+        public static float Apex(float distance, float jumpSpeed, float gravity)
+            => distance <= NoArcDistance ? 0f : jumpSpeed * jumpSpeed / (2f * gravity) + distance * ArcDistanceBonus;
+
+        // Moves 'body' from start to end along the arc; the caller blocks input/jumps while this runs and resumes pathing after.
+        public static async UniTask Traverse(Transform body, Vector3 start, Vector3 end, float speed, float jumpSpeed, float gravity, CancellationToken ct)
+        {
+            float distance = Vector3.Distance(start, end);
+            float duration = Mathf.Max(0.01f, distance / speed);
+            float apex = Apex(distance, jumpSpeed, gravity);
+            for (float t = 0f; t < duration; t += Time.deltaTime)
+            {
+                float k = Mathf.SmoothStep(0f, 1f, t / duration);
+                var p = Vector3.Lerp(start, end, k);
+                p.y += 4f * apex * k * (1f - k);                 // parabola with peak 'apex' at k = 0.5
+                body.position = p;
+                await UniTask.Yield(PlayerLoopTiming.Update, ct);
+            }
+            body.position = end;
+        }
+    }
+}

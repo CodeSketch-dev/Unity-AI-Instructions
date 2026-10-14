@@ -1,0 +1,16 @@
+id: PAT-spin-wheel
+type: ui_screen
+kind: popup_modal
+fidelity: faithful
+pattern: ui-pattern-library/spin-wheel
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [idle, spinning, result]
+elements:
+  - {n: 1, name: Board, anchor: center, pos: [0, 0], size: [1100, 700], container: true}
+  - {n: 2, name: Title, anchor: center, pos: [0, 300], size: [500, 60]}
+  - {n: 3, name: Btn_Close, anchor: center, pos: [480, 300], size: [100, 100], behaviour: close}
+  - {n: 4, name: Wheel, anchor: center, pos: [-200, -60], size: [480, 480]}
+  - {n: 5, name: Pointer, anchor: center, pos: [-200, 222], size: [70, 70]}
+  - {n: 6, name: Text_Spins, anchor: center, pos: [250, 150], size: [360, 60]}
+  - {n: 7, name: Btn_SpinFree, anchor: center, pos: [250, 40], size: [360, 110], behaviour: spin}
+  - {n: 8, name: Btn_SpinAd, anchor: center, pos: [250, -90], size: [360, 110], behaviour: spin_ad}

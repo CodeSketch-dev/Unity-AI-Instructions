@@ -70,9 +70,15 @@ if exist "%REPO%\skills" (
     call :install_skills "%CODEX_HOME%\skills"
 )
 
+rem ---- 5. pipeline agents, commands and hook scripts -> Claude only ------------------------
+if exist "%REPO%\agents" call :install_tree "%REPO%\agents" "%CLAUDE_HOME%\agents" "agents"
+if exist "%REPO%\commands" call :install_tree "%REPO%\commands" "%CLAUDE_HOME%\commands" "commands"
+if exist "%REPO%\hooks" call :install_tree "%REPO%\hooks" "%CLAUDE_HOME%\pipeline-hooks\hooks" "hook scripts"
+
 echo.
 if "%RESULT%"=="0" (
-    echo Codex and Claude sync complete ^(instructions + skills^).
+    echo Codex and Claude sync complete ^(instructions + skills + pipeline agents/commands/hook scripts^).
+    echo Hooks are NOT enabled by sync: run  py -I tools\install_hooks.py  and merge the snippet into settings.json.
     echo Open a new session to reload.
 ) else (
     echo Sync finished with ERRORS above; review them.
@@ -111,6 +117,18 @@ exit /b 0
 set "SK_DEST=%~1"
 if not exist "%SK_DEST%" mkdir "%SK_DEST%"
 for /d %%S in ("%REPO%\skills\*") do call :install_one_skill "%%~fS" "%SK_DEST%\%%~nxS" "%%~nxS" "%SK_DEST%"
+exit /b 0
+
+:install_tree
+robocopy "%~1" "%~2" /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP >nul
+set "ROBO=%errorlevel%"
+set /a "ROBO_COPIED=ROBO & 1"
+if %ROBO% GEQ 8 (
+    echo ERROR: cannot copy %~3 to %~2
+    set "RESULT=1"
+    exit /b 0
+)
+if %ROBO_COPIED% NEQ 0 echo Updated %~3 -^> %~2
 exit /b 0
 
 :install_one_skill

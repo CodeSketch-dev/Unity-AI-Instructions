@@ -1,0 +1,15 @@
+id: PAT-mode-select-card
+type: ui_screen
+kind: hud
+fidelity: faithful
+pattern: ui-pattern-library/mode-select-card
+reference_canvas: {w: 1920, h: 1080, match: 0.5}
+states: [default, selected, locked, coming_soon]
+elements:
+  - {n: 1, name: Card, anchor: center, pos: [0, 0], size: [488, 357], container: true, behaviour: select}
+  - {n: 2, name: Thumbnail, anchor: center, pos: [0, -16], size: [429, 261]}
+  - {n: 3, name: Title_Strip, anchor: center, pos: [0, 148], size: [488, 62], container: true}
+  - {n: 4, name: Text_Name, anchor: center, pos: [-100, 148], size: [290, 50], text: {key: ui.mode.name, auto_size: true}}
+  - {n: 5, name: Status, anchor: center, pos: [170, 148], size: [120, 50]}
+  - {n: 6, name: Frame_Selected, anchor: center, pos: [0, 0], size: [496, 365], container: true, state: selected}
+  - {n: 7, name: ComingSoon, anchor: center, pos: [0, 0], size: [488, 357], container: true, state: coming_soon}

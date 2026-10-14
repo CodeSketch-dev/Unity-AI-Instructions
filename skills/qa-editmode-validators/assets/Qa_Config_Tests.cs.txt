@@ -1,0 +1,82 @@
+// TEMPLATE (uncompiled). EditMode test. Place under Assets/_Game/Tests/EditMode/ with an Editor-only test asmdef that
+// references the game assembly (or reach Assembly-CSharp through reflection if the project has no asmdefs).
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using NUnit.Framework;
+using UnityEditor;
+using UnityEngine;
+
+namespace Game.Tests
+{
+    public class Qa_Config_Tests
+    {
+        const string CONFIG_ROOT = "Assets/_Game/Configs";
+        const BindingFlags FLAGS = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+        static IEnumerable<ScriptableObject> Configs()
+        {
+            foreach (var guid in AssetDatabase.FindAssets("t:ScriptableObject", new[] { CONFIG_ROOT }))
+            {
+                var so = AssetDatabase.LoadAssetAtPath<ScriptableObject>(AssetDatabase.GUIDToAssetPath(guid));
+                if (so != null) yield return so;
+            }
+        }
+
+        static IEnumerable<FieldInfo> SerializedFields(Type t)
+        {
+            for (var c = t; c != null && c != typeof(ScriptableObject) && c != typeof(object); c = c.BaseType)
+                foreach (var f in c.GetFields(FLAGS | BindingFlags.DeclaredOnly))
+                    if (!f.IsStatic && !f.IsNotSerialized && (f.IsPublic || f.GetCustomAttribute<SerializeField>() != null))
+                        yield return f;
+        }
+
+        static bool Has<T>(FieldInfo f) where T : Attribute => f.GetCustomAttribute<T>() != null;
+
+        [Test]
+        public void Object_references_are_assigned()
+        {
+            var bad = new List<string>();
+            foreach (var so in Configs())
+                foreach (var f in SerializedFields(so.GetType()))
+                    if (typeof(UnityEngine.Object).IsAssignableFrom(f.FieldType) && !Has<QaOptionalAttribute>(f)
+                        && (UnityEngine.Object)f.GetValue(so) == null)
+                        bad.Add($"{AssetDatabase.GetAssetPath(so)}: {f.Name} is null");
+            Assert.IsEmpty(bad, string.Join("\n", bad));
+        }
+
+        [Test]
+        public void Numeric_fields_obey_range_and_nonzero()
+        {
+            var bad = new List<string>();
+            foreach (var so in Configs())
+                foreach (var f in SerializedFields(so.GetType()))
+                {
+                    if (!f.FieldType.IsPrimitive || f.FieldType == typeof(bool)) continue;
+                    var v = Convert.ToDouble(f.GetValue(so));
+                    var r = f.GetCustomAttribute<QaRangeAttribute>();
+                    if (r != null && (v < r.Min || v > r.Max)) bad.Add($"{AssetDatabase.GetAssetPath(so)}: {f.Name}={v} outside [{r.Min},{r.Max}]");
+                    if (Has<QaNonZeroAttribute>(f) && v == 0) bad.Add($"{AssetDatabase.GetAssetPath(so)}: {f.Name} is zero");
+                }
+            Assert.IsEmpty(bad, string.Join("\n", bad));
+        }
+
+        [Test]
+        public void Ids_are_unique_per_type_and_nonempty()
+        {
+            var seen = new Dictionary<string, string>();
+            var bad = new List<string>();
+            foreach (var so in Configs())
+                foreach (var f in SerializedFields(so.GetType()))
+                {
+                    if (f.FieldType != typeof(string) || !Has<QaIdAttribute>(f)) continue;
+                    var id = (string)f.GetValue(so);
+                    if (string.IsNullOrWhiteSpace(id)) { bad.Add($"{AssetDatabase.GetAssetPath(so)}: empty id"); continue; }
+                    var key = so.GetType().FullName + "/" + id;
+                    if (seen.TryGetValue(key, out var other)) bad.Add($"duplicate id {id}: {other} and {AssetDatabase.GetAssetPath(so)}");
+                    else seen[key] = AssetDatabase.GetAssetPath(so);
+                }
+            Assert.IsEmpty(bad, string.Join("\n", bad));
+        }
+    }
+}
