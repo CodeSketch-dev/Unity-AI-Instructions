@@ -1,6 +1,6 @@
 ---
 name: unity-ui
-description: Use when creating or modifying Unity uGUI Canvas, HUD, popups, panels, buttons, joystick, or any screen layout for a mobile game. Defines canvas setup, anchors, HUD zones, safe area, banner clearance, and layout validation.
+description: Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab.
 ---
 
 # Unity UI
@@ -26,14 +26,8 @@ Before writing any UI helper/prefab (`UISafeArea`, `FloatingJoystick`, `PopupMan
 - Popup/panel: buttons never near the panel edge (comfortable inner padding). Center of gameplay view stays free.
 - Non-interactive Graphics: Raycast Target off.
 
-## HUD zones (inside SafeArea; empty zones stay empty)
-- Top-center: progression bar (level/XP/checkpoint), anchor top-center, width by anchors.
-- Top-left: settings; menu buttons opening popups (shop, daily reward, lucky wheel, mission, bag, index, pets, skins, trails, store) in an even column/row.
-- Top-right: currency bars; related bars (speed etc.) below or same row, still top-right. Reward/boost buttons (watch ad) prefer right half near them; if crowded, overflow to the left.
-- Center-right: vertical sliders (zoom, speed).
-- Bottom-left: `FloatingJoystick`; object `Move` = transparent touch region (Image no sprite, Raycast on), default anchors (0,0)-(0.35,0.6) (`ui.joystick.touchRegion`), max left half; visuals never cross center. Keep prefab fields.
-- Bottom-center: toolbar/hotbar (multi-slot bar for tools, weapons, items; contents are per game), anchor bottom-center, above bottom clearance, between the joystick and interact group without overlapping either.
-- Bottom-right: interact group (attack, jump, pick up, drop, dropdown, carpet), above bottom clearance.
+## HUD zones
+Zone map, sizes and thumb rules: `mobile-hud-layout` (single source; do not duplicate it here). Project-specific additions: joystick object `Move` = transparent touch region (Image no sprite, Raycast on), default anchors (0,0)-(0.35,0.6) (`ui.joystick.touchRegion`), max left half, keep prefab fields; toolbar/hotbar bottom-center above bottom clearance between joystick and interact group; empty zones stay empty.
 
 ## Procedure
 1. Read project-config and existing UI prefabs; don't rescan unchanged files.

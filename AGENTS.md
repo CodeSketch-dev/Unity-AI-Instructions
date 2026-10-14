@@ -1,6 +1,6 @@
 # Global Codex Instructions — Unity Game Development
 
-These are reusable defaults for all my projects. Project-specific `AGENTS.md` instructions take precedence where they differ. Reply to me in Vietnamese unless I request otherwise. Keep code, identifiers, Unity API names, and tool names in English.
+These are reusable defaults for all my projects. Project-specific `AGENTS.md` instructions take precedence where they differ. Write all files, docs, comments, skills and notes in English. Keep replies terse; reply in the language I write in. Keep code, identifiers, Unity API names, and tool names in English.
 
 ## Role and priorities
 
@@ -53,6 +53,17 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - Do not commit, push, merge, or create branches unless requested. Preserve any existing user changes.
 - Do not expose secrets, tokens, keystores, signing credentials, or private configuration in output or logs.
 
+## Parallel agents: never overwrite newer work
+
+- The disk is the source of truth, not your context. Claude, Codex, subagents, the human and the Unity Editor may change files while you work. Treat anything you read before a compile, Play Mode run, long tool/MCP call, subagent run, context compaction, or other-agent activity as potentially stale.
+- Re-read a file immediately before editing it. Use targeted patches/edits with surrounding context. Never rewrite an existing file from memory and never write over a file you have not read in the current step.
+- Apply your change on top of the current content. If the file changed since you read it, merge your intent into the new version. Never restore your older copy, never revert changes you did not make (no `git checkout --`, `restore`, `reset`, `stash`, `clean`), and never bulk-reformat shared files.
+- If both intents genuinely conflict, stop and ask me, quoting both versions. Tell me in one line whenever you detected and merged someone else's change.
+- When the `multi-agent-coexistence` skill is installed, use its `workspace_guard.py`: `snapshot` after reading, `check` right before writing, `claim` scenes, prefabs, builders and singleton assets, and respect other agents' claims.
+- Unity: the Editor may hold an older scene/prefab than the file on disk and save over it. After external changes, reload the scene/prefab from disk before saving. One writer per scene/prefab at a time. Do not "fix" compile errors in files another agent is editing; wait or report them.
+- Shared docs (`docs/feedback-notes.md`, plans, project map, handoff) are append-only: re-read the tail immediately before appending, change only your own lines, preserve line endings.
+- At session start read `git status`, `docs/agent-handoff.md` and the feedback notes. After finishing a task that touched shared areas, append to `docs/agent-handoff.md`: date, agent, files, what changed, what the other side must re-read or reload.
+
 ## Feedback notes
 
 - During the conversation, always summarise important user feedback (corrections, preferences, design decisions, rejected approaches, and standing rules) and save it to a notes file, `docs/feedback-notes.md` in the project root (create it if missing).
@@ -61,7 +72,7 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 
 ## Communication
 
-- Communicate in concise Vietnamese. For long tasks, give short progress updates when useful.
+- Communicate tersely. For long tasks, give short progress updates when useful.
 - Prefer editing/performing the task over delivering instructions for me to do it manually, when tools allow.
 - When blocked, describe the exact blocker and smallest next step; do not repeatedly ask me to reinstall tools that already work.
 - Distinguish facts verified through tools from assumptions and suggestions.
