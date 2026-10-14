@@ -8,6 +8,7 @@ description: UI hub for recreating a reference UI (HUD, popups, shops, boards) a
 Route UI work to one skill per concern; load only what the task needs:
 | Concern | Skill |
 |---|---|
+| Standard screens (skin shop, shop, popups): fixed structure, game supplies art | `ui-pattern-library` (check first) |
 | Canvas/SafeArea/PopupRoot structure, validation at 3 aspect ratios | `unity-ui` |
 | Where each HUD element goes, sizes, thumb reach | `mobile-hud-layout` |
 | Matching a reference screen or demo image 1:1, build/compare loop | this skill + `ui-popup-from-demo` |

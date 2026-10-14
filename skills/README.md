@@ -34,6 +34,7 @@ Project-independent skills for Claude and Codex. Start with `clone-pipeline`; it
 | UI/UX | `ui-style-rules` | Standing visual defaults from past corrections |
 | UI/UX | `ui-popup-from-demo` | Popup/HUD from demo images, builder + compare loop |
 | UI/UX | `currency-spread-fx` | Rewards fly into HUD currency bars |
+| UI/UX | `ui-pattern-library` | Game-independent screen patterns (skin shop...): fixed structure/states/behavior, per-game theme + binding |
 | UI/UX | `ui-clone` | UI hub: fidelity process + routing to the UI skills (precedence rules inside) |
 | UI/UX | `game-feel-polish` | Juice, FX, haptics, rarity scaling |
 | UI/UX | `game-audio-system` | BGM/SFX layer, config, budgets, provenance |

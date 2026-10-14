@@ -46,7 +46,7 @@ Gates (each ends with a human-playable build and a short written artifact in `do
 - G6 QA: test matrix passed, perf budget met on a low-end device.
 - G7 Release candidate: signed build, store checklist.
 
-## Skill catalogue (48 skills)
+## Skill catalogue (49 skills)
 Each skill: one `SKILL.md` (pushy description, why-driven steps, under 500 lines), optional `references/`, `assets/`, `scripts/`.
 
 Discover: `clone-pipeline`, `gameplay-video-analysis`, `game-clone-recon`, `roblox-genre-patterns`, `reference-index`, `clone-ip-safety`
@@ -57,7 +57,7 @@ Port: `reference-port`, `asset-transfer-closure`
 Money: `monetization-integration`
 Quality: `done-means-wired`, `unity-qa-playtest`, `unity-debugging`, `unity-log-triage`, `mobile-perf-audit`
 Ship: `mobile-build-release`
-Added later: `spec-pdf-extract`, `ads-popup-flow`, `unity-iap-port`, `currency-spread-fx`, `ui-popup-from-demo`, `ui-style-rules`, `unity-ui`, `playmode-script-testing`
+Added later: `ui-pattern-library`, `spec-pdf-extract`, `ads-popup-flow`, `unity-iap-port`, `currency-spread-fx`, `ui-popup-from-demo`, `ui-style-rules`, `unity-ui`, `playmode-script-testing`
 Process: `token-efficient-workflow`, `spec-then-plan`, `feedback-notes-sync`, `multi-agent-coexistence`
 
 ## Framework model (game-independent)
