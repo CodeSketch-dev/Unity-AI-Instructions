@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da3a700d318d9a488fc3ed831e903a0, type: 3}
+  m_Name: TextureDataAsset
+  m_EditorClassIdentifier: Assembly-CSharp::Base_VanHuy.TextureDataAsset
+  albedoTextures:
+  - {fileID: 2800000, guid: c5c5c9016af6dca4aa4784e2ea44fb5d, type: 3}
+  - {fileID: 2800000, guid: 7f1111691c0f62446bbbed6d5e1877ac, type: 3}
+  - {fileID: 2800000, guid: dd537cbe9f424624aa19144357a70e2b, type: 3}
+  legoTextures:
+  - legoDetail: {fileID: 2800000, guid: 37c40fed6962ad7499f1017a16425489, type: 3}
+    legoNormal: {fileID: 2800000, guid: 56969f5a67dc4e3458bbe9dba966ed80, type: 3}
+  - legoDetail: {fileID: 2800000, guid: 54710864038436141ab4d185bc27e0a5, type: 3}
+    legoNormal: {fileID: 2800000, guid: bd19e41ca6652d44abfc2d9b7a69eb29, type: 3}
+  defaultAssetReferences:
+  - referenceName: Metal Material
+    asset: {fileID: 2100000, guid: 5f129a4b91562ca44ab31f71510a0ca5, type: 2}
+  - referenceName: Opaque Material
+    asset: {fileID: 2100000, guid: 484de8ce880211d4ca5f08bd0c0f6d4b, type: 2}
+  - referenceName: Transparent Material
+    asset: {fileID: 2100000, guid: d7086bbcba714da41b45c55c01518147, type: 2}
+  - referenceName: Lego Detail Texture 1
+    asset: {fileID: 2800000, guid: 37c40fed6962ad7499f1017a16425489, type: 3}
+  - referenceName: Lego Normal Texture 1
+    asset: {fileID: 2800000, guid: 56969f5a67dc4e3458bbe9dba966ed80, type: 3}
+  - referenceName: Checker Detail Texture
+    asset: {fileID: 2800000, guid: 77282131af9749840ae807eed940204e, type: 3}
+  - referenceName: Arrow Texture
+    asset: {fileID: 2800000, guid: af9ef1d05e30e4f41954d635c945b172, type: 3}
+  - referenceName: Cube Map Cosmic
+    asset: {fileID: 8900000, guid: 3cfc49be302048b48a672bc7c3814645, type: 3}

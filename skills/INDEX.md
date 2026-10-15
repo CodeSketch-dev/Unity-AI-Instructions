@@ -230,6 +230,7 @@
 ## roblox
 - roblox-character-camera - Roblox-feel movement, jump, ragdoll, animation states and third-person camera in Unity, with stud/WalkSpeed/JumpPower conversions. Use when building or tuning player character/camera or fixing controller issues.
 - roblox-genre-patterns - Catalog of Roblox genres (simulator, pet/egg, tycoon, steal/carry, obby, TD, treadmill, fighting, survival) with core loops and required systems. Use when planning a clone or deciding which systems it needs.
+- roblox-shader-kit - Shared Roblox/Lego-style environment foundation: vertex-color surfaces, batched URP shader, minimal material profiles, water/lava/sand variants, static mesh combine, decor LOD and bake validation. Auto-load when GDD/environment evidence calls for Roblox studs or block-built visuals; no manual invocation required.
 - roblox-world-kit - Roblox-look world kit: stud scale, palette, surface registry, modular kit pieces, assembly rules and world validation. Use when building or cloning a Roblox-style map in Unity.
 
 ## rule
