@@ -28,6 +28,6 @@ Roblox hits are built from a small set of recurring loops. Identify the genre fi
 ## Mobile adaptation rules of thumb
 - Everything reachable with two thumbs; one primary action button (see `mobile-hud-layout`).
 - Auto-actions (auto-collect, auto-attack near target) because holding and aiming is costly on touch.
-- Short sessions: first reward under 30 s, meaningful upgrade within 2-3 min.
+- Short sessions: use the reference timeline or `auto-balance-game`; do not copy generic first-reward or upgrade timings into a new clone.
 - Cut Roblox-only mechanics (chat, complex trading, user-generated content) unless the reference depends on them.
 - Replace multiplayer with bots unless netcode is in scope (`npc-bots-and-enemies`).

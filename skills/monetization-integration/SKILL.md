@@ -8,8 +8,8 @@ description: "Monetization hooks behind interfaces: rewarded/interstitial ads, I
 Roblox-style games monetize through multipliers, convenience and cosmetics. Integrate the hooks early behind interfaces so gameplay code never depends on a specific SDK, and so everything is testable in the Editor.
 
 ## Placement ideas by genre loop
-- **Rewarded ads** (opt-in, always with clear reward): 2x income for N minutes, free egg/spin, revive, skip wait, double offline earnings, extra daily reward.
-- **IAP**: starter pack (one-time, early), permanent 2x pass, VIP, extra slots/auto features, cosmetic trails/skins, currency packs.
+- **Rewarded ads** (opt-in, always with clear reward): temporary income acceleration, free egg/spin, revive, skip wait, offline acceleration, or extra daily reward as observed/configured. The multiplier and duration belong to the balance pass.
+- **IAP**: starter pack, permanent progression pass, VIP, extra slots/auto features, cosmetic trails/skins, or currency packs as observed/configured. Payouts and multipliers belong to the balance pass.
 - **Interstitials**: sparingly at natural breaks (never mid-action, never during FTUE); cap frequency.
 - **Daily reward / streaks / timed events**: retention drivers, server-independent where possible but guard against clock tampering if value is high.
 - **Offers**: contextual (when the player hits a wall or lacks currency), limited by cooldown.

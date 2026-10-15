@@ -11,7 +11,7 @@ Every minute an agent or human spends grinding to reach a test state is wasted. 
 1. Copy `assets/DebugCheats.cs` into the project's runtime scripts (namespace `Game`; adjust to the project). It bootstraps itself after scene load, is compiled only for the Editor and development builds, resets its static registry for domain-reload-off sessions, and opens with the backtick key or a three-finger tap.
 2. Each feature registers its own actions next to its code (so the menu grows with the game and never lives in one giant file):
    ```csharp
-   DebugCheats.Register("Economy", "+1M money", () => Data_Wallet.Add(1_000_000));
+   DebugCheats.Register("Economy", "Grant test money", () => Data_Wallet.Add(configuredTestAmount));
    ```
    Register from an initialization point that runs in the Editor and dev builds (e.g. a feature's `Awake`/`OnInitialize`), not inside the game logic's hot path.
 3. Wrap registrations in `#if DEVELOPMENT_BUILD || UNITY_EDITOR` when they touch real data, so release builds contain none of it.
@@ -19,7 +19,7 @@ Every minute an agent or human spends grinding to reach a test state is wasted. 
 ## Standard cheat set for clones
 | Group | Actions |
 |---|---|
-| Economy | +1K/+1M/+1B money; set income multiplier; grant offline earnings |
+| Economy | Grant configurable test money; set income multiplier; grant offline earnings |
 | Progression | set speed stat; unlock zone N; set tool/cage/treadmill level; trigger rebirth |
 | World | teleport to zone/base/boss; spawn egg/pet of rarity X; spawn boss; toggle safe zone |
 | Time | timeScale slider (QA only; normalize before judging balance), skip N minutes of timers, set daily-reward clock |

@@ -20,7 +20,7 @@ Generators that "just work once" are the most dangerous code in a Unity project:
 10. **Compile gate**: after editing the tool, wait for recompile to finish before invoking it.
 
 ## Before running through MCP
-- Check Editor state: not in Play Mode (edits made in Play Mode are lost), not compiling, correct scene open, correct project. See `unity-mcp-workflow`.
+- Check Editor state: not in Play Mode (edits made in Play Mode are lost), not compiling, correct scene open, correct project. If Unity is playing, stop Play Mode through MCP and wait until the Editor is idle before refreshing/importing assets or running the tool. See `unity-mcp-workflow`.
 - Save the scene before and after each stage.
 - Another agent or the human may be using the same Editor; expect Play Mode to be interrupted by their QA, and never run a long tool while they are mid-test (`multi-agent-coexistence`).
 

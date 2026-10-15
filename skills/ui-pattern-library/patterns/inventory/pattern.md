@@ -1,6 +1,6 @@
 # Pattern: inventory
 
-Source: report 07 sec 4 row 9 (`Item_Inventory`; Board 1154x800 at y+50, title h75, ScrollRect inset (-116,-205) y-62, close 97x93, dim 0.86, open 0.3 / close 0.2; VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Grid rules: `ui-scroll-board`; tool/item data: `tool-weapon-pipeline` (when added).
+Generic inventory pattern. Treat any dimensions/timing in `spec.yaml` as per-game reference evidence; item data comes from the current project's inventory system.
 
 ## States
 | State | Visual |

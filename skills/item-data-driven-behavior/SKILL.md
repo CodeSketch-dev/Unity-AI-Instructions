@@ -9,7 +9,7 @@ Anti-patterns found in the reference code (report 15 sec 1, VERIFIED in knife-to
 
 | Smell | Rule |
 |---|---|
-| `switch (Item_Type)` choosing the throw/attack logic in `Character_Attack` | the polymorphic data class owns the algorithm: `[SerializeReference] Tool_Behavior` with `TryExecute` (`tool-weapon-pipeline`) |
+| `switch (Item_Type)` choosing item logic in `Character_Attack` | the polymorphic data class owns the algorithm: `[SerializeReference] Item_Behavior` with `TryExecute` |
 | `Instantiate` (a create helper) for the banana throw | pooled projectile through `PoolPrefabGlobal` (`pool-everything`) |
 | `new HashSet<Character>()` / `new List<Character>()` every 0.15 s in a tick | reusable buffers, cached collections (`combat-hit-detection-rule`) |
 | `try { } catch { }` around event subscribe | symmetric subscribe/unsubscribe in `OnEnable`/`OnDisable` (`static-bus-events`) |

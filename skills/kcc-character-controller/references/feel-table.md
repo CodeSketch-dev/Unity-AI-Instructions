@@ -1,6 +1,6 @@
 # Feel table (DATA)
 
-Source: report 04 sec 2 (knife-tower KT, monkey-escape ME; values VERIFIED in assets/code unless marked). **Soft defaults**: use them when the clone's reference shows nothing better; override when the reference's measured feel differs, and write the reason in the GDD or `docs/feedback-notes.md`. Convert Roblox units once (`STUD_M` 0.28 is UNVERIFIED) and keep every stat as data.
+Source: reference-project data. **Reference-only examples**: never apply these values to a new game unless the GDD/evidence selects this movement model. Prefer the current GDD or `auto-balance-game`; keep every stat as data.
 
 ## Locomotion
 | Parameter | KT / ME Escape | ME Obby | Note |
@@ -22,7 +22,7 @@ Source: report 04 sec 2 (knife-tower KT, monkey-escape ME; values VERIFIED in as
 | Jetpack | power 30, 3 s, refuel 1 s | | |
 | Fly carpet | speed 8, accel 8, yaw 120 deg/s, FOV 60 | | |
 
-Recipe: keep speed 4.5, pick a 2 m jump, g = 30 -> v = sqrt(2*30*2) = 10.95 m/s.
+Recipe: choose speed, jump height, and gravity from the current GDD; derive jump speed with `v = sqrt(2 * gravityMagnitude * jumpHeight)`.
 
 ## Progression-driven speed (ME)
 Real speed = base 4.5 + `max(0, level - world.LevelRequired) * 0.5`; jump bonus +0.1 m/s per level; display speed to real `(display + 14.5) / 5`; `SpeedLimitFactor` (0..1) scales only the added speed; earn tick 0.15 s with moving speed > 0.5 m/s; air steering by angle 0 deg 100%, 90 deg 50%, 180 deg 0%; high-speed FOV +10 from `speed01 >= 0.95`, ramp 1 s, release 0.35 s, speed lines at 0.7.

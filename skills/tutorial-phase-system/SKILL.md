@@ -6,7 +6,7 @@ description: "Tutorial phase system: persisted phase int, per-phase HUD visibili
 # Tutorial phase system
 
 - Persist a phase int and per-reward flags in a `Data_Tutorial` block; each reward is granted once.
-- Phases: one system introduced per phase, HUD parts hidden until introduced, currency sinks locked, optional damage protection, action within seconds, first reward within a minute.
+- Phases: one system introduced per phase, HUD parts hidden until introduced, currency sinks locked, optional damage protection, and action/reward timing from the reference or `auto-balance-game`.
 - Guidance: arrow or line renderer plus a spotlight mask; re-show the pointer after idle.
 - Resume-safe: re-entering shows the current phase; old saves migrate to done.
 - No interstitials until the tutorial is done; the rating prompt and daily login appear after it.

@@ -23,7 +23,7 @@
   },
   "skins": [
     {"id": "Character_Skin_Boy", "type": "Normal", "rig": "humanoid", "unlock": "Free", "price": 0, "iap_id": null, "order": 1},
-    {"id": "Character_Skin_Girl", "type": "Normal", "rig": "humanoid", "unlock": "Gem", "price": 100, "iap_id": null, "order": 2},
+    {"id": "Character_Skin_Girl", "type": "Normal", "rig": "humanoid", "unlock": "Gem", "price": "auto", "iap_id": null, "order": 2},
     {"id": "Character_Skin_Knight", "type": "VIP", "rig": "humanoid", "unlock": "IAP", "price": 0, "iap_id": "skin_knight", "order": 3}
   ],
   "allowed_types_per_mode": {"obby": ["Normal", "VIP"], "event": ["Normal"]},

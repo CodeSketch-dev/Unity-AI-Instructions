@@ -7,10 +7,11 @@ fidelity: faithful
 evidence: []
 depends_on: []
 recipe: economy-progression-design
+auto_balance: true
 currencies:
   - {id: coins, display: Coins, start: 0, sources: [], sinks: []}
-tables: [economy/prices.csv]
-balance_targets: {first_purchase_s: ?}
+tables: []
+balance_targets: {}
 features:
   - id: F-NN.1
     name: ?

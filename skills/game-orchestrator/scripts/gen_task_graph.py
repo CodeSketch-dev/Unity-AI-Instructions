@@ -35,7 +35,7 @@ TEMPLATES = {
         ("logic", "Shop logic: buy, equip, persist", 3, ["config-and-factory-authoring", "recipe-add-skin-or-item", "done-means-wired"], "D", 0.8, ["code:Logic/Shop/*"], ["[edit] insufficient funds unchanged", "[play] restart persists"]),
         ("catalog", "Catalog fill from tables (assets and icons)", 4, ["reference-port", "asset-transfer-closure"], "D", 1.0, ["asset:Configs/Shop"], ["[edit] data audit equals prices.csv"]),
     ],
-    "inventory": [("inventory", "Inventory and hotbar", 4, ["hotbar-inventory", "tool-weapon-pipeline"], "D", 1.0, ["code:Logic/Inventory/*"], ["[play] pick, equip, full state"])],
+    "inventory": [("inventory", "Inventory and hotbar", 4, ["hotbar-inventory"], "D", 1.0, ["code:Logic/Inventory/*"], ["[play] pick, equip, full state"])],
     "pets": [("pets", "Pets: data, follow, equip", 4, ["cosmetic-slot-providers", "config-and-factory-authoring"], "D", 1.5, ["code:Logic/Pet/*"], ["[play] pet follows and income"])],
     "quests": [("quests", "Quests and tracker", 4, ["recipe-quests-achievements", "ui-pattern-library"], "D", 1.0, ["code:Logic/Quest/*"], ["[play] quest completes and claims"])],
     "tutorial": [("tutorial", "Tutorial steps and pointers", 4, ["tutorial-phase-system", "unity-ui"], "D", 0.6, ["code:Logic/Tutorial/*"], ["[play] full tutorial path"])],

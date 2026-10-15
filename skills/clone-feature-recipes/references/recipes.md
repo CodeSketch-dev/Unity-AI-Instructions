@@ -2,7 +2,7 @@
 
 Contents: 1 Egg break and hatch, 2 Pet carry and base income, 3 Treadmill and speed, 4 Zones, gates, banners, 5 Boss chase and safe zone, 6 Shops, 7 Upgrade boards, 8 Rebirth, 9 Daily reward and streak, 10 Collection index, 11 Auto buttons, 12 Bots as players, 13 Trails and cosmetics, 14 Rewarded-ad boosts, 15 Offline earnings.
 
-Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Verify**.
+Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Verify**. Recipes define structure and invariants, never prices, boosts, cooldowns, income, HP, or other balance constants. If a reference value is not evidenced, use a tunable placeholder and let the balance pass generate it.
 
 ## 1 Egg break and hatch
 - **Behavior**: eggs spawn in zone slots with HP by biome/rarity/luck; the tool hits at a cadence (cooldown measured from the real animation clip); on break, FX + a pet appears (or hatch animation for shop eggs).
@@ -14,7 +14,7 @@ Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Veri
 
 ## 2 Pet carry and base income
 - **Behavior**: pick up a pet (contextual button), carry it (arms up, speed rules from reference), place it in a base slot; each pet earns $/s while placed; carry timer pauses.
-- **Data**: pet instances (id, rarity, size/mutation, level), base slots and level. **Config**: pet species (income, size curve), slot count and multiplier per base level.
+- **Data**: pet instances (id, rarity, size/mutation, level), base slots and level. **Config**: pet species, size curve, slot rules, and multiplier layers as tunable fields.
 - **Events**: `PetPickedUp`, `PetDropped`, `PetPlaced`, `IncomeTick`. **UI**: single Interact button (Pick up/Drop swap), carry info card above the hotbar, base pet labels ($/s, rarity, name).
 - **Edge cases**: full base keeps pet in hand; bots' bases obey the same cap; drop while chased; disconnect/app pause with pet in hand; first-time FX only.
 - **Perf**: income ticks batched in one manager; pets in base are pooled meshes, labels throttled.
@@ -22,7 +22,7 @@ Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Veri
 
 ## 3 Treadmill and speed
 - **Behavior**: standing on a treadmill trains Speed over time (auto, no run button); leaving stops gain without snapping; run animation plays while on it; floating "+speed" popups on each tick.
-- **Data**: speed stat, treadmill level. **Config**: treadmill tiers (multiplier, price), tick interval, big-number formatting.
+- **Data**: speed stat, treadmill level. **Config**: station tiers, stat effect, accumulation cadence, unlock channels, and number formatting as tunable fields; populate values only from evidence or the balance pass.
 - **Events**: `SpeedChanged`, `TreadmillEntered/Exited`. **UI**: speed bar, upgrade board, popup text.
 - **Edge cases**: other characters' treadmills never train the player; treadmill footprint must not block the base door; tier upgrade while standing on it.
 - **Verify**: speed increases at the configured rate; leaving keeps value; bots use it too.
@@ -52,7 +52,7 @@ Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Veri
 
 ## 7 Upgrade boards (cage, treadmill, tool)
 - **Behavior**: world board at the base edge showing level, price, benefit; tap to upgrade; price turns red when unaffordable; fixed (not billboarded).
-- **Data**: levels. **Config**: price and effect tables.
+- **Data**: levels. **Config**: level/effect tables with generated or observed values; the recipe does not prescribe prices.
 - **UI**: real tap collider, range-based fade that also disables raycasts, press-scale feedback, tappable from reference distance.
 - **Edge cases**: max level state; other cages (bots) show boards too; ad-reward button wired.
 - **Verify**: tap from far/near, unaffordable, max level.
@@ -87,7 +87,7 @@ See `npc-bots-and-enemies`: real characters with a brain, strength tiers, same c
 - **Perf**: pooled trail renderers, capped particle counts.
 
 ## 14 Rewarded-ad boosts
-- **Behavior**: optional "x2 income for N minutes", "free hatch", revive; never forced.
+- **Behavior**: optional temporary acceleration, free action, or revive when observed; never forced.
 - **Architecture**: `monetization-integration` (interfaces + Editor mock); reward exactly once; works offline-safe (button hides when no ad ready).
 - **Verify**: success/failure/cancel paths in the mock; boost timer persists.
 

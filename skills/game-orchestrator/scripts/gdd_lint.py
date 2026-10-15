@@ -88,6 +88,17 @@ def unknowns(obj, path=""):
         yield path
 
 
+TUNABLE_KEYS = {"price", "cost", "income", "reward", "amount", "multiplier", "boost", "damage", "cooldown",
+                "range", "speed", "jump", "hp", "health", "interval", "duration", "growth", "target", "requirement",
+                "cap", "weight", "odds", "chance", "radius", "lifetime", "count", "slots", "level", "value", "effect"}
+
+
+def is_tunable_path(path):
+    """Return true for numeric tuning fields that auto-balance may generate."""
+    keys = re.findall(r"[A-Za-z_][A-Za-z0-9_]*", path.lower())
+    return any(k in TUNABLE_KEYS or any(k.endswith(s) for s in ("_price", "_cost", "_rate", "_multiplier", "_seconds")) for k in keys)
+
+
 def features(fm):
     return [f for f in (fm.get("features") or []) if isinstance(f, dict)]
 
@@ -187,6 +198,7 @@ def lint(g, estimate_h=None, day_h=16, last_hash=None):
     for n in list(graph):
         visit(n)
     # L003 evidence, L004 acceptance, L005 unknowns
+    auto_balance = bool(idx.get("auto_balance")) or any(bool(fm.get("auto_balance")) for _, fm, _ in docs)
     for key, fm, where in docs:
         p_file = fm.get("priority", "P1")
         for f in features(fm):
@@ -206,6 +218,8 @@ def lint(g, estimate_h=None, day_h=16, last_hash=None):
             elif prio == "P0" and not any(a.strip().startswith(("[play]", "[edit]")) for a in acc):
                 add("BLOCK", "L004", "%s %s" % (where, f.get("id")), "P0 feature needs a [play] or [edit] criterion")
         for path in unknowns(fm):
+            if auto_balance and is_tunable_path(path):
+                continue
             add("BLOCK" if p_file == "P0" else "WARN", "L005", "%s %s" % (where, path), "unknown value '?'")
     # L006 numbers, L007 reachability
     econ = [fm for _, fm, _ in docs if fm.get("type") == "economy"]
@@ -218,7 +232,7 @@ def lint(g, estimate_h=None, day_h=16, last_hash=None):
             if not c.get("sinks"):
                 add("BLOCK", "L006", c.get("id"), "currency has no sink")
     prices = g["prices"]
-    if econ and not prices:
+    if econ and not prices and not auto_balance:
         add("BLOCK", "L006", "economy/prices.csv", "price table missing")
     for row in prices:
         if row.get("currency") not in currencies and currencies:

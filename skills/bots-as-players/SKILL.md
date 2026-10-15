@@ -11,7 +11,7 @@ Extends `npc-bots-and-enemies` (tiers, population) with the character-side rules
 - Skin: `Factory_Character.GetRandomSkin(type)` from an allowed-types list per mode; avoid duplicates on screen when the pool allows; name from the catalog `bot_names` list (localized defaults, `ui-localization`); optional random aura/trail changed every N revives (`cosmetic-slot-providers`).
 - Nametag: one world-space text per visible bot inside a CullingGroup band (~25 m), max 8 visible, text set on change, distinct colour/outline for the local player (`character-emotes-nametags`).
 - Spawn: one bot per frame behind a loader task; count = base x device tier scale (`device-tier-policy`); pooled skins keyed by id.
-- Fake runners (monkey-escape treadmill): fake characters swap random skins every 90-120 s with the first load staggered over 1.5 s to fake population.
+- Fake runners may swap random skins on a configurable cadence observed from the reference; never copy another game's timing.
 - Low-end: CullCompletely animators, no real shadows, shared material, ragdoll only for the nearest few (`character-perf-budgets`).
 - Rubber band bots by checkpoint distance; bots never write player progress or purchases (`checkpoint-respawn`).
 - Fake social: leaderboards seeded from curves, "friends" as named bots (`recipe-fake-leaderboard`).

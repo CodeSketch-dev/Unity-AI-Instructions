@@ -1,20 +1,20 @@
 ---
 name: kcc-advanced-movement
-description: "Advanced KCC movement states: rope swing, wall jump, sink zones, force zones, fly carpet and jetpack, each as an extra state with its constants. Use when the game needs swinging, wall jumping, quicksand or flying."
+description: "Use when a game needs rope swing, wall jump, sink zones, force zones, fly carpet or jetpack movement states."
 ---
 
 # Advanced KCC movement
 
-Each mechanic is one extra `State` plus a `partial class` file or sibling component on top of `kcc-character-controller`; constants come from monkey-escape/knife-tower (report 04 sec 3.2, 7, VERIFIED) and belong in the SO profile.
+Each mechanic is one extra `State` plus a `partial class` file or sibling component on top of `kcc-character-controller`; all feel/tuning values belong in the SO profile and come from the current GDD or auto-balance output.
 
-| Mechanic | Constants (reference defaults) |
+| Mechanic | Config contract |
 |---|---|
-| Rope swing | rope limit 8 m, input accel 30, gravity x1, damping 0.5 (idle 0.5), max tangential speed 60, steering sharpness 3, flip assist 1.5 above speed 10, release jump up 8 + forward boost 2, min hold 0.3 s, input buffer 0.12 s, retract 0.75 s / extend 1.25 s, acquire scoring forward weight 130 and distance penalty 0.015. API: `BeginSwing` / `ReleaseSwing`; the platform hooks it (`Platform_Swing`) |
-| Wall jump | modes OneJump / Infinite, min up force 25 (override 20), cooldown 0.5 s, wall contact grace 0.12 s, forward probe 0.75 m, horizontal control while rising x0.18, control ramp 1.5 s, blinking highlight 0.35 s |
-| Sink zone | `EnterSinkZone`: sink speed 0.5, jump multiplier 0.5 (quicksand, mud); trigger posts through the registry |
-| Force zone | constant push ~10 m/s along a direction (`platform-kit`) |
-| Fly carpet | speed 8, accel 8, yaw 120 deg/s, rig x1.25, camera FOV 60, bottom rig (-5, 3) |
-| Jetpack | power 30, 3 s, refuel 1 s, jump magnitude 0.3 (unused in ME) |
+| Rope swing | rope constraint, input acceleration, gravity, damping, tangential speed, steering, release impulse, hold/buffer/retract/extend timing, acquire scoring; API `BeginSwing` / `ReleaseSwing` |
+| Wall jump | jump mode, up force, cooldown, wall grace, probe, air control, control ramp, feedback timing |
+| Sink zone | `EnterSinkZone`: sink speed and jump modifier; trigger posts through the registry |
+| Force zone | push magnitude and direction (`platform-kit`) |
+| Fly carpet | speed, acceleration, yaw, rig scale, camera presentation, rig offset |
+| Jetpack | power, fuel duration, refuel timing, jump magnitude |
 
 ## Rules
 - A new state needs: enter/exit conditions in `BeforeCharacterUpdate`, a branch in `UpdateVelocity`, animator parameters with guards, a tutorial hook if it is taught (`TutorialActionPressed/SwingPressed`), and a separate input button when relevant (Jump vs Swing).
