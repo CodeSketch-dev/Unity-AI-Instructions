@@ -20,7 +20,9 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gdd_lint  # noqa: E402
+import evidence_index  # noqa: E402
 import gen_task_graph  # noqa: E402
+import skill_context  # noqa: E402
 
 MAX_ATTEMPTS = 3
 FILE_LANE = ("P", "D", "T")
@@ -60,6 +62,7 @@ def save(project, state):
 
 def init(gdd_dir, project, day_h=16.0):
     g = gdd_lint.load_gdd(gdd_dir)
+    evidence_index.write(gdd_dir, os.path.join(gdd_dir, "_generated", "evidence-index.json"))
     graph = gen_task_graph.generate(g, day_h)
     state = {"schema": 1, "game": g["index"].get("game"), "gdd_hash": gdd_lint.gdd_hash(gdd_dir), "started": now(), "phase": 0,
              "gate": {}, "budget": {"day_h": day_h, "est_wall_h": graph["totals"]["wall_h"], "est_sum_h": graph["totals"]["sum_h"],
@@ -121,6 +124,13 @@ def mark(project, tid, status, evidence=None, note=None, agent=None):
     t = state["tasks"][tid]
     if status == "done" and not evidence:
         raise ValueError("a task cannot be done without evidence (definition of done)")
+    if status == "done" and t.get("key") == "visual-evidence":
+        joined = " ".join(evidence).lower()
+        if "require-images" not in joined and "image" not in joined:
+            raise ValueError("visual-evidence requires explicit image-gate evidence")
+    if status == "done" and t.get("key") == "visual-mapspec":
+        if "mapspec schema valid" not in " ".join(evidence).lower():
+            raise ValueError("visual-mapspec requires schema validation evidence")
     if status == "in_progress":
         if any(state["tasks"][d]["status"] != "done" for d in t["depends_on"] if d in state["tasks"]):
             raise ValueError("%s has unfinished dependencies" % tid)
@@ -137,6 +147,31 @@ def mark(project, tid, status, evidence=None, note=None, agent=None):
     save(project, state)
     log(project, "%s | %s | %s" % (tid, status, note or "; ".join(evidence or [])))
     return state
+
+
+def collect_result(project, tid, result):
+    """Normalize an MCP/subagent result and reject missing evidence before marking."""
+    if not isinstance(result, dict) or not result.get("evidence_contract", {}).get("must_be_returned"):
+        raise ValueError("result is missing evidence_contract")
+    evidence = result.get("evidence_contract", {}).get("evidence")
+    required_kinds = result.get("evidence_contract", {}).get("required_kinds", [])
+    evidence_by_kind = result.get("evidence_contract", {}).get("evidence_by_kind", {})
+    missing_kinds = [kind for kind in required_kinds if not evidence_by_kind.get(kind)]
+    if missing_kinds:
+        raise ValueError("result is missing evidence kinds: %s" % ", ".join(missing_kinds))
+    if not evidence:
+        raise ValueError("result is missing gate evidence")
+    return evidence if isinstance(evidence, list) else [str(evidence)]
+
+
+def _evidence_kinds(verify):
+    kinds = []
+    text = " ".join(verify).lower()
+    for marker, kind in (("compile", "compile"), ("console", "console"), ("[play]", "playmode"),
+                         ("[shot]", "screenshot"), ("performance", "performance"), ("build", "build")):
+        if marker in text:
+            kinds.append(kind)
+    return kinds
 
 
 def resume(project, live=()):
@@ -168,6 +203,33 @@ def status(state):
             "blocked": [t["id"] for t in state["tasks"].values() if t["status"] == "blocked"]}
 
 
+def dispatch_payload(project, max_file=4):
+    """Return ready tasks with an explicit task-scoped context contract."""
+    state = load(project)
+    always_on = ["game-orchestrator", "multi-agent-coexistence", "token-efficient-workflow"]
+    manifest_path = os.path.join(project, "docs", "orchestrator", "active-skills.json")
+    previous = []
+    try:
+        with open(manifest_path, encoding="utf-8") as stream:
+            previous = json.load(stream).get("active", [])
+    except (OSError, ValueError):
+        pass
+    skills_root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+    available = [name for name in os.listdir(skills_root)
+                 if os.path.isdir(os.path.join(skills_root, name))]
+    payload = []
+    for task in ready(state, max_file):
+        context = skill_context.select(task.get("skills", []), always_on, previous=previous, available=available)
+        payload.append({"task_id": task["id"], "title": task["title"], "claims": task["claims"],
+                        "skills": sorted(task.get("skills", [])), "active_skills": context["active"],
+                        "unload_skills": context["unload"],
+                        "context_policy": "load-only-these-skills", "verify": task["verify"],
+                        "evidence_contract": {"required": task["verify"], "kinds": _evidence_kinds(task["verify"]),
+                                              "required_kinds": _evidence_kinds(task["verify"]),
+                                              "must_be_returned": True}})
+    return payload
+
+
 def _opt(argv, key, default=None):
     return argv[argv.index(key) + 1] if key in argv else default
 
@@ -188,6 +250,9 @@ def main(argv=None):
         elif cmd == "status":
             print(json.dumps(status(load(project)), indent=1))
         elif cmd == "next":
+            if "--json" in argv:
+                print(json.dumps(dispatch_payload(project), indent=1))
+                return 0
             for t in ready(load(project)):
                 print("%s [%s] %s (%s) skills: %s" % (t["id"], t["agent"], t["title"], t["group"], ", ".join(t["skills"])))
         elif cmd == "mark":

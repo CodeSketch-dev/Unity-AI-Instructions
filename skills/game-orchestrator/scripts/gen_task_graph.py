@@ -52,13 +52,16 @@ TEMPLATES = {
 }
 UI_EST = {"hud": 1.2, "popup_modal": 0.9, "popup_fullscreen": 1.4, "world_board": 0.8, "toast": 0.4, "banner": 0.4}
 CROSS = [  # (key, title, phase, skills, agent, est, claims, verify, system_dependent)
-    ("lint", "Lint and freeze the GDD, generate the plan", 0, ["gdd-intake", "game-clone-recon"], "P", 0.3, ["file:gdd/_generated/*"], ["lint 0 BLOCK"]),
+    ("lint", "Lint and freeze the GDD, generate the plan", 0, ["gdd-intake", "game-clone-recon"], "P", 0.3, ["file:gdd/_generated/*", "file:gdd/_generated/evidence-index.json"], ["lint 0 BLOCK", "evidence index valid"]),
+    ("visual-evidence", "Index reference images for visual reconstruction", 0, ["clone-pipeline", "game-clone-recon"], "P", 0.2, ["file:gdd/_generated/evidence-index.json"], ["evidence index valid", "--require-images passes"]),
+    ("visual-mapspec", "Emit and validate the compact visual MapSpec", 1, ["roblox-shader-kit", "clone-pipeline"], "P", 0.4, ["file:gdd/_generated/map-spec.json"], ["MapSpec schema valid", "unknowns explicit"]),
     ("specs", "Short specs for P0 systems", 0, ["spec-then-plan"], "D", 0.5, ["file:docs/specs/*"], ["specs exist per P0 system"]),
     ("provenance", "Asset provenance and reference index", 0, ["reference-index", "clone-ip-safety", "asset-transfer-closure"], "D", 0.2, ["file:docs/asset-provenance.md"], ["all ref-project paths resolve"]),
     ("bootstrap", "Project bootstrap: URP, folders, asmdefs, framework map, MCP", 1, ["unity-project-bootstrap", "new-game-bootstrap", "framework-version-map", "unity-mcp-workflow"], "B", 0.7, ["asset:ProjectSettings"], ["compile, Console clean"]),
     ("bootdata", "Boot scene, Data/Factory scaffolding, cheats menu", 1, ["boot-sequence-setup", "config-and-factory-authoring", "debug-cheats-menu"], "D", 0.5, ["code:Core/*"], ["[edit] boot test"]),
     ("map", "Project map and guard scripts", 1, ["project-context-map", "multi-agent-coexistence"], "D", 0.3, ["file:docs/PROJECT-MAP.md"], ["map paths exist"]),
     ("gate2", "Gate G2: golden path steps for the core loop", 2, ["playmode-script-testing", "unity-qa-playtest", "qa-fix-retest-loop"], "T", 0.6, ["file:Tests/PlayMode/*"], ["[play] golden path core steps"]),
+    ("balance", "Generate and simulate the balance plan", 2, ["auto-balance-game", "auto-balance-loop", "config-and-factory-authoring"], "D", 0.7, ["file:gdd/_generated/balance-plan.json"], ["balance validator 0 errors", "simulation reaches target tolerance"]),
     ("gate3", "Gate G3: screenshots and layout checks", 3, ["ui-validator", "ui-visual-qa", "qa-fix-retest-loop"], "T", 0.5, ["file:qa/shots/*"], ["[shot] 3 aspect ratios"]),
     ("audit", "Wiring audit, data audit, Console triage", 6, ["done-means-wired", "unity-log-triage", "qa-static-checks", "qa-editmode-validators"], "T", 0.6, ["file:qa/reports/*"], ["zero missing refs"]),
     ("perf", "Performance audit on the Mobile tier", 6, ["mobile-perf-audit", "profiling-evidence", "qa-playmode-smoke"], "T", 0.8, ["file:qa/reports/*"], ["budgets within tier"]),
@@ -125,6 +128,8 @@ def generate(g, day_h=16, cut=True):
     cross["bootdata"]["depends_on"] += [boot]
     cross["map"]["depends_on"] += [boot]
     cross["specs"]["depends_on"] += [cross["lint"]["id"]]
+    cross["visual-evidence"]["depends_on"] += [cross["lint"]["id"]]
+    cross["visual-mapspec"]["depends_on"] += [cross["visual-evidence"]["id"]]
     cross["provenance"]["depends_on"] += [cross["lint"]["id"]]
     cross["bootstrap"]["depends_on"] += [cross["specs"]["id"]]
     for t in tasks:
@@ -132,6 +137,8 @@ def generate(g, day_h=16, cut=True):
             t["depends_on"].append(bootdata)
     p2 = [t["id"] for t in tasks if t["phase"] == 2 and t["system"] != "pipeline"]
     cross["gate2"]["depends_on"] += p2
+    cross["balance"]["depends_on"] += p2
+    cross["gate2"]["depends_on"] += [cross["balance"]["id"]]
     p3 = [t["id"] for t in tasks if t["phase"] == 3 and t["system"] != "pipeline"]
     cross["gate3"]["depends_on"] += p3 + [cross["gate2"]["id"]]
     later = [t["id"] for t in tasks if t["phase"] in (4, 5)]

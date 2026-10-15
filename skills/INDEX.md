@@ -15,6 +15,7 @@
 
 ## auto
 - auto-balance-game - Use when a Roblox clone needs all time-sensitive gameplay stats generated from a full-game playtime target, daily session budget, optional milestone timeline, or additional balance constraints.
+- auto-balance-loop - Use when a generated balance plan must be simulated, tuned within a bounded iteration cap, materialized into Unity configs and verified against a fresh-save PlayMode target.
 
 ## boot
 - boot-sequence-setup - Set up or debug game boot order: data preload/warmup, one-time init hooks, settings-to-audio binding, static resets. Use when adding startup code or when a save, factory or manager is not ready at startup.
@@ -230,7 +231,7 @@
 ## roblox
 - roblox-character-camera - Roblox-feel movement, jump, ragdoll, animation states and third-person camera in Unity, with stud/WalkSpeed/JumpPower conversions. Use when building or tuning player character/camera or fixing controller issues.
 - roblox-genre-patterns - Catalog of Roblox genres (simulator, pet/egg, tycoon, steal/carry, obby, TD, treadmill, fighting, survival) with core loops and required systems. Use when planning a clone or deciding which systems it needs.
-- roblox-shader-kit - Shared Roblox/Lego-style environment foundation: vertex-color surfaces, batched URP shader, minimal material profiles, water/lava/sand variants, static mesh combine, decor LOD and bake validation. Auto-load when GDD/environment evidence calls for Roblox studs or block-built visuals; no manual invocation required.
+- roblox-shader-kit - Routed Roblox/Lego environment foundation for visual recon, materialization, mesh baking, chunk/culling and render validation; load only when the current task needs those phases.
 - roblox-world-kit - Roblox-look world kit: stud scale, palette, surface registry, modular kit pieces, assembly rules and world validation. Use when building or cloning a Roblox-style map in Unity.
 
 ## rule
@@ -297,6 +298,7 @@
 - ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on "UI looks ugly/uneven".
 - ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections.
 - ui-text-tmp - TextMeshPro conventions: fonts, outline materials, autosize ranges, colors, raycast, number formats. Use when creating labels, titles, counters or fixing text that overflows or looks unlike the reference.
+- text-spread - Knife Tower-style pooled reward/stat text for Canvas UI or world-space TMP, with a left TMP Sprite icon, right TMP label, and shared 512x512/128-cell atlas. Use when showing +money, +speed, +luck or similar feedback.
 - ui-validator - Check a UI prefab numerically for structure, overlap, safe area, text fit, raycast, 9-slice, missing references and more at several aspect ratios, with reasoned exceptions. Use after building or changing any popup, HUD or page, before screenshots.
 - ui-visual-qa - Capture a screen at several aspect ratios, diff it against a mockup or approved golden image (pixels, SSIM, edge map) and measure text contrast, with a stdlib PNG toolchain. Use after ui-validator passes, or when a build must match a reference image.
 

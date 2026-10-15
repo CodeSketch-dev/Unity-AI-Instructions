@@ -19,4 +19,6 @@ The output contains numeric `generated_values` per milestone for progression gat
 
 Materialization contract: import the plan as generated data, map each `generated_values[].path` to the game's config/factory IDs, preserve GDD-observed values, apply explicit overrides last, and fail on an unmapped discovered stat that affects completion time. Never silently invent a feature from an unknown stat.
 
+Before Unity materialization, run `py -I <skills>/auto-balance-game/scripts/econ_sim.py PLAN.json --mode tune --out simulation.json`. Use `references/sim-vs-game.md` for the required mapping and PlayMode evidence; a simulator pass alone is never a balance pass.
+
 Do not use this skill for a reference-only audit where the task is to reproduce observed numbers without tuning.

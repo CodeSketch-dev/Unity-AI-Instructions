@@ -17,8 +17,8 @@ namespace RobloxShaderKit.Editor
             var material = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (material == null) { material = new Material(shader); AssetDatabase.CreateAsset(material,path); }
             material.shader = shader;
-            string[] properties = { "_Albedo1", "_Albedo2", "_Albedo3", "_CheckerDetail", "_LegoDetail", "_LegoNormal" };
-            string[] textures = { "T_Water.png", "T_Lava.png", "T_Sand.png", "T@_Checker.png", "T@_Brick_Albedo.png", "T@_Brick_Normal.png" };
+            string[] properties = { "_Albedo1", "_Albedo2", "_Albedo3", "_Albedo4", "_CheckerDetail", "_LegoDetail", "_LegoNormal" };
+            string[] textures = { "T_Water.png", "T_Lava.png", "T_Sand.png", "T@_Brick_Albedo.png", "T@_Checker.png", "T@_Brick_Albedo.png", "T@_Brick_Normal.png" };
             for (int i = 0; i < properties.Length; i++)
             {
                 var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/SourceContract/Textures/" + textures[i]);

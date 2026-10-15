@@ -10,10 +10,13 @@ MCP is the only way to know the real Editor state. File edits do not prove that 
 ## Session start
 1. List the available Unity MCP tools and check connection status; prefer the team's default server (ivanmurzak) and do not mix servers for one operation. Never invent a tool name.
 2. Confirm the Editor has the intended project and scene open (name/path) before touching anything.
-3. Read the Console first to know the baseline errors.
+3. Read the Console first to know the baseline errors. Record the latest sequence/timestamp and classify existing entries as baseline before any mutation; never clear the Console before preserving that baseline.
 
 ## Stale-state guard
 Before any MCP mutation or save of a scene/prefab, run `workspace_guard.py check` (skill `multi-agent-coexistence`): if the file changed on disk since you read it, reload it in the Editor first, otherwise the save overwrites the other agent's work.
+
+## CodeGraph boundary
+When `.codegraph/` exists, use CodeGraph MCP first for C# source exploration and call-flow/impact questions. Treat its index as derived and potentially a few moments behind concurrent writes; it never replaces the stale-state check, one-writer coordination, or Unity MCP read-back. Use Unity MCP for the authoritative scene, prefab, serialized-reference, import, compile, Console, and Play Mode state.
 
 ## Operating pattern
 1. **Inspect** (read-only): hierarchy, components, serialized values, assets, prefab status.
@@ -21,6 +24,7 @@ Before any MCP mutation or save of a scene/prefab, run `workspace_guard.py check
 3. **Mutate in small batches.** For prefab instances, edit the source prefab asset (open prefab, change, save), not a scene override, unless asked.
 4. **Save**: scene/prefab/assets explicitly.
 5. **Refresh + compile**, wait for domain reload to finish, then read the Console.
+   Compare against the saved baseline: new compile errors are hard failures; pre-existing third-party/editor warnings stay visible as notes and are not silently treated as caused by the current task.
 6. **Read back** the changed objects and verify serialized references (null, Missing).
 7. **Play**: enter Play Mode, drive the feature, capture Console and a screenshot, exit Play Mode and ensure no scene changes were left from play.
 
