@@ -8,7 +8,7 @@ description: Author config ScriptableObject entries and register them in a Facto
 Extends `config-driven-feature` (the end-to-end chain). This skill is the detail for the authored entries and the registry (report 03).
 
 ## Entries
-- One asset per entry under `Assets/_Game/Configs/<Feature>/`, role-prefixed names (`Pool_Fx_*`, `Character_Brainrot_*`, `Shop_*`, `Battle_*`, `Wing_*`). Feature subfolders, never loose files in the root.
+- One asset per entry under `Assets/_Game/Configs/<Feature>/`, role-prefixed names (`Pool_Fx_*`, `Character_<Variant>_*`, `Shop_*`, `Battle_*`, `Wing_*`). Feature subfolders, never loose files in the root.
 - Plain `ScriptableObject` by default; `SerializedScriptableObject` only for Odin needs (dictionaries, `[OdinSerialize]`).
 - Polymorphic data without Odin: `[SerializeReference] Info _info` plus subclasses and a `TryGetInfo<T>(out T)` downcast.
 - Fields `[SerializeField]` private with read-only properties. No runtime state in assets except `[NonSerialized]` caches; persistent state lives in `Data_X.Get(ID)` (lazy `TryAdd`).

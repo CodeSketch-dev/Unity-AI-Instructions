@@ -11,7 +11,7 @@ Pattern from knife-tower and monkey-escape (report 04, VERIFIED unless marked). 
 - `Character : OptCollisionSensorFast<ICharacterCollidable>` is the actor root and the single physics-callback owner (`collision-registry`). Sibling components (renderer, animator, checkpoint, dead, fx, sfx, fall detector, skin) derive from the cached-mono hub base and read the root through `Hub`.
 - `CharacterKC : ICharacterController` holds motion. Same character, different driver: `Player` and `AI` write an input struct and call `SetInputs(ref input)` (`bot-brain-waypoints`).
 - Input structs: `{moveAxisForward, moveAxisRight, cameraRotation, jumpDown}` for the player, `{MoveVector, LookVector, Jump}` for AI. Camera-relative movement: project the camera rotation onto the up plane, clamp the input to length 1.
-- States via the framework `StateMachine<State>` used as a holder with a `switch` in the KCC callbacks (`Default, Freeze, ClimbingLadder, Jumping, Jetpack, FlyCarpet, Treadmill, Stop`; advanced states in `kcc-advanced-movement`). `IsGrounded = CurrentState == Default`.
+- States via the framework `StateMachine<State>` used as a holder with a `switch` in the KCC callbacks; define only the GDD-selected modes (for example grounded, airborne, traversal, mounted, or scripted action). `IsGrounded` must derive from the project's grounded state.
 
 ## Callback pipeline
 `SetInputs` (clamp, camera plane, set `_jumpRequested`) -> `BeforeCharacterUpdate` (state switches) -> `UpdateRotation` -> `UpdateVelocity` (ground lerp / air accel + gravity + drag / jump / ladder) -> `AfterCharacterUpdate` (buffer expiry, reset `_jumpConsumed` on stable ground, coyote timer) -> `PostGroundingUpdate` (`OnLanded`, `OnLeaveStableGround`).

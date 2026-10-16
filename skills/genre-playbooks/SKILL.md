@@ -11,9 +11,9 @@ Planning aid, not a design. The GDD is the truth; this lists which systems a clo
 |---|---|
 | Obby / stage runner | `kcc-character-controller`, `platform-kit`, `checkpoint-respawn`, `ladder-climb`, `revive-result-flow`, `intro-camera-flyover` |
 | Tower climb | `kcc-character-controller`, `platform-kit`, `checkpoint-respawn`, `freelook-third-person-camera` |
-| Simulator / clicker | `economy-loop-archetypes`, `recipe-restock-shop`, `hotbar-inventory`, `recipe-retention-timers`, `recipe-spin-wheel` |
+| Simulator / clicker | `economy-loop-archetypes`, `hotbar-inventory`, `recipe-retention-timers` |
 | Tycoon | `economy-loop-archetypes`, `recipe-retention-timers`, `zone-level-design`, `recipe-add-pickup`, `npc-bots-and-enemies` |
-| Pet / egg collector | `economy-loop-archetypes`, `recipe-gacha-box`, `cosmetic-slot-providers`, `recipe-add-skin-or-item`, `recipe-retention-timers` |
+| Pet / egg collector | `economy-loop-archetypes`, `cosmetic-slot-providers`, `recipe-add-skin-or-item`, `recipe-retention-timers` |
 | Steal / base defense | `bot-brain-waypoints`, `simple-boss-patrol-chase`, `teleporter-pad`, `combat-health-status`, `economy-loop-archetypes` |
 | Escape / chase | `bot-brain-waypoints`, `simple-boss-patrol-chase`, `checkpoint-respawn`, `nav-traversal-link-tool`, `revive-result-flow` |
 | Racing / parkour | `kcc-advanced-movement`, `platform-kit`, `checkpoint-respawn`, `freelook-third-person-camera`, `bots-as-players` |

@@ -5,7 +5,7 @@ description: "Bots that act like other players plus enemy/boss AI for single-pla
 
 # NPC bots and enemies
 
-Single-player clones fake the multiplayer feel with bots. The most maintainable bot is a real player-type character driven by a brain instead of a second code path, so everything the player can do (animations, treadmill, pets, shops, ragdoll) works for bots too.
+Single-player clones fake the multiplayer feel with bots. The most maintainable bot is a real player-type character driven by a brain instead of a second code path, so every GDD-enabled player capability is available to bots through the same public rules.
 
 ## Bots as players
 1. **Same character, different driver.** Instantiate the player's character type flagged as NPC; replace the input source with a brain that writes into the same input bridge (move vector, jump, action). Reuse stats, animation, ragdoll, nameplates and economy systems.
@@ -13,7 +13,7 @@ Single-player clones fake the multiplayer feel with bots. The most maintainable 
 3. **Tiers**: weak/normal/VIP strength, re-rolled periodically so some bots rise to higher zones, run faster or find rarer items; avoid a world of identical weak bots that the player trivially outclasses.
 4. **Believable presence**: random names, join/leave over time, varied speeds, occasional mistakes, idle gestures, not all heading to the same target. Cap population by performance (e.g. 6-10 active, others simulated cheaply or hidden).
    - **Skins**: bots randomize their visual skin through the character/skin factory (as the reference projects do), never by reusing the player's equipped skin or data, and never from a serialized skin pool on the bot prefab.
-   - **Bot-owned bases** (cages, treadmills) get randomized levels so the world looks populated, obey the same slot caps as the player (upgrade or replace a weaker pet to free a slot), and show their deposited pets and upgrade boards. Standing on another character's treadmill must not train the player.
+   - **Bot-owned locations** use only GDD-defined progression/ownership states, obey the same capacity rules as the player, and expose their authored presentation. One actor's interaction must never mutate another actor's private progression state.
 5. **Fairness**: bots obey the same rules (slots, caps, cooldowns). Do not give them special stealing/griefing powers unless the reference does.
 6. **Persistence**: bots' bases/state may be rebuilt each session; keep their data separate from the player's save.
 

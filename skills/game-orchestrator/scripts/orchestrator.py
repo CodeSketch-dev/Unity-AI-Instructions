@@ -167,7 +167,7 @@ def collect_result(project, tid, result):
 def _evidence_kinds(verify):
     kinds = []
     text = " ".join(verify).lower()
-    for marker, kind in (("compile", "compile"), ("console", "console"), ("[play]", "playmode"),
+    for marker, kind in (("compile", "compile"), ("console", "console"), ("[inspect]", "inspection"), ("[play]", "playmode"),
                          ("[shot]", "screenshot"), ("performance", "performance"), ("build", "build")):
         if marker in text:
             kinds.append(kind)
@@ -224,6 +224,7 @@ def dispatch_payload(project, max_file=4):
                         "skills": sorted(task.get("skills", [])), "active_skills": context["active"],
                         "unload_skills": context["unload"],
                         "context_policy": "load-only-these-skills", "verify": task["verify"],
+                        "context_refs": task.get("context_refs", []),
                         "evidence_contract": {"required": task["verify"], "kinds": _evidence_kinds(task["verify"]),
                                               "required_kinds": _evidence_kinds(task["verify"]),
                                               "must_be_returned": True}})

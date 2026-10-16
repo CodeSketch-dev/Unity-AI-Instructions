@@ -25,6 +25,7 @@ ENVELOPE = ("id", "type", "title", "priority", "fidelity")
 VERIFIERS = ("[play]", "[shot]", "[edit]", "[inspect]", "[sim]")
 P0_TYPES = ("character", "camera", "input", "world", "economy")
 CAP_RE = re.compile(r"^(CAP-\d+)@")
+ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]{0,63}$")
 ANCHORS = {"top-left", "top-center", "top-right", "mid-left", "center", "mid-right", "bottom-left", "bottom-center", "bottom-right",
            "stretch", "stretch-top", "stretch-bottom", "stretch-left", "stretch-right"}
 BASE = {"top-left": (0, 1), "top-center": (0.5, 1), "top-right": (1, 1), "mid-left": (0, 0.5), "center": (0.5, 0.5), "mid-right": (1, 0.5),
@@ -158,6 +159,8 @@ def lint(g, estimate_h=None, day_h=16, last_hash=None):
     ids = {}
     for key, fm, where in docs:
         i = fm.get("id")
+        if not isinstance(i, str) or not ID_RE.fullmatch(i):
+            add("BLOCK", "L002", where, "invalid id %r; use letters, digits, _ or - and start with a letter" % i)
         if i in ids:
             add("BLOCK", "L002", where, "duplicate id %s (also %s)" % (i, ids[i]))
         ids[i] = where

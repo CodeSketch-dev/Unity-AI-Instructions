@@ -39,7 +39,7 @@ Use `scripts/copy_payload.py <unity-project-root>` or an equivalent MCP/editor t
 
 ## Non-negotiable output
 
-- GDD-driven environment only; never invent a dig, treadmill, weapon or other feature.
+- GDD-driven environment only; never invent an unrequested gameplay feature.
 - Minimize material state: try the shared-material + baked-mesh-data path first, then use the smallest justified material families when sharing is incompatible or measurably worse.
 - Prefer vertex colors and UV metadata for compatible static variation; never create duplicated per-object materials merely to represent a color.
 - Any alternate material path must state the constraint that prevented sharing and validate material count, batches, memory and visual fidelity.

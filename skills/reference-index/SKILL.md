@@ -20,14 +20,14 @@ python -I ../project-context-map/scripts/unity_project_scan.py scan --root <ref 
 
 ## Query
 ```
-python -I ../project-context-map/scripts/unity_project_scan.py query --index <name>.json pet cage [--limit 25] [--no-vendor]
-python -I ../project-context-map/scripts/unity_project_scan.py show  --index <name>.json BoardUpgradeCage
+python -I ../project-context-map/scripts/unity_project_scan.py query --index <name>.json <gdd-feature-synonym> [--limit 25] [--no-vendor]
+python -I ../project-context-map/scripts/unity_project_scan.py show  --index <name>.json <symbol-from-query>
 ```
 - `query` takes several terms (all must match, case-insensitive) and searches script paths and types, prefab paths and the classes they use, scenes, editor menu items and ScriptableObject classes. Results show kind, path, declared types and line counts; `(v)` marks vendor code.
 - `show` on a class prints its definition summary and the prefabs using it; on a prefab prints the scripts it uses with their paths. This answers "what does this prefab need" before an asset transfer.
 
 ## Workflow with other skills
-1. User names a feature -> `query` the likely reference(s) (try 2-3 synonyms: board/upgrade/cage; treadmill/speed).
+1. User/GDD names a feature -> `query` the likely reference(s) with 2-3 synonyms derived from that feature.
 2. `show` the prefab and its scripts -> choose what to read in full (only the few files that matter).
 3. Dependency closure for the transfer: `asset-transfer-closure` (`resolve_closure.py`).
 4. Compare and implement: `reference-port`. Record the paths you used in the plan or the project map's reference table.

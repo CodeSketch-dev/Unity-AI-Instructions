@@ -11,6 +11,7 @@ The orchestrator is a continuing agent loop, not a one-shot code generator. Keep
 5. Use MCP to inspect the actual Unity project before mutation: editor state, open scenes, target prefab/asset, Console baseline, and serialized references.
 6. Apply one focused, idempotent mutation through the MCP/editor path. Save the owned asset, refresh, then re-read it.
 7. Compile and run the narrowest relevant EditMode/PlayMode test. Capture concrete evidence in task state.
+   When a task requires `inspection`, return the Editor readback of the source prefab/scene hierarchy and serialized references as `evidence_by_kind.inspection`; a static file check cannot satisfy it.
 8. Normalize the returned result through `orchestrator.collect_result(project, task_id, result)`; reject missing `evidence_contract` or empty evidence before calling `mark`.
 9. On failure, classify REAL, TEST-BUG, ENV, or FLAKY. Route REAL failures to the owning task with a stable signature, repair only that owner, and retest from the failed stage.
 10. On success, mark the task only with evidence. Unload phase-specific skills before selecting the next phase set.

@@ -17,7 +17,7 @@ Roblox games share a movement feel: blocky avatar, predictable constant-speed ru
 - Use the project's existing character controller (kinematic/Character Controller based) before writing a new one. Stats (speed, jump, etc.) come from data, not magic numbers.
 - Movement: instant acceleration (or very short), no drifting; speed from a single stat; run animation intensity can scale with speed.
 - Ground check with a short ray/spherecast, coyote time, jump buffer (see `mobile-input-controls`).
-- States: idle, run, jump/fall, carry (arms raised), action, ragdoll. Use the project's state machine for modes; force-run animation while on a treadmill or similar.
+- States: select only the GDD-required locomotion/action modes. Use the project's state machine and let configured interaction states request their authored animation.
 - Ragdoll/knockback: keep the visible skin continuous (detach the skin pose before disabling the Animator, sync transforms, then enable physics) to avoid a one-frame snap; recover by blending back to animation.
 - Collision: capsule only; keep physics layers minimal; route triggers through the project's collision registry (see `mobile-perf-audit`).
 - Nameplates/labels: world text batched, billboarded, scaled by distance.

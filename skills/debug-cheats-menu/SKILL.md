@@ -20,8 +20,8 @@ Every minute an agent or human spends grinding to reach a test state is wasted. 
 | Group | Actions |
 |---|---|
 | Economy | Grant configurable test money; set income multiplier; grant offline earnings |
-| Progression | set speed stat; unlock zone N; set tool/cage/treadmill level; trigger rebirth |
-| World | teleport to zone/base/boss; spawn egg/pet of rarity X; spawn boss; toggle safe zone |
+| Progression | set a GDD-selected stat; unlock a configured zone; set a configured feature level; trigger the selected reset/prestige flow |
+| World | teleport to a configured location; spawn a GDD-defined test entity; toggle a configured safe/hazard zone |
 | Time | timeScale slider (QA only; normalize before judging balance), skip N minutes of timers, set daily-reward clock |
 | Save | reset save (confirmation), dump save summary to the log, load a named test save |
 | Monetization | simulate ad success/failure, grant/revoke an entitlement |
@@ -30,7 +30,7 @@ Every minute an agent or human spends grinding to reach a test state is wasted. 
 ## Rules
 - **Never in release**: the panel and registrations are compiled out; verify by checking that a release build has no `DebugCheats` types.
 - **Cheats must not corrupt the save permanently by accident**: mark the session as "cheated" if a cheat modifies persisted data and make "reset save" explicit.
-- **Mind game-time vs real-time**: raising `timeScale` shortens real-time timers (pet lifetimes, boss recovery). Verify behavior at 1x before concluding anything from an accelerated run (`unity-qa-playtest`).
+- **Mind game-time vs real-time**: raising `timeScale` shortens real-time timers. Verify behavior at 1x before concluding anything from an accelerated run (`unity-qa-playtest`).
 - Keep actions idempotent and one-line; avoid cheats that need multi-step UI.
 - Mobile: buttons sized for touch, scrollable, closable; three-finger tap must not trigger accidentally in normal play (dev builds only).
 

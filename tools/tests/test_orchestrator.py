@@ -63,6 +63,11 @@ class GraphTests(unittest.TestCase):
         for ui in ("UI-00-hud", "UI-10-skin-shop", "UI-11-revive", "UI-12-settings"):
             self.assertIn(ui, titles)
 
+    def test_ui_build_requires_prefab_inspection_evidence(self):
+        build = next(t for t in graph()["tasks"] if t["key"] == "ui-build")
+        self.assertIn("done-means-wired", build["skills"])
+        self.assertIn("[inspect] source prefab hierarchy and serialized refs", build["verify"])
+
     def test_scope_cut_drops_p2_then_p1_and_keeps_p0(self):
         g = graph(day_h=7)
         self.assertTrue(g["dropped"])
@@ -75,6 +80,30 @@ class GraphTests(unittest.TestCase):
         zone_tasks = [t for t in graph()["tasks"] if t["key"].startswith("zone-")]
         self.assertEqual(len(zone_tasks), 3)
         self.assertEqual(sorted(t["phase"] for t in zone_tasks), [2, 4, 4])
+
+    def test_world_zones_wait_for_validated_visual_mapspec(self):
+        tasks = graph()["tasks"]
+        mapspec = next(t["id"] for t in tasks if t["key"] == "visual-mapspec")
+        zone_tasks = [t for t in tasks if t["key"].startswith("zone-")]
+        self.assertTrue(zone_tasks)
+        self.assertTrue(all(mapspec in t["depends_on"] for t in zone_tasks))
+
+    def test_clone_tasks_receive_compact_house_style_profile(self):
+        clone_tasks = [t for t in graph()["tasks"] if t["system"] != "pipeline" and t["phase"] >= 2]
+        self.assertTrue(clone_tasks)
+        self.assertTrue(all("docs/reference-foundation.md" in t["context_refs"] for t in clone_tasks))
+
+    def test_system_claims_use_gdd_ids_not_template_feature_names(self):
+        claims = [claim for task in graph()["tasks"] for claim in task["claims"]]
+        self.assertFalse(any("<System>" in claim for claim in claims))
+        self.assertFalse(any("Factory_Minigame" in claim or "Factory_Economy" in claim for claim in claims))
+        self.assertFalse(any("Logic/Quest" in claim or "Logic/Audio" in claim or "Logic/AI" in claim for claim in claims))
+
+    def test_generator_rejects_unsafe_gdd_id(self):
+        g = gl.load_gdd(EXAMPLE)
+        g["systems"]["S-02-camera"]["fm"]["id"] = "../escape"
+        with self.assertRaises(ValueError):
+            gt.generate(g)
 
     def test_markdown_table(self):
         text = gt.to_markdown(graph())
@@ -93,6 +122,7 @@ class StateTests(unittest.TestCase):
         self.assertEqual(payload[0]["task_id"], "T01")
         self.assertEqual(payload[0]["skills"], ["game-clone-recon", "gdd-intake"])
         self.assertEqual(payload[0]["context_policy"], "load-only-these-skills")
+        self.assertEqual(payload[0]["context_refs"], [])
 
     def test_next_json_cli_emits_dispatch_payload(self):
         output = StringIO()
@@ -161,6 +191,9 @@ class StateTests(unittest.TestCase):
             orch.collect_result(self.d, "T01", result)
         result["evidence_contract"]["evidence_by_kind"] = {"compile": "Console sequence 12"}
         self.assertEqual(orch.collect_result(self.d, "T01", result), ["compile ok"])
+
+    def test_inspection_is_an_editor_evidence_kind(self):
+        self.assertEqual(orch._evidence_kinds(["[inspect] source prefab hierarchy and serialized refs"]), ["inspection"])
 
     def test_failed_retries_then_blocks(self):
         orch.mark(self.d, "T01", "in_progress")

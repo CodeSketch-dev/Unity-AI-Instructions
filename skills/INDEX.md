@@ -40,6 +40,7 @@
 - clone-feature-recipes - Use when a clone feature needs a reusable behavior/data/config/UI/wiring contract without hard-coded genre-specific balance values.
 - clone-ip-safety - Asset provenance and IP hygiene for clones: track asset origin, flag ripped/trademarked content, store-safe naming. Use when importing from a reference game, naming the game, or before a public build/store listing.
 - clone-pipeline - Entry point for cloning a Roblox-style game to Unity mobile: maps phase -> skills -> gates, and holds the per-game docs/clone-plan.md. Use at project start, \"what's next\", or when unsure which skill applies.
+- house-style-foundation - Build a compact reference-derived foundation contract for framework version, singleton/global Canvas, boot, collision, data/factory/state and pooling before clone gameplay work.
 
 ## collision
 - collision-registry - Route trigger and collision contacts through the framework OptCollisionRegister and OptCollisionSensor instead of per-object OnTrigger with GetComponent. Use when adding any pickup, platform, zone, checkpoint or hazard.
@@ -212,14 +213,8 @@
 - recipe-add-minigame - Add a minigame or mode (enum id, scene, selection asset, factory, data, UI entry, verification). Use when a GDD adds a new playable mode or stage type.
 - recipe-add-pickup - Add a collectible (coin, gem, boost) with registry collision, data write, sfx, respawn and prefab. Use when a GDD or request adds a new pickup type.
 - recipe-add-skin-or-item - Add a character skin or item entry (asset, factory registration, unlock type, events, shop, save check). Use when adding purchasable or unlockable cosmetics or items.
-- recipe-daily-login - Daily login reward recipe: cycle config assets, claim states, unlock window, clock-tamper guard, missed-day handling, red dot. For daily login popups and streak rewards.
-- recipe-fake-leaderboard - Local fake leaderboard and share: seeded daily bots, real player row, weekly rewards, bot friends, share card. Use when a GDD has rankings or social features in a local-only game.
-- recipe-gacha-box - Gacha box recipe: box asset with weighted rewards, price deducted before the open animation, single-instance popup, events. Use when a GDD sells random boxes.
-- recipe-jackpot-slot - Slot or jackpot spin recipe: outcome roll, pity counter, free daily spin plus banked spins, IAP spin fallback, paytable UI. For slot machines and jackpot spins.
 - recipe-quests-achievements - Stat-driven quests and achievements: one stat bus, quest and achievement assets, daily and weekly resets, red dot. For quests, missions and badges.
-- recipe-restock-shop - Rotating restock shop recipe: slot timer on UTC, weighted rarity roll per tier, stock limits, ad-forced restock, capacity slots. Use for boost or item shops that refresh.
 - recipe-retention-timers - Retention timers: clock-tamper guard, offline earnings with cap, local notification table, redeem codes. Use for any feature that depends on real time away from the game.
-- recipe-spin-wheel - Spin wheel recipe: wheel asset with weighted slots, daily free spin, ad spins with a cap, result chosen before animation. For the lucky wheel.
 
 ## reference
 - reference-index - One-time searchable index of the reference projects in docs/clone-plan.md; find a prefab/script/scene/tool in one query. Use on "like the reference", before reference-port/asset transfer, or when searching big projects is slow.
@@ -230,7 +225,7 @@
 
 ## roblox
 - roblox-character-camera - Roblox-feel movement, jump, ragdoll, animation states and third-person camera in Unity, with stud/WalkSpeed/JumpPower conversions. Use when building or tuning player character/camera or fixing controller issues.
-- roblox-genre-patterns - Catalog of Roblox genres (simulator, pet/egg, tycoon, steal/carry, obby, TD, treadmill, fighting, survival) with core loops and required systems. Use when planning a clone or deciding which systems it needs.
+- roblox-genre-patterns - Catalog of Roblox genres and selectable core-loop/system patterns. Use when planning a clone or deciding which systems the active GDD needs.
 - roblox-shader-kit - Routed Roblox/Lego environment foundation for visual recon, materialization, mesh baking, chunk/culling and render validation; load only when the current task needs those phases.
 - roblox-world-kit - Roblox-look world kit: stud scale, palette, surface registry, modular kit pieces, assembly rules and world validation. Use when building or cloning a Roblox-style map in Unity.
 

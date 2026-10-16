@@ -19,36 +19,36 @@ FILE_LANE_WORKERS = 4
 # type -> list of (key, title, phase, skills, agent, est_h, claims, verify)
 TEMPLATES = {
     "character": [
-        ("controller", "Character data and controller", 2, ["kcc-character-controller", "config-driven-feature"], "D", 1.2, ["code:Logic/Character/*"], ["[edit] feel numbers", "[play] move and jump path"]),
-        ("wiring", "Character prefab wiring and animation", 2, ["character-rig-and-animation-contract", "done-means-wired"], "B", 0.6, ["prefab:Character"], ["[play] animation states"]),
+        ("controller", "Character data and controller", 2, ["kcc-character-controller", "config-driven-feature"], "D", 1.2, ["code:Logic/<System>/*"], ["[edit] feel numbers", "[play] move and jump path"]),
+        ("wiring", "Character prefab wiring and animation", 2, ["character-rig-and-animation-contract", "done-means-wired"], "B", 0.6, ["prefab:<System>"], ["[play] animation states"]),
     ],
-    "camera": [("camera", "Camera rig and input axes", 2, ["freelook-third-person-camera"], "D", 0.8, ["code:Logic/Camera/*"], ["[play] orbit works"])],
-    "input": [("input", "Joystick, look drag and buttons", 2, ["mobile-input-controls", "mobile-hud-layout"], "D", 0.8, ["code:Logic/Input/*"], ["[play] joystick region, no overlap"])],
+    "camera": [("camera", "Camera rig and input axes", 2, ["freelook-third-person-camera"], "D", 0.8, ["code:Logic/<System>/*"], ["[play] orbit works"])],
+    "input": [("input", "Joystick, look drag and buttons", 2, ["mobile-input-controls", "mobile-hud-layout"], "D", 0.8, ["code:Logic/<System>/*"], ["[play] joystick region, no overlap"])],
     "interactable": [
-        ("registry", "Collision-registry interactables", 2, ["collision-registry", "platform-kit", "checkpoint-respawn"], "D", 1.0, ["code:Logic/Interact/*"], ["[edit] trigger fires once", "no GetComponent in callbacks"]),
-        ("respawn", "Respawn, fall and death loop", 2, ["checkpoint-respawn", "clone-feature-recipes"], "D", 0.8, ["code:Logic/Run/*"], ["[play] respawn at checkpoint"]),
+        ("registry", "Collision-registry interactables", 2, ["collision-registry", "platform-kit", "checkpoint-respawn"], "D", 1.0, ["code:Logic/<System>/*"], ["[edit] trigger fires once", "no GetComponent in callbacks"]),
+        ("respawn", "Respawn, fall and death loop", 2, ["checkpoint-respawn", "clone-feature-recipes"], "D", 0.8, ["code:Logic/<System>/*"], ["[play] respawn at checkpoint"]),
     ],
     "economy": [
-        ("tables", "Economy tables to config assets, wallet and events", 2, ["economy-progression-design", "economy-loop-archetypes", "config-and-factory-authoring", "data-block-template"], "D", 0.7, ["asset:SingletonAssets/Factory_Economy"], ["[edit] wallet and events"]),
+        ("tables", "Economy tables to config assets, wallet and events", 2, ["economy-progression-design", "economy-loop-archetypes", "config-and-factory-authoring", "data-block-template"], "D", 0.7, ["asset:Configs/<System>"], ["[edit] wallet and events"]),
     ],
     "shop": [
-        ("logic", "Shop logic: buy, equip, persist", 3, ["config-and-factory-authoring", "recipe-add-skin-or-item", "done-means-wired"], "D", 0.8, ["code:Logic/Shop/*"], ["[edit] insufficient funds unchanged", "[play] restart persists"]),
-        ("catalog", "Catalog fill from tables (assets and icons)", 4, ["reference-port", "asset-transfer-closure"], "D", 1.0, ["asset:Configs/Shop"], ["[edit] data audit equals prices.csv"]),
+        ("logic", "Shop logic: buy, equip, persist", 3, ["config-and-factory-authoring", "recipe-add-skin-or-item", "done-means-wired"], "D", 0.8, ["code:Logic/<System>/*"], ["[edit] insufficient funds unchanged", "[play] restart persists"]),
+        ("catalog", "Catalog fill from tables (assets and icons)", 4, ["reference-port", "asset-transfer-closure"], "D", 1.0, ["asset:Configs/<System>"], ["[edit] data audit equals GDD table"]),
     ],
-    "inventory": [("inventory", "Inventory and hotbar", 4, ["hotbar-inventory"], "D", 1.0, ["code:Logic/Inventory/*"], ["[play] pick, equip, full state"])],
-    "pets": [("pets", "Pets: data, follow, equip", 4, ["cosmetic-slot-providers", "config-and-factory-authoring"], "D", 1.5, ["code:Logic/Pet/*"], ["[play] pet follows and income"])],
-    "quests": [("quests", "Quests and tracker", 4, ["recipe-quests-achievements", "ui-pattern-library"], "D", 1.0, ["code:Logic/Quest/*"], ["[play] quest completes and claims"])],
-    "tutorial": [("tutorial", "Tutorial steps and pointers", 4, ["tutorial-phase-system", "unity-ui"], "D", 0.6, ["code:Logic/Tutorial/*"], ["[play] full tutorial path"])],
-    "audio": [("audio", "Audio factory and sfx wiring", 4, ["game-audio-system", "sfx-variation-ducking"], "D", 0.5, ["code:Logic/Audio/*"], ["[inspect] each event has sfx"])],
-    "vfx": [("vfx", "Pooled effects", 4, ["vfx-budget-rules", "pool-everything", "game-feel-polish"], "D", 0.6, ["code:Logic/Vfx/*"], ["[inspect] pooled and within budget"])],
+    "inventory": [("inventory", "Inventory and hotbar", 4, ["hotbar-inventory"], "D", 1.0, ["code:Logic/<System>/*"], ["[play] pick, equip, full state"])],
+    "pets": [("pets", "Companion data, follow, equip", 4, ["cosmetic-slot-providers", "config-and-factory-authoring"], "D", 1.5, ["code:Logic/<System>/*"], ["[play] configured companion behavior"])],
+    "quests": [("quests", "Quests and tracker", 4, ["recipe-quests-achievements", "ui-pattern-library"], "D", 1.0, ["code:Logic/<System>/*"], ["[play] quest completes and claims"])],
+    "tutorial": [("tutorial", "Tutorial steps and pointers", 4, ["tutorial-phase-system", "unity-ui"], "D", 0.6, ["code:Logic/<System>/*"], ["[play] full tutorial path"])],
+    "audio": [("audio", "Audio factory and sfx wiring", 4, ["game-audio-system", "sfx-variation-ducking"], "D", 0.5, ["code:Logic/<System>/*"], ["[inspect] each event has sfx"])],
+    "vfx": [("vfx", "Pooled effects", 4, ["vfx-budget-rules", "pool-everything", "game-feel-polish"], "D", 0.6, ["code:Logic/<System>/*"], ["[inspect] pooled and within budget"])],
     "monetization": [
-        ("ads", "Ads layer (mock), consent, rewarded flows", 5, ["monetization-integration", "ads-layer-generic", "ads-popup-flow"], "D", 0.8, ["code:Logic/Ads/*"], ["[play] mock flows, ad failure never blocks"]),
-        ("iap", "IAP stubs and grants", 5, ["iap-catalog", "unity-iap-port"], "D", 0.6, ["code:Logic/Iap/*"], ["[play] grant once"]),
+        ("ads", "Ads layer (mock), consent, rewarded flows", 5, ["monetization-integration", "ads-layer-generic", "ads-popup-flow"], "D", 0.8, ["code:Logic/<System>/*"], ["[play] mock flows, ad failure never blocks"]),
+        ("iap", "IAP stubs and grants", 5, ["iap-catalog", "unity-iap-port"], "D", 0.6, ["code:Logic/<System>/*"], ["[play] grant once"]),
     ],
-    "retention": [("daily", "Daily reward and retention", 5, ["recipe-daily-login", "recipe-retention-timers"], "D", 0.6, ["code:Logic/Retention/*"], ["[play] claim once per day"])],
-    "localization": [("strings", "String table and runtime lookup", 3, ["ui-localization", "localization-pipeline"], "D", 0.5, ["asset:Localization"], ["[inspect] no hard-coded text"])],
-    "bots": [("bots", "Bots as players", 4, ["bots-as-players", "bot-brain-waypoints"], "D", 1.2, ["code:Logic/AI/*"], ["[play] bots finish the course"])],
-    "minigame": [("minigame", "Minigame registration and scene", 4, ["recipe-add-minigame", "minigame-registration", "scene-flow-loading"], "D", 1.0, ["asset:Factory_Minigame"], ["[play] entry loads the scene"])],
+    "retention": [("daily", "Daily reward and retention", 5, ["recipe-daily-login", "recipe-retention-timers"], "D", 0.6, ["code:Logic/<System>/*"], ["[play] claim once per day"])],
+    "localization": [("strings", "String table and runtime lookup", 3, ["ui-localization", "localization-pipeline"], "D", 0.5, ["asset:Configs/<System>"], ["[inspect] no hard-coded text"])],
+    "bots": [("bots", "Bots as players", 4, ["bots-as-players", "bot-brain-waypoints"], "D", 1.2, ["code:Logic/<System>/*"], ["[play] bots finish the course"])],
+    "minigame": [("minigame", "Minigame registration and scene", 4, ["recipe-add-minigame", "minigame-registration", "scene-flow-loading"], "D", 1.0, ["asset:Configs/<System>"], ["[play] entry loads the scene"])],
 }
 UI_EST = {"hud": 1.2, "popup_modal": 0.9, "popup_fullscreen": 1.4, "world_board": 0.8, "toast": 0.4, "banner": 0.4}
 CROSS = [  # (key, title, phase, skills, agent, est, claims, verify, system_dependent)
@@ -58,6 +58,8 @@ CROSS = [  # (key, title, phase, skills, agent, est, claims, verify, system_depe
     ("specs", "Short specs for P0 systems", 0, ["spec-then-plan"], "D", 0.5, ["file:docs/specs/*"], ["specs exist per P0 system"]),
     ("provenance", "Asset provenance and reference index", 0, ["reference-index", "clone-ip-safety", "asset-transfer-closure"], "D", 0.2, ["file:docs/asset-provenance.md"], ["all ref-project paths resolve"]),
     ("bootstrap", "Project bootstrap: URP, folders, asmdefs, framework map, MCP", 1, ["unity-project-bootstrap", "new-game-bootstrap", "framework-version-map", "unity-mcp-workflow"], "B", 0.7, ["asset:ProjectSettings"], ["compile, Console clean"]),
+    # Keep Foundation token-light: the profile records contracts and routes leaf skills lazily.
+    ("foundation", "Reference house-style foundation: singleton, global Canvas, boot and framework contracts", 1, ["house-style-foundation", "framework-version-map", "project-context-map"], "B", 0.8, ["file:docs/reference-foundation.md", "asset:GameSingleton", "asset:GlobalCanvas"], ["foundation profile verified", "framework API map verified", "persistent root/Canvas wired", "service contracts routed"]),
     ("bootdata", "Boot scene, Data/Factory scaffolding, cheats menu", 1, ["boot-sequence-setup", "config-and-factory-authoring", "debug-cheats-menu"], "D", 0.5, ["code:Core/*"], ["[edit] boot test"]),
     ("map", "Project map and guard scripts", 1, ["project-context-map", "multi-agent-coexistence"], "D", 0.3, ["file:docs/PROJECT-MAP.md"], ["map paths exist"]),
     ("gate2", "Gate G2: golden path steps for the core loop", 2, ["playmode-script-testing", "unity-qa-playtest", "qa-fix-retest-loop"], "T", 0.6, ["file:Tests/PlayMode/*"], ["[play] golden path core steps"]),
@@ -73,7 +75,14 @@ PRIO = {"P0": 0, "P1": 1, "P2": 2}
 
 def _task(tid, system, key, title, phase, skills, agent, est, claims, verify, prio):
     return {"id": tid, "system": system, "key": key, "title": title, "phase": phase, "skills": skills, "agent": agent,
-            "claims": claims, "depends_on": [], "est_h": est, "verify": verify, "priority": prio, "status": "pending", "attempts": 0}
+            "claims": claims, "depends_on": [], "context_refs": [], "est_h": est, "verify": verify, "priority": prio, "status": "pending", "attempts": 0}
+
+
+def _gdd_id(value, fallback):
+    candidate = str(value if value is not None else fallback)
+    if not gdd_lint.ID_RE.fullmatch(candidate):
+        raise ValueError("invalid GDD id %r" % candidate)
+    return candidate
 
 
 def generate(g, day_h=16, cut=True):
@@ -92,20 +101,22 @@ def generate(g, day_h=16, cut=True):
     for name, v in g["systems"].items():
         fm = v["fm"]
         typ, prio = fm.get("type"), fm.get("priority", "P1")
+        system_id = _gdd_id(fm.get("id"), name)
         chain = []
         if typ == "world":
             for z in fm.get("zones") or []:
                 first = z.get("index", 0) == 0
-                chain.append(new(fm.get("id", name), "zone-" + str(z.get("id")), "Zone %s greybox, hazards and checkpoints" % z.get("name", z.get("id")),
+                chain.append(new(system_id, "zone-" + str(z.get("id")), "Zone %s greybox, hazards and checkpoints" % z.get("name", z.get("id")),
                                  2 if first else 4, ["zone-level-design", "roblox-world-kit", "mesh-merge-baker"], "B", 1.3 if first else 1.5,
                                  ["scene:Game"], ["[play] path reachable", "[inspect] renderers within budget"], prio if first else "P1"))
         else:
             for key, title, phase, skills, agent, est, claims, verify in TEMPLATES.get(typ, []):
-                chain.append(new(fm.get("id", name), key, title, phase, skills, agent, est, list(claims), list(verify), prio))
+                resolved_claims = [claim.replace("<System>", system_id) for claim in claims]
+                chain.append(new(system_id, key, title, phase, skills, agent, est, resolved_claims, list(verify), prio))
         if typ == "interactable":
             kinds = fm.get("kinds") or []
             chain[0]["est_h"] = round(0.4 + 0.15 * len(kinds), 2)
-        by_system[fm.get("id", name)] = chain
+        by_system[system_id] = chain
         for a, b in zip(chain, chain[1:]):
             if typ != "world":
                 b["depends_on"].append(a["id"])
@@ -117,10 +128,11 @@ def generate(g, day_h=16, cut=True):
                     t["depends_on"].append(by_system[dep][-1]["id"])
     for name, v in g["ui"].items():
         fm = v["fm"]
+        ui_id = _gdd_id(fm.get("id"), name)
         est = UI_EST.get(fm.get("kind"), 0.9)
         prio = fm.get("priority", "P1")
-        build = new(fm.get("id", name), "ui-build", "Build %s from its layout contract" % fm.get("id", name), 3, ["ui-builder", "ui-pattern-library", "unity-ui"], "U", est, ["prefab:" + str(fm.get("id", name))], ["[shot] 3 aspect ratios", "ui_validator 0 FAIL"], prio)
-        bind = new(fm.get("id", name), "ui-bind", "Bind %s to systems and events" % fm.get("id", name), 3, ["done-means-wired", "static-bus-events"], "D", 0.4, ["code:Logic/UI/" + str(fm.get("id", name))], ["[play] opens and closes"], prio)
+        build = new(ui_id, "ui-build", "Build %s from its layout contract" % ui_id, 3, ["ui-builder", "ui-pattern-library", "unity-ui", "done-means-wired"], "U", est, ["prefab:" + ui_id], ["[inspect] source prefab hierarchy and serialized refs", "[shot] 3 aspect ratios", "ui_validator 0 FAIL"], prio)
+        bind = new(ui_id, "ui-bind", "Bind %s to systems and events" % ui_id, 3, ["done-means-wired", "static-bus-events"], "D", 0.4, ["code:Logic/UI/" + ui_id], ["[play] opens and closes"], prio)
         bind["depends_on"].append(build["id"])
         build["depends_on"].append(cross["bootstrap"]["id"])
     # cross-cutting edges
@@ -132,9 +144,14 @@ def generate(g, day_h=16, cut=True):
     cross["visual-mapspec"]["depends_on"] += [cross["visual-evidence"]["id"]]
     cross["provenance"]["depends_on"] += [cross["lint"]["id"]]
     cross["bootstrap"]["depends_on"] += [cross["specs"]["id"]]
+    cross["foundation"]["depends_on"] += [cross["bootstrap"]["id"], cross["map"]["id"]]
+    cross["bootdata"]["depends_on"] += [cross["foundation"]["id"]]
     for t in tasks:
         if t["system"] not in ("pipeline",) and t["phase"] >= 2 and bootdata not in t["depends_on"]:
             t["depends_on"].append(bootdata)
+            t["context_refs"].append("docs/reference-foundation.md")
+        if t["key"].startswith("zone-") and cross["visual-mapspec"]["id"] not in t["depends_on"]:
+            t["depends_on"].append(cross["visual-mapspec"]["id"])
     p2 = [t["id"] for t in tasks if t["phase"] == 2 and t["system"] != "pipeline"]
     cross["gate2"]["depends_on"] += p2
     cross["balance"]["depends_on"] += p2
