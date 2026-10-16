@@ -85,24 +85,82 @@ class SpriteBorderTests(unittest.TestCase):
 
 
 class OverflowTests(unittest.TestCase):
-    def test_long_text_in_small_rect_warns(self):
+    def test_long_text_in_small_rect_fails_text_fit(self):
         n = nodes([("Title", dict(size=(100, 40)), lambda c, g: tmp_text(c, g, "A very long title that cannot fit", size=36))])
-        self.assertIn("UI-OVERFLOW", rules(uv.validate(n), "WARN"))
+        self.assertIn("UI-TEXT-FIT", rules(uv.validate(n), "FAIL"))
 
     def test_short_text_ok(self):
         n = nodes([("Title", dict(size=(300, 60)), lambda c, g: tmp_text(c, g, "Play", size=36))])
-        self.assertNotIn("UI-OVERFLOW", rules(uv.validate(n)))
+        self.assertNotIn("UI-TEXT-FIT", rules(uv.validate(n), "FAIL"))
 
     def test_autosize_uses_min_font(self):
         text = "Equipped now"
         small = nodes([("T", dict(size=(150, 60)), lambda c, g: tmp_text(c, g, text, size=60, mn=18, auto=1))])
-        self.assertNotIn("UI-OVERFLOW", rules(uv.validate(small)))
+        self.assertNotIn("UI-TEXT-FIT", rules(uv.validate(small), "FAIL"))
         nofit = nodes([("T", dict(size=(150, 60)), lambda c, g: tmp_text(c, g, text, size=60, mn=18, auto=0))])
-        self.assertIn("UI-OVERFLOW", rules(uv.validate(nofit)))
+        self.assertIn("UI-TEXT-FIT", rules(uv.validate(nofit), "FAIL"))
 
     def test_min_font_below_18_warns(self):
         n = nodes([("T", dict(size=(400, 60)), lambda c, g: tmp_text(c, g, "Hi", size=36, mn=10, auto=1))])
         self.assertIn("UI-FONT-MIN", rules(uv.validate(n), "WARN"))
+
+    def test_ellipsis_or_truncate_fails_even_when_short_text_fits(self):
+        for mode in (1, 3):
+            markup = tmp_text(0, 0, "Play").replace("m_RaycastTarget: 0\n", "m_RaycastTarget: 0\n  m_overflowMode: %d\n" % mode)
+            n = nodes([("Title", dict(size=(300, 60)), lambda c, g, markup=markup: markup.replace("{fileID: 0}", "{fileID: %d}" % g))])
+            self.assertIn("UI-TEXT-FIT", rules(uv.validate(n), "FAIL"))
+
+    def test_word_wrapping_fails_text_fit(self):
+        markup = tmp_text(0, 0, "Play").replace("m_RaycastTarget: 0\n", "m_RaycastTarget: 0\n  m_enableWordWrapping: 1\n")
+        n = nodes([("Title", dict(size=(300, 60)), lambda c, g: markup.replace("{fileID: 0}", "{fileID: %d}" % g))])
+        self.assertIn("UI-TEXT-FIT", rules(uv.validate(n), "FAIL"))
+
+
+class ContentContainmentTests(unittest.TestCase):
+    def test_content_child_outside_padded_container_fails(self):
+        n = nodes([
+            ("Board", dict(size=(600, 400)), lambda c, g: sprite_image(c, g, GUID_PLAIN)),
+            ("Content", dict(father=11, size=(400, 240)), lambda c, g: ""),
+            ("Buy", dict(father=21, size=(300, 100), pos=(150, 0)), lambda c, g: "  m_Transition: 1\n  m_OnClick:\n    m_PersistentCalls:\n      m_Calls: []\n"),
+        ])
+        self.assertIn("UI-CONTENT-CONTAINMENT", rules(uv.validate(n), "FAIL"))
+
+    def test_content_child_inside_padded_container_is_valid(self):
+        n = nodes([
+            ("Board", dict(size=(600, 400)), lambda c, g: sprite_image(c, g, GUID_PLAIN)),
+            ("Content", dict(father=11, size=(400, 240)), lambda c, g: ""),
+            ("Buy", dict(father=21, size=(300, 100)), lambda c, g: "  m_Transition: 1\n  m_OnClick:\n    m_PersistentCalls:\n      m_Calls: []\n"),
+        ])
+        self.assertNotIn("UI-CONTENT-CONTAINMENT", rules(uv.validate(n)))
+
+    def test_full_stretch_content_has_no_padding_and_fails(self):
+        n = nodes([
+            ("Board", dict(size=(600, 400)), lambda c, g: sprite_image(c, g, GUID_PLAIN)),
+            ("Content", dict(father=11, size=(600, 400)), lambda c, g: ""),
+        ])
+        self.assertIn("UI-CONTENT-CONTAINMENT", rules(uv.validate(n), "FAIL"))
+
+    def test_overlapping_content_siblings_fail(self):
+        n = nodes([
+            ("Content", dict(size=(400, 240)), lambda c, g: ""),
+            ("Label_A", dict(father=11, size=(180, 50)), lambda c, g: tmp_text(c, g, "Play")),
+            ("Label_B", dict(father=11, size=(180, 50)), lambda c, g: tmp_text(c, g, "Shop")),
+        ])
+        self.assertIn("UI-CONTENT-CONTAINMENT", rules(uv.validate(n), "FAIL"))
+
+    def test_decorative_frame_may_extend_beyond_board(self):
+        n = nodes([
+            ("Board", dict(size=(600, 400)), lambda c, g: sprite_image(c, g, GUID_PLAIN)),
+            ("Frame", dict(father=11, size=(640, 440)), lambda c, g: sprite_image(c, g, GUID_PLAIN)),
+        ])
+        self.assertNotIn("UI-CONTENT-CONTAINMENT", rules(uv.validate(n)))
+
+    def test_frame_named_control_is_not_treated_as_decoration(self):
+        n = nodes([
+            ("Content", dict(size=(400, 240)), lambda c, g: ""),
+            ("FrameButton", dict(father=11, size=(300, 100), pos=(150, 0)), lambda c, g: "  m_Transition: 1\n  m_OnClick:\n    m_PersistentCalls:\n      m_Calls: []\n"),
+        ])
+        self.assertIn("UI-CONTENT-CONTAINMENT", rules(uv.validate(n), "FAIL"))
 
 
 class RefMatchTests(unittest.TestCase):

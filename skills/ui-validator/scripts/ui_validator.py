@@ -6,7 +6,7 @@ Usage: py -I ui_validator.py <file.prefab> [--hud] [--ref 1920x1080] [--exceptio
                               [--project <unity-project>] (enables UI-9SLICE, UI-MISSING guid checks) [--reference ref.prefab] (enables UI-REF-MATCH)
 Resolves every RectTransform to a rect in canvas units (CanvasScaler Expand) at several
 aspect ratios and applies numeric rules. FAIL (exit 1) rules: UI-OVERLAP, UI-SAFE, UI-BANNER (--hud),
-UI-CHILD-EQ-PARENT, UI-RAYCAST. WARN rule: UI-TOUCH (needs a reasoned exception to silence).
+UI-CHILD-EQ-PARENT, UI-RAYCAST, UI-TEXT-FIT and UI-CONTENT-CONTAINMENT. WARN rule: UI-TOUCH (needs a reasoned exception to silence).
 Elements under Layout Groups / ContentSizeFitter are reported as UI-UNKNOWN and skipped (their size
 needs the runtime validator). Rule ids follow report 17 section 5.3.
 """
@@ -17,11 +17,12 @@ import sys
 from collections import namedtuple
 
 Finding = namedtuple("Finding", "level rule path message")
-Node = namedtuple("Node", "id name path father is_canvas amin amax pos size pivot interactive graphic raycast is_text unknown active handler sprite img_type text font_size font_min autosize scale script_guids overflow_mode")
+Node = namedtuple("Node", "id name path father is_canvas amin amax pos size pivot interactive graphic raycast is_text unknown active handler sprite img_type text font_size font_min autosize word_wrap scale script_guids overflow_mode")
 
 DOC_RE = re.compile(r"^--- !u!(\d+) &(-?\d+)", re.M)
 VEC_RE = re.compile(r"\{x:\s*(-?[\d.eE+-]+),\s*y:\s*(-?[\d.eE+-]+)")
-EXEMPT = ("background", "backdrop", "dim", "overlay", "blocker", "block", "bg", "fill", "viewport", "mask")
+EXEMPT = ("background", "backdrop", "dim", "overlay", "blocker", "block", "bg", "fill", "viewport", "mask", "frame", "glow")
+CONTENT_INSET_MIN = 10
 ASPECTS = [(1920, 1080), (2400, 1080), (1600, 1200)]
 # notch + gesture bar simulation (pixels) for the wide aspect, per report 17: left/right 132, bottom 63
 SAFE_PX = {(2400, 1080): (132, 0, 132, 63)}
@@ -84,7 +85,7 @@ def nodes_from_prefab(path):
         b = rects[g]
         interactive = graphic = is_text = handler = False
         raycast = sprite = img_type = text_value = font_size = font_min = None
-        autosize = False
+        autosize = word_wrap = False
         script_guids = []
         overflow_mode = None
         for cb in comps.get(g, []):
@@ -102,6 +103,7 @@ def nodes_from_prefab(path):
                 font_size = _num(_field(cb, "m_fontSize"))
                 font_min = _num(_field(cb, "m_fontSizeMin"))
                 autosize = _field(cb, "m_enableAutoSizing") == "1"
+                word_wrap = _field(cb, "m_enableWordWrapping") == "1"
                 overflow_mode = _num(_field(cb, "m_overflowMode"))
             elif _field(cb, "m_Sprite") is not None and _field(cb, "m_PreserveAspect") is not None:
                 graphic = True
@@ -118,7 +120,7 @@ def nodes_from_prefab(path):
         out.append(Node(g, name, path_of(g), parent, g in canvases, _vec(b, "m_AnchorMin"), _vec(b, "m_AnchorMax", (1.0, 1.0)),
                         _vec(b, "m_AnchoredPosition"), _vec(b, "m_SizeDelta"), _vec(b, "m_Pivot", (0.5, 0.5)),
                         interactive, graphic, raycast, is_text, parent in layout_go, active, handler,
-                        sprite, img_type, text_value, font_size, font_min, autosize, _scale_x(b), script_guids, overflow_mode))
+                        sprite, img_type, text_value, font_size, font_min, autosize, word_wrap, _scale_x(b), script_guids, overflow_mode))
     return out
 
 
@@ -255,8 +257,7 @@ def resolve_rects(nodes, canvas):
 
 
 def _exempt(name):
-    low = name.lower()
-    return any(k in low for k in EXEMPT)
+    return any(token in EXEMPT for token in re.split(r"[^a-z0-9]+", name.lower()) if token)
 
 
 def _ancestors(n, by_id):
@@ -271,6 +272,15 @@ def _inter(a, b, shrink=4):
     w = min(a[2] - shrink, b[2] - shrink) - max(a[0] + shrink, b[0] + shrink)
     h = min(a[3] - shrink, b[3] - shrink) - max(a[1] + shrink, b[1] + shrink)
     return w > 0 and h > 0
+
+
+def _contains(outer, inner, tolerance=1):
+    return (inner[0] >= outer[0] - tolerance and inner[1] >= outer[1] - tolerance
+            and inner[2] <= outer[2] + tolerance and inner[3] <= outer[3] + tolerance)
+
+
+def _is_content_area(node):
+    return "content" in node.name.lower()
 
 
 def _excused(exceptions, rule, path):
@@ -317,6 +327,17 @@ def validate(nodes, canvas=(1920.0, 1080.0), safe_inset=(0, 0, 0, 0), edge_margi
         if live and n.interactive and (r[2] - r[0] < touch_min or r[3] - r[1] < touch_min):
             add("WARN", "UI-TOUCH", n, "touch target %.0fx%.0f < %d" % (r[2] - r[0], r[3] - r[1], touch_min))
         parent = by_id.get(n.father)
+        if live and _is_content_area(n) and parent and not parent.is_canvas:
+            pr = rects[parent.id]
+            inset = (r[0] - pr[0], r[1] - pr[1], pr[2] - r[2], pr[3] - r[3])
+            if not _contains(pr, r) or min(inset) < CONTENT_INSET_MIN:
+                add("FAIL", "UI-CONTENT-CONTAINMENT", n,
+                    "content inset %s is below %d px or leaves parent %s" % (tuple(round(v) for v in inset), CONTENT_INSET_MIN, parent.path))
+        if live and parent and _is_content_area(parent) and not _exempt(n.name):
+            pr = rects[parent.id]
+            if not _contains(pr, r):
+                add("FAIL", "UI-CONTENT-CONTAINMENT", n,
+                    "rect %s leaves padded content area %s" % (tuple(round(v) for v in r), parent.path))
         if parent and parent.graphic and not parent.is_text and n.graphic and not n.is_text and n.name != "Root" and not _exempt(n.name):
             pr = rects[parent.id]
             if all(abs(a - b) <= 1 for a, b in zip(r, pr)):
@@ -331,13 +352,19 @@ def validate(nodes, canvas=(1920.0, 1080.0), safe_inset=(0, 0, 0, 0), edge_margi
                 add("FAIL", "UI-9SLICE", n, "sprite has a 9-slice border but Image Type is not Sliced")
             elif (r[2] - r[0]) < border[0] + border[2] or (r[3] - r[1]) < border[1] + border[3]:
                 add("WARN", "UI-9SLICE", n, "rect %.0fx%.0f is smaller than the border sum (Unity shrinks the borders; check the look)" % (r[2] - r[0], r[3] - r[1]))
-        if live and n.is_text and n.text and not (n.overflow_mode == 0 and not n.autosize):
+        if live and n.is_text and n.text:
             font = n.font_min if n.autosize and n.font_min else n.font_size
             lines = n.text.replace("\\n", "\n").split("\n")
             if font:
                 w_est, h_est = max(len(x) for x in lines) * font * 0.55, len(lines) * font * 1.2
-                if w_est > (r[2] - r[0]) or h_est > (r[3] - r[1]):
-                    add("WARN", "UI-OVERFLOW", n, "estimated %.0fx%.0f text at size %.0f vs rect %.0fx%.0f (heuristic; runtime validator is authoritative)"
+                if n.word_wrap:
+                    add("FAIL", "UI-TEXT-FIT", n, "uses TMP word wrapping")
+                elif n.overflow_mode in (1, 3):
+                    add("FAIL", "UI-TEXT-FIT", n, "uses TMP ellipsis or truncation")
+                elif n.overflow_mode == 0 and not n.autosize:
+                    add("FAIL", "UI-TEXT-FIT", n, "uses TMP Overflow without Auto Size")
+                elif w_est > (r[2] - r[0]) or h_est > (r[3] - r[1]):
+                    add("FAIL", "UI-TEXT-FIT", n, "estimated %.0fx%.0f text at size %.0f vs rect %.0fx%.0f (heuristic; runtime validator is authoritative)"
                         % (w_est, h_est, font, r[2] - r[0], r[3] - r[1]))
         if n.is_text and n.autosize and n.font_min is not None and n.font_min < 18:
             add("WARN", "UI-FONT-MIN", n, "autosize min font %.0f < 18 (readability on phones)" % n.font_min)
@@ -353,6 +380,14 @@ def validate(nodes, canvas=(1920.0, 1080.0), safe_inset=(0, 0, 0, 0), edge_margi
             cy0, cy1 = canvas[1] * 0.3, canvas[1] * 0.7
             if r[0] < cx1 and r[2] > cx0 and r[1] < cy1 and r[3] > cy0:
                 add("WARN", "UI-CENTER-FREE", n, "HUD element inside the central 40% x 40% of the view")
+    for parent in known:
+        if not _is_content_area(parent):
+            continue
+        members = [n for n in known if n.father == parent.id and (n.active or include_inactive) and not _exempt(n.name)]
+        for i, a in enumerate(members):
+            for b in members[i + 1:]:
+                if _inter(rects[a.id], rects[b.id]):
+                    add("FAIL", "UI-CONTENT-CONTAINMENT", a, "overlaps content sibling %s" % b.path)
     for n in nodes:                                   # script/asset references (all nodes, also under layout groups)
         if None in n.script_guids:
             add("FAIL", "UI-MISSING", n, "component with a missing script (m_Script fileID 0)")
