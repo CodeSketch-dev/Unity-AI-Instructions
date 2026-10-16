@@ -40,7 +40,6 @@
 - clone-feature-recipes - Use when a clone feature needs a reusable behavior/data/config/UI/wiring contract without hard-coded genre-specific balance values.
 - clone-ip-safety - Asset provenance and IP hygiene for clones: track asset origin, flag ripped/trademarked content, store-safe naming. Use when importing from a reference game, naming the game, or before a public build/store listing.
 - clone-pipeline - Entry point for cloning a Roblox-style game to Unity mobile: maps phase -> skills -> gates, and holds the per-game docs/clone-plan.md. Use at project start, \"what's next\", or when unsure which skill applies.
-- house-style-foundation - Build a compact reference-derived foundation contract for framework version, singleton/global Canvas, boot, collision, data/factory/state and pooling before clone gameplay work.
 
 ## collision
 - collision-registry - Route trigger and collision contacts through the framework OptCollisionRegister and OptCollisionSensor instead of per-object OnTrigger with GetComponent. Use when adding any pickup, platform, zone, checkpoint or hazard.
@@ -113,6 +112,9 @@
 
 ## hotbar
 - hotbar-inventory - Hotbar and inventory: Data_Inventory shape, static hotbar with selection event and slot fallback, scroll panel of owned tools, equip classes and locking rules. Use when adding a tool bar, backpack list or equipment slots.
+
+## house
+- house-style-foundation - Build the compact project foundation from the user's reference Unity project before clone gameplay work: framework version, singleton/global Canvas, boot, collision registry, data/factory/state/pool contracts.
 
 ## iap
 - iap-catalog - Catalog-driven in-app purchases: product table, payout receiver switch, ownership data, restore, price text fallback. Use when adding products or shop packs to a clone.
@@ -225,7 +227,7 @@
 
 ## roblox
 - roblox-character-camera - Roblox-feel movement, jump, ragdoll, animation states and third-person camera in Unity, with stud/WalkSpeed/JumpPower conversions. Use when building or tuning player character/camera or fixing controller issues.
-- roblox-genre-patterns - Catalog of Roblox genres and selectable core-loop/system patterns. Use when planning a clone or deciding which systems the active GDD needs.
+- roblox-genre-patterns - Catalog of Roblox genres and selectable core-loop/system patterns. Use when planning a clone or deciding which systems it needs.
 - roblox-shader-kit - Routed Roblox/Lego environment foundation for visual recon, materialization, mesh baking, chunk/culling and render validation; load only when the current task needs those phases.
 - roblox-world-kit - Roblox-look world kit: stud scale, palette, surface registry, modular kit pieces, assembly rules and world validation. Use when building or cloning a Roblox-style map in Unity.
 
@@ -242,6 +244,9 @@
 - scene-flow-loading - Scene flow and loading: boot scene order, loader screen with real plus fake progress, one-time costs behind loading, no blocking SDK init. Use when wiring scenes and startup.
 - scene-naming-conventions - Scene, prefab and asset naming conventions and folders for a clone project, checked by the naming lint. Use when creating scenes, prefabs or assets.
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints) callable from the menu and from Unity MCP. Use when a scene needs several bake steps run in the right order.
+
+## senior
+- senior-tester - Act as a senior tester on any software or game: normal-user flows first, then exploratory, abuse, interruption, boundary and extreme-state testing, soak runs, unique bug signatures, fix-and-replay. Use when asked to test, find bugs, break it, QA, or before calling anything done or releasing.
 
 ## settings
 - settings-pause-offline - Settings screen, pause popup and app pause/resume handling: toggles, language, quality, restore, privacy rows, timeScale and audio group. Use when building settings or pause.
@@ -268,6 +273,9 @@
 ## teleporter
 - teleporter-pad - Teleporter pads and portals: paired or destination mode, fades, anti ping-pong, control-state restore, camera warp. Use when adding portals, zone travel pads or teleports between areas.
 
+## text
+- text-spread - Use when creating Unity screen-space or world-space reward/stat text such as +money, +speed, +luck, or damage with a left TMP Sprite icon and right TextMeshPro label.
+
 ## thrown
 - thrown-bomb-aoe - Thrown items and bombs: pooled arc or linear projectiles, fuse with blink, NonAlloc blast with falloff, owner safety, optional terrain dig. Use when adding grenades, bombs, shuriken, shields, hammers or banana throws.
 
@@ -293,7 +301,6 @@
 - ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on "UI looks ugly/uneven".
 - ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections.
 - ui-text-tmp - TextMeshPro conventions: fonts, outline materials, autosize ranges, colors, raycast, number formats. Use when creating labels, titles, counters or fixing text that overflows or looks unlike the reference.
-- text-spread - Knife Tower-style pooled reward/stat text for Canvas UI or world-space TMP, with a left TMP Sprite icon, right TMP label, and shared 512x512/128-cell atlas. Use when showing +money, +speed, +luck or similar feedback.
 - ui-validator - Check a UI prefab numerically for structure, overlap, safe area, text fit, raycast, 9-slice, missing references and more at several aspect ratios, with reasoned exceptions. Use after building or changing any popup, HUD or page, before screenshots.
 - ui-visual-qa - Capture a screen at several aspect ratios, diff it against a mockup or approved golden image (pixels, SSIM, edge map) and measure text contrast, with a stdlib PNG toolchain. Use after ui-validator passes, or when a build must match a reference image.
 
