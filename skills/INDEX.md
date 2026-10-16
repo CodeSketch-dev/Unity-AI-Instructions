@@ -4,6 +4,12 @@
 - ads-layer-generic - Provider-agnostic ads: adapter, policy and static facade layers, fake Editor provider, consent state, placement enum. Use when adding or porting ads to any game.
 - ads-popup-flow - Implement an ad/monetization sheet (interstitial/rewarded popups, boosters, show-conditions, placements) on top of the project ads SDK wrapper. Use when given an ad placement sheet or asked for inter/reward popups or boosters.
 
+## agent
+- agent-team-protocol - Coordinator rules for running many subagents on one Unity project: model tiering, brief template, FIFO Editor lock with heartbeat, keep-compiling, denial handling, report format. Use when dispatching or acting as a subagent on a shared Editor.
+
+## ambience
+- ambience-layers - Per-zone ambience: crossfaded loops, safe vs danger music, budgeted 3D loops, random one-shots with cooldown, ducking, tier-gated particles, toggle obedience. Use when zones or biomes should feel alive after the audio system exists.
+
 ## analytics
 - analytics-events-taxonomy - Analytics event taxonomy: naming rules, parameter limits, standard event groups, funnels, per-game docs/analytics-events.md. Use before adding any logged event.
 
@@ -22,9 +28,13 @@
 
 ## bot
 - bot-brain-waypoints - Bots that run an obby course: same character with an AI driver, class states, waypoint graph with grid lookup, 3-ray jump avoidance, stuck checks, rubber-band teleport, one-per-frame spawn, and a waypoint graph checker. Use when adding bot racers or chasers.
+- bot-path-follow-smoothing - Fix jittery bots on waypoint paths at speed: corner-pass test, speed hint, last-leg easing, turn-rate limit, fresh direction between throttled ticks, jitter harness. Use when bots wobble, orbit waypoints or snap their facing.
 
 ## bots
 - bots-as-players - Make bots look and behave like other players in a single-player clone: same character prefab, AI driver, random allowed skins and names, nametags, one-per-frame spawn, fake runner skin swaps. Use when a multiplayer game is cloned offline and the world must feel populated.
+
+## camera
+- camera-occlusion-fade - Cheap third-person occluder fade: segment-vs-bounds test on a registered target list every 0.05-0.1 s, hysteresis, shared transparent twin material, instant or timed fade. Use when props or models block the player view.
 
 ## character
 - character-emotes-nametags - Emotes (animator trigger layer, emote wheel) and nametags (single world-space label with a CullingGroup band). Use when the GDD has emotes, player names over heads, or chat-bubble style labels.
@@ -106,6 +116,7 @@
 ## gdd
 - gdd-intake - Turn a Roblox game's videos, screenshots and play notes into a lint-clean GDD package: scaffold, evidence ingest, draft with unknowns, batched questions, UI layout contracts, reference match, lint loop and sign-off. Use when a human wants a clone and only has footage and notes.
 - gdd-schema - The machine-readable GDD package format: folder layout, ids, evidence tokens, fidelity and priority, per-system-type front-matter, UI layout contracts, templates and a worked example. Use when writing, reviewing or consuming a GDD for the clone pipeline.
+- gdd-to-game-fast-path - Thin ordered playbook from GDD to playable build with the fewest tokens: first-30-minutes checklist, skills per phase, gates, what to skip, common pitfalls. Use when kicking off a clone or when the next step is unclear.
 
 ## genre
 - genre-playbooks - Map a Roblox genre (obby, tower climb, simulator, tycoon, pet collector, steal, escape, racing, mining, arena) to the systems and skills a clone needs. Use at planning when the GDD names a genre.
@@ -177,6 +188,9 @@
 ## new
 - new-game-bootstrap - Create a new Unity game from the template with one scripted procedure: config, token replace, project settings applier, pinned packages, ignore rules, repo preflight, human TODO list. Use when starting a new clone project.
 
+## night
+- night-lighting-mobile - Readable, pretty night for mobile scenes: moonlit ambient and fog, sun kept above horizon at low intensity, fake glow lights, tier-gated fireflies, no extra realtime lights. Use when a day/night cycle looks too dark or flat.
+
 ## npc
 - npc-bots-and-enemies - Bots that act like other players plus enemy/boss AI for single-player clones: shared character systems, tiers, wander/chase, cheap pathing, population. Use when the reference is multiplayer or adding rivals/bosses.
 
@@ -187,6 +201,7 @@
 - platform-kit - Reactive platform recipes (trampoline, conveyor, fade, glass bridge, force zone, kill zone, moving platform) built on the collision registry and KCC hooks. Use when building obby/tower platforms.
 
 ## playmode
+- playmode-driver-recipes - Headless-ish Play Mode testing through script-execute when no game-view screenshot or input tool exists: ScreenCapture, real UI taps via EventSystem raycast, input driver, GameView aspect, save backup, blocking popups. Use when verifying UI or gameplay by Play Mode.
 - playmode-script-testing - Verify features in Play Mode via MCP with small C# scripts (invoke onClick by reflection, read state, stretch timers) and screenshots, then restore saved data. Use for end-to-end checks when waiting or input is impractical.
 
 ## pool
@@ -222,6 +237,9 @@
 - reference-index - One-time searchable index of the reference projects in docs/clone-plan.md; find a prefab/script/scene/tool in one query. Use on "like the reference", before reference-port/asset transfer, or when searching big projects is slow.
 - reference-port - Port or match a feature from a reference project/screenshot faithfully: inspect first, compare side by side, adapt not blind-copy. Use on \"like the reference\", \"match 100%\", or \"ours looks different\".
 
+## render
+- render-parity-debugging - Find why imported or cloned models look worse than in the reference project: shader, textures, MaterialPropertyBlock, vertex colour colour space, lighting parity. Use when a ported asset renders flat, washed out, textured wrong or differently lit.
+
 ## revive
 - revive-result-flow - Revive and result flow: timed revive popup, rewarded ad revive, give-up interstitial, result routing and rewards. Use for death, fail and win screens.
 
@@ -244,6 +262,7 @@
 - scene-flow-loading - Scene flow and loading: boot scene order, loader screen with real plus fake progress, one-time costs behind loading, no blocking SDK init. Use when wiring scenes and startup.
 - scene-naming-conventions - Scene, prefab and asset naming conventions and folders for a clone project, checked by the naming lint. Use when creating scenes, prefabs or assets.
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints) callable from the menu and from Unity MCP. Use when a scene needs several bake steps run in the right order.
+- scene-teardown-safety - Prevent teardown-order bugs when switching scenes or modes: destroyed pooled objects in OnDisable, surviving popup roots, leaked tweens/tasks/listeners, duplicate singletons. Use when adding scene or mode switching, pools, or after a MissingReferenceException on exit.
 
 ## senior
 - senior-tester - Act as a senior tester on any software or game: normal-user flows first, then exploratory, abuse, interruption, boundary and extreme-state testing, soak runs, unique bug signatures, fix-and-replay. Use when asked to test, find bugs, break it, QA, or before calling anything done or releasing.

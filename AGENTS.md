@@ -281,3 +281,9 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - Follow the full workflow: plan, implement, wire, save, compile, and test. Never report a gameplay feature complete after only creating scripts.
 - When a target is a prefab instance or appears under Prefab Mode in Context, modify the source prefab asset and apply/save it. Do not leave a scene-only override unless explicitly requested.
 - After wiring, inspect the source prefab and a scene instance, verify serialized references, refresh/compile Unity, and test the relevant Play Mode path before reporting completion.
+
+## Agent team and Play testing (mandatory)
+
+- Multi-agent work: follow `agent-team-protocol` (briefs, FIFO Editor lock with heartbeat, keep the project compiling, stop and report on a denied call, report file + short final answer).
+- Before any Play test or screenshot: claim blocking reward/offline popups with a real tap, back up the save, restore it after (`playmode-driver-recipes`).
+- Scene or mode switching code must pass the repeated scene-flow test in `scene-teardown-safety`.
