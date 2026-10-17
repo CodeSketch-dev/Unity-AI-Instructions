@@ -5,26 +5,25 @@ description: "Coordinator rules for running many subagents on one Unity project:
 
 # Agent team protocol
 
-Complements `editor-lane-single-writer` (what is serial) and `multi-agent-coexistence` (file conflicts). This skill is the operating manual: how to brief, lock, queue and report. If `parallel-subagents-unity-lock` is installed, its lock file may be used instead of the script here; never run both on one project.
+Operating manual; see `editor-lane-single-writer` (what is serial) and `multi-agent-coexistence` (file conflicts). Use one lock only: this script or another lock skill, never both.
 
 ## Coordinator
-1. **Model tiering**: strongest model only for balance/architecture review and root-cause hunts; cheaper models for builders, test runners, docs, scans. Never use the top tier to poll or to summarize logs.
-2. **Brief** every subagent from `references/brief-template.md`: read-first list (paths, not pasted text), rules, process, report path, final-answer length cap (10 lines). Ask for conclusions, not dumps.
-3. **Lanes**: Editor-touching tasks are serial through the lock; file-only tasks (C#, tests, docs, Python) run in parallel on disjoint files (max 4).
-4. **Collect**: read report files, not transcripts. Append to shared docs only (re-read the tail first).
-5. **Denials**: if a permission classifier denies a subagent call, the agent stops and reports the exact call. The coordinator never repeats, reroutes or launders a denied action (no "do it via another tool"); ask the user.
+- **Tiering**: top model only for balance/architecture review and root-cause hunts; cheaper models for builders, test runners, docs, scans; never to poll or summarize logs.
+- **Brief** from `references/brief-template.md`: read-first paths (not pasted text), rules, report path, 10-line answer cap.
+- **Lanes**: Editor work is serial via the lock; file-only work (C#, tests, docs) runs in parallel on disjoint files (max 4).
+- **Collect** report files, not transcripts. Append to shared docs only (re-read the tail first).
+- **Denials**: a classifier-denied call stops the agent; it reports the exact call. Never retry, reroute or launder it; ask the user. Pre-authorise routine Editor calls in settings rules; for refresh, the allowed alternative is running `AssetDatabase.Refresh()` via the script-execute tool.
 
-## Editor lock (any agent touching Play, compile, scenes, prefabs, assets, screenshots)
-- Use `scripts/editor_lock.sh acquire <agent> <task>`; it takes a ticket, waits FIFO, writes a heartbeat; `release` always, also on failure; `touch` every ~60 s in long sessions.
-- A lock whose heartbeat is older than 5 min is stale: the next in queue takes over and notes it in the report.
-- **Never end your turn while waiting** for the lock or a background job: poll with short sleeps, or hand back a "blocked on lock held by X" report. No orphan background jobs: stop what you started.
-- Hold the lock for one batch only (compile + run + screenshots), then release.
+## Editor lock (Play, compile, scenes, prefabs, assets, screenshots)
+- `scripts/editor_lock.sh acquire <agent>` queues FIFO (no ticket = starvation); `touch` every ~2 min; `release` always, also on failure. Set `LOCK`/`Q` env to relocate; default is under `Temp/`.
+- No heartbeat for 5 min = stale, next ticket takes over (note it in the report). A waiter silent for 2 min leaves the queue.
+- **Stay alive while waiting**: run acquire in the foreground with a timeout under the tool limit and repeat it; never end the turn or background it. If it times out, report "blocked on lock held by X". Stop any background job you started (orphans keep tickets).
+- Hold for one batch only (compile + run + screenshots), leave Edit Mode.
 
 ## Keep the project compiling
-- Write a whole file once (one Write/Edit), never leave it half-edited between calls. Compile under the lock, read the Console, fix your errors before releasing.
-- Patch scripts that mutate files must be idempotent; check for a double run (duplicate blocks) before compiling.
-- Never fix compile errors in a file another agent owns: report it.
-- Never save a scene while Play-created objects exist (see `playmode-driver-recipes`).
+- One whole Write/Edit per file; no half-edited state between calls. Do not edit scripts while Play runs (compile stalls): exit Play, edit, recompile.
+- Compile under the lock, read the Console, fix your own errors before release. Others' errors: report, do not fix.
+- Patch scripts must be idempotent (check for double-applied blocks). Never save a scene with Play-created objects (`playmode-driver-recipes`).
 
-## Report format (file, not chat)
-`docs/reports/<task>.md`: Status (DONE / DONE_WITH_CONCERNS / BLOCKED), files changed, checks actually run with numbers, what is unverified, what others must reload/re-read. Final answer: that status plus the path.
+## Report
+`docs/reports/<task>.md`: status (DONE / DONE_WITH_CONCERNS / BLOCKED), files, checks run with numbers, unverified items, what others must reload. Final answer: status + path.

@@ -301,6 +301,9 @@
 ## token
 - token-efficient-workflow - Rules that cut tokens and time: read less, query indexes, batch calls, small outputs, delegate wide search, avoid rework, clean hand-off. Use at the start of long Unity/clone sessions or when slow/costly.
 
+## tuning
+- tuning-by-probe - Tune a curve, force, speed or knockback by measuring the real outcome first: seeded probe, before/after table, reference shape scaled to the world, bounds tests. Use before editing any gameplay curve or number copied from a reference.
+
 ## tutorial
 - tutorial-phase-system - Tutorial phase system: persisted phase int, per-phase HUD visibility and locks, spotlight guidance, rewards once, resume safety. Use when building the first-time tutorial.
 
@@ -346,6 +349,7 @@
 
 ## world
 - world-batching-culling - Make big static worlds cheap on low-end mobile: bake meshes/materials, chunked distance culling, parity and render-stat checks. Use when a map has thousands of renderers, high draw calls, or on \"optimize the map\".
+- world-canvas-ui - World-space canvas boards and slot layouts: strip imported layout groups, scale pixel layouts with pixelsPerUnitMultiplier, z-order, capacity at least data count. Use when building boards, signs or slot grids in the 3D world.
 
 ## zone
 - zone-level-design - Lay out zones, bases, hubs and levels for Roblox-style mobile games: progression gating, scale, walkability, landmarks, kit reuse, performance budgets. Use when building a map/zone or when the layout is cramped, empty or off-scale.

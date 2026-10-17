@@ -18,3 +18,4 @@ Extends `playmode-script-testing` (reflection checks). Use these when you need r
 9. **Time**: stretch timers by config/reflection, restore `timeScale`, one action per call when a frame matters.
 
 Report numbers and screenshot paths; state what only a device can verify.
+- Tutorial gating can hide HUD buttons (alpha 0, no raycast): taps report "no hit" until it is complete or skipped.

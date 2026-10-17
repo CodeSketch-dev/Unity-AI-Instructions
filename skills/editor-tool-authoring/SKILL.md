@@ -26,3 +26,6 @@ Generators that "just work once" are the most dangerous code in a Unity project:
 
 ## After running
 Verify counts (renderers, materials, objects) against expectations, open the result, read the Console, save, and note any manual step the tool cannot do. Record the tool's name and parameters in the plan or notes so the result is reproducible.
+
+## Idempotency drift
+If the scene hash differs between two builder runs, diff the copies and grep for your own names before blaming your step. Another step or an SDK often re-creates a stray root object ("New Game Object", e.g. from an ads SDK) each run: sweep it in the builder.

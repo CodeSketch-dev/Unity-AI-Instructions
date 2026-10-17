@@ -124,6 +124,7 @@
   "teleporter-pad": "name-only",
   "thrown-bomb-aoe": "name-only",
   "token-efficient-workflow": "name-only",
+  "tuning-by-probe": "name-only",
   "tutorial-phase-system": "name-only",
   "ui-button-anatomy": "name-only",
   "ui-clone": "name-only",
@@ -153,6 +154,7 @@
   "vertex-color-baking": "name-only",
   "vfx-budget-rules": "name-only",
   "world-batching-culling": "name-only",
+  "world-canvas-ui": "name-only",
   "zone-level-design": "name-only"
  }
 }

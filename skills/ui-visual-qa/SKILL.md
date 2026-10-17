@@ -24,3 +24,6 @@ Per (screen, aspect) in 1920x1080, 2400x1080, 1600x1200 (+ portrait if the game 
 The numbers above are starting values. Before enforcing them as a gate: capture 5 approved screens at 3 aspects, re-capture after a deliberate 1-2 px shift, a font change and a colour tweak, record the three metrics for "same", "acceptable" and "wrong" pairs, then set PASS/WARN/FAIL between the observed groups and write the values into the project's `qa/ui-thresholds.json`. Until then the verdicts are advisory.
 
 Limits: only 8-bit non-interlaced PNG; the Editor capture template was not compiled (no Unity MCP this session); a mockup that was not rendered by Unity will always differ in antialiasing and fonts. Taste decisions (look, feel) stay with the user.
+
+## Popup capture batches
+Snapshot popup-root children before create, destroy only the new ones after capture, wait for the open tween, and claim blocking popups (offers, offline reward) with a real tap first; they respawn on resize/focus.
