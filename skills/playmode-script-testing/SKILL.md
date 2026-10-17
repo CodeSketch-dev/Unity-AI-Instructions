@@ -19,3 +19,6 @@ Complements `unity-qa-playtest` and `done-means-wired`. For real taps, screensho
 
 ## Report
 State every path exercised (success, unclaimed, decline, failure), the values observed, and what only a device can verify (real ads, store, performance).
+
+## More
+Traps and recipes (GameView size, MCP stalls, save restore, popup taps, overlay sorting): `references/gotchas.md`.
