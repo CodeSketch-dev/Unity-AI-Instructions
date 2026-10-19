@@ -16,4 +16,4 @@ Why: melee in the reference is non-physical and scheduled at an impact time; per
 7. Throttle attackable-indicator checks (reference interval 0.15 s); no `GetComponent` or LINQ in the query; no allocation in the check.
 8. Checks run on the main thread at impact; cancel pending impacts on death/unequip.
 
-Resolver surface: `Combat_Resolver.FindInCone(origin, fwd, range, halfAngle, buf)`, `FindNearest`. Verify with a profiler capture that a swing allocates 0 bytes (`profiling-evidence`; say if only Editor-measured). Used by `tool-weapon-pipeline`, `thrown-bomb-aoe`.
+Resolver surface: `Combat_Resolver.FindInCone(origin, fwd, range, halfAngle, buf)`, `FindNearest`. Verify with a profiler capture that an attack allocates 0 bytes (`profiling-evidence`; say if only Editor-measured). Used by combat features such as `thrown-bomb-aoe` when present.

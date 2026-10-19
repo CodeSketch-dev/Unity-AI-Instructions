@@ -18,3 +18,7 @@ From report 07 (counts over 223 KT / 184 ME button objects, VERIFIED).
 - Hit area at least a comfortable thumb target (`mobile-hud-layout`); non-interactive Graphics have Raycast Target off.
 - Icon never as large as its button (`ui-style-rules`); icon + label group layout is in `ui-icon-label-layout`.
 - Custom buttons derive the framework's button base (finds the Button in children, listener in `Awake`, override the click method).
+
+## Safe expansion
+
+Build a button inside a parent-owned padded content area. Its label uses TMP Auto Size and its icon+label group is centred within the button content inset. Preferred-size expansion is permitted only while the full button rect stays inside that parent content area and does not intersect another content or interactive sibling. A Board/Frame is a decorative layer, not permission to cover its border or a neighbour. If the label cannot fit at its minimum font within those limits, fail the build for a design/content choice instead of clipping, overflowing or overlapping.

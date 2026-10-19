@@ -13,7 +13,7 @@ On a phone the player has two thumbs and no mouse. Everything depends on assigni
 - **Finger identity**: track `fingerId` (or the Input System touch id) per role; never infer the role from the current position. A finger that began on the joystick keeps being the joystick even if it slides over a button.
 - **Dead zone** 0.1-0.15, radial clamp, optional response curve; normalise diagonal movement.
 - **Floating vs fixed**: floating by default; offer fixed in settings if the reference has it.
-- **Auto actions** reduce touch load: auto-attack/collect when a valid target is in range, auto-run on treadmills, contextual action button that swaps by state.
+- **Auto actions** reduce touch load only when the GDD enables them: use explicit target/eligibility rules and contextual actions that swap by state.
 - **Jump**: buffer input (~0.1 s) and coyote time (~0.1 s) for forgiving platforming.
 
 ## Implementation notes (Unity)

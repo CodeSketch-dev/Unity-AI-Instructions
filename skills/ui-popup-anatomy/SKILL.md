@@ -24,3 +24,6 @@ Boards 1146x754 / 1154x768-800 large, 800x650 settings, 665x512 confirm, 528x435
 Page: title bar (~175 high) + `Btn_Back` (~103x107) + Background + SafeArea; use for tabbed or scrolling content. Popup: floating Board + `Btn_Close`; use for confirmations and short offers.
 
 Framework APIs differ slightly by version (`framework-version-map`); read the installed `Popup` before writing.
+
+## Close during open animation
+Frameworks may ignore `Close()` while the open tween plays. Owners: never consume state or set a busy flag before the close succeeded; retry Close next frame until the popup is gone. Test drivers: wait for the open tween (up to ~8 s) before the first tap.

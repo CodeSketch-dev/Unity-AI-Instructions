@@ -5,14 +5,14 @@ description: Add a collectible (coin, gem, boost) with registry collision, data 
 
 # Recipe: add a pickup
 
-Traced from knife-tower `Collect`, `Collect_Gem` (report 03, VERIFIED). Detect the framework version first (`framework-version-map`); collision base differs (`collision-registry`).
+Detect the target framework first (`framework-version-map`); its collision/data/audio APIs determine the implementation. Reference evidence may validate a selected capability but must not supply class names, paths, currencies, timers, or prefab defaults.
 
-1. **Script** `Scripts/Logic/Collect/Collect_<Name>.cs`: `: Collect` (a register + `ICharacterCollidable` base with empty callbacks). Serialized `_value`, `_respawnTimeInSeconds`. Override `OnTriggerEnterFunc(Character c)`: call `base`, guard `if (!c.IsPlayer) return;`.
-2. **Collect-once memory** (only if needed): add a keyed accessor to the matching `Data_X` (lazy `TryAdd`, see `data-block-template`) and a scene-instance GUID field generated in `OnValidate` (skip prefab assets and prefab stage), plus a `[Button] GenerateGUID`.
-3. **Effect**: `Data_Currency.<X>.Value += value` (the DataValue change drives the HUD); sfx through `AudioManager.Play(Factory_Audio.<Sfx>)` (new `AudioConfig` in `Configs/Audio/` and a field in `Factory_Audio`); a notification text via the project helper.
-4. **Collision wiring**: nothing manual; the base registers child colliders in `OnEnable`. Prefab = root with the script, child collider `isTrigger` on a layer the actor reaches (check the layer matrix), mesh/vfx child. Save under `Prefabs/Collect/`, place instances in the scene.
-5. **Respawn**: `SetActive(false)` then a PrimeTween delay to re-enable; stop the tween in `OnDestroy`; check `this == null` in the callback.
-6. **Fx**: use a pooled fx via `pool-everything`, never `Instantiate`.
+1. **Runtime behavior**: implement only the GDD-selected interaction, actor eligibility, value/reward rule and optional respawn policy using the target's installed collision API.
+2. **Collect-once memory**: add it only when the GDD requires it, through the target persistent-data contract. Generate/store stable instance identity only if authored instances must be remembered.
+3. **Effect**: route the configured reward through the target's data/event/audio/UI services; do not name a currency, notification, or audio registry in the recipe.
+4. **Wiring**: author the target-defined prefab/scene contract, collision layer and trigger policy. Use the framework registry where installed; never add a parallel callback path.
+5. **Lifecycle**: use the project's configured pooling/respawn/cancellation policy; do not assume a tween library or a timer.
+6. **Fx**: pool repeatedly spawned presentation through the installed pool.
 7. **Verify** (Unity MCP, not file edits): compiles, no console errors, collect as player changes value and HUD, restart shows persistence, respawn works, non-player does not collect.
 
-Soft defaults from the reference; override when the project's pickups differ.
+All concrete pickup behavior comes from the active GDD/evidence; this recipe supplies only the required integration chain.

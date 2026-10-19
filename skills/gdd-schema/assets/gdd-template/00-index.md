@@ -11,5 +11,6 @@ fidelity_default: faithful
 ui_default: exact
 locales: [en]
 local_only: true
+auto_balance: true
 budget: {day_h: 16, tokens_cap: 8000000}
 ---

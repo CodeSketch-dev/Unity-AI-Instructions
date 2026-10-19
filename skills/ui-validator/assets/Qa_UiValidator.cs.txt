@@ -16,7 +16,7 @@ namespace Game.Qa
     public static class Qa_UiValidator
     {
         static readonly Vector2Int[] Screens = { new(1920, 1080), new(2400, 1080), new(1600, 1200) };
-        const float EdgeMargin = 24f, TouchMin = 88f;
+        const float EdgeMargin = 24f, TouchMin = 88f, ContentInsetMin = 10f;
 
         // Entry for Unity MCP. Writes findings JSON to outJson and returns a one-line summary.
         public static string Run(string prefabPath, string outJson, float refW = 1920f, float refH = 1080f)
@@ -49,6 +49,7 @@ namespace Game.Qa
                         if ((a.interactive || a.text) && !Inside(safe, r)) { Add(sb, "FAIL", "UI-SAFE", s, a.rt, "outside safe area"); fails++; }
                         if (a.interactive && (r.width < TouchMin || r.height < TouchMin)) Add(sb, "WARN", "UI-TOUCH", s, a.rt, $"{r.width:0}x{r.height:0}");
                         if (a.text) fails += Overflow(sb, s, a.rt, r);
+                        fails += ContentContainment(sb, s, a.rt, r);
                         foreach (var b in items)
                             if (a.interactive && b.interactive && a.rt.GetInstanceID() < b.rt.GetInstanceID()
                                 && !a.rt.IsChildOf(b.rt) && !b.rt.IsChildOf(a.rt) && Shrink(r, 4).Overlaps(Shrink(WorldRect(b.rt), 4)))
@@ -66,12 +67,36 @@ namespace Game.Qa
         {
             var t = rt.GetComponent<TMP_Text>();
             // preferred size at the current font size (or the autosize minimum) must fit the rect; truncation is a failure
+            if (t.enableWordWrapping) { Add(sb, "FAIL", "UI-TEXT-FIT", s, rt, "uses TMP word wrapping"); return 1; }
+            if (t.overflowMode == TextOverflowModes.Ellipsis || t.overflowMode == TextOverflowModes.Truncate) { Add(sb, "FAIL", "UI-TEXT-FIT", s, rt, "uses TMP ellipsis or truncation"); return 1; }
+            if (!t.enableAutoSizing && t.overflowMode == TextOverflowModes.Overflow) { Add(sb, "FAIL", "UI-TEXT-FIT", s, rt, "uses TMP Overflow without Auto Size"); return 1; }
             float fs = t.enableAutoSizing ? t.fontSizeMin : t.fontSize;
             var pref = t.GetPreferredValues(t.text, r.width, 0f);
             float k = fs / Mathf.Max(1f, t.fontSize);
-            if (pref.x * k > r.width + 0.5f || pref.y * k > r.height + 0.5f) { Add(sb, "FAIL", "UI-OVERFLOW", s, rt, "text does not fit at min size"); return 1; }
+            if (pref.x * k > r.width + 0.5f || pref.y * k > r.height + 0.5f) { Add(sb, "FAIL", "UI-TEXT-FIT", s, rt, "text does not fit at min size"); return 1; }
             if (t.enableAutoSizing && t.fontSizeMin < 18f) Add(sb, "WARN", "UI-FONT-MIN", s, rt, $"min {t.fontSizeMin}");
             return 0;
+        }
+
+        static int ContentContainment(StringBuilder sb, Vector2Int s, RectTransform rt, Rect r)
+        {
+            int fails = 0;
+            if (rt.parent is not RectTransform parent) return fails;
+            if (IsContentArea(rt) && parent.GetComponent<Canvas>() == null)
+            {
+                var parentRect = WorldRect(parent);
+                float inset = Mathf.Min(r.xMin - parentRect.xMin, r.yMin - parentRect.yMin, parentRect.xMax - r.xMax, parentRect.yMax - r.yMax);
+                if (!Inside(parentRect, r) || inset < ContentInsetMin) { Add(sb, "FAIL", "UI-CONTENT-CONTAINMENT", s, rt, "content has insufficient parent inset"); fails++; }
+            }
+            if (!IsContentArea(parent) || IsDecorative(rt)) return fails;
+            if (!Inside(WorldRect(parent), r)) { Add(sb, "FAIL", "UI-CONTENT-CONTAINMENT", s, rt, "leaves padded content area " + parent.name); fails++; }
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                if (parent.GetChild(i) is not RectTransform sibling || sibling == rt || IsDecorative(sibling)) continue;
+                if (rt.GetInstanceID() < sibling.GetInstanceID() && Shrink(r, 4).Overlaps(Shrink(WorldRect(sibling), 4)))
+                { Add(sb, "FAIL", "UI-CONTENT-CONTAINMENT", s, rt, "overlaps content sibling " + sibling.name); fails++; }
+            }
+            return fails;
         }
 
         static Rect SafeRect(Vector2Int s, float scale, Vector2 size)
@@ -81,6 +106,15 @@ namespace Game.Qa
             return new Rect(l + EdgeMargin, b + EdgeMargin, size.x - 2 * l - 2 * EdgeMargin, size.y - b - 2 * EdgeMargin);
         }
         static bool Inside(Rect outer, Rect r) => r.xMin >= outer.xMin && r.yMin >= outer.yMin && r.xMax <= outer.xMax && r.yMax <= outer.yMax;
+        static bool IsContentArea(RectTransform rt) => rt.name.ToLowerInvariant().Contains("content");
+        static bool IsDecorative(RectTransform rt)
+        {
+            foreach (var token in rt.name.ToLowerInvariant().Split('_', ' ', '-'))
+                if (token == "background" || token == "backdrop" || token == "dim" || token == "overlay" || token == "blocker"
+                    || token == "block" || token == "bg" || token == "fill" || token == "viewport" || token == "mask"
+                    || token == "frame" || token == "glow") return true;
+            return false;
+        }
         static Rect Shrink(Rect r, float m) => new(r.x + m, r.y + m, r.width - 2 * m, r.height - 2 * m);
         static Rect WorldRect(RectTransform rt) { var c = new Vector3[4]; rt.GetWorldCorners(c); return new Rect(c[0].x, c[0].y, c[2].x - c[0].x, c[2].y - c[0].y); }
         static void Add(StringBuilder sb, string level, string rule, Vector2Int s, RectTransform rt, string msg)

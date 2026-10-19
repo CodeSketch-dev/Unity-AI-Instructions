@@ -14,3 +14,7 @@ Findings from the earlier UI mining of knife-tower/monkey-escape (handoff UI fin
 - Price plate: currency icon + amount in the same group; unaffordable amount turns red/grey.
 - Ad marker: the reference game's ad icon half outside the left edge (popup) or slightly outside the top-right (HUD); never self-drawn "AD" text.
 - Verify by script: loop buttons, compare child rect to parent, check overlap; screenshot at 3 aspect ratios (`unity-ui`).
+
+## Containment-first construction
+
+Create `Button/Content/IconLabelGroup` rather than placing the icon and TMP directly on the button. `Content` owns the button’s padded inset; the centred group may use preferred size and the button may expand only if its resulting rect stays inside the parent content area and clear of content siblings. Background, frame and glow layers are decorative exceptions; they may fill their visual parent but never replace the content boundary. After a layout rebuild, reject a label/icon group that leaves its content inset, overlaps another control or needs a per-prefab baseline nudge.

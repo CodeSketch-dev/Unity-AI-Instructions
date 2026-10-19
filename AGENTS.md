@@ -18,6 +18,15 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - For a small, unambiguous task, act directly with minimal ceremony. For a multi-step or risky task, inspect, propose a concise plan, and implement in verifiable stages.
 - Ask only when a missing decision materially affects gameplay design, public APIs, data loss, budget, or architecture. Make reasonable small decisions independently.
 
+### Global skill-context lifecycle
+
+- Skill availability is not the same as active context. The full skill directory may be indexed/discoverable, but it must never be loaded wholesale into a task prompt.
+- At the start of each phase or task, select the smallest active skill set that directly performs the current work. Load a skill only when its instructions, references or scripts are needed now.
+- Keep active skills scoped to the current phase/task. When its gate closes, remove that skill and its long references from the active context; retain only a compact result, artifact path or gate evidence.
+- When the work changes phase, re-route from the available-skill index and replace the previous active set. Do not carry completed or unused skills into later prompts “just in case”.
+- Always-on process rules (`using-superpowers`, coexistence/safety, token-efficient workflow and verification when applicable) remain compact policy, not full skill bodies. Load their detailed files only when the current action triggers them.
+- Record the active skill set and reason in the current plan/task ledger when the work is multi-step. If a skill is not used by the current action, it must not be included in the prompt context.
+
 ## Unity MCP and editor interaction
 
 - When Unity is involved, prefer the `ivanmurzak` MCP server for Unity Editor interactions: inspect scenes, hierarchy, components, assets, prefabs, Console, and relevant settings; then edit and verify.
@@ -26,6 +35,13 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - Prefer read-only inspection first. Before broad scene or prefab changes, summarize the intended effect and preserve existing work.
 - Use Unity MCP to verify actual Editor state. File edits alone are not evidence that Unity compiled or that the scene works.
 - If MCP is unavailable, explain what cannot be verified and use safe file-based work where possible. Never claim an Editor test occurred if it did not.
+
+### CodeGraph for source-code exploration
+
+- When a project contains a `.codegraph/` index and CodeGraph MCP is available, use `codegraph_explore` first for C# structure, symbol, caller/callee, flow, and impact questions; use raw `rg`/`Read` only to confirm details CodeGraph does not cover.
+- CodeGraph is a derived read index, not the source of truth, a write lock, or proof that Unity serialized/imported/compiled the current state. It does not replace Unity MCP for scenes, prefabs, ScriptableObjects, YAML, Console, or Play Mode.
+- After another agent edits code, treat CodeGraph results as potentially stale until its watcher catches up; check index status or re-index through the project's approved workflow before relying on a result for a mutation.
+- Do not install or modify every agent/skill configuration implicitly. Review installer diffs and scope CodeGraph integration to the agents and projects that actually use it.
 
 ## Standard execution workflow
 
@@ -51,6 +67,7 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - Ask before destructive changes, deleting assets, major package upgrades, credential changes, or publishing/build submission.
 - Do not run `git reset --hard`, destructive clean commands, or force pushes without explicit authorization.
 - Do not commit, push, merge, or create branches unless requested. Preserve any existing user changes.
+- This repository is an instruction/skill repository only: never create, copy, modify, upload, commit, or push an example or production Unity project from here. Unity projects are external targets and require an explicit user request plus the target project's own workspace.
 - Do not expose secrets, tokens, keystores, signing credentials, or private configuration in output or logs.
 
 ## Parallel agents: never overwrite newer work
@@ -264,3 +281,9 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - Follow the full workflow: plan, implement, wire, save, compile, and test. Never report a gameplay feature complete after only creating scripts.
 - When a target is a prefab instance or appears under Prefab Mode in Context, modify the source prefab asset and apply/save it. Do not leave a scene-only override unless explicitly requested.
 - After wiring, inspect the source prefab and a scene instance, verify serialized references, refresh/compile Unity, and test the relevant Play Mode path before reporting completion.
+
+## Agent team and Play testing (mandatory)
+
+- Multi-agent work: follow `agent-team-protocol` (briefs, FIFO Editor lock with heartbeat, keep the project compiling, stop and report on a denied call, report file + short final answer).
+- Before any Play test or screenshot: claim blocking reward/offline popups with a real tap, back up the save, restore it after (`playmode-driver-recipes`).
+- Scene or mode switching code must pass the repeated scene-flow test in `scene-teardown-safety`.

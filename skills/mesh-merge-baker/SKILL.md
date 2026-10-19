@@ -8,7 +8,7 @@ description: Bake a static map or prefab set into merged chunk meshes with gener
 Based on thunder-break-egg `Map_BatchBaker` and `Egg_MeshBaker` (report 11, VERIFIED) with the colliders/navmesh design from report 18 (INFERRED).
 
 ## Pipeline
-`MapSpec -> parts per segment -> merge per chunk (one mesh, <= 65k verts, UInt16 preferred) -> save Meshes/.../Chunk_XX.asset (delete+recreate) -> chunk objects (MeshFilter+MeshRenderer, shared material, ShadowCasting Off) -> colliders -> NavMesh -> bounds bake -> render-stats -> save scene`.
+`MapSpec -> parts per segment -> merge per chunk (one mesh, <= 65k verts, UInt16 preferred) -> save Meshes/.../Chunk_XX.asset (delete+recreate) -> chunk objects (MeshFilter+MeshRenderer, shared material, ShadowCasting Off) -> colliders -> NavMesh -> bounds bake -> render-stats -> save scene`. Require a schema-valid `gdd/_generated/map-spec.json` and preserve its evidence link before starting Unity writes.
 
 ## Rules
 - `Bake(segment)` per call; keep authoring objects; skip transparent, multi-submesh and mixed-normal sources; moving parts (platforms, spinners, doors) stay separate prefabs with the same material.

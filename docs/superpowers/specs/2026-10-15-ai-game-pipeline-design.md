@@ -25,7 +25,7 @@ Server/multiplayer, UGC, store-compliance rules about drop odds (designer decide
 - Rules are principles with reasons and soft numeric defaults; deviation needs a stated reason (not hard-fail), except safety rules (data loss, compile, wiring).
 - Skills live only in this repo; open Unity projects are read-only references. Idempotent editor tools only; never `InstantiatePrefab` on nested prefabs (caused a 30 GB hang).
 - Parallel agents obey `AGENTS.md` "never overwrite newer work" protocol.
-- Python launcher is `py`; Unity MCP bridge is ivanmurzak (`unity-mcp`); `ai-game-developer` MCP failed to connect on 2026-10-15.
+- Python launcher is `py`; the connected `ai-game-developer`/Unity MCP adapter is authoritative for Unity state and exposes scene, prefab, asset, Console, screenshot, and test operations. File-only checks remain insufficient for Editor gates.
 
 ## Decided by the user (see `docs/feedback-notes.md`)
 1 material goal; AGENTS.md wording merge; no odds-compliance rule; shared generic ads layer (per-app keys); start everything now; agent may self-propose missing domains and run them; hundreds to 1000+ skills acceptable.

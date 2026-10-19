@@ -17,7 +17,7 @@ Bots use the player's character prefab (type Npc). `AI : MonoCachedFast` writes 
 - Follow rules: advance when reached; optional crossing-advance and speed-expanded reach for fast modes; stuck check every 5 s rewinds or teleports; ME config: pathfinding on, velocity-reached on, level randomised per revive.
 - Jump heuristics (3 cached NonAlloc raycasts in local space): block (0,0.1,0)->(0,1,1), fall (0,0.5,0.4)->(0,-0.5,0.4), kill (0,0.1,0)->(0,0.1,1); `Jump = obstacleAhead || fallAhead || obstacleKill`; never jump while climbing.
 - Rubber band: when a bot's checkpoint index differs from the player's by more than 5 (`TeleportIfFartherThan`), revive it at a checkpoint around the player (range 3) (`checkpoint-respawn`).
-- Aggression (battle modes): attack-player probability 0.25, ranged weapon chance 0.15, per-minigame overrides in a factory.
+- Aggression (battle modes): attack-player probability and ranged-weapon chance are per-mode config values; tune them from the GDD or balance pass.
 - Spawning: one bot per frame, count scaled by device tier (`device-tier-policy`), registered as a loading task. Bots get random skins, names and auras/trails (`bots-as-players`, `cosmetic-slot-providers`).
 - Pathing: the nav agent body is overwritten from the KCC motor every LateUpdate; use one backend (NavMesh agent or the A* package), not both (`nav-traversal-link-tool`). DOTS crowd backends only for >100 chasers (`no-ecs-by-default`).
 

@@ -11,7 +11,7 @@ A clone's map must read quickly on a small screen: where am I, where do I go, ho
 1. **Zone ladder**: list zones in progression order with their gate (stat required), recommended value shown in the entry banner, theme (biome/color), content (resources/enemies/shops) and the reward step up. Derive from `docs/gameplay-analysis.md`.
 2. **Blockout first**: place scale-correct greybox (use the character's height as the unit), paths, gates, spawn, safe zone, shops and key landmarks. Walk it in Play Mode before decorating.
 3. **Readability on a phone**: strong silhouette landmarks visible from the hub; color-coded zones; clear walkable paths with width >= 3 character widths for main routes; no tiny gaps requiring precision.
-4. **Distance and pacing**: time to cross a zone at base speed 10-30 s; shops and upgrade boards placed on the natural route; safe zone near the start of each zone.
+4. **Distance and pacing**: derive traversal time from observed geometry and movement feel; shops and upgrade boards placed on the natural route; safe zone near the start of each zone when the reference has one.
 5. **Reuse the kit**: prefer existing prefabs/materials; build repeated pieces as prefabs with consistent pivots and snap grid; avoid unique one-off meshes.
 6. **Decoration**: props at the edges to frame the path; keep the center clear for gameplay; no collider on pure decoration.
 7. **Atmosphere**: skybox, fog color/density and ambient light match per zone; fog hides far-clip pop-in and is a perf tool on mobile.

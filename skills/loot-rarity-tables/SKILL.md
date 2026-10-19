@@ -13,7 +13,7 @@ What is displayed must equal what is rolled: roll by sum of weights, `random * t
 ## Data
 - `Rarity_Asset`/table: colour, shiny fx, frame, stat multiplier; enums seen: Normal/Rare/Legend (3), Common..Mythic (6), Common..Celestial (10). Power comes from the item tier, not from the rarity enum.
 - Loot table: entries {asset, weight, min rarity}, rolls, pity after N, guaranteed rarity. Gacha box: price + weighted rewards.
-- Luck (TBE): luck values 1, 2, 3, 5, 10, 25, 50, 100, 500, 1k, 5k, 10k, 100k, 1M with weights 45, 25, 14, 7, 4, 2.5, 1.3, 0.7, 0.3, 0.12, 0.05, 0.02, 0.005, 0.001; higher-rarity eggs lean the weights (`1 + rarity * 0.08`); luck buys at most 4 visual rarity steps but only 2 count for income; mutations at luck 0: Normal 88 / Gold 9 / Diamond 2.5 / Rainbow 0.5 (%), luck 1 triples specials; size roll bell curve in [0.8, 1.4].
+- Luck and rarity values, weights, pity thresholds, mutation odds, and size distributions are per-game data. Generate them with `auto-balance-game` when the GDD does not provide evidence; displayed odds must equal real odds.
 - Money-band rarity (KT): odds shift with the player's wealth through bands `{moneyFrom, moneyTo} -> Rate[]`.
 - Boost shop (ME): per-rank restock weights (base vs VIP), stock ranges per rank, max stock 10, fuse 3 -> 1 higher.
 - Chest (CT): rewards with `UnlockChance` and an open timer; ads or currency price.

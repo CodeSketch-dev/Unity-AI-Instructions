@@ -4,6 +4,8 @@ import shutil
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SK = os.path.join(HERE, "..", "..", "skills")
@@ -61,6 +63,11 @@ class GraphTests(unittest.TestCase):
         for ui in ("UI-00-hud", "UI-10-skin-shop", "UI-11-revive", "UI-12-settings"):
             self.assertIn(ui, titles)
 
+    def test_ui_build_requires_prefab_inspection_evidence(self):
+        build = next(t for t in graph()["tasks"] if t["key"] == "ui-build")
+        self.assertIn("done-means-wired", build["skills"])
+        self.assertIn("[inspect] source prefab hierarchy and serialized refs", build["verify"])
+
     def test_scope_cut_drops_p2_then_p1_and_keeps_p0(self):
         g = graph(day_h=7)
         self.assertTrue(g["dropped"])
@@ -74,10 +81,33 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(len(zone_tasks), 3)
         self.assertEqual(sorted(t["phase"] for t in zone_tasks), [2, 4, 4])
 
+    def test_world_zones_wait_for_validated_visual_mapspec(self):
+        tasks = graph()["tasks"]
+        mapspec = next(t["id"] for t in tasks if t["key"] == "visual-mapspec")
+        zone_tasks = [t for t in tasks if t["key"].startswith("zone-")]
+        self.assertTrue(zone_tasks)
+        self.assertTrue(all(mapspec in t["depends_on"] for t in zone_tasks))
+
+    def test_clone_tasks_receive_compact_house_style_profile(self):
+        clone_tasks = [t for t in graph()["tasks"] if t["system"] != "pipeline" and t["phase"] >= 2]
+        self.assertTrue(clone_tasks)
+        self.assertTrue(all("docs/reference-foundation.md" in t["context_refs"] for t in clone_tasks))
+
+    def test_system_claims_use_gdd_ids_not_template_feature_names(self):
+        claims = [claim for task in graph()["tasks"] for claim in task["claims"]]
+        self.assertFalse(any("<System>" in claim for claim in claims))
+        self.assertFalse(any("Factory_Minigame" in claim or "Factory_Economy" in claim for claim in claims))
+        self.assertFalse(any("Logic/Quest" in claim or "Logic/Audio" in claim or "Logic/AI" in claim for claim in claims))
+
+    def test_generator_rejects_unsafe_gdd_id(self):
+        g = gl.load_gdd(EXAMPLE)
+        g["systems"]["S-02-camera"]["fm"]["id"] = "../escape"
+        with self.assertRaises(ValueError):
+            gt.generate(g)
+
     def test_markdown_table(self):
         text = gt.to_markdown(graph())
         self.assertIn("| T01 |", text)
-
 
 class StateTests(unittest.TestCase):
     def setUp(self):
@@ -87,11 +117,37 @@ class StateTests(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.d)
 
+    def test_dispatch_payload_carries_task_scoped_skill_context(self):
+        payload = orch.dispatch_payload(self.d)
+        self.assertEqual(payload[0]["task_id"], "T01")
+        self.assertEqual(payload[0]["skills"], ["game-clone-recon", "gdd-intake"])
+        self.assertEqual(payload[0]["context_policy"], "load-only-these-skills")
+        self.assertEqual(payload[0]["context_refs"], [])
+
+    def test_next_json_cli_emits_dispatch_payload(self):
+        output = StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(orch.main(["next", "--project", self.d, "--json"]), 0)
+        payload = json.loads(output.getvalue())
+        self.assertEqual(payload[0]["active_skills"], ["game-clone-recon", "game-orchestrator", "gdd-intake", "multi-agent-coexistence", "token-efficient-workflow"])
+        self.assertEqual(payload[0]["evidence_contract"]["required"], payload[0]["verify"])
+        self.assertEqual(payload[0]["evidence_contract"]["kinds"], [])
+        result = {"evidence_contract": {"must_be_returned": True, "evidence": "lint 0 BLOCK"}}
+        self.assertEqual(orch.collect_result(self.d, payload[0]["task_id"], result), ["lint 0 BLOCK"])
+
+    def test_dispatch_payload_reports_skills_to_unload(self):
+        path = os.path.join(self.d, "docs", "orchestrator", "active-skills.json")
+        with open(path, "w", encoding="utf-8") as stream:
+            json.dump({"active": ["old-phase-skill", "game-orchestrator"]}, stream)
+        payload = orch.dispatch_payload(self.d)
+        self.assertEqual(payload[0]["unload_skills"], ["old-phase-skill"])
+
     def test_init_and_persistence(self):
         s = orch.load(self.d)
         self.assertEqual(s["game"], "Sky Climb")
         self.assertEqual(s["phase"], 0)
         self.assertTrue(os.path.isfile(os.path.join(self.d, "docs", "orchestrator", "log.md")))
+        self.assertTrue(os.path.isfile(os.path.join(EXAMPLE, "_generated", "evidence-index.json")))
         self.assertFalse(os.path.exists(os.path.join(self.d, "docs", "orchestrator", "state.json.tmp")))
 
     def test_next_respects_dependencies_and_lanes(self):
@@ -112,6 +168,33 @@ class StateTests(unittest.TestCase):
         with self.assertRaises(KeyError):
             orch.mark(self.d, "T99", "done", evidence=["x"])
 
+    def test_visual_evidence_requires_image_gate(self):
+        orch.mark(self.d, "T01", "in_progress")
+        orch.mark(self.d, "T01", "done", evidence=["lint 0 BLOCK"])
+        visual = next(t["id"] for t in orch.load(self.d)["tasks"].values() if t.get("key") == "visual-evidence")
+        orch.mark(self.d, visual, "in_progress")
+        with self.assertRaises(ValueError):
+            orch.mark(self.d, visual, "done", evidence=["evidence index valid"])
+        orch.mark(self.d, visual, "done", evidence=["--require-images passes"])
+
+    def test_collect_result_rejects_missing_contract(self):
+        with self.assertRaises(ValueError):
+            orch.collect_result(self.d, "T01", {})
+        self.assertEqual(orch.collect_result(self.d, "T01", {
+            "evidence_contract": {"must_be_returned": True, "evidence": "MapSpec schema valid"}}),
+            ["MapSpec schema valid"])
+
+    def test_collect_result_requires_editor_evidence_kinds(self):
+        result = {"evidence_contract": {"must_be_returned": True, "required_kinds": ["compile"],
+                                         "evidence": "compile ok"}}
+        with self.assertRaises(ValueError):
+            orch.collect_result(self.d, "T01", result)
+        result["evidence_contract"]["evidence_by_kind"] = {"compile": "Console sequence 12"}
+        self.assertEqual(orch.collect_result(self.d, "T01", result), ["compile ok"])
+
+    def test_inspection_is_an_editor_evidence_kind(self):
+        self.assertEqual(orch._evidence_kinds(["[inspect] source prefab hierarchy and serialized refs"]), ["inspection"])
+
     def test_failed_retries_then_blocks(self):
         orch.mark(self.d, "T01", "in_progress")
         orch.mark(self.d, "T01", "failed", note="try 1")
@@ -123,7 +206,8 @@ class StateTests(unittest.TestCase):
 
     def test_gates_and_phase_advance(self):
         for tid in [t for t in orch.load(self.d)["tasks"] if orch.load(self.d)["tasks"][t]["phase"] == 0]:
-            orch.mark(self.d, tid, "done", evidence=["ok"]) if orch.load(self.d)["tasks"][tid]["depends_on"] == [] or True else None
+            evidence = ["--require-images passes"] if orch.load(self.d)["tasks"][tid].get("key") == "visual-evidence" else ["ok"]
+            orch.mark(self.d, tid, "done", evidence=evidence) if orch.load(self.d)["tasks"][tid]["depends_on"] == [] or True else None
         s = orch.load(self.d)
         self.assertEqual(s["gate"]["G0"], "pass")
         self.assertEqual(s["phase"], 1)

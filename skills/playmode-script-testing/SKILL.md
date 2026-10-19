@@ -5,7 +5,7 @@ description: Verify features in Play Mode via MCP with small C# scripts (invoke 
 
 # Play Mode script testing
 
-Complements `unity-qa-playtest` and `done-means-wired`.
+Complements `unity-qa-playtest` and `done-means-wired`. For real taps, screenshots, input drivers and blocking popups see `playmode-driver-recipes`.
 
 ## Recipe
 1. Enter Play Mode and wait until it is playing; scripts sent during the domain reload fail with a retry error: just resend.

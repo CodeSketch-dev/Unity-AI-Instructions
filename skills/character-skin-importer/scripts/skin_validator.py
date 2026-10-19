@@ -5,7 +5,7 @@ Usage:
   py -I skin_validator.py prefab  <skin.prefab> --catalog <catalog.json> --rig <rigId> [--role player|bot] [--stats stats.json]
 
 catalog checks (FAIL unless noted): duplicate/unknown skin ids and rigs and types, unlock rules (Free price 0,
-Gem/Coin price > 0, IAP needs iap_id, unlock must be one of Free/Gem/Coin/IAP/Ads/Daily/Subscription), allowed types per
+Gem/Coin price > 0 or "auto", IAP needs iap_id, unlock must be one of Free/Gem/Coin/IAP/Ads/Daily/Subscription), allowed types per
 mode exist, rig slots point at rig bones, rig bone count <= rig max_bones, duplicate skin order (WARN).
 prefab checks: skeleton = ordered SkinnedMeshRenderer bones equal the rig's required bones (bone-mismatch, reports
 missing/extra; equal -> info shared-mesh-ok with the skeleton hash), bone and material budgets, exactly one Animator,
@@ -57,7 +57,7 @@ def check_catalog(cat):
             out.append(Finding("FAIL", "bad-unlock", str(sid), "unlock %r not one of %s" % (u, sorted(UNLOCKS))))
         if u == "IAP" and not s.get("iap_id"):
             out.append(Finding("FAIL", "iap-without-id", str(sid), "IAP skin needs iap_id"))
-        if u in ("Gem", "Coin") and price <= 0:
+        if u in ("Gem", "Coin") and price != "auto" and price <= 0:
             out.append(Finding("FAIL", "gem-without-price", str(sid), "%s skin needs a positive price" % u))
         if u == "Free" and price != 0:
             out.append(Finding("FAIL", "free-with-price", str(sid), "Free skin has price %s" % price))

@@ -19,6 +19,9 @@ The failure: agent A reads a file, spends minutes working; agent B changes the f
 
 The script (`workspace_guard.py`, Python 3, no dependencies) keeps its state inside `.git/agent-guard/`, never under `Assets/`; run `python -I scripts/workspace_guard.py --help` for details. It is an aid, not a lock manager: the discipline is the point, so apply steps 2-6 even when the script is not available (compare `git diff`/hash or simply re-read).
 
+## CodeGraph is not coordination
+CodeGraph can accelerate source exploration when a `.codegraph/` index exists, but its SQLite index and file watcher are derived state. It is not a lock, conflict detector, or authority over the current disk/Unity Editor state. After concurrent code edits, allow/check the index update before using a result; still re-read the target file, run the workspace guard (or compare hashes when the guard cannot write its state), and claim shared Unity assets before mutation.
+
 ## Never do
 - Restore or "clean up" other people's changes: no `git checkout --`, `restore`, `reset`, `stash`, `clean`, no copying an older version or backup over a newer file.
 - Bulk formatting, repo-wide renames, or regenerating generated output while the other agent may be editing its source.

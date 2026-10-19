@@ -10,7 +10,7 @@ Design from report 19 sec 3 (knife-tower facts VERIFIED, contract INFERRED). Why
 ## Rig
 - One `Character_Rig_Asset` per skeleton family (humanoid, pet, ...): ordered required bone names, root bone, Generic or Humanoid flag, `SkeletonHash` (FNV-1a of the ordered names, `character-skin-importer/scripts/skin_validator.py`), the `RuntimeAnimatorController`, required parameters (name + type), slots `{id, bone, local offset}` (hat, hand_r, back/wing, tail, nametag), max bones (default <= 30; budgets in `character-perf-budgets`), local bounds.
 - Generic with a shared bone-name skeleton is cheaper and keeps bone-name rebinding simple; Humanoid only when retargeting external mocap is required.
-- A skin references the rig, not its own controller. Special rigs (the reference's one controller per brainrot skin) use an `AnimatorOverrideController`.
+- A skin references the rig, not its own controller. When variants share a rig but need animation differences, use an `AnimatorOverrideController`.
 
 ## Animator parameters (fixed names, hashed once in a static class)
 `Speed` or `VelocityZ` (float), `IsGrounded`, `IsJumping`, `IsJumpingDouble`, `IsClimbing` (bool), `ClimbY` (float), `IsSwimming` if used, `MotionType` (float), `HasWeapon`, `AttackType` / `TriggerAttack`, `EmoteId` (int) + `TriggerEmote`, `IsDead` / `TriggerHit`. Never rename per skin. Write parameters only if the controller has them (cache `animator.parameters` per animator into a `Dictionary<int, ParameterType>`, "IfExists" guards) so skins with a smaller controller do not warn (knife-tower `Character_Animator`).

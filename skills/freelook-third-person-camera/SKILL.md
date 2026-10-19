@@ -26,7 +26,7 @@ Zero damping with an instant (sharpness 1000) character gives the locked, snappy
 - A follow transform one unit above the pivot updated in `LateUpdate`; input via `m_XAxis.m_InputAxisValue` from the drag delta, nothing smoothing the drag itself.
 - Speed FOV: boost = max speed FOV - default FOV (+10), starts at `speed01 >= 0.95`, rises over 1 s, releases in 0.35 s.
 - Far-clip zones through the collision registry (deepest zone wins): `culling-group-distance`.
-- Occluder fade: NonAlloc ray camera -> player (buffer 32), alpha 0.25, fade 0.15 s on tagged renderers.
+- Occluder fade: NonAlloc ray camera -> player (buffer 32), alpha 0.25, fade 0.15 s on tagged renderers. Cheaper registered-list variant: `camera-occlusion-fade`.
 - Camera lifecycle events: reset after revive/teleport (`Event_Camera_Reset`, place at `character.TransformPoint((0, 10, -20))` next frame); teleport warp calls the rig's `OnTargetObjectWarped` / force position after one frame.
 - Low-end: disable post-processing and depth texture per camera (`device-tier-policy`).
 

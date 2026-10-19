@@ -8,15 +8,15 @@ Build a local-only agent/skill/hook suite so a game designer can give Claude or 
 
 ## Current verified state
 
-- 158 skills; 15 visible hubs; all other skills are `name-only` through `docs/skill-overrides.snippet.json`.
-- The skill listing costs 6,923 / 8,000 characters at a 200K-token context (86%).
+- 156 skills; 12 visible hubs; all other skills are `name-only` through `docs/skill-overrides.snippet.json`.
+- The skill listing costs 6,266 / 8,000 characters at a 200K-token context (78%).
 - `319` Python tests pass and `py -I tools/skill_lint.py --strict skills` is clean.
 - Active terminology is **local Unity batch automation** only: normal local compile/test, APK/AAB/iOS build and size/QA checks. Never call this cloud build, CI/CD, deployment or publishing.
 - Active QA entrypoint: `qa-batch-and-fallbacks`; gate file: `qa/gates.json`.
 
 ## Do next
 
-The safe read-only calibration is complete. Remaining plan work needs an explicit user decision: paid trigger evals (Task 26), creation of a throwaway Unity pilot project (Task 27), and eventual commit. Task 23 remains intentionally excluded. Until one is authorized, only documentation/read-only audits are in scope.
+The safe read-only calibration is complete. Paid trigger evals, Unity pilot creation, and commits remain separately gated. The user has now explicitly requested the parameterized auto-balance command; continue validating that suite artifact locally, but do not run paid evals, create a new Unity project, or commit without separate authorization.
 
 ## Do not do without a new explicit user approval
 
@@ -24,7 +24,7 @@ The safe read-only calibration is complete. Remaining plan work needs an explici
 - Do not create, write to, or modify a Unity project (including a throwaway pilot).
 - Do not run `sync.bat` because it writes into the user's Claude/Codex home folders.
 - Do not commit, push, publish, upload or deploy.
-- Do not implement Task 23 auto-balance: the user does not want formula-heavy/calculator scope.
+- Auto-balance scope is now the requested time-targeted command (`/auto-balance-game`), not a hand-authored economy table. Keep parameters repeatable and keep generated values in the machine-readable plan.
 
 ## Commands
 

@@ -6,7 +6,7 @@ rem    AGENTS.md  ->  %USERPROFILE%\.claude\CLAUDE.md  va  %USERPROFILE%\.codex\
 rem    skills\*   ->  %USERPROFILE%\.claude\skills\    va  %USERPROFILE%\.codex\skills\
 rem  Options: /nopause (no final keypress wait)   /nopull (skip git pull)
 rem  Runs git pull --ff-only if the repository is clean; skips pull when there are uncommitted changes.
-rem  Differing destination files are backed up (*.backup-yyyyMMdd-HHmmss) before overwrite.
+rem  Differing destination files are overwritten directly; no backup files are created.
 rem ===========================================================================
 chcp 65001 >nul
 
@@ -56,21 +56,17 @@ if errorlevel 1 (
 )
 :after_pull
 
-rem ---- 2. backup timestamp ---------------------------------------------
-set "TS=backup"
-for /f %%T in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd-HHmmss" 2^>nul') do set "TS=%%T"
-
-rem ---- 3. instructions: AGENTS.md -> Codex + Claude -------------------------------
+rem ---- 2. instructions: AGENTS.md -> Codex + Claude -------------------------------
 call :install_file "%CODEX_HOME%\AGENTS.md"
 call :install_file "%CLAUDE_HOME%\CLAUDE.md"
 
-rem ---- 4. skills -> Claude + Codex -------------------------------------------
+rem ---- 3. skills -> Claude + Codex -------------------------------------------
 if exist "%REPO%\skills" (
     call :install_skills "%CLAUDE_HOME%\skills"
     call :install_skills "%CODEX_HOME%\skills"
 )
 
-rem ---- 5. pipeline agents, commands and hook scripts -> Claude only ------------------------
+rem ---- 4. pipeline agents, commands and hook scripts -> Claude only ------------------------
 if exist "%REPO%\agents" call :install_tree "%REPO%\agents" "%CLAUDE_HOME%\agents" "agents"
 if exist "%REPO%\commands" call :install_tree "%REPO%\commands" "%CLAUDE_HOME%\commands" "commands"
 if exist "%REPO%\hooks" call :install_tree "%REPO%\hooks" "%CLAUDE_HOME%\pipeline-hooks\hooks" "hook scripts"
@@ -101,8 +97,6 @@ if exist "%DEST%" (
         echo Already in sync: %DEST%
         exit /b 0
     )
-    copy /y "%DEST%" "%DEST%.backup-%TS%" >nul
-    echo Backed up: %DEST%.backup-%TS%
 )
 copy /y "%SRC%" "%DEST%" >nul
 if errorlevel 1 (

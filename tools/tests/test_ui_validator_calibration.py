@@ -43,13 +43,13 @@ class CalibrationTests(unittest.TestCase):
                  dict(name="Viewport", father=0, rect=dict(size=(500, 300)), comps=[image()])]
         self.assertNotIn("UI-CHILD-EQ-PARENT", rules(uv.validate(nodes(items))))
 
-    def test_overflow_mode_overflow_without_autosize_is_not_flagged(self):
+    def test_overflow_mode_without_autosize_fails_text_fit(self):
         t = text("A very long title that cannot fit", 36).replace("m_RaycastTarget: 0\n", "m_RaycastTarget: 0\n  m_overflowMode: 0\n")
         n = nodes([dict(name="T", rect=dict(size=(100, 40)), comps=[t])])
-        self.assertNotIn("UI-OVERFLOW", rules(uv.validate(n)))
+        self.assertIn("UI-TEXT-FIT", rules(uv.validate(n), "FAIL"))
         t2 = text("A very long title that cannot fit", 36).replace("m_RaycastTarget: 0\n", "m_RaycastTarget: 0\n  m_overflowMode: 1\n")
         n2 = nodes([dict(name="T", rect=dict(size=(100, 40)), comps=[t2])])
-        self.assertIn("UI-OVERFLOW", rules(uv.validate(n2), "WARN"))
+        self.assertIn("UI-TEXT-FIT", rules(uv.validate(n2), "FAIL"))
 
     def test_stacked_icon_and_label_not_checked(self):
         items = [dict(name="Card", rect=dict(size=(300, 400)), comps=[]),

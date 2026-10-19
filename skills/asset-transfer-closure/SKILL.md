@@ -20,7 +20,7 @@ Copying a prefab alone silently drops what it points at. The goal is zero broken
    - **Different GUID, same name** in the target: stop and decide remap vs keep; never silently substitute.
 3. **Choose destinations** deliberately: first-party content under the project's art/game folders by feature, vendor content isolated in its own folder. Pass `--dest-prefix`; the source relative path is kept below it so related assets stay together.
 4. **Apply**: rerun with `--apply` (adds `.meta` copies, GUIDs preserved; add `--allow-scripts` only after the review above). Never hand-author `.meta` or Unity YAML.
-5. **Refresh the AssetDatabase** through the editor tooling and read the Console for import errors; fix importer settings that are project-specific (audio streaming/load type, texture compression, sprite borders).
+5. **Stop Play Mode before refresh**. Through the editor tooling, ensure Unity is not playing and is idle, then refresh the AssetDatabase and read the Console for import errors; fix importer settings that are project-specific (audio streaming/load type, texture compression, sprite borders).
 6. **Verify**: open each transferred prefab; scan for Missing/null; for particle/VFX materials check both the shader and every texture property (`_MainTex`/particle texture, normal, emission); instantiate in a scene and play; confirm render-pipeline compatibility. Re-run the script in dry-run: every member should now be `present`.
 7. **Record provenance** for each transferred group in `docs/asset-provenance.md` (`clone-ip-safety`).
 8. **Report** the closure list, what was skipped/isolated and why, and the verification result.

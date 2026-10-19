@@ -1,17 +1,14 @@
 # Skills that keep their descriptions in the model-visible listing. Every other skill is set to name-only (tools/skill_budget.py).
 # Hubs are the entry points; leaf skills are reached through the task graph, hub references, and by name.
 game-orchestrator
+auto-balance-game
 gdd-intake
 clone-pipeline
-genre-playbooks
 project-context-map
-framework-version-map
 config-driven-feature
 unity-mcp-workflow
-unity-ui
 ui-builder
 qa-fix-retest-loop
-qa-static-checks
 new-game-bootstrap
 unity-batch-build
 mobile-build-release

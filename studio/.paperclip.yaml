@@ -1,0 +1,1126 @@
+schema: "paperclip/v1"
+agents:
+  3d-modeling-environment-artist:
+    role: "designer"
+    capabilities: "Blender headless modeling, UVs, materials, props, terrain, environments."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "35e7aa5c-b9e2-4691-a329-75f00b0d1c77"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "golden-hour"
+      schemaVersion: 1
+  ai-director:
+    role: "ceo"
+    capabilities: "Plans, delegates and coordinates the Unity game studio; manages requirement changes; escalates blockers."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-opus-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "033846d5-19e3-41db-b7de-1a4434d6bc4d"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "flamingo-jade"
+      schemaVersion: 1
+  ai-physics-engineer:
+    role: "engineer"
+    capabilities: "NPC AI, navigation, collision and physics."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "299136d1-636b-453e-911b-6f0dd67ea1a5"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "ultraviolet-tide"
+      schemaVersion: 1
+  animation-vfx-artist:
+    role: "designer"
+    capabilities: "Rigging, animation, IK, controllers, particles, shaders, lighting, post-processing."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "bf805111-2d8b-47c7-ad4e-8016550b61e0"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "golden-hour"
+      schemaVersion: 1
+  asset-pipeline-engineer:
+    role: "engineer"
+    capabilities: "Asset import settings, registry, Blender-to-Unity pipeline, naming."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "acda0ade-f9cc-4a48-8842-584b55813262"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "solar-flare"
+      schemaVersion: 1
+  audio-designer:
+    role: "designer"
+    capabilities: "SFX, music, ambience, audio integration and mixing."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-haiku-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "e5a37632-fb60-4c76-8063-edc7434ce192"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "solar-flare"
+      schemaVersion: 1
+  game-designer:
+    role: "designer"
+    capabilities: "Writes GDD, economy, progression and acceptance criteria from references."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "fd49422d-5048-4384-836d-198c821ab014"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "orchid-peach"
+      schemaVersion: 1
+  gameplay-engineer:
+    role: "engineer"
+    capabilities: "C# gameplay, player controllers, game features."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "fd9edaeb-266b-4d23-bddd-c6fe5a4c7174"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "coral-current"
+      schemaVersion: 1
+  independent-quality-reviewer:
+    role: "qa"
+    capabilities: "Read-only reviewer: verifies against requirements, references, runtime; findings with evidence, severity, expected, actual, fix."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-opus-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "57065ac9-033e-4998-b36e-77aa4b34a77e"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "solar-flare"
+      schemaVersion: 1
+  integration-release-manager:
+    role: "devops"
+    capabilities: "Merges git worktrees, resolves conflicts, runs verification pipelines, manages build artifacts."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "d506e328-0def-4f19-89fe-0b442bf12109"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "violet-ember"
+      schemaVersion: 1
+  knowledge-skills-engineer:
+    role: "engineer"
+    capabilities: "Extracts reusable lessons, improves Unity-AI-Instructions skills on branches with lint, budget and evals; avoids duplicates and game-specific content."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-opus-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "11789145-344b-48f4-89f6-7585d3dac526"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "coral-current"
+      schemaVersion: 1
+  level-designer:
+    role: "designer"
+    capabilities: "Level layout, zones, pacing, scene assembly."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "70dc99a0-7f25-4444-9904-75546ba63d8b"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "deep-tide"
+      schemaVersion: 1
+  performance-build-engineer:
+    role: "devops"
+    capabilities: "Profiling, optimization, Android builds, device tier policy."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "9aefb1aa-7367-4939-8834-4044f94ef265"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "deep-tide"
+      schemaVersion: 1
+  qa-test-automation-engineer:
+    role: "qa"
+    capabilities: "Senior tester: plays like a normal player, EditMode/PlayMode tests, safe cheats and speed-ups that are restored after testing."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "bab79da7-f884-4e43-97e3-2574ab24bb68"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "orchid-peach"
+      schemaVersion: 1
+  reference-analyst:
+    role: "researcher"
+    capabilities: "Analyzes Roblox reference videos, screenshots, wikis; builds reference coverage matrix and versioned requirements."
+    adapter:
+      config:
+        engine: "cli"
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "991f4d07-b466-450c-a591-645fdeee0961"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "solar-flare"
+      schemaVersion: 1
+  sketch-dev:
+    role: "general"
+    adapter:
+      config:
+        chrome: true
+        effort: "low"
+        engine: "cli"
+        maxTurnsPerRun: 30
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+      heartbeat:
+        intervalSec: 300
+        skipTimerWhenNoActionableWork: true
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "5a5466a8-27dd-4d5c-a0a7-c26eb272f9e0"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "ultraviolet-tide"
+      schemaVersion: 1
+  systems-engineer:
+    role: "engineer"
+    capabilities: "Save/load, inventory, economy, upgrades, monetization, analytics, localization, networking."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "663ed71d-f872-4c6f-9b80-ceacd5b15d07"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "violet-ember"
+      schemaVersion: 1
+  technical-architect:
+    role: "engineer"
+    capabilities: "Designs Unity 6 project architecture on Sketch Engine; decides systems, dependencies, ADRs."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-opus-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "b704aa32-09bf-401c-b34d-fd195414b3fb"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "ultraviolet-tide"
+      schemaVersion: 1
+  tools-automation-engineer:
+    role: "engineer"
+    capabilities: "Unity Editor tools, Unity MCP reliability, batch scripts, CI automation."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "1aa2e1f5-8dd0-4e77-a388-3065af6c5bac"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "orchid-peach"
+      schemaVersion: 1
+  ui-ux-engineer:
+    role: "engineer"
+    capabilities: "Mobile UI, HUD, menus, responsive layouts using existing ui-* skills."
+    adapter:
+      config:
+        effort: "medium"
+        engine: "cli"
+        maxTurnsPerRun: 40
+        model: "claude-sonnet-5-5"
+      type: "claude_local"
+    runtime:
+      aiConnection:
+        method: "subscription"
+        mode: "responsible_user"
+        provider: "anthropic"
+    permissions:
+      canCreateAgents: true
+      canCreateSkills: true
+    permissionGrants:
+      -
+        permissionKey: "agents:configure"
+      -
+        permissionKey: "agents:suggest-changes"
+      -
+        permissionKey: "audit:view_agent_actions"
+      -
+        permissionKey: "inbox:manage"
+        scope:
+          responsibleUserOnly: true
+      -
+        permissionKey: "skills:create"
+      -
+        permissionKey: "skills:suggest-changes"
+      -
+        permissionKey: "tasks:assign"
+      -
+        permissionKey: "tasks:assign_scope"
+        scope:
+          subtreeRootAgentId: "2b282c7b-0907-4ef8-82af-f88c04e6d524"
+      -
+        permissionKey: "tasks:manage_active_checkouts"
+      -
+        permissionKey: "tools:manage_connections"
+      -
+        permissionKey: "tools:manage_profiles"
+      -
+        permissionKey: "tools:manage_runtime"
+      -
+        permissionKey: "tools:use"
+      -
+        permissionKey: "tools:view_audit"
+    appearance:
+      characterVersion: "cap-v1"
+      paletteId: "golden-hour"
+      schemaVersion: 1
+schemaVersion: 7
+sidebar:
+  agents:
+    - "sketch-dev"
+    - "ai-director"
+    - "3d-modeling-environment-artist"
+    - "ai-physics-engineer"
+    - "animation-vfx-artist"
+    - "asset-pipeline-engineer"
+    - "audio-designer"
+    - "game-designer"
+    - "gameplay-engineer"
+    - "independent-quality-reviewer"
+    - "integration-release-manager"
+    - "knowledge-skills-engineer"
+    - "level-designer"
+    - "performance-build-engineer"
+    - "qa-test-automation-engineer"
+    - "reference-analyst"
+    - "systems-engineer"
+    - "technical-architect"
+    - "tools-automation-engineer"
+    - "ui-ux-engineer"

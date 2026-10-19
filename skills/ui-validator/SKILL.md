@@ -23,7 +23,8 @@ It resolves each RectTransform to a rect (anchors, pivot, offsets) and re-evalua
 | UI-MIRROR | FAIL | text mirrored by a negative X scale on itself or an ancestor |
 | UI-MISSING | FAIL | script reference with fileID 0; with `--project`, script or sprite guid unknown to the project |
 | UI-REF-MATCH | FAIL | with `--reference`: element missing, centre/size off by more than 2 px, sprite or font size differs |
-| UI-OVERFLOW | WARN | static estimate of text vs rect (autosize minimum when on); skipped for Overflow mode without autosize |
+| UI-TEXT-FIT | FAIL | static estimate says text cannot fit inside its rect at the configured Auto Size minimum, or it uses Overflow without Auto Size |
+| UI-CONTENT-CONTAINMENT | FAIL | content/control child leaves its padded parent content area or overlaps a content sibling; named decorative background/frame/glow layers are exempt |
 | UI-FONT-MIN | WARN | autosize minimum font under 18 |
 | UI-TOUCH | WARN | interactive target under 88 px |
 | UI-SPACING | WARN | 3+ interactive siblings with gap spread over max(8 px, 15%) |
@@ -41,6 +42,8 @@ Degenerate rects (zero or negative size) and inactive objects are skipped by the
 After three tuning rounds (container panels, scroll parts, inactive panels, degenerate rects, viewports, overflow mode, stacked icon/label) the remaining findings are real deviations of the reference itself: UI-STRUCT in 15 prefabs (popup trees without the standard `Root`; the user's `unity-ui` rules are the standard anyway), 9-slice sprites set to Simple (Gacha), one sprite guid that no project meta defines (`Gacha_Box_Popup`; reported, not checked in the Editor), decorative frames with Raycast Target on, soft warnings (touch 65x87 close buttons, autosize minimum 10, icon sizes). Treat them as the baseline for a new game: fix, or record a reasoned exception.
 
 ## Runtime validator (template)
-`assets/Qa_UiValidator.cs.txt` is an UNCOMPILED Editor template that instantiates the prefab on a sized world canvas at the same 3 aspects, forces layout rebuilds, reads world corners and TMP preferred sizes, and writes findings JSON. It is the authoritative check for layout groups and real text sizes. Compile it via Unity MCP and compare its output with this script on one known prefab before trusting it; it uses TextMeshPro, so the UniText experiment needs its own measuring adapter.
+`assets/Qa_UiValidator.cs.txt` is an UNCOMPILED Editor template that instantiates the prefab on a sized world canvas at the same 3 aspects, forces layout rebuilds, reads world corners and TMP preferred sizes, and writes findings JSON. It reports `UI-TEXT-FIT` and `UI-CONTENT-CONTAINMENT` as hard failures after resolved layout. It is the authoritative check for layout groups and real text sizes. Compile it via Unity MCP and compare its output with this script on one known prefab before trusting it; it uses TextMeshPro, so the UniText experiment needs its own measuring adapter. A static pass without this runtime evidence is unverified for layout groups/size fitters.
 
 Not covered: nested prefab-instance overrides are not resolved (validate the expanded prefab or the runtime result). The static pass does not replace screenshots (`ui-visual-qa`) or the user's eye on taste.
+
+Triage output before fixing: real (e.g. raycast left on leaf visuals) / false positive (dim backdrops, runtime safe-area insets, intentional fill-parent) / needs screenshot. Fix generated prefabs in the builder, not only the asset. Raycast sweeps clear leaf visuals only; skip graphics with interactive descendants or blocker-like names (frames, headers), or taps fall through popups.

@@ -1,3 +1,7 @@
 __pycache__/
 *.pyc
 _pilots/
+_unity-pilots/roblox-shader-kit-pilot/
+
+# Generated fixtures from the example GDD; never publish test output.
+/skills/gdd-schema/assets/example-sky-climb/gdd/_generated/

@@ -21,7 +21,7 @@ Use with `spec-pdf-extract` (read the sheet + demo first), `monetization-integra
 4. `Flow` MonoBehaviour created per gameplay scene: one Update ticking timers; show-conditions in ONE function (no other popup open, not chased by a boss, not ragdolled, quiet N seconds after joystick/jump input, not carrying when tense). Add a static `LastInputTime` to the player control for the quiet rule.
 5. Popups derive from the project popup base; ladder rows/cells are prefabs instantiated from the config array length (never hard-code 6 or 8).
 6. New `AdsPlacement` entries per ad moment (claim, auto, close, rewarded, booster, real speed).
-7. Multipliers hook at the single gain site (per-tick treadmill gain, move speed), player only.
+7. Multipliers hook at the single GDD-selected gain site, player only.
 8. An editor builder (partial class) generates popups, HUD buttons, the factory asset and wires all refs; re-runnable.
 
 ## 3. Behavior rules that were easy to get wrong

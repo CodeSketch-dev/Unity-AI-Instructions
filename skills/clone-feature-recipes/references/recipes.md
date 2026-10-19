@@ -1,45 +1,41 @@
 # Recipes
 
-Contents: 1 Egg break and hatch, 2 Pet carry and base income, 3 Treadmill and speed, 4 Zones, gates, banners, 5 Boss chase and safe zone, 6 Shops, 7 Upgrade boards, 8 Rebirth, 9 Daily reward and streak, 10 Collection index, 11 Auto buttons, 12 Bots as players, 13 Trails and cosmetics, 14 Rewarded-ad boosts, 15 Offline earnings.
+Contents: 1 Interaction reward source, 2 Carry/place flow, 3 Station progression, 4 Zones and gates, 5 Conditional hazard, 6 Commerce, 7 Upgrade surfaces, 8 Prestige, 9 Timed rewards, 10 Collection, 11 Optional automation, 12 Bots, 13 Cosmetics, 14 Optional ad rewards, 15 Offline accrual.
 
-Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Verify**.
+Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Verify**. Recipes define structure and invariants, never prices, boosts, cooldowns, income, HP, or other balance constants. If a reference value is not evidenced, use a tunable placeholder and let the balance pass generate it.
 
-## 1 Egg break and hatch
-- **Behavior**: eggs spawn in zone slots with HP by biome/rarity/luck; the tool hits at a cadence (cooldown measured from the real animation clip); on break, FX + a pet appears (or hatch animation for shop eggs).
-- **Data**: pickaxe/tool level, eggs broken counter, owned/discovered pets. **Config**: egg tiers (HP, rarity weights, luck), tool table (damage, price, cadence) in a registry; spawn slots per zone.
-- **Events**: `EggHit`, `EggBroken(egg, owner)`, `PetObtained`. **UI**: egg label (name, rarity, HP bar `cur/max`), hit feedback, rarity-colored reveal.
-- **Edge cases**: two players/bots hitting one egg; breaking while carrying; egg despawn; luck display counts up during reveal; no eggs left in zone (respawn timer).
-- **Perf**: pool eggs and FX; world labels via one batched text system; hit cooldown gates SFX.
-- **Verify**: break -> pet appears at the same frame count at 1x; fresh save works; HP/time table within the balance audit (`economy-progression-design`).
+## 1 Interaction reward source
+- **Behavior**: a GDD-defined world source receives its configured interaction and emits the configured reward/state transition.
+- **Data/Config**: source identity, ownership, interaction cadence, reward table and respawn policy are authored data.
+- **Events/UI**: use feature-owned state/reward events and only GDD-specified feedback.
+- **Edge cases/Verify**: concurrent actors, interruption, despawn/respawn, save/load and reward-once behavior.
 
-## 2 Pet carry and base income
-- **Behavior**: pick up a pet (contextual button), carry it (arms up, speed rules from reference), place it in a base slot; each pet earns $/s while placed; carry timer pauses.
-- **Data**: pet instances (id, rarity, size/mutation, level), base slots and level. **Config**: pet species (income, size curve), slot count and multiplier per base level.
-- **Events**: `PetPickedUp`, `PetDropped`, `PetPlaced`, `IncomeTick`. **UI**: single Interact button (Pick up/Drop swap), carry info card above the hotbar, base pet labels ($/s, rarity, name).
-- **Edge cases**: full base keeps pet in hand; bots' bases obey the same cap; drop while chased; disconnect/app pause with pet in hand; first-time FX only.
-- **Perf**: income ticks batched in one manager; pets in base are pooled meshes, labels throttled.
-- **Verify**: pick up -> place -> income credited to wallet; slot cap enforced; save/load keeps placed pets.
+## 2 Carry and owned-slot flow
+- **Behavior**: acquire, carry, place, release, or transfer the GDD-defined entity only through its documented interaction states.
+- **Data/Config**: instance identity, slot capacity, placement rules and optional production rules are authored data.
+- **Events/UI**: feature-owned transition events and only the required interaction feedback.
+- **Edge cases/Verify**: capacity, interruption, transfer, disconnect/pause, save/load and bot ownership rules.
 
-## 3 Treadmill and speed
-- **Behavior**: standing on a treadmill trains Speed over time (auto, no run button); leaving stops gain without snapping; run animation plays while on it; floating "+speed" popups on each tick.
-- **Data**: speed stat, treadmill level. **Config**: treadmill tiers (multiplier, price), tick interval, big-number formatting.
-- **Events**: `SpeedChanged`, `TreadmillEntered/Exited`. **UI**: speed bar, upgrade board, popup text.
-- **Edge cases**: other characters' treadmills never train the player; treadmill footprint must not block the base door; tier upgrade while standing on it.
-- **Verify**: speed increases at the configured rate; leaving keeps value; bots use it too.
+## 3 Station-based progression
+- **Behavior**: entering a configured station starts the GDD-defined action; exiting stops it without duplicating gains or invalidating current state.
+- **Data**: the GDD-selected stat and station state. **Config**: tiers, effect, cadence, unlock channels, and display format are tunable fields populated only from evidence or the balance pass.
+- **Events/UI**: use feature-owned state-change events and only the feedback the GDD specifies.
+- **Edge cases**: ownership, overlapping stations, an upgrade during use, and the applicable bot policy.
+- **Verify**: configured progression, exit behavior, ownership rules, and persistence where selected.
 
 ## 4 Zones, gates, banners
 - **Behavior**: world split into zones with a gate stat (speed); entering shows a banner (zone name + recommended value) that slides in and fades; fog/skybox per zone.
-- **Data**: highest zone reached. **Config**: zone list (name, gate, recommended, theme, egg table, boss).
+- **Data**: highest zone reached. **Config**: zone list (name, gate, recommendation, theme and GDD-defined content references).
 - **Events**: `ZoneEntered`. **UI**: banner; region label at top (shrinks after intro).
 - **Edge cases**: rapid back-and-forth at a border (hysteresis); teleport; recommended speed includes a safety margin over chaser speed.
 - **Perf**: per-zone far-clip and decor culling (`world-batching-culling`).
 - **Verify**: monotonic gates (audit), banner plays once per entry.
 
 ## 5 Boss chase and safe zone
-- **Behavior**: bosses chase only under the reference's condition (e.g. while carrying a pet); straight-line chase by transform; safe zone (home) stops them with entry FX once; catching drops the pet/ragdolls.
+- **Behavior**: a configured hazard activates only under the GDD-defined condition; a configured safe rule ends it and the configured catch outcome resolves it.
 - **Data**: none persistent. **Config**: chase speed per boss, aggro range, recovery time.
 - **Events**: `BossChaseStarted/Ended`, `PlayerCaught`. **UI**: warning indicator (reference asset), chase SFX loop.
-- **Edge cases**: dropping the pet ends the chase; safe-zone boundary flicker; boss stuck behind walls; chase speed vs player speed escapable with effort.
+- **Edge cases**: condition removal, safe-zone boundary flicker, navigation obstruction, and fairness at GDD-defined tuning.
 - **Verify**: carry -> boss reacts -> reach safe zone -> chase ends; no boss when not carrying.
 
 ## 6 Shops (tools, trails, skins)
@@ -50,11 +46,11 @@ Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Veri
 - **UI**: list + preview layout per `ui-scroll-board`; sell only through the channels the game really has (reward ad, IAP, currency); drop states for systems that do not exist (no daily -> no daily plate).
 - **Verify**: buy -> persists after restart; failed purchase has no side effects.
 
-## 7 Upgrade boards (cage, treadmill, tool)
-- **Behavior**: world board at the base edge showing level, price, benefit; tap to upgrade; price turns red when unaffordable; fixed (not billboarded).
-- **Data**: levels. **Config**: price and effect tables.
+## 7 Upgrade surfaces
+- **Behavior**: a GDD-specified world or UI surface presents level, cost and effect; its interaction and visual states are evidence-driven.
+- **Data**: feature levels. **Config**: level/effect tables with generated or observed values; the recipe does not prescribe prices.
 - **UI**: real tap collider, range-based fade that also disables raycasts, press-scale feedback, tappable from reference distance.
-- **Edge cases**: max level state; other cages (bots) show boards too; ad-reward button wired.
+- **Edge cases**: max level state; applicable bot presentation; configured reward-channel state.
 - **Verify**: tap from far/near, unaffordable, max level.
 
 ## 8 Rebirth / prestige
@@ -74,9 +70,9 @@ Each recipe: **Behavior / Data / Config / Events / UI / Edge cases / Perf / Veri
 - **UI**: compact popup, 5-column grid, biome column with sliced ribbons, detail column; port from the reference 1:1 (`reference-port`).
 - **Edge cases**: new species discovered while the popup is open; mutations/sizes.
 
-## 11 Auto buttons
-- **Behavior**: Auto-Hit works only near eggs; Auto-Collect picks up nearby drops; toggle state persists in session; sits centered above the hotbar, small.
-- **Edge cases**: ending automatically when target is gone or when carrying; never auto-buy.
+## 11 Optional automation
+- **Behavior**: each GDD-authorized automation has explicit eligibility, target, cancellation, persistence and UI rules.
+- **Edge cases**: target loss, mutually exclusive states, and forbidden transactions.
 
 ## 12 Bots as players
 See `npc-bots-and-enemies`: real characters with a brain, strength tiers, same caps and systems, random skins from the factory, populated bases.
@@ -87,7 +83,7 @@ See `npc-bots-and-enemies`: real characters with a brain, strength tiers, same c
 - **Perf**: pooled trail renderers, capped particle counts.
 
 ## 14 Rewarded-ad boosts
-- **Behavior**: optional "x2 income for N minutes", "free hatch", revive; never forced.
+- **Behavior**: optional temporary acceleration, free action, or revive when observed; never forced.
 - **Architecture**: `monetization-integration` (interfaces + Editor mock); reward exactly once; works offline-safe (button hides when no ad ready).
 - **Verify**: success/failure/cancel paths in the mock; boost timer persists.
 
