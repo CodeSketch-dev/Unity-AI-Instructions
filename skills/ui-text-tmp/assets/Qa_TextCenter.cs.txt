@@ -1,0 +1,109 @@
+// Qa_TextCenter: put the visual (cap-height) centre of single-line TMP labels on the centre of their button/header face.
+// Copy to Assets/_Game/Scripts/Editor/Qa/Qa_TextCenter.cs. Idempotent: a second run moves nothing. Dry run first (menu: Tools/QA/Center Text (dry)).
+using System.Collections.Generic;
+using System.Text;
+using TMPro;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
+
+public static class Qa_TextCenter
+{
+    static readonly string[] FOLDERS = { "Assets/_Game/Prefabs" };   // never third-party UI sets
+    const float MIN_DELTA = 0.75f, MAX_DELTA = 7f, MAX_SYMMETRIC = 3.5f, MAX_FACE_HEIGHT = 260f;
+
+    [MenuItem("Tools/QA/Center Text (dry)")] static void Dry() => Run(false);
+    [MenuItem("Tools/QA/Center Text (apply)")] static void Apply() => Run(true);
+
+    static bool MiddleAligned(TMP_Text t)
+    {
+        VerticalAlignmentOptions v = t.verticalAlignment;
+        return v == VerticalAlignmentOptions.Middle || v == VerticalAlignmentOptions.Geometry || v == VerticalAlignmentOptions.Capline;
+    }
+
+    static void Run(bool apply)
+    {
+        var log = new StringBuilder();
+        var canvas = new GameObject("QaTextCenterCanvas", typeof(Canvas));
+        canvas.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+        try
+        {
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", FOLDERS))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (asset == null || !(asset.transform is RectTransform) || asset.GetComponentInChildren<TMP_Text>(true) == null) continue;
+
+                GameObject inst = Object.Instantiate(asset, canvas.transform);   // TMP bounds are invalid outside a Canvas
+                Canvas.ForceUpdateCanvases();
+                var moves = new List<KeyValuePair<string, float>>();
+                foreach (TMP_Text t in inst.GetComponentsInChildren<TMP_Text>(false))
+                    if (Measure(t, canvas.transform, out float dLocal)) moves.Add(new KeyValuePair<string, float>(PathOf(t.transform, inst.transform), dLocal));
+                Object.DestroyImmediate(inst);
+                if (moves.Count == 0) continue;
+
+                log.AppendLine($"{path} x{moves.Count}");
+                if (!apply) continue;
+                GameObject root = PrefabUtility.LoadPrefabContents(path);
+                foreach (var m in moves)
+                {
+                    Transform target = m.Key.Length == 0 ? root.transform : root.transform.Find(m.Key);
+                    if (target is RectTransform rt) rt.anchoredPosition += new Vector2(0f, m.Value);
+                }
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+        finally { Object.DestroyImmediate(canvas); }
+        Debug.Log($"[Qa_TextCenter] {(apply ? "applied" : "dry run")}\n{log}");
+    }
+
+    // dLocal = how far (parent-local y) the label must move so its cap centre sits on the face centre.
+    static bool Measure(TMP_Text t, Transform canvas, out float dLocal)
+    {
+        dLocal = 0f;
+        if (string.IsNullOrEmpty(t.text) || t.font == null || !MiddleAligned(t)) return false;
+        if (t.transform.parent != null && t.transform.parent.GetComponent<LayoutGroup>() != null) return false;
+        t.ForceMeshUpdate(true, true);
+        TMP_TextInfo info = t.textInfo;
+        if (info.characterCount == 0 || info.lineCount != 1) return false;
+
+        Image face = null;
+        for (Transform p = t.transform.parent; p != null && p != canvas; p = p.parent)
+        {
+            var im = p.GetComponent<Image>();
+            if (im != null && im.sprite != null && im.type == Image.Type.Sliced) { face = im; break; }
+        }
+        if (face == null) return false;
+
+        RectTransform fr = face.rectTransform, tr = t.rectTransform;
+        float faceScale = fr.lossyScale.y, textScale = t.transform.lossyScale.y;
+        if (fr.rect.height > MAX_FACE_HEIGHT) return false;
+        float faceCenter = fr.TransformPoint(new Vector3(0f, (0.5f - fr.pivot.y) * fr.rect.height, 0f)).y;
+        float rectCenter = tr.TransformPoint(new Vector3(0f, (0.5f - tr.pivot.y) * tr.rect.height, 0f)).y;
+        if (Mathf.Abs(faceCenter - rectCenter) / faceScale > fr.rect.height * 0.22f) return false;   // label is deliberately elsewhere
+
+        Vector4 b = face.sprite.border;   // L, B, R, T
+        float borderScale = Mathf.Max(0.01f, face.pixelsPerUnitMultiplier) * face.sprite.pixelsPerUnit / 100f;
+        float faceOffset = (b.y - b.w) * 0.5f / borderScale;   // thicker bottom lip lifts the face centre
+        float target = faceCenter + faceOffset * faceScale;
+
+        float fontScale = t.fontSize / t.font.faceInfo.pointSize * t.font.faceInfo.scale;
+        float baseline = t.transform.TransformPoint(new Vector3(0f, info.characterInfo[0].baseLine, 0f)).y;
+        float capCenter = baseline + t.font.faceInfo.capLine * fontScale * textScale * 0.5f;
+        float delta = (target - capCenter) / textScale;
+
+        if (float.IsNaN(delta) || Mathf.Abs(delta) < MIN_DELTA || Mathf.Abs(delta) > MAX_DELTA) return false;
+        if (Mathf.Abs(faceOffset) < 0.01f && Mathf.Abs(delta) > MAX_SYMMETRIC) return false;   // plain frame: probably intentional
+        dLocal = (target - capCenter) / (tr.parent != null ? tr.parent.lossyScale.y : 1f);
+        return true;
+    }
+
+    static string PathOf(Transform t, Transform root)
+    {
+        var parts = new List<string>();
+        for (Transform c = t; c != null && c != root; c = c.parent) parts.Add(c.name);
+        parts.Reverse();
+        return string.Join("/", parts);
+    }
+}

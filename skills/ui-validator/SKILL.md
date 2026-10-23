@@ -47,3 +47,5 @@ After three tuning rounds (container panels, scroll parts, inactive panels, dege
 Not covered: nested prefab-instance overrides are not resolved (validate the expanded prefab or the runtime result). The static pass does not replace screenshots (`ui-visual-qa`) or the user's eye on taste.
 
 Triage output before fixing: real (e.g. raycast left on leaf visuals) / false positive (dim backdrops, runtime safe-area insets, intentional fill-parent) / needs screenshot. Fix generated prefabs in the builder, not only the asset. Raycast sweeps clear leaf visuals only; skip graphics with interactive descendants or blocker-like names (frames, headers), or taps fall through popups.
+
+**Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.

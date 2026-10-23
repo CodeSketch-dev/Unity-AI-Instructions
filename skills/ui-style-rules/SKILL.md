@@ -29,3 +29,5 @@ Standing defaults for the team's Roblox-style look. If the current reference gam
 
 ## Verification
 Screenshot every changed popup at 1920x1080, zoom-crop the details the user complained about, and list the rules above that were checked.
+
+**Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.

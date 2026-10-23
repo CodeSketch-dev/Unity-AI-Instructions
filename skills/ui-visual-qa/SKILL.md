@@ -27,3 +27,5 @@ Limits: only 8-bit non-interlaced PNG; the Editor capture template was not compi
 
 ## Popup capture batches
 Snapshot popup-root children before create, destroy only the new ones after capture, wait for the open tween, and claim blocking popups (offers, offline reward) with a real tap first; they respawn on resize/focus.
+
+**Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.

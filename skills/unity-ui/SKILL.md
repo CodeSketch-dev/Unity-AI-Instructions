@@ -39,3 +39,5 @@ Zone map, sizes and thumb rules: `mobile-hud-layout` (single source; do not dupl
 
 ## Output
 Changed prefabs/scenes, config values used, rules not verified, helpers created.
+
+**Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.

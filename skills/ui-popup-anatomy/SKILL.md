@@ -27,3 +27,7 @@ Framework APIs differ slightly by version (`framework-version-map`); read the in
 
 ## Close during open animation
 Frameworks may ignore `Close()` while the open tween plays. Owners: never consume state or set a busy flag before the close succeeded; retry Close next frame until the popup is gone. Test drivers: wait for the open tween (up to ~8 s) before the first tap.
+
+- Text centring: Capline alignment plus the sprite face offset, never a per-label nudge (`ui-text-tmp` Optical centring).
+
+**Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.

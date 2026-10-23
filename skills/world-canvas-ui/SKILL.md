@@ -10,3 +10,5 @@ description: "World-space canvas boards and slot layouts: strip imported layout 
 - Keep the canvas a hair in front of the frame mesh (z-fighting). Set an event camera if the board is tappable.
 - **Capacity**: slot count must be >= data count; shrink spacing, never truncate. Size from the largest item, not the average. Test newest-last ordering with the biggest items (symptom: newest item missing while totals stay right).
 - Related: `ui-validator`, `text-spread`.
+- Text centring: Capline alignment plus the sprite face offset, never a per-label nudge (`ui-text-tmp` Optical centring).
+- World buttons need press feedback too: `UIPressPrimeTween` on the button, pointer down/up forwarded by the pass-through (`ui-button-anatomy` World buttons).

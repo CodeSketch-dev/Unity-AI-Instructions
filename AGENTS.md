@@ -60,6 +60,8 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - Keep material/shader changes compatible with the project's actual render pipeline and target platforms.
 - For level design, reuse existing art assets; establish composition, scale, walkability, object grouping, and camera readability; verify layout in the Editor rather than only describing it.
 - Prefer a clear separation between gameplay state and visual presentation when it improves maintainability; do not force architectural patterns on small features.
+- UI and world text: centre labels with Capline alignment plus the sprite face offset (skill `ui-text-tmp`, Optical centring). After building UI with text, run `Qa_TextCenter` (dry run) and confirm with a Play screenshot; never hand-nudge a label.
+- Pressable things (UI Button/Toggle, world sprite or text buttons, touch icons): every one needs the press scale animation (skill `ui-button-anatomy`, reuse `UIPressPrimeTween`), added in builders and runtime creators; run `Qa_PressAnim` and verify down/up scale in Play. Reward / watch-ad / free buttons also get the gentle `UI_RewardPulse` (same skill).
 
 ## Safety and source control
 
@@ -276,6 +278,12 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - After file changes, refresh/compile through Unity when available, inspect Console errors, verify created assets and serialized references, and run relevant EditMode/PlayMode tests. A successful external C# build alone is not proof that Unity serialization, scenes, or prefabs are correct.
 - When Unity MCP is unavailable or connected to a different project, make only safe file-based changes, state exactly what was not Editor-verified, and never claim scene/prefab/Console validation occurred.
 
+## UI centre alignment (mandatory)
+
+- Before building or editing ANY Unity UI (popups, bars, buttons, tabs, icon + text, currency bars), read `skills/ui-center-alignment/SKILL.md` and follow it.
+- Always centre content yourself: measure container vs content bounds by script (tolerance <= 1 px), keep siblings on one row at the same y centre, prefer layout groups over hand offsets, and never finish UI work without that check plus a screenshot.
+- Do not wait for the user to ask for centring; misaligned bars/labels are a defect to fix before reporting done.
+
 ## Unity prefab and ready-to-play workflow
 
 - Follow the full workflow: plan, implement, wire, save, compile, and test. Never report a gameplay feature complete after only creating scripts.
@@ -287,3 +295,19 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - Multi-agent work: follow `agent-team-protocol` (briefs, FIFO Editor lock with heartbeat, keep the project compiling, stop and report on a denied call, report file + short final answer).
 - Before any Play test or screenshot: claim blocking reward/offline popups with a real tap, back up the save, restore it after (`playmode-driver-recipes`).
 - Scene or mode switching code must pass the repeated scene-flow test in `scene-teardown-safety`.
+
+## Gem buttons (standing rule)
+
+- Every button that spends Gems (shops, popups, skin/pickaxe/trail cards, every minigame) uses a YELLOW squarer sliced sprite (`Gem_UiConfig.ButtonGem`), a gem icon + price (shortened K/M/B/T with `UtilityNumber.Format`), red price text when the player is short, and ALWAYS carries `Gem_ButtonPulse` (gentle scale up/down) so the player focuses on it. Create with `Gem_Ui.CreateGemButton` or call `Gem_ButtonPulse.Attach(button)`.
+- Short on Gems inside a minigame: tapping the button calls `Gem_TopUp.Run(cost, onReady)`, which buys the nearest Home Gem pack (`com.thunder.egg.gem1..6`, smallest pack that covers the missing Gems) with `IAPManager.Purchase`; on success the Gems are already in `Data_Currency.Gem`, then spend the price and unlock the item without asking again. In the Home shop the same case jumps to the Gem tab (`Shop_Common.OpenTab(Shop_Common_Type.Gem)`) instead. All spends go through `Gem_Shop.Buy` / `Break_Gem_Shop.Buy`, never subtract Gems elsewhere.
+- IAP funnel logs: `LogHelper.IAPPurchaseSuccess` is called once, right after `BounceSdk.LogIAPSuccess` in `IAPManager.IAPListener_OnPurchaseComplete`; do not call it from buttons or purchase callbacks.
+
+## Money text (standing rule)
+
+- In-game cash / money is always written as a bare shortened number (`+5M`, `150M`, `1B`), never with a `$` sign, in every label, toast, subtitle and placeholder. Real-store prices keep their currency text.
+- A reward-ad skin has ONE reward button only (no extra Gem button next to it); pickaxes and trails have no reward button.
+
+## UI and text (automatic, every project, mandatory)
+
+- Before ANY UI, popup, HUD, button, world-canvas or text work, read the `ui-text-autofit-system` skill and make sure the project has the `UI_TextAutoFit` system installed (install it if missing). Text fitting is automatic: auto size, padding from frames/buttons/shadows, no overflow, centred icon+label groups, never a `$` prefix on money. HARD RULE: text (its rect AND its rendered bounds) must never extend outside its parent/frame or overlap a sibling icon, never use ellipsis (shrink to min 10 instead), and overlays (banners/native half/tutorial hints) must never cover popup content; verify with a scripted rect/textBounds measurement over every popup state, not by eye.
+- Do not wait to be asked to align or fit text. Every new or changed UI is built correctly, normalised by the system, then verified by measurement (`textBounds` vs rect) and a screenshot in Play Mode before reporting done.

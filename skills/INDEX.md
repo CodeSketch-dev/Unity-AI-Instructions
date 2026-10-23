@@ -313,6 +313,7 @@
 - ui-clone - UI hub for recreating a reference UI (HUD, popups, shops, boards) and routing to the other UI skills. Use when UI must look/behave like another game or shows wrong 9-slice/anchors/overlap/mirrored text.
 - ui-design-tokens - Quantized UI sizes, spacing, insets and design principles mined from reference prefabs, to build consistent screens from a spec alone. Use when choosing sizes or spacing for any new UI element and no mockup supplies them.
 - ui-feedback-toasts - Timing recipes for toasts, announcement banners, warning messages, count-up counters and attention loops. Use when a screen needs transient feedback (reward received, error, warning, currency change).
+- ui-center-alignment - Mandatory centring audit for ANY Unity UI work (popups, bars, buttons, tabs, icon+text, currency bars, headers); measure content vs container and widget vs parent by script and fix offsets yourself. Use on every UI task, in every project.
 - ui-icon-label-layout - Lay out icon + label inside buttons, pills and price plates with a HorizontalLayoutGroup child instead of hand offsets. Use when a button has an icon and text, a currency price, or the text looks off-centre.
 - ui-localization - Localization setup for UI text: Unity Localization tables, TMP localize components, per-locale fonts, RTL, glyph coverage. Use when adding languages, new UI text, or fixing missing or unreadable glyphs.
 - ui-naming-conventions - Naming and folder conventions for UI prefabs and objects (Btn_, Text_, Root, Board, State_*). Use when creating UI hierarchies so builders, validators and scripts can find objects by name.
@@ -322,7 +323,7 @@
 - ui-scroll-board - Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview.
 - ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on "UI looks ugly/uneven".
 - ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections.
-- ui-text-tmp - TextMeshPro conventions: fonts, outline materials, autosize ranges, colors, raycast, number formats. Use when creating labels, titles, counters or fixing text that overflows or looks unlike the reference.
+- ui-text-tmp - TextMeshPro conventions: fonts, outline materials, autosize, colors, raycast, number formats, optical vertical centring. Use when creating labels, titles, counters, or fixing text that overflows, sits high/low in its button, or looks unlike the reference.
 - ui-validator - Check a UI prefab numerically for structure, overlap, safe area, text fit, raycast, 9-slice, missing references and more at several aspect ratios, with reasoned exceptions. Use after building or changing any popup, HUD or page, before screenshots.
 - ui-visual-qa - Capture a screen at several aspect ratios, diff it against a mockup or approved golden image (pixels, SSIM, edge map) and measure text contrast, with a stdlib PNG toolchain. Use after ui-validator passes, or when a build must match a reference image.
 

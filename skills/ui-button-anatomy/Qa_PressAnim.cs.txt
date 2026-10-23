@@ -1,0 +1,39 @@
+// Qa_PressAnim: add the press-scale component to every Button/Toggle that lacks it. Idempotent.
+// Copy to Assets/<Game>/Scripts/Editor/Qa/Qa_PressAnim.cs. Set PRESS to the installed press type's full name and FOLDERS to first-party folders only.
+using System;
+using System.Linq;
+using System.Text;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+
+public static class Qa_PressAnim
+{
+    const string PRESS = "SketchEngine.Utilities.UI.UIPressPrimeTween";
+    static readonly string[] FOLDERS = { "Assets/_Game/Prefabs", "Assets/_Game/Resources" };
+
+    [MenuItem("Tools/QA/Press Anim (dry)")] static void Dry() => Run(false);
+    [MenuItem("Tools/QA/Press Anim (apply)")] static void Apply() => Run(true);
+
+    static void Run(bool apply)
+    {
+        Type press = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return new Type[0]; } }).First(t => t.FullName == PRESS);
+        var log = new StringBuilder();
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", FOLDERS))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var asset = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            int need = asset.GetComponentsInChildren<Selectable>(true).Count(s => (s is Button || s is Toggle) && s.GetComponent(press) == null);
+            if (need == 0) continue;
+            log.AppendLine($"{path} x{need}");
+            if (!apply) continue;
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            foreach (var s in root.GetComponentsInChildren<Selectable>(true))
+                if ((s is Button || s is Toggle) && s.GetComponent(press) == null) s.gameObject.AddComponent(press);
+            PrefabUtility.SaveAsPrefabAsset(root, path);   // fails on prefabs with missing scripts: fix those first
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+        Debug.Log($"[Qa_PressAnim] {(apply ? "applied" : "dry run")}\n{log}");   // scenes: same loop over OpenScene, skip PrefabUtility.IsPartOfPrefabInstance objects
+    }
+}

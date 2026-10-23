@@ -15,3 +15,4 @@ description: "World-space and HUD text rules: one rich-text label with rarity/si
 - Restyled imported TMP text invisible: check `textInfo.characterCount` in Play; replace with a fresh UGUI text and rebind the owner's serialized reference.
 - Squash/pop tweens target a child wrapper at scale 1, never an object another script rescales; stop tweens on pool release.
 - Occlusion fade: give targets `SuspendUntil(time)` and call it on reveal/landing moments; only settled objects fade.
+- Text centring: Capline alignment plus the sprite face offset, never a per-label nudge (`ui-text-tmp` Optical centring).

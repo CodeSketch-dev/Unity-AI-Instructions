@@ -45,3 +45,5 @@ Shop/inventory popups with a scroll list and a preview follow `ui-scroll-board` 
 
 ## Notes
 Animated entrances (banner slide + fade, popup scale-in) are part of fidelity. Take timing and easing from the reference instead of inventing them.
+
+**Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.

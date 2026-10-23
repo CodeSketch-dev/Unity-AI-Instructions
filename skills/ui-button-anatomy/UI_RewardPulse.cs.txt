@@ -1,0 +1,38 @@
+// UI_RewardPulse: gentle attention pulse for reward / watch-ad / free buttons. Copy to Assets/<Game>/Scripts/Logic/UI/UI_RewardPulse.cs (needs PrimeTween).
+// Coexists with the press-scale script on the same object: yields while the finger is down, resumes from the base scale afterwards.
+using PrimeTween;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[DisallowMultipleComponent]
+public sealed class UI_RewardPulse : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
+{
+    [SerializeField, Min(1f)] float _peak = 1.06f;
+    [SerializeField, Min(0.1f)] float _halfCycle = 0.7f;
+    const float RESUME_DELAY = 0.2f;   // press restore is 0.1 s
+
+    Button _button; Vector3 _base; Tween _tween; bool _held; float _resumeAt;
+
+    void Awake() => _button = GetComponent<Button>();
+    void OnEnable() { _base = transform.localScale; _held = false; _resumeAt = 0f; }
+    void OnDisable() { _tween.Stop(); transform.localScale = _base; }
+
+    void Update()
+    {
+        bool want = !_held && (_button == null || _button.IsInteractable());
+        if (want && !_tween.isAlive && Time.unscaledTime >= _resumeAt) Play();
+        else if (!want && _tween.isAlive && !_held) { _tween.Stop(); transform.localScale = _base; }
+    }
+
+    void Play()
+    {
+        transform.localScale = _base;
+        _tween = Tween.Scale(transform, _base, _base * _peak, _halfCycle, Ease.InOutSine, -1, CycleMode.Yoyo, 0f, 0f, true);
+    }
+
+    public void OnPointerDown(PointerEventData e) { _held = true; _tween.Stop(); }
+    public void OnPointerUp(PointerEventData e) => Release();
+    public void OnPointerExit(PointerEventData e) => Release();
+    void Release() { if (!_held) return; _held = false; _resumeAt = Time.unscaledTime + RESUME_DELAY; }
+}
