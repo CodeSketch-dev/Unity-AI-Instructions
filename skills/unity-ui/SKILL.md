@@ -1,6 +1,6 @@
 ---
 name: unity-ui
-description: "Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab."
+description: "Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # Unity UI

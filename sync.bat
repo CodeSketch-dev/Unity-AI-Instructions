@@ -4,7 +4,10 @@ rem ===========================================================================
 rem  Sync AGENTS.md + skills to Claude and Codex. Double-click to run.
 rem    AGENTS.md  ->  %USERPROFILE%\.claude\CLAUDE.md  va  %USERPROFILE%\.codex\AGENTS.md
 rem    skills\*   ->  %USERPROFILE%\.claude\skills\    va  %USERPROFILE%\.codex\skills\
-rem  Options: /nopause (no final keypress wait)   /nopull (skip git pull)
+rem    + user settings.json: UI-gate hook enabled, UI skills un-hidden (no name-only)
+rem    + every Unity project found next to this repo (and in projects.txt):
+rem        CLAUDE.md block, .claude\ai-instructions.md, .claude\skills  (works for cloud sessions too)
+rem  Options: /nopause   /nopull (skip git pull)   /nopro (skip per-project step)
 rem  Runs git pull --ff-only if the repository is clean; skips pull when there are uncommitted changes.
 rem  Differing destination files are overwritten directly; no backup files are created.
 rem ===========================================================================
@@ -15,10 +18,12 @@ if "%REPO:~-1%"=="\" set "REPO=%REPO:~0,-1%"
 rem (REPO must be computed before 'shift', which also shifts %0)
 set "NOPAUSE="
 set "NOPULL="
+set "NOPRO="
 :args
 if "%~1"=="" goto :args_done
 if /i "%~1"=="/nopause" set "NOPAUSE=1"
 if /i "%~1"=="/nopull" set "NOPULL=1"
+if /i "%~1"=="/nopro" set "NOPRO=1"
 shift
 goto :args
 :args_done
@@ -70,11 +75,19 @@ rem ---- 4. pipeline agents, commands and hook scripts -> Claude only ----------
 if exist "%REPO%\agents" call :install_tree "%REPO%\agents" "%CLAUDE_HOME%\agents" "agents"
 if exist "%REPO%\commands" call :install_tree "%REPO%\commands" "%CLAUDE_HOME%\commands" "commands"
 if exist "%REPO%\hooks" call :install_tree "%REPO%\hooks" "%CLAUDE_HOME%\pipeline-hooks\hooks" "hook scripts"
+if exist "%REPO%\ui_gate_reminder.ps1" call :install_tree "%REPO%" "%CLAUDE_HOME%\pipeline-hooks\hooks" "ui gate hook"
+
+rem ---- 5. user settings (hook + skill visibility) and all Unity projects -------------------
+set "NOPROFLAG="
+if defined NOPRO set "NOPROFLAG=-NoProjects"
+if exist "%REPO%\tools\sync_claude_setup.ps1" (
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\tools\sync_claude_setup.ps1" -Repo "%REPO%" -ClaudeHome "%CLAUDE_HOME%" %NOPROFLAG%
+    if errorlevel 1 set "RESULT=1"
+)
 
 echo.
 if "%RESULT%"=="0" (
-    echo Codex and Claude sync complete ^(instructions + skills + pipeline agents/commands/hook scripts^).
-    echo Hooks are NOT enabled by sync: run  py -I tools\install_hooks.py  and merge the snippet into settings.json.
+    echo Sync complete: instructions + skills + agents/commands + UI-gate hook + Unity projects.
     echo Open a new session to reload.
 ) else (
     echo Sync finished with ERRORS above; review them.

@@ -1,6 +1,6 @@
 ---
 name: ui-notification-dots
-description: "Default red notification dots on HUD buttons, tabs and item cards when the player can afford a better stat item or claim something. Use when starting any new game and whenever building or changing a shop, upgrade, collection or reward screen; add it without being asked."
+description: "Default red notification dots on HUD buttons, tabs and item cards when the player can afford a better stat item or claim something. Use when starting any new game and whenever building or changing a shop, upgrade, collection or reward screen; add it without being asked. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # Notification dots (default feature)

@@ -1,0 +1,5 @@
+# Extra folders to scan (depth 3) for Unity projects. One path per line.
+# The parent folder of this repo is always scanned, so siblings are found automatically.
+# Example:
+# D:\GitProject
+# E:\Work\Games

@@ -1,6 +1,6 @@
 ---
 name: ui-button-anatomy
-description: "Required components and behavior of every button: press scale, click sfx on pointer down, grayscale disabled, per-state variants, notify dot, hit areas. Use when creating or auditing any button, tab or HUD icon."
+description: "Required components and behavior of every button: press scale, click sfx on pointer down, grayscale disabled, per-state variants, notify dot, hit areas. Use when creating or auditing any button, tab or HUD icon. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # Button anatomy

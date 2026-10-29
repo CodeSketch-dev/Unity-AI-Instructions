@@ -63,6 +63,18 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - UI and world text: centre labels with Capline alignment plus the sprite face offset (skill `ui-text-tmp`, Optical centring). After building UI with text, run `Qa_TextCenter` (dry run) and confirm with a Play screenshot; never hand-nudge a label.
 - Pressable things (UI Button/Toggle, world sprite or text buttons, touch icons): every one needs the press scale animation (skill `ui-button-anatomy`, reuse `UIPressPrimeTween`), added in builders and runtime creators; run `Qa_PressAnim` and verify down/up scale in Play. Reward / watch-ad / free buttons also get the gentle `UI_RewardPulse` (same skill).
 
+### UI work gate (always on)
+
+- Any task that creates or edits UI (button, text/label, icon, popup, shop, tab, HUD, currency bar, price plate, prefab layout) must start by reading skill `ui-always` and the skills it lists. This overrides the "smallest skill set" lifecycle rule above: the UI set is always loaded for UI work, and skills are never skipped because a task looks small.
+- UI work is not done until the `ui-center-alignment` bounds script has been run on the changed containers (<= 1 px) and a Play screenshot has been checked. The report must list the skills read and the measured dx/dy.
+- Subagents doing UI work get `skills/ui-always/SKILL.md` in their brief and must read it first. Never wait for the user to remind you to apply these skills.
+
+### Automatic skill routing (always on, all domains)
+- At the start of every task, route it yourself: match the request to a skill via the router hook hint (UserPromptSubmit "Skill router"), the available-skill list, or `skills/INDEX.md`, then load the matching skills. The user never has to say "use my skills"; a prompt that names no skill still triggers them.
+- This holds for skills listed as `name-only` too: the hook names them, so load them by name. Load only what the current step needs and drop it afterwards (lifecycle rule above).
+- Keep domain pairs together: ads/rewarded -> `ads-popup-flow`; economy/prices -> `economy-progression-design`; bots -> `bots-as-players`; perf/atlas/draw calls -> `mobile-perf-audit`; save data -> `data-persistence-facts`; porting from a reference game -> `reference-port` + `rule-port-not-invent`; Editor/MCP work -> `unity-mcp-workflow`; QA -> `qa-playmode-smoke` + `rule-qa-verdicts`.
+- Every task ends with `done-means-wired` (feature reachable and used in game) and a verification run; report which skills were applied.
+
 ## Safety and source control
 
 - Never delete or overwrite unrelated scripts, scenes, prefabs, assets, or project settings to make an error disappear.

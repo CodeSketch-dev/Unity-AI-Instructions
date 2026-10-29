@@ -1,6 +1,6 @@
 ---
 name: ui-icon-label-layout
-description: Lay out icon + label inside buttons, pills and price plates with a HorizontalLayoutGroup child instead of hand offsets. Use when a button has an icon and text, a currency price, or the text looks off-centre.
+description: "Lay out icon + label inside buttons, pills and price plates with a HorizontalLayoutGroup child instead of hand offsets. Use when a button has an icon and text, a currency price, or the text looks off-centre. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # Icon + label layout

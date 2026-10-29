@@ -1,6 +1,6 @@
 ---
 name: ui-clone
-description: UI hub for recreating a reference UI (HUD, popups, shops, boards) and routing to the other UI skills. Use when UI must look/behave like another game or shows wrong 9-slice/anchors/overlap/mirrored text.
+description: "UI hub for recreating a reference UI (HUD, popups, shops, boards) and routing to the other UI skills. Use when UI must look/behave like another game or shows wrong 9-slice/anchors/overlap/mirrored text. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # UI clone (UI hub)

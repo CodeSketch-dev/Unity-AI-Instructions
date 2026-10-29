@@ -1,6 +1,6 @@
 ---
 name: ui-text-tmp
-description: "TextMeshPro conventions: fonts, outline materials, autosize, colors, raycast, number formats, optical vertical centring. Use when creating labels, titles, counters, or fixing text that overflows, sits high/low in its button, or looks unlike the reference."
+description: "TextMeshPro conventions: fonts, outline materials, autosize, colors, raycast, number formats, optical vertical centring. Use when creating labels, titles, counters, or fixing text that overflows, sits high/low in its button, or looks unlike the reference. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # UI text (TMP)

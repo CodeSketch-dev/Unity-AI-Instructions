@@ -1,6 +1,6 @@
 ---
 name: ui-style-rules
-description: Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on "UI looks ugly/uneven".
+description: "Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on \"UI looks ugly/uneven\". Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # UI style rules (defaults, each one came from a rejected result)

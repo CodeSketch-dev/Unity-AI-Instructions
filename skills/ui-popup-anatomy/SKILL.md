@@ -1,6 +1,6 @@
 ---
 name: ui-popup-anatomy
-description: Popup prefab tree, animation modules and timings, dim, Escape stack and page-vs-popup distinction. Use when building or fixing any popup, confirm dialog or full page.
+description: "Popup prefab tree, animation modules and timings, dim, Escape stack and page-vs-popup distinction. Use when building or fixing any popup, confirm dialog or full page. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # Popup anatomy

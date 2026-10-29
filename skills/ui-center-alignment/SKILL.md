@@ -1,6 +1,6 @@
 ---
 name: ui-center-alignment
-description: Mandatory centring audit for any Unity UI work (bars, pills, buttons, icon+text, currency bars, popups, tabs). Use whenever you build or edit UI; verify by script that content is geometrically centred before finishing.
+description: "Mandatory centring audit for any Unity UI work (bars, pills, buttons, icon+text, currency bars, popups, tabs). Use whenever you build or edit UI; verify by script that content is geometrically centred before finishing. Part of the ui-always set: read skills/ui-always first for any UI task."
 ---
 
 # UI centre alignment (always)
