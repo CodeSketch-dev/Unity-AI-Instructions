@@ -45,3 +45,6 @@ The user prompts ONCE; the agent runs the whole pass without being told the step
 UI_TextAutoFit normalises every TMP text automatically (auto size, padding from frames, no overflow). Never hand-fit text; build layouts correctly,
 let the system normalise, then measure textBounds vs rect in Play. Read the ui-text-autofit-system skill before any UI/text work.
 ```
+
+## Opt-out instead of per-frame hacks
+- If an auto-fit/normalising system re-centres or resizes a text you placed deliberately (e.g. a right-aligned corner amount under a button-like card), use the system's explicit opt-out marker on that text; never fight it with `Update`/`LateUpdate` code. Re-check alignment on the live screen after the first frame, because normalisers run after your builder.

@@ -94,14 +94,15 @@ namespace UiAudit
                 if (gr.yMax < text.yMin || gr.yMin > text.yMax) continue;
                 if (g.GetComponent<TMP_Text>() != null) continue;
                 bool overlaps = gr.xMin < text.xMax && gr.xMax > text.xMin && gr.yMin < text.yMax && gr.yMax > text.yMin;
-                if (overlaps) issues.Add("OVERLAP " + g.name);
+                if (overlaps) issues.Add((gr.width * gr.height > 40000f ? "RECT-OVERLAP(check visually, big art icon) " : "OVERLAP ") + g.name);
                 if (gr.center.x <= text.center.x) gapMin = Mathf.Max(gapMin, gr.xMax); else gapMax = Mathf.Min(gapMax, gr.xMin);
             }
             if (gapMax - gapMin > 20f)
             {
                 float dx = text.center.x - (gapMin + gapMax) * 0.5f;
                 bool leftAligned = t.alignment.ToString().Contains("Left") || t.alignment.ToString().Contains("Right");
-                if (!leftAligned && Mathf.Abs(dx) > DX_TOL) issues.Add("dx=" + dx.ToString("F1") + " vs free gap [" + gapMin.ToString("F0") + ".." + gapMax.ToString("F0") + "]");
+                bool centredOnFrame = gapMax - gapMin > 500f && Mathf.Abs(text.center.x - frame.center.x) <= DX_TOL;   // wide header: a title centred on the header (>= 250 px free each side) is correct
+                if (!leftAligned && !centredOnFrame && Mathf.Abs(dx) > DX_TOL) issues.Add("dx=" + dx.ToString("F1") + " vs free gap [" + gapMin.ToString("F0") + ".." + gapMax.ToString("F0") + "]");
             }
             float padL = text.xMin - frame.xMin, padR = frame.xMax - text.xMax, padB = text.yMin - frame.yMin, padT = frame.yMax - text.yMax;
             bool bigFrame = frame.width >= 40f && frame.height >= 20f && frame.width < UnityEngine.Screen.width * 0.9f;
@@ -110,8 +111,8 @@ namespace UiAudit
                 if (padL < MIN_PAD || padR < MIN_PAD) issues.Add("padLR=" + padL.ToString("F0") + "/" + padR.ToString("F0"));
                 if (padB < 2f || padT < 2f) issues.Add("padTB=" + padT.ToString("F0") + "/" + padB.ToString("F0"));
             }
-            float row = Mathf.Max(1f, frame.height);
-            if (bigFrame && (t.fontSize < MIN_FONT || t.fontSize < row * MIN_FONT_FRAC * 0.5f) && t.enableAutoSizing) issues.Add("fontSize=" + t.fontSize.ToString("F0") + " row=" + row.ToString("F0"));
+            float rectH = Mathf.Max(1f, Screen(rt).height);   // the text's own box (not the card it sits in): autosize shrank it when the font is far below that box
+            if (bigFrame && (t.fontSize < MIN_FONT || (t.enableAutoSizing && t.fontSize < rectH * MIN_FONT_FRAC * 0.6f))) issues.Add("fontSize=" + t.fontSize.ToString("F0") + " box=" + rectH.ToString("F0"));
             Material mat = t.fontSharedMaterial;
             if (mat == null || !mat.HasProperty("_OutlineWidth") || mat.GetFloat("_OutlineWidth") < 0.01f) issues.Add("NO OUTLINE");
             if (issues.Count == 0) return null;
