@@ -31,3 +31,7 @@ Frameworks may ignore `Close()` while the open tween plays. Owners: never consum
 - Text centring: Capline alignment plus the sprite face offset, never a per-label nudge (`ui-text-tmp` Optical centring).
 
 **Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.
+
+## Banner clearance (mobile)
+- Every popup stays at least 200 px (1080-high reference) clear of the screen bottom so it never touches the banner ad: the popup's usable region is [bottom 200 px .. top safe area]; centre the popup in that region and scale it down uniformly (keep >= ~0.75) when it is taller. Implement it once in the shared popup root / safe-area component (one inset constant), not per prefab, and make it compose with any side push (native half).
+- Verify per popup in Play: bottom edge >= 200 px above the screen bottom, header fully visible, no overlap with the banner.
