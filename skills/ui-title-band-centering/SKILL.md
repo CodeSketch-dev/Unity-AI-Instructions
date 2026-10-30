@@ -8,6 +8,8 @@ triggers: title, header, band, popup title, align title, center title, canh giua
 
 Popups are often ONE board sprite (sliced): the header band and the body differ only by colour. The rect of a `Header` object is NOT the visible band (it can be 95 px tall while the band is 150 px). Never centre a title on a rect, never nudge by eye.
 
+Key idea: the title band and the body have DIFFERENT colours, so the colour change in a screenshot gives the true band height. Run `band_scan.py <shot.png> <x>` (this folder) to get the band top, face bottom and face centre in one call, then centre the title ink on that centre.
+
 ## Procedure (always, automatic for any popup title / header content)
 1. Open the popup in Play at 1920x1080 (claim blocking popups first), `ScreenCapture.CaptureScreenshot` to the scratchpad, read it next call.
 2. Scan one pixel column that crosses only the board (not text/icons, e.g. between title and close button) from the top: band face = first saturated colour run after the dark outline; band bottom = the colour change to the cream/body (the darker lip belongs to the band edge, not the face). Python/PIL: print `getpixel((x,y))` every 6 px.
