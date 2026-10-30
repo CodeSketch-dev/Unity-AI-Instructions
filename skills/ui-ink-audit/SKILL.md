@@ -11,19 +11,16 @@ Rects lie. Buttons are sprites with bands top to bottom: dark OUTLINE, LIGHT hig
 ## Rule 0 (construction)
 Every button / pill / frame holding icon + text is ONE `HorizontalLayoutGroup` (icon first, label second, MiddleCenter, Capline text, spacing 5/10/15). Top/bottom padding carries the light/shadow asymmetry. Never a hand-positioned icon beside a stretched label. Badges ("x2", dots) overhang on purpose and are excluded from the pair.
 
-## It runs by itself (no prompt, any project)
-`Qa_InkWatcher` (Editor, `[InitializeOnLoad]`) watches what the player sees in Play Mode: the open popups, or with no popup the set of visible buttons of the active scene. When that set changes and settles it dumps the screen (`Qa_InkDump`), captures a screenshot and runs `ink_audit.py`. Each distinct violation is a Console warning `[InkAudit] <screen> FAIL ...` (once per session) and is appended to `Temp/InkAudit/report.txt`; a screen with none logs `[InkAudit] <screen> -> 0 fail`.
+## Manual only (the automatic watcher was removed)
+An always-on watcher costs real CPU in Play Mode (measured: about +160% of one core on top of the game's ~350%), which made the user's PC lag, so there is NO background watcher. The audit runs only when the agent asks for it:
+1. Open the screen in Play, then `AiQa.Qa_InkDump.Run(json)` + `ScreenCapture.CaptureScreenshot(png)` in the same call (call it through reflection by type name `AiQa.Qa_InkDump`), then `python ink_audit.py png json [--fixes fixes.json]`.
+2. Apply with `AiQa.Qa_InkFix.Run()` in Edit Mode (menu Tools/Qa/Apply Ink Fixes): changes are clamped (8 units per step, 16 max padding, skip when > 20), only failing items are touched. Always look at the screenshot afterwards; if a result looks wrong (tiny text, squeezed button) revert that prefab.
+3. For judgment calls: take the screenshot and LOOK at it (or give it to an agent) before accepting any auto change.
 
-## It also fixes itself (zero effort, zero tokens)
-Every FAIL with a source prefab is written to `Temp/InkAudit/fixes.json` and applied at once (also while Play runs; leftovers when Play stops) by `Qa_InkFix`: HLG padding for buttons with a group, child offsets for plain label buttons, label offset for header titles; only failing items are touched, each target at most twice (then it logs "needs a manual look"). Toggle: menu Tools/Qa/Auto-apply ink fixes after Play. Gradient / textured buttons and frames use the button rect as the face; tiles whose icon overhangs the label (HUD) only check the horizontal centre; currency bars, joysticks and badges are skipped (own contracts). Runtime-built UI (no prefab) is reported but cannot be auto-fixed.
-
-Install: nothing to do. `sync.bat` copies the Editor scripts (`templates/unity-editor/AiQa/*.cs.txt`, namespace `AiQa`) to `Assets/_AiQa/Editor/` of every Unity project that has uGUI/TMP (and removes older hand-copied `Qa_Ink*.cs`), places `ink_audit.py` under `<project>/.claude/skills/ui-ink-audit/`, and registers the agent notifier hook (`ink_audit_notify.ps1`). New projects get it on their first sync. Needs `python` + Pillow on PATH.
-
-## The agent is told automatically
-When a screen has FAILs the watcher writes `Temp/InkAudit/pending.txt`; the hook `ink_audit_notify.ps1` (PostToolUse / UserPromptSubmit / Stop) hands it to the agent once, so the agent fixes the rest without the user saying anything. Nothing pending = the hook prints nothing and costs nothing.
+Install: `sync.bat` copies `Qa_InkDump` and `Qa_InkFix` (`templates/unity-editor/AiQa/*.cs.txt`, namespace `AiQa`) to `Assets/_AiQa/Editor/` of every Unity project with uGUI/TMP, and `ink_audit.py` to `<project>/.claude/skills/ui-ink-audit/`. Needs `python` + Pillow.
 
 ## What the agent must do (every task, every Play test, every autoplay)
-1. During and after any Play run read the Console for `[InkAudit]` (e.g. console-get-logs Warning). Open popups the test never reaches (offline/welcome, daily, shops, treadmill, bag, pets, eggs, every minigame HUD) so the watcher sees them; a screen nobody opened is NOT audited.
+1. After UI work and after Play tests, audit the screens you touched or opened (steps above). A screen nobody opened is NOT audited.
 2. Every FAIL line carries the fix (HLG padding units = px*2/scale, or move title N units). Apply it on the SOURCE prefab (stop Play first, animated components off while saving), re-run, repeat until `0 fail` for every screen touched. Treat a FAIL seen in any test as a bug of this task, not a note for the user.
 3. Manual run: `Qa_InkDump.Run(json)` + `ScreenCapture.CaptureScreenshot(png)` then `python ink_audit.py png json`.
 4. Report the screens audited with their fail counts. If python/Pillow is missing, say so and fall back to `ui-title-band-centering` measurements.
