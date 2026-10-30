@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Game
+namespace AiQa
 {
     // Applies the corrections ink_audit.py wrote to Temp/InkAudit/fixes.json (only items that FAILED; aligned UI is never touched) to the SOURCE prefabs.
     // Edit Mode only. Button with a HorizontalLayoutGroup: padding right/bottom grow by 2*d/scale (the group centres, so the pair moves by d). No group:
@@ -18,9 +18,9 @@ namespace Game
         [MenuItem("Tools/Qa/Apply Ink Fixes")]
         public static void RunMenu() => Debug.Log(Run());
 
-        public static string Run()
+        public static string Run(bool allowInPlay = false)
         {
-            if (EditorApplication.isPlaying) return "[InkFix] stop Play Mode first";
+            if (EditorApplication.isPlaying && !allowInPlay) return "[InkFix] stop Play Mode first";
             string file = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Temp", "InkAudit", "fixes.json"));
             if (!File.Exists(file)) return "[InkFix] no fixes.json";
             var list = JsonUtility.FromJson<FixList>(File.ReadAllText(file));

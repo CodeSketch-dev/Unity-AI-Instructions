@@ -66,8 +66,24 @@ Register-EnforceHook $s 'PostToolUse' 'Skill|Edit|Write|MultiEdit|NotebookEdit|m
 Register-EnforceHook $s 'Stop' ''
 Register-EnforceHook $s 'SubagentStop' ''
 Register-EnforceHook $s 'SubagentStart' ''
+# Ink audit notifier: hands the agent the misaligned UI the Unity watcher found while the user plays (silent and free when nothing is pending).
+$inkScript = Join-Path $ClaudeHome 'pipeline-hooks\hooks\ink_audit_notify.ps1'
+$inkCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $inkScript + '"'
+function Register-InkHook($settings, [string]$event, [string]$matcher) {
+  if (-not ($settings.hooks.PSObject.Properties.Name -contains $event)) { $settings.hooks | Add-Member -NotePropertyName $event -NotePropertyValue @() }
+  $found = $false
+  foreach ($e in @($settings.hooks.$event)) { foreach ($h in @($e.hooks)) { if ($h.command -like '*ink_audit_notify*') { $found = $true; if ($h.command -ne $inkCmd) { $h.command = $inkCmd } } } }
+  if (-not $found) {
+    $entry = [pscustomobject]@{ hooks = @([pscustomobject]@{ type = 'command'; command = $inkCmd; timeout = 10 }) }
+    if ($matcher) { $entry | Add-Member -NotePropertyName matcher -NotePropertyValue $matcher }
+    $settings.hooks.$event = @($settings.hooks.$event) + $entry
+  }
+}
+Register-InkHook $s 'PostToolUse' 'mcp__ai-game-developer__.*|Bash|Read|Edit|Write'
+Register-InkHook $s 'UserPromptSubmit' ''
+Register-InkHook $s 'Stop' ''
 # Fail loudly if an installed hook script does not parse (a silent parse error once disabled the whole skill router).
-foreach ($hs in @($hookScript, $editScript, $obsScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'), $enfScript)) {
+foreach ($hs in @($hookScript, $editScript, $obsScript, $inkScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'), $enfScript)) {
   if (Test-Path -LiteralPath $hs) {
     $errs = $null; $tok = $null
     [void][Management.Automation.Language.Parser]::ParseFile($hs, [ref]$tok, [ref]$errs)
@@ -132,6 +148,22 @@ foreach ($p in $projects) {
   } else { $new = $block + "`n" }
   if ($new -ne $txt) { [IO.File]::WriteAllText($cm, $new, $utf8) }
   & robocopy $skills (Join-Path $cl 'skills') /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP | Out-Null
+  # Automatic UI audit tooling (skill ui-ink-audit): Editor-only scripts go to Assets/_AiQa/Editor of every Unity project that has uGUI/TMP; nobody copies files by hand.
+  $qaSrc = Join-Path $Repo 'templates\unity-editor\AiQa'
+  $manifest = Join-Path $p 'Packages\manifest.json'
+  if ((Test-Path -LiteralPath $qaSrc) -and (Test-Path -LiteralPath (Join-Path $p 'Assets')) -and (Test-Path -LiteralPath $manifest) -and ([IO.File]::ReadAllText($manifest) -match 'com\.unity\.(ugui|textmeshpro)')) {
+    $qaDst = Join-Path $p 'Assets\_AiQa\Editor'
+    New-Item -ItemType Directory -Force -Path $qaDst | Out-Null
+    # migrate: remove older hand-copied versions (same file names) so only one watcher runs
+    Get-ChildItem -LiteralPath (Join-Path $p 'Assets') -Recurse -Depth 6 -Filter 'Qa_Ink*.cs' -ErrorAction SilentlyContinue |
+      Where-Object { $_.Name -in @('Qa_InkDump.cs', 'Qa_InkWatcher.cs', 'Qa_InkFix.cs') } |
+      Where-Object { $_.FullName -notlike '*\_AiQa\*' } | ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force; Remove-Item -LiteralPath ($_.FullName + '.meta') -Force -ErrorAction SilentlyContinue; Write-Host ("  AiQa: removed old copy " + $_.FullName) }
+    foreach ($f in Get-ChildItem -LiteralPath $qaSrc -Filter '*.cs.txt') {
+      $target = Join-Path $qaDst ($f.Name -replace '\.txt$', '')
+      $new = [IO.File]::ReadAllText($f.FullName)
+      if (-not (Test-Path -LiteralPath $target) -or ([IO.File]::ReadAllText($target) -ne $new)) { [IO.File]::WriteAllText($target, $new, $utf8); Write-Host ("  AiQa installed: " + $target) }
+    }
+  }
   Write-Host ("project synced: " + $p)
 }
 if (-not $projects) { Write-Host 'no Unity projects found next to the repo (add roots to projects.txt)' }

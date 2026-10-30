@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Game
+namespace AiQa
 {
     // Automatic UI audit for the WHOLE game (skill ui-ink-audit). In Play Mode it watches what the player can see: the open popups (children of "PopupRoot"),
     // or, with no popup, the set of active buttons (HUD, shops, minigame screens, scene changes). Whenever that set changes and settles it dumps the screen,
@@ -116,6 +116,14 @@ namespace Game
                         if (s_reported.Add(line)) UnityEngine.Debug.LogWarning("[InkAudit] " + _label + " " + line);   // each distinct violation logged once per session
                     }
                     UnityEngine.Debug.Log("[InkAudit] " + _label + " -> " + (fails == 0 ? "0 fail" : fails + " FAIL"));
+                    if (fails > 0)
+                    {
+                        // apply what can be fixed right now (source prefabs, no need to stop Play) and leave a note for the agent hook (ink_audit_notify.ps1)
+                        string fixRes = EditorPrefs.GetBool(AUTOFIX_KEY, true) ? Qa_InkFix.Run(true) : "auto-fix disabled";
+                        File.WriteAllText(Path.Combine(_dir, "pending.txt"), "Screen: " + _label + "
+" + report + "InkFix: " + fixRes + "
+");
+                    }
                     File.AppendAllText(Path.Combine(_dir, "report.txt"), System.DateTime.Now.ToString("HH:mm:ss") + " " + _label + " " + fails + " fail\n" + report);
                 }
             }

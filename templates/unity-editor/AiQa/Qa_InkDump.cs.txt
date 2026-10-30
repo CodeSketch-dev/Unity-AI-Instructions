@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Game
+namespace AiQa
 {
     // Play Mode dump for ink_audit.py (skill ui-ink-audit): every Selectable (icon + label buttons) and every title label with its SCREEN rects (top-origin px),
     // the icon / text-ink rects inside it and whether a HorizontalLayoutGroup drives them. Call Run(path), then CaptureScreenshot in the same frame.
