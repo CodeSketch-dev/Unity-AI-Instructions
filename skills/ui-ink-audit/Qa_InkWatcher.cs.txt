@@ -16,11 +16,15 @@ namespace Game
     [InitializeOnLoad]
     public static class Qa_InkWatcher
     {
+        const string AUTOFIX_KEY = "Qa.InkAutoFix";
         const int SETTLE_FRAMES = 25, SHOT_WAIT_FRAMES = 3;
+
+        [MenuItem("Tools/Qa/Auto-apply ink fixes after Play (toggle)")]
+        static void ToggleAutoFix() { EditorPrefs.SetBool(AUTOFIX_KEY, !EditorPrefs.GetBool(AUTOFIX_KEY, true)); UnityEngine.Debug.Log("[InkAudit] auto-apply fixes after Play = " + EditorPrefs.GetBool(AUTOFIX_KEY, true)); }
         const double MIN_SECONDS_BETWEEN = 3.0;
         static string _signature = "", _pending = "";
         static int _stableFrames, _shotCountdown = -1;
-        static double _lastAudit;
+        static double _lastAudit, _lastPoll;
         static bool _pythonWarned;
         static string _dir, _png, _json, _label;
         static readonly HashSet<string> s_reported = new HashSet<string>();
@@ -28,7 +32,19 @@ namespace Game
         static Qa_InkWatcher()
         {
             EditorApplication.update += Tick;
-            EditorApplication.playModeStateChanged += s => { _signature = _pending = ""; _stableFrames = 0; _shotCountdown = -1; s_reported.Clear(); };
+            // Leaving Play reloads the domain, so the PlayModeStateChanged below may never reach this copy: also apply pending fixes whenever the Editor (re)loads in Edit Mode.
+            EditorApplication.delayCall += () =>
+            {
+                if (!EditorApplication.isPlayingOrWillChangePlaymode && EditorPrefs.GetBool(AUTOFIX_KEY, true))
+                { string r = Qa_InkFix.Run(); if (!r.Contains("no fixes.json")) UnityEngine.Debug.Log(r); }
+            };
+            EditorApplication.playModeStateChanged += s =>
+            {
+                _signature = _pending = ""; _stableFrames = 0; _shotCountdown = -1; s_reported.Clear();
+                // Back in Edit Mode: write every correction collected during the session into the source prefabs (zero effort, zero tokens).
+                if (s == PlayModeStateChange.EnteredEditMode && EditorPrefs.GetBool(AUTOFIX_KEY, true))
+                    EditorApplication.delayCall += () => { string r = Qa_InkFix.Run(); if (!r.Contains("no fixes.json")) UnityEngine.Debug.Log(r); };
+            };
         }
 
         // popup mode: names of open popups; otherwise: sorted names of visible buttons (so a scene change or a new HUD element re-triggers the audit).
@@ -47,7 +63,17 @@ namespace Game
 
         static void Tick()
         {
-            if (!EditorApplication.isPlaying || EditorApplication.isPaused) return;
+            if (!EditorApplication.isPlaying)
+            {
+                // Edit Mode: apply corrections collected during Play (every 2 s check; survives domain reloads, never runs while entering/leaving Play).
+                if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || EditorApplication.isUpdating) return;
+                if (EditorApplication.timeSinceStartup - _lastPoll < 2.0) return;
+                _lastPoll = EditorApplication.timeSinceStartup;
+                if (EditorPrefs.GetBool(AUTOFIX_KEY, true) && File.Exists(Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Temp", "InkAudit", "fixes.json"))))
+                    UnityEngine.Debug.Log(Qa_InkFix.Run());
+                return;
+            }
+            if (EditorApplication.isPaused) return;
             if (_shotCountdown >= 0)
             {
                 if (--_shotCountdown == 0) { _shotCountdown = -1; Audit(); }

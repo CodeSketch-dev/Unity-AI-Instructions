@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +30,19 @@ namespace Game
         // Source prefab asset + path inside it, so Qa_InkFix can write the correction back to the prefab (empty for runtime-built objects).
         static string PrefabJson(Transform t)
         {
+            // runtime clone ("Name(Clone)"): the nearest ancestor with that suffix whose name matches a prefab asset is the source prefab
+            for (Transform top = t; top != null; top = top.parent)
+            {
+                if (!top.name.EndsWith("(Clone)")) continue;
+                string n = top.name.Substring(0, top.name.Length - "(Clone)".Length);
+                foreach (string g in AssetDatabase.FindAssets(n + " t:Prefab"))
+                {
+                    string ap = AssetDatabase.GUIDToAssetPath(g);
+                    if (System.IO.Path.GetFileNameWithoutExtension(ap) != n) continue;
+                    string r = t == top ? "" : AnimationUtility.CalculateTransformPath(t, top);
+                    return "\"prefab\":\"" + ap + "\",\"rel\":\"" + r + "\"";
+                }
+            }
             GameObject root = PrefabUtility.GetNearestPrefabInstanceRoot(t.gameObject);
             if (root == null) return "\"prefab\":\"\",\"rel\":\"\"";
             string asset = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(t.gameObject);
@@ -56,6 +70,27 @@ namespace Game
             return false;
         }
 
+        // One audited item: host rect + its text-ink and icon rects. Returns null when out of scope / not visible.
+        static string ItemJson(Transform host, Graphic bg, string kind, List<Transform> scopes)
+        {
+            var rt = host as RectTransform; if (rt == null || !InScope(host, scopes)) return null;
+            Canvas canvas = host.GetComponentInParent<Canvas>();
+            Rect rect = ScreenRect(rt, canvas); if (!Visible(rect)) return null;
+            var parts = new List<string>();
+            foreach (TMP_Text t in host.GetComponentsInChildren<TMP_Text>(false))
+                if (t != null && !t.name.Contains("Badge") && !t.transform.parent.name.Contains("Badge") && !string.IsNullOrEmpty(t.text)) parts.Add("{\"type\":\"text\",\"name\":\"" + t.name + "\",\"rect\":" + R(TextInk(t, canvas)) + "}");
+            foreach (Image im in host.GetComponentsInChildren<Image>(false))
+            {
+                if (im == null || im.name.Contains("Badge") || im.name.Contains("Dot") || im == bg || im.sprite == null || im.color.a < 0.05f || im.transform == host) continue;
+                Rect ir = ScreenRect(im.rectTransform, canvas);
+                if (ir.width > rect.width * 0.8f || ir.height > rect.height * 0.9f) continue;   // frames / glows, not icons
+                parts.Add("{\"type\":\"icon\",\"name\":\"" + im.name + "\",\"rect\":" + R(ir) + "}");
+            }
+            bool hlg = host.GetComponentInChildren<HorizontalLayoutGroup>(false) != null || host.GetComponentInParent<HorizontalLayoutGroup>() != null;
+            return "{\"kind\":\"" + kind + "\",\"name\":\"" + host.name + "\",\"path\":\"" + Path(host) + "\",\"rect\":" + R(rect) + "," + PrefabJson(host) + ",\"hlg\":" + (hlg ? "true" : "false")
+                 + ",\"scale\":" + Mathf.Abs(host.lossyScale.x).ToString("F3") + ",\"parts\":[" + string.Join(",", parts) + "]}";
+        }
+
         public static string Run(string path)
         {
             List<Transform> scopes = PopupScopes();
@@ -64,24 +99,21 @@ namespace Game
             bool first = true;
             foreach (Selectable s in Object.FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
-                var rt = s.transform as RectTransform; if (rt == null || !InScope(s.transform, scopes) || s.name.Contains("Backdrop") || s.name.Contains("Dim")) continue;
-                Canvas canvas = s.GetComponentInParent<Canvas>();
-                Rect rect = ScreenRect(rt, canvas); if (!Visible(rect)) continue;
-                var parts = new List<string>();
-                foreach (TMP_Text t in s.GetComponentsInChildren<TMP_Text>(false))
-                    if (t != null && !t.name.Contains("Badge") && !t.transform.parent.name.Contains("Badge") && !string.IsNullOrEmpty(t.text)) parts.Add("{\"type\":\"text\",\"name\":\"" + t.name + "\",\"rect\":" + R(TextInk(t, canvas)) + "}");
-                foreach (Image im in s.GetComponentsInChildren<Image>(false))
-                {
-                    if (im == null || im.name.Contains("Badge") || im.name.Contains("Dot") || im == s.targetGraphic || im.sprite == null || im.color.a < 0.05f || im.transform == s.transform) continue;
-                    Rect ir = ScreenRect(im.rectTransform, canvas);
-                    if (ir.width > rect.width * 0.8f || ir.height > rect.height * 0.9f) continue;   // frames / glows, not icons
-                    parts.Add("{\"type\":\"icon\",\"name\":\"" + im.name + "\",\"rect\":" + R(ir) + "}");
-                }
-                bool hlg = s.GetComponentInChildren<HorizontalLayoutGroup>(false) != null || s.GetComponentInParent<HorizontalLayoutGroup>() != null;
-                if (!first) sb.Append(','); first = false;
-                sb.Append("{\"kind\":\"button\",\"name\":\"").Append(s.name).Append("\",\"path\":\"").Append(Path(s.transform)).Append("\",\"rect\":").Append(R(rect))
-                  .Append(',').Append(PrefabJson(s.transform)).Append(",\"hlg\":").Append(hlg ? "true" : "false").Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3"))
-                  .Append(",\"parts\":[").Append(string.Join(",", parts)).Append("]}");
+                if (s.name.Contains("Backdrop") || s.name.Contains("Dim")) continue;
+                string json = ItemJson(s.transform, s.targetGraphic, "button", scopes);
+                if (json == null) continue;
+                if (!first) sb.Append(','); first = false; sb.Append(json);
+            }
+            // frames / cards / pills that are not buttons but hold a label (and maybe an icon): the frame rect is the face
+            foreach (Image fr in Object.FindObjectsByType<Image>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                if (fr.sprite == null || fr.GetComponentInParent<Selectable>() != null || fr.GetComponent<TMP_Text>() != null) continue;
+                bool hasLabel = false;
+                foreach (Transform c in fr.transform) if (c.GetComponent<TMP_Text>() != null && c.gameObject.activeInHierarchy) { hasLabel = true; break; }
+                if (!hasLabel || fr.name.Contains("Header") || fr.name.Contains("Background")) continue;
+                string json = ItemJson(fr.transform, fr, "frame", scopes);
+                if (json == null) continue;
+                if (!first) sb.Append(','); first = false; sb.Append(json);
             }
             foreach (TMP_Text t in Object.FindObjectsByType<TMP_Text>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
@@ -101,7 +133,7 @@ namespace Game
                 if (limit < float.MaxValue) probe = (ink.xMax + limit) * 0.5f;
                 if (!first) sb.Append(','); first = false;
                 sb.Append("{\"kind\":\"title\",\"name\":\"").Append(t.name).Append("\",\"path\":\"").Append(Path(t.transform)).Append("\",\"rect\":").Append(R(ink))
-                  .Append(',').Append(PrefabJson(t.transform)).Append(",\"probeX\":").Append(probe.ToString("F0")).Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3")).Append(",\"parts\":[]}");
+                  .Append(',').Append(PrefabJson(t.transform)).Append(",\"probeX\":").Append(probe.ToString("F0")).Append(",\"scale\":").Append(Mathf.Abs(t.transform.lossyScale.x).ToString("F3")).Append(",\"parts\":[]}");
             }
             sb.Append("]}");
             System.IO.File.WriteAllText(path, sb.ToString());

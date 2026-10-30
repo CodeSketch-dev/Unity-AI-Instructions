@@ -77,7 +77,7 @@ fails, oks, fixes = [], [], []
 fixes_path = None
 if "--fixes" in args:
     i = args.index("--fixes"); fixes_path = args[i + 1]; del args[i:i + 2]
-buttons = [i for i in data["items"] if i["kind"] == "button"]
+buttons = [i for i in data["items"] if i["kind"] in ("button", "frame")]
 for it in buttons:
     parts = it["parts"]
     has_icon = any(p["type"] == "icon" for p in parts); has_text = any(p["type"] == "text" for p in parts)
@@ -95,11 +95,13 @@ for it in buttons:
     if has_icon and has_text and not it["hlg"]:
         fails.append(f"{tag}: icon + label without a HorizontalLayoutGroup -> wrap in ONE HLG (icon first, label Capline)")
     fb = face_box(it["rect"])
-    if not fb: continue
-    box, face = fb[:4], fb[4]
+    rh = it["rect"][3] - it["rect"][1]
+    if fb and fb[3] - fb[1] >= max(24, 0.55 * rh):
+        box, face = fb[:4], fb[4]
+    else:   # gradient / textured button: no single face colour, so the button rect itself is the face
+        r = it["rect"]; box = [r[0], r[1], r[2], r[3]]; face = (-999, -999, -999)
     ink = ink_bbox(parts, face)
     if not ink: continue
-    if box[3] - box[1] < 24: continue   # face not found reliably (gradient / tiny sprite)
     dx = (ink[0] + ink[2]) / 2 - (box[0] + box[2]) / 2
     dy = (ink[1] + ink[3]) / 2 - (box[1] + box[3]) / 2
     if stacked: dy = 0.0   # label sits on a lower bar under an overhanging icon: only the horizontal centre is meaningful

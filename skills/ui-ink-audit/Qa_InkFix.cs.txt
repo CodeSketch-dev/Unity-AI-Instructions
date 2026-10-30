@@ -26,8 +26,17 @@ namespace Game
             var list = JsonUtility.FromJson<FixList>(File.ReadAllText(file));
             var byPrefab = new Dictionary<string, List<Fix>>();
             int skipped = 0;
+            // Safety: a given target is auto-corrected at most twice; if it still fails after that it needs a human look (logged, never loops).
+            string attemptsFile = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Library", "InkFixAttempts.txt"));
+            var attempts = new Dictionary<string, int>();
+            if (File.Exists(attemptsFile))
+                foreach (string line in File.ReadAllLines(attemptsFile)) { int i = line.LastIndexOf('='); if (i > 0 && int.TryParse(line.Substring(i + 1), out int n)) attempts[line.Substring(0, i)] = n; }
             foreach (Fix f in list.fixes)
             {
+                string key = f.prefab + "|" + f.rel + "|" + f.kind;
+                attempts.TryGetValue(key, out int done);
+                if (done >= 2) { Debug.LogWarning("[InkFix] gave up after 2 automatic attempts, needs a manual look: " + key); skipped++; continue; }
+                attempts[key] = done + 1;
                 if (string.IsNullOrEmpty(f.prefab)) { skipped++; continue; }
                 if (!byPrefab.TryGetValue(f.prefab, out var l)) byPrefab[f.prefab] = l = new List<Fix>();
                 l.Add(f);
@@ -51,6 +60,8 @@ namespace Game
                 }
                 finally { PrefabUtility.UnloadPrefabContents(root); }
             }
+            var lines = new List<string>(); foreach (var kv in attempts) lines.Add(kv.Key + "=" + kv.Value);
+            File.WriteAllLines(attemptsFile, lines);
             File.Delete(file);
             return "[InkFix] applied " + applied + " fix(es) to " + byPrefab.Count + " prefab(s), skipped " + skipped + " (runtime-built or missing)";
         }
