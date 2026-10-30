@@ -37,3 +37,6 @@ Feel comes from immediate, proportional feedback to every meaningful event. Do i
 Record or capture a short Play Mode sequence of the event and compare it with the reference clip at the same timing; confirm no leaked objects after 100 repeats and no Console errors.
 
 Combat numbers (shake, punches, damage text, hit-stop proposal): `references/combat-feel.md`.
+
+## Attention pulses stay subtle
+- Looping attention pulses (reward/watch-ad/CTA buttons) scale at most +3% with >= 1 s per half cycle (sine in/out); stronger reads as nervous and annoying (user feedback). Clamp the limits inside the pulse component so serialized prefab values cannot exceed them, and measure min/max scale in Play (sample for ~5 s).
