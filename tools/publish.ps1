@@ -58,7 +58,7 @@ if ($behind -gt 0) {
 }
 
 # 5. push
-if (-not $NoPush -and $ahead -gt 0 -or (-not $NoPush -and $dirty)) {
+if (-not $NoPush) {
   Step 'push'
   git push -q origin $branch
   if ($LASTEXITCODE -ne 0) { Write-Host 'push failed' -ForegroundColor Red; exit 1 }
