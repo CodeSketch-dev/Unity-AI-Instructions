@@ -38,3 +38,7 @@ Text component: TextMeshPro is the default in the primary references (knife-towe
 ## Automatic fitting
 
 Always pair this skill with `ui-text-autofit-system`: the project must have `UI_TextAutoFit` installed so auto size, padding and overflow are handled automatically. Do not hand-fit texts.
+
+## Outline is mandatory on EVERY text
+- No text may ship without the black outline material (white/coloured face + dark outline), on every screen, popup, tab, button, price, small helper line and world label; without it text is unreadable on bright art. When creating, cloning or restyling any TMP, assign the outlined preset immediately.
+- Verify by script on the live screen: every active TMP's material has outline width > 0 (or an underlay); list offenders by hierarchy path and fix at the shared source (prefab/builder/text factory), not per instance. A screenshot showing plain-white text on a light surface is a defect to fix at once (auto-fix loop in `ui-always`).

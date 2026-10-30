@@ -35,6 +35,11 @@ Read this for every UI task. A UI is not done until it is measured as centred, n
 - Script (run on every bar/pill/button changed): per text collect sibling graphics' world rects (`GetWorldCorners`, active, alpha > 0.05, not a full-size background), compute gapMin/gapMax as above, print `dx = textBounds.center.x - (gapMin+gapMax)/2`, `dy = textBounds.center.y - row.center.y`, overlap yes/no, fontSize. Fail if |dx| or |dy| > 1 px, overlap, or font below the min.
 - Fix in the layout, not per label: icon + label + button as a HorizontalLayoutGroup (label flexibleWidth 1, centred) so the gap logic holds for any value width.
 
+## Containment and padding (never touch or cross the border)
+- Every child (icon, text, badge, image, button) sits INSIDE its frame/button/plate with padding on all 4 sides (at least ~6 px at 1080p, more on big frames, equal left/right and equal top/bottom unless the art needs an optical correction). Text and icons never overflow or touch a button/frame edge; decorative overhang (a ribbon, a "NEW" tag) is the only exception and must be deliberate.
+- ScrollRect/viewport/grid areas are never 100% of the board: leave a margin on all 4 sides inside the board art (about 3-5% of the board size, minimum 12 px) so cards and scrollbars do not hug the frame; list/grid content gets the same inner padding (layout group padding) so the first/last item is not glued to the edge.
+- Measure it: for each child compute `padLeft/padRight/padTop/padBottom` against the frame's inner rect (`GetWorldCorners`), fail if any is below the minimum or left/right (top/bottom) differ by more than 1 px; for every ScrollRect compare its rect to the board rect. Fix in the layout (insets, layout group padding), not per label, then re-measure.
+
 ## Auto-fix loop (no asking, no waiting)
 - Whenever ANY screenshot, Play capture, test dump or review shows text off-centre, overlapping an icon, clipped, too small, or edges not aligned: stop, load `ui-always` + this skill, fix the layout, re-measure, re-capture; repeat until the numbers pass. Do this even when the task was something else (QA, shop logic, balance). Never just list it as a finding for the user, unless the fix needs a design decision.
 
