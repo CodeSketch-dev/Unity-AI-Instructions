@@ -68,15 +68,19 @@ namespace AiQa
 
         static void Shift(Transform t, float dx, float dyUp) { var rt = (RectTransform)t; rt.anchoredPosition += new Vector2(dx, dyUp); }
 
+        const float MAX_STEP = 8f, MAX_PADDING = 16f;   // a correction larger than this is a measurement problem, not a layout problem: leave it for a human
+
         static void ApplyButton(Transform button, float dx, float dyDown)
         {
+            if (Mathf.Abs(dx) > 20f || Mathf.Abs(dyDown) > 20f) { Debug.LogWarning("[InkFix] implausible correction (" + dx.ToString("F0") + "," + dyDown.ToString("F0") + ") on " + button.name + ", needs a manual look"); return; }
             // ink lower than the face centre by dyDown (units) -> raise the pair; ink right by dx -> move it left
             var hlg = button.GetComponent<HorizontalLayoutGroup>() ?? button.GetComponentInChildren<HorizontalLayoutGroup>(true);
             if (hlg != null)
             {
                 RectOffset p = hlg.padding;
-                if (dyDown > 0) p.bottom += Mathf.RoundToInt(2f * dyDown); else p.top += Mathf.RoundToInt(-2f * dyDown);
-                if (dx > 0) p.right += Mathf.RoundToInt(2f * dx); else p.left += Mathf.RoundToInt(-2f * dx);
+                int sx = Mathf.RoundToInt(Mathf.Clamp(2f * dx, -MAX_STEP, MAX_STEP)), sy = Mathf.RoundToInt(Mathf.Clamp(2f * dyDown, -MAX_STEP, MAX_STEP));
+                if (sy > 0) p.bottom = Mathf.Min(Mathf.RoundToInt(MAX_PADDING), p.bottom + sy); else p.top = Mathf.Min(Mathf.RoundToInt(MAX_PADDING), p.top - sy);
+                if (sx > 0) p.right = Mathf.Min(Mathf.RoundToInt(MAX_PADDING), p.right + sx); else p.left = Mathf.Min(Mathf.RoundToInt(MAX_PADDING), p.left - sx);
                 hlg.padding = p;
                 return;
             }

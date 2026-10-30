@@ -17,14 +17,14 @@ namespace AiQa
     public static class Qa_InkWatcher
     {
         const string AUTOFIX_KEY = "Qa.InkAutoFix";
-        const int SETTLE_FRAMES = 25, SHOT_WAIT_FRAMES = 3;
+        const int SETTLE_FRAMES = 3, SHOT_WAIT_FRAMES = 3;
 
         [MenuItem("Tools/Qa/Auto-apply ink fixes after Play (toggle)")]
         static void ToggleAutoFix() { EditorPrefs.SetBool(AUTOFIX_KEY, !EditorPrefs.GetBool(AUTOFIX_KEY, true)); UnityEngine.Debug.Log("[InkAudit] auto-apply fixes after Play = " + EditorPrefs.GetBool(AUTOFIX_KEY, true)); }
         const double MIN_SECONDS_BETWEEN = 3.0;
         static string _signature = "", _pending = "";
         static int _stableFrames, _shotCountdown = -1;
-        static double _lastAudit, _lastPoll;
+        static double _lastAudit, _lastPoll, _nextScan;
         static bool _pythonWarned;
         static string _dir, _png, _json, _label;
         static readonly HashSet<string> s_reported = new HashSet<string>();
@@ -48,11 +48,19 @@ namespace AiQa
         }
 
         // popup mode: names of open popups; otherwise: sorted names of visible buttons (so a scene change or a new HUD element re-triggers the audit).
+        static Transform _popupRoot;
+        static double _nextPopupLookup;
+
         static string Signature(out string label)
         {
             var popups = new StringBuilder();
-            foreach (Transform t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
-                if (t.name == "PopupRoot") for (int i = 0; i < t.childCount; i++) if (t.GetChild(i).gameObject.activeInHierarchy) popups.Append(t.GetChild(i).name).Append('|');
+            if (_popupRoot == null && EditorApplication.timeSinceStartup >= _nextPopupLookup)
+            {
+                _nextPopupLookup = EditorApplication.timeSinceStartup + 2.0;   // GameObject.Find walks every active object: never more than every 2 s
+                GameObject go = GameObject.Find("PopupRoot"); _popupRoot = go != null ? go.transform : null;
+            }
+            if (_popupRoot != null)
+                for (int i = 0; i < _popupRoot.childCount; i++) if (_popupRoot.GetChild(i).gameObject.activeInHierarchy) popups.Append(_popupRoot.GetChild(i).name).Append('|');
             if (popups.Length > 0) { label = popups.ToString(); return "P:" + label; }
             var names = new List<string>();
             foreach (Selectable s in Object.FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)) if (s.isActiveAndEnabled) names.Add(s.name);
@@ -79,6 +87,9 @@ namespace AiQa
                 if (--_shotCountdown == 0) { _shotCountdown = -1; Audit(); }
                 return;
             }
+            // the screen-state scan is the only per-tick cost: run it at 4 Hz, never every frame (an every-frame FindObjectsByType made the whole PC lag)
+            if (EditorApplication.timeSinceStartup < _nextScan) return;
+            _nextScan = EditorApplication.timeSinceStartup + 0.25;
             string label;
             string sig = Signature(out label);
             if (sig != _pending) { _pending = sig; _stableFrames = 0; return; }
