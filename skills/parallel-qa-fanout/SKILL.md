@@ -14,3 +14,8 @@ Lessons: one agent asked to test everything ran out of turns with no report; par
 5. Compare against the design sheet row by row (mismatch table), never "looks right".
 6. QA is not only reporting: when a capture shows misaligned/overlapping/tiny UI, apply the UI skills and fix it in the same pass (`ui-always` auto-fix loop).
 7. Report in the user's language: screen x PASS/FAIL/UNVERIFIED, bugs, files changed, what remains.
+
+## Lock starvation lesson (do not repeat)
+- Launching more than two Editor-bound agents at once starves them: they spend their whole turn budget polling the lock and deliver no result. Cap Editor-bound agents at 2 concurrent; give the rest file-only work (reading code/prefabs, preparing scripts) or start them after the first finish.
+- Prefer ONE batch tool that audits/fixes everything in a single Editor call (e.g. an Edit-Mode UI audit of all prefabs writing a report file) over many agents each walking screens by hand; then split the FIX list from the report across at most two agents with short lock holds.
+- If the user is playing, the agent must wait or work on files, never stop their Play; the coordinator tells the user once ("stop Play to let the QA run").
