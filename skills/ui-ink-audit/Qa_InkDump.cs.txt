@@ -1,0 +1,107 @@
+using System.Collections.Generic;
+using System.Text;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Game
+{
+    // Play Mode dump for ink_audit.py (skill ui-ink-audit): every Selectable (icon + label buttons) and every title label with its SCREEN rects (top-origin px),
+    // the icon / text-ink rects inside it and whether a HorizontalLayoutGroup drives them. Call Run(path), then CaptureScreenshot in the same frame.
+    public static class Qa_InkDump
+    {
+        static Rect ScreenRect(RectTransform rt, Canvas canvas)
+        {
+            var c = new Vector3[4]; rt.GetWorldCorners(c);
+            Camera cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+            Vector2 a = RectTransformUtility.WorldToScreenPoint(cam, c[0]), b = RectTransformUtility.WorldToScreenPoint(cam, c[2]);
+            return Rect.MinMaxRect(Mathf.Min(a.x, b.x), Screen.height - Mathf.Max(a.y, b.y), Mathf.Max(a.x, b.x), Screen.height - Mathf.Min(a.y, b.y));
+        }
+
+        static Rect TextInk(TMP_Text t, Canvas canvas)
+        {
+            Bounds b = t.textBounds;
+            Camera cam = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+            Vector2 a = RectTransformUtility.WorldToScreenPoint(cam, t.transform.TransformPoint(b.min)), c = RectTransformUtility.WorldToScreenPoint(cam, t.transform.TransformPoint(b.max));
+            return Rect.MinMaxRect(Mathf.Min(a.x, c.x), Screen.height - Mathf.Max(a.y, c.y), Mathf.Max(a.x, c.x), Screen.height - Mathf.Min(a.y, c.y));
+        }
+
+        static string R(Rect r) => "[" + r.xMin.ToString("F1") + "," + r.yMin.ToString("F1") + "," + r.xMax.ToString("F1") + "," + r.yMax.ToString("F1") + "]";
+
+        static bool Visible(Rect r) => r.width > 4f && r.height > 4f && r.xMax > 0 && r.yMax > 0 && r.xMin < Screen.width && r.yMin < Screen.height;
+
+        // While a popup is open only its subtree is audited (the HUD behind a dimmer is not what the player looks at); no popup -> whole screen.
+        static List<Transform> PopupScopes()
+        {
+            var list = new List<Transform>();
+            foreach (Transform t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+                if (t.name == "PopupRoot") for (int i = 0; i < t.childCount; i++) if (t.GetChild(i).gameObject.activeInHierarchy) list.Add(t.GetChild(i));
+            return list;
+        }
+
+        static bool InScope(Transform t, List<Transform> scopes)
+        {
+            if (scopes.Count == 0) return true;
+            foreach (Transform s in scopes) if (t.IsChildOf(s)) return true;
+            return false;
+        }
+
+        public static string Run(string path)
+        {
+            List<Transform> scopes = PopupScopes();
+            var sb = new StringBuilder();
+            sb.Append("{\"screen\":[").Append(Screen.width).Append(',').Append(Screen.height).Append("],\"items\":[");
+            bool first = true;
+            foreach (Selectable s in Object.FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                var rt = s.transform as RectTransform; if (rt == null || !InScope(s.transform, scopes) || s.name.Contains("Backdrop")) continue;
+                Canvas canvas = s.GetComponentInParent<Canvas>();
+                Rect rect = ScreenRect(rt, canvas); if (!Visible(rect)) continue;
+                var parts = new List<string>();
+                foreach (TMP_Text t in s.GetComponentsInChildren<TMP_Text>(false))
+                    if (t != null && !string.IsNullOrEmpty(t.text)) parts.Add("{\"type\":\"text\",\"name\":\"" + t.name + "\",\"rect\":" + R(TextInk(t, canvas)) + "}");
+                foreach (Image im in s.GetComponentsInChildren<Image>(false))
+                {
+                    if (im == null || im == s.targetGraphic || im.sprite == null || im.color.a < 0.05f || im.transform == s.transform) continue;
+                    Rect ir = ScreenRect(im.rectTransform, canvas);
+                    if (ir.width > rect.width * 0.8f || ir.height > rect.height * 0.9f) continue;   // frames / glows, not icons
+                    parts.Add("{\"type\":\"icon\",\"name\":\"" + im.name + "\",\"rect\":" + R(ir) + "}");
+                }
+                bool hlg = s.GetComponentInChildren<HorizontalLayoutGroup>(false) != null || s.GetComponentInParent<HorizontalLayoutGroup>() != null;
+                if (!first) sb.Append(','); first = false;
+                sb.Append("{\"kind\":\"button\",\"name\":\"").Append(s.name).Append("\",\"path\":\"").Append(Path(s.transform)).Append("\",\"rect\":").Append(R(rect))
+                  .Append(",\"hlg\":").Append(hlg ? "true" : "false").Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3"))
+                  .Append(",\"parts\":[").Append(string.Join(",", parts)).Append("]}");
+            }
+            foreach (TMP_Text t in Object.FindObjectsByType<TMP_Text>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                if (!t.name.Contains("Title") || string.IsNullOrEmpty(t.text) || t.GetComponentInParent<Selectable>() != null || !InScope(t.transform, scopes)) continue;
+                bool inHeader = false; for (Transform p = t.transform.parent; p != null; p = p.parent) if (p.name.Contains("Header")) { inHeader = true; break; }
+                if (!inHeader) continue;   // only header titles sit on a colour band
+                Canvas canvas = t.GetComponentInParent<Canvas>();
+                Rect ink = TextInk(t, canvas); if (!Visible(ink)) continue;
+                // probe column: right of the title, left of the next graphic on the same band (close button), else just right of the ink
+                float probe = ink.xMax + 12f, limit = float.MaxValue;
+                foreach (Graphic g in t.transform.root.GetComponentsInChildren<Graphic>(false))
+                {
+                    if (g == null || g.canvas == null || g.transform.IsChildOf(t.transform) || g.rectTransform.rect.width * g.canvas.scaleFactor > Screen.width * 0.5f) continue;
+                    Rect gr = ScreenRect(g.rectTransform, canvas);
+                    if (gr.xMin > ink.xMax && gr.yMin < ink.center.y && gr.yMax > ink.center.y && gr.xMin < limit) limit = gr.xMin;
+                }
+                if (limit < float.MaxValue) probe = (ink.xMax + limit) * 0.5f;
+                if (!first) sb.Append(','); first = false;
+                sb.Append("{\"kind\":\"title\",\"name\":\"").Append(t.name).Append("\",\"path\":\"").Append(Path(t.transform)).Append("\",\"rect\":").Append(R(ink))
+                  .Append(",\"probeX\":").Append(probe.ToString("F0")).Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3")).Append(",\"parts\":[]}");
+            }
+            sb.Append("]}");
+            System.IO.File.WriteAllText(path, sb.ToString());
+            return "dumped " + path;
+        }
+
+        static string Path(Transform t)
+        {
+            var parts = new List<string>(); for (Transform p = t; p != null && parts.Count < 5; p = p.parent) parts.Add(p.name);
+            parts.Reverse(); return string.Join("/", parts);
+        }
+    }
+}

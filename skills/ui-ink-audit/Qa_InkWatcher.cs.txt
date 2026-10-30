@@ -1,0 +1,82 @@
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
+
+namespace Game
+{
+    // Automatic UI audit (skill ui-ink-audit): in Play Mode, whenever the set of open popups (children of "PopupRoot") changes and settles, it dumps the
+    // screen, captures a screenshot and runs ink_audit.py. Every violation is written to the Console as "[InkAudit] FAIL ..." so any Play test, manual or
+    // scripted, surfaces misaligned icon+text / titles without anybody asking. Needs `python` with Pillow on PATH; otherwise it logs once and stays quiet.
+    [InitializeOnLoad]
+    public static class Qa_InkWatcher
+    {
+        const int SETTLE_FRAMES = 25, SHOT_WAIT_FRAMES = 3;
+        static string _signature = "", _pending = "";
+        static int _stableFrames, _shotCountdown = -1;
+        static bool _pythonWarned;
+        static string _dir, _png, _json;
+
+        static Qa_InkWatcher()
+        {
+            EditorApplication.update += Tick;
+            EditorApplication.playModeStateChanged += s => { _signature = _pending = ""; _stableFrames = 0; _shotCountdown = -1; };
+        }
+
+        static string Signature()
+        {
+            var sb = new StringBuilder();
+            foreach (Transform t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+                if (t.name == "PopupRoot") for (int i = 0; i < t.childCount; i++) if (t.GetChild(i).gameObject.activeInHierarchy) sb.Append(t.GetChild(i).name).Append('|');
+            return sb.ToString();
+        }
+
+        static void Tick()
+        {
+            if (!EditorApplication.isPlaying || EditorApplication.isPaused) return;
+            if (_shotCountdown >= 0)
+            {
+                if (--_shotCountdown == 0) { _shotCountdown = -1; Audit(); }
+                return;
+            }
+            string sig = Signature();
+            if (sig != _pending) { _pending = sig; _stableFrames = 0; return; }
+            if (++_stableFrames < SETTLE_FRAMES || sig == _signature) return;
+            _signature = sig;
+            _dir = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Temp", "InkAudit"));
+            Directory.CreateDirectory(_dir);
+            _png = Path.Combine(_dir, "auto.png"); _json = Path.Combine(_dir, "auto.json");
+            if (File.Exists(_png)) File.Delete(_png);
+            Qa_InkDump.Run(_json);
+            ScreenCapture.CaptureScreenshot(_png);
+            _shotCountdown = SHOT_WAIT_FRAMES;
+        }
+
+        static void Audit()
+        {
+            string script = Path.GetFullPath(Path.Combine(Application.dataPath, "..", ".claude", "skills", "ui-ink-audit", "ink_audit.py"));
+            if (!File.Exists(script) || !File.Exists(_png)) return;
+            try
+            {
+                var psi = new ProcessStartInfo("python", "-I \"" + script + "\" \"" + _png + "\" \"" + _json + "\"")
+                { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, CreateNoWindow = true };
+                using (Process p = Process.Start(psi))
+                {
+                    string output = p.StandardOutput.ReadToEnd();
+                    if (!p.WaitForExit(20000)) { p.Kill(); return; }
+                    int fails = 0;
+                    foreach (string line in output.Split('\n'))
+                        if (line.StartsWith("FAIL")) { fails++; UnityEngine.Debug.LogWarning("[InkAudit] " + _signature + " " + line.Trim()); }
+                    UnityEngine.Debug.Log("[InkAudit] " + _signature + " -> " + (fails == 0 ? "0 fail" : fails + " FAIL (see warnings)"));
+                }
+            }
+            catch (System.Exception e)
+            {
+                if (_pythonWarned) return;
+                _pythonWarned = true;
+                UnityEngine.Debug.LogWarning("[InkAudit] python/Pillow not available, auto UI audit disabled: " + e.Message);
+            }
+        }
+    }
+}
