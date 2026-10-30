@@ -41,7 +41,10 @@ elseif ($ev -eq 'PostToolUse') {
     }
   }
   elseif ($tool -match '(?i)console-get-logs') {
-    if ($resp -match '(?i)"LogType":"(Error|Exception)"') {
+    if ($resp -match '\[UIAudit\]') {
+      $msg = 'UI AUDIT WARNINGS in the Console ([UIAudit]): the editor audit found layout defects on a popup. Do not just report them: load ui-always + ui-center-alignment, fix each violation at its shared source (prefab/builder), re-open the popup in Play and confirm the warning is gone.'
+    }
+    elseif ($resp -match '(?i)"LogType":"(Error|Exception)"') {
       $msg = 'Console errors present: triage with unity-log-triage / systematic-debugging, separate your own errors from MCP-tool script errors, fix root causes of game errors now.'
     }
   }

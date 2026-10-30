@@ -23,6 +23,11 @@ if ($ev -eq 'PostToolUse') {
   if ($tool -eq 'Skill') { if ($inp -match '(?i)ui-always|ui-center-alignment|ui-layout-audit') { $s.uiskill = $true; $changed = $true } }
   elseif ($tool -match '^(Edit|Write|MultiEdit|NotebookEdit)$') { $fp = ''; try { $fp = [string]$j.tool_input.file_path } catch {}; if ($fp -match $uiPath -and $fp -notmatch '(?i)\.(md|ps1|json|txt|py|bat)$') { $s.uiedit = $true; $s.audit = $false; $changed = $true } }
   elseif ($tool -match '(?i)gameobject-(modify|component-(add|modify|destroy)|create|duplicate|set-parent)|assets-prefab-(save|create)|assets-modify') { $s.uiedit = $true; $s.audit = $false; $changed = $true }
+  elseif ($tool -match '(?i)console-get-logs') {
+    $resp = ''
+    try { $resp = ($j.tool_response | ConvertTo-Json -Compress -Depth 6) } catch {}
+    if ($resp -match '\[UIAudit\]') { $s.uiedit = $true; $s.audit = $false; $changed = $true }   # auto-audit warnings in the Console re-arm the gate: fix them before finishing
+  }
   elseif ($tool -match '(?i)script-execute') {
     if ($inp -match '(?i)Qa_UiAudit|UiAudit|textBounds') { $s.audit = $true; $changed = $true }
     elseif ($inp -match '(?i)(sizeDelta|anchoredPosition|offsetMin|offsetMax|anchorMin|anchorMax|fontSize|localScale)\s*[+\-]?=') { $s.uiedit = $true; $s.audit = $false; $changed = $true }
