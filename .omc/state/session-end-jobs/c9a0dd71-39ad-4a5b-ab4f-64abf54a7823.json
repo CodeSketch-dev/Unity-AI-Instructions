@@ -1,0 +1,353 @@
+{
+  "version": 1,
+  "jobId": "f0ba8318-916b-4a3f-9108-3e6e9125b614",
+  "sessionId": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+  "scopeKey": "7292e600dc79d3a7dfa6dd5ecab1324fe477254783482bed2a33add32b268cba",
+  "revision": 73,
+  "createdAt": "2026-10-24T20:45:17.855Z",
+  "updatedAt": "2026-10-24T20:45:53.935Z",
+  "producerGraceExpiresAt": "2026-10-24T20:45:47.856Z",
+  "bestEffortDeadlineAt": "2026-10-24T20:46:40.856Z",
+  "producers": {
+    "core": {
+      "state": "sealed",
+      "intentKey": "a557c6efdbab37b7272f13a8845aae5c83ede01a391962d57fff89f1981cef3a",
+      "payloadDigest": "a557c6efdbab37b7272f13a8845aae5c83ede01a391962d57fff89f1981cef3a",
+      "sealedAt": "2026-10-24T20:45:49.963Z",
+      "sealedBy": "recovery"
+    },
+    "wiki": {
+      "state": "no-op",
+      "sealedAt": "2026-10-24T20:45:17.855Z",
+      "sealedBy": "wiki-producer"
+    }
+  },
+  "actions": {
+    "foreground-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "febf6dba2f2536433960a07f7cedce72e946b43ced0896570df80f017b8914d2",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "metrics": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "ended_at": "2026-10-24T20:45:49.303Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        }
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-10-24T20:45:48.346Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "c23c5bd9-b32c-4899-96e3-e015d7963c10",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:49.952Z"
+    },
+    "wiki-capture": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "1719cd1ef5b51e0269b78c4cb8c9308c9c1f7b82fd1c067fc034c060f23863f5",
+      "payload": {},
+      "budgetMs": 9000,
+      "completedAt": "2026-10-24T20:45:17.855Z"
+    },
+    "team-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "cee6ac31df545408e1e822247ac249b3f8182a98a5fe8e448ae3b251e55bdee1",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "metrics": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "ended_at": "2026-10-24T20:45:49.303Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        }
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-10-24T20:45:50.011Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "e33e968b-4217-4228-84b7-51186d517d15",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:50.502Z"
+    },
+    "python-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "1f1370c4ac056606059d517e2f106b602d8cbcb04587b3fcc5f3b9f89e649cd0",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "metrics": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "ended_at": "2026-10-24T20:45:49.303Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        }
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-10-24T20:45:50.527Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "7c95241a-06d3-4253-ba25-49cb123a1b78",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:51.013Z"
+    },
+    "reply-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "0b3a8b47c28b26d56aca004d4f572b96c118f16819c0d35162418816f9a5420a",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-10-24T20:45:51.037Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "1b36bc7a-cfd6-46de-8e9d-1d10a9da6804",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:51.604Z"
+    },
+    "callback": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "d068ede2655bf89e0c0950e087d0603d7dcf45538e94f20a654d08c6f4841895",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "metrics": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "ended_at": "2026-10-24T20:45:49.303Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        }
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-10-24T20:45:51.627Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "dad43c7f-3bf4-42b8-ac78-3ff1948470e1",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:52.384Z"
+    },
+    "notification": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "89c0438ff63097ce04beb60efb87292ff68a7af350a0ee331f3de9dbf42d62fc",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "metrics": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "ended_at": "2026-10-24T20:45:49.303Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        }
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-10-24T20:45:52.435Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "2bf1e1f6-0e66-40c0-9511-d1028dd7c984",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:52.902Z"
+    },
+    "openclaw": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "31fe8f6e1cf204e27006de511df257326fdd98655122ca437013e8779ffc735b",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "metrics": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "ended_at": "2026-10-24T20:45:49.303Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        }
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-10-24T20:45:52.928Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "84da3a7f-9b09-43e7-8b87-32987a8aef81",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:53.377Z"
+    },
+    "spawn-next": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "408951e1348d4a381fd7b22db242636c91151ee01597146cf28243ae3875d0be",
+      "payload": {
+        "transcriptPath": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+        "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+        "reason": "other",
+        "input": {
+          "session_id": "c9a0dd71-39ad-4a5b-ab4f-64abf54a7823",
+          "transcript_path": "C:\\Users\\PC\\.claude\\projects\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823.jsonl",
+          "cwd": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+          "scratchpad_dir": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Unity-GitProject-Unity-AI-Instructions\\c9a0dd71-39ad-4a5b-ab4f-64abf54a7823\\scratchpad",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-10-24T20:45:53.400Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "29b79f4d-f3dd-4c4a-93ef-fbe9a79d896f",
+        "phase": "terminal",
+        "deadlineAt": "2026-10-24T20:45:57.871Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-10-24T20:45:53.872Z"
+    }
+  },
+  "owner": null,
+  "phase": "complete",
+  "recoverableFailure": {
+    "reason": "actions-settled",
+    "releasedAt": "2026-10-24T20:45:53.908Z",
+    "ownerNonce": "28df4e24-e2b0-4e6b-b21d-9b12a423746a"
+  },
+  "completion": {
+    "completedAt": "2026-10-24T20:45:53.908Z",
+    "terminalDigest": "74039dc512136511cc9e8a4dffe5ca1b654d8fe93dc4cdd0948fa044cacd967c",
+    "terminalRevision": 72
+  }
+}

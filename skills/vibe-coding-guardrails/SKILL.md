@@ -36,3 +36,5 @@ Each rule comes from a real mistake. Follow the habit, it is cheaper than the re
 ## Prove it, then say it
 - Done = wired + compiled + Console clean + exercised in Play (done-means-wired, verification-before-completion). Say plainly what was NOT verified; never write PASS without evidence; a subagent report is a claim, spot-check one fact yourself.
 - Report in the user's language, short: what changed, how verified, what is left. Offer the next step as one question with a recommended default.
+- Stage only the files you changed (`git add <paths>`), never a whole folder in a Unity project: the Editor regenerates baked meshes, materials and font assets in the background and they ride along into your commit as noise.
+- A measurement tool that returns 0 elements is a broken tool, not a clean screen: check how it finds its root (canvas name, scene object) before trusting "no findings", and say so in the report.

@@ -1,0 +1,170 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1793134801739,
+  "projectRoot": "C:\\Unity\\GitProject\\Unity-AI-Instructions",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "agents": {
+      "path": "agents",
+      "purpose": null,
+      "fileCount": 11,
+      "lastAccessed": 1793134801710,
+      "keyFiles": [
+        "art-tech.md",
+        "economy-balancer.md",
+        "game-designer.md",
+        "gameplay-dev.md",
+        "orchestrator.md"
+      ]
+    },
+    "commands": {
+      "path": "commands",
+      "purpose": null,
+      "fileCount": 6,
+      "lastAccessed": 1793134801710,
+      "keyFiles": [
+        "auto-balance-game.md",
+        "clone-game.md",
+        "gdd-lint.md",
+        "pipeline-resume.md",
+        "pipeline-status.md"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 10,
+      "lastAccessed": 1793134801710,
+      "keyFiles": [
+        "agent-handoff.md",
+        "agents-md-changelog.md",
+        "CONTINUATION-HANDOFF.md",
+        "feedback-notes.md",
+        "INSTALL.md"
+      ]
+    },
+    "evals": {
+      "path": "evals",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1793134801711,
+      "keyFiles": []
+    },
+    "hooks": {
+      "path": "hooks",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1793134801711,
+      "keyFiles": [
+        "hooks.json"
+      ]
+    },
+    "oh-my-claude": {
+      "path": "oh-my-claude",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1793134801711,
+      "keyFiles": []
+    },
+    "skills": {
+      "path": "skills",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1793134801711,
+      "keyFiles": [
+        "INDEX.md",
+        "README.md"
+      ]
+    },
+    "templates": {
+      "path": "templates",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1793134801711,
+      "keyFiles": [
+        "project-config.yaml"
+      ]
+    },
+    "tools": {
+      "path": "tools",
+      "purpose": null,
+      "fileCount": 6,
+      "lastAccessed": 1793134801711,
+      "keyFiles": [
+        "build_task_tracker.mjs",
+        "hubs.txt",
+        "install_hooks.py",
+        "skill_budget.py",
+        "skill_index.py"
+      ]
+    },
+    "hooks\\scripts": {
+      "path": "hooks\\scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 10,
+      "lastAccessed": 1793134801712,
+      "keyFiles": [
+        "block_git_danger.py",
+        "gate_ok.py",
+        "hooklib.py"
+      ]
+    },
+    "oh-my-claude\\config": {
+      "path": "oh-my-claude\\config",
+      "purpose": "Configuration files",
+      "fileCount": 0,
+      "lastAccessed": 1793134801713,
+      "keyFiles": []
+    },
+    "oh-my-claude\\scripts": {
+      "path": "oh-my-claude\\scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 0,
+      "lastAccessed": 1793134801713,
+      "keyFiles": []
+    },
+    "tools\\tests": {
+      "path": "tools\\tests",
+      "purpose": "Test files",
+      "fileCount": 34,
+      "lastAccessed": 1793134801714,
+      "keyFiles": [
+        "test_auto_balance_game.py",
+        "test_balance_integration.py",
+        "test_config_registry_audit.py"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}

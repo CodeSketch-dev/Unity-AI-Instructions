@@ -19,3 +19,5 @@ Extends `playmode-script-testing` (reflection checks). Use these when you need r
 
 Report numbers and screenshot paths; state what only a device can verify.
 - Tutorial gating can hide HUD buttons (alpha 0, no raycast): taps report "no hit" until it is complete or skipped.
+- Polling a result file written by a test runner (e.g. `Temp/test_results.txt` that says `running` then `done pass=N fail=M`): the file from the PREVIOUS run still says `done` until the new run rewrites it, so a poll started too early reports a stale result. Check the file mtime or wait until it has been seen as `running` once; re-arm a Monitor before it expires, since a full PlayMode suite can take ~17 min. A UI test run also leaves the Game View at the test's size: reset it afterwards.
+- Spawn/teleport spots in "never fall through the ground" tests must avoid dig pits and other holes: the legitimate floor there is lower and can move with the clock, so assert against the ground measured under the player (excluding its own collider), not a fixed y.
