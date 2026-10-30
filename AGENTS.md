@@ -69,6 +69,10 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - UI work is not done until the `ui-center-alignment` bounds script has been run on the changed containers (<= 1 px) and a Play screenshot has been checked. The report must list the skills read and the measured dx/dy.
 - Subagents doing UI work get `skills/ui-always/SKILL.md` in their brief and must read it first. Never wait for the user to remind you to apply these skills.
 
+### Graphify and skill auto-load (always on)
+- Never wait to be asked. At session start in a Unity project: run skill `graphify-workflow` (bootstrap if `graphify` CLI or `graphify-out/` is missing: install, build graph, start the single managed watcher; if the watcher is dead, restart it). Then prefer `graphify query/path/explain` to scope C# before Read/Grep; fall back to Read/Grep when the graph is missing, stale or errors; never load `GRAPH_REPORT.md`/`graph.json`; INFERRED edges are unverified; Graphify does not replace Unity MCP.
+- Every skill whose description matches the task is loaded automatically (router hint, skill list or `skills/INDEX.md`); the user never has to name a skill.
+
 ### Automatic skill routing (always on, all domains)
 - At the start of every task, route it yourself: match the request to a skill via the router hook hint (UserPromptSubmit "Skill router"), the available-skill list, or `skills/INDEX.md`, then load the matching skills. The user never has to say "use my skills"; a prompt that names no skill still triggers them.
 - This holds for skills listed as `name-only` too: the hook names them, so load them by name. Load only what the current step needs and drop it afterwards (lifecycle rule above).

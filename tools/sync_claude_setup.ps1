@@ -65,6 +65,7 @@ $gate = @'
 @.claude/ai-instructions.md
 UI work gate (always on): for ANY Unity UI task (button, text, label, popup, shop, tab, HUD, icon, prefab layout) FIRST load skill `ui-always` and the skills it names, follow them, and verify centring (<=1px) and text autofit/outline by script before reporting done. Read the reference game directly (MCP) when matching it. Never skip this, never wait for the user to remind you.
 Skill routing (always on): at the start of every task match it against `.claude/skills/INDEX.md` (and the router hook hints) and load the matching skills with the Skill tool; apply them without being asked, drop them when the step ends.
+Graphify (always on): at session start load skill `graphify-workflow`: bootstrap Graphify if missing (install, build graph, single watcher), restart a dead watcher, and prefer `graphify query/path/explain` over reading code; never ask the user.
 <!-- ai-instructions:end -->
 '@
 foreach ($p in $projects) {

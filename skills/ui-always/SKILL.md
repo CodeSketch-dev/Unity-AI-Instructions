@@ -14,6 +14,7 @@ This skill exists because the UI skills were being skipped. Any task that adds, 
 4. `ui-text-autofit-system` - `UI_TextAutoFit`: auto size / padding / overflow handled by the system, never hand-fitted.
 5. `ui-icon-label-layout` - icon + label as a HorizontalLayoutGroup content group; icon <= ~50% of the button's shorter side.
 6. `ui-button-anatomy` - press feedback, click sfx, grayscale disabled, notify dot.
+7. `ui-9slice-buttons` - cutting sprite borders for Sliced buttons/tabs/plates (no notch/seam at any size); read when importing or fixing a button sprite.
 Add by task: popups `ui-popup-anatomy`; tabs `ui-tabs`; lists/shops `ui-scroll-board`; HUD `mobile-hud-layout`; reward / watch-ad buttons `ads-popup-flow`; verification `ui-validator`, `ui-visual-qa`.
 If a skill file cannot be read, say so in the report; do not pretend it was applied.
 
@@ -28,6 +29,7 @@ Either way the Step 2 gate (measured dx/dy) is mandatory.
 - Icon + label (button, pill, price plate, currency bar, rewarded-ad button): one centred group, spacing 5/10/15 by size; the label sits in the free gap between its neighbours with equal padding; icon height <= 50% of the plate.
 - A rewarded-ad button never reads as a plain FREE button: distinct colour, ad icon on the left, label on the right.
 - Prefer layout groups over hand offsets; fix the source prefab, then check instance overrides.
+- Standing TMP rules: EVERY TMP text has Auto Size ON and a bounded RectTransform (inside its parent, never stretched past the frame; min 10, max <= 0.6 x frame height). Alignment: horizontal Center + Capline, content centred per `ui-center-alignment` (<= 1 px). Every icon + value pill (currency bars, price plates, icon+label buttons) is a HorizontalLayoutGroup content group, not hand offsets.
 
 ## Step 2 - Gate before reporting done (mandatory)
 1. Run the `ui-center-alignment` bounds script on every changed container: print container centre vs content centre (dx, dy); fail if > 1 px. Also each text: preferred bounds inside its inset at the final font size.

@@ -121,6 +121,9 @@
 ## genre
 - genre-playbooks - Map a Roblox genre (obby, tower climb, simulator, tycoon, pet collector, steal, escape, racing, mining, arena) to the systems and skills a clone needs. Use at planning when the GDD names a genre.
 
+## graphify
+- graphify-workflow - ALWAYS ON: bootstrap Graphify (install, build graph, single watcher) at session start without asking and prefer graphify query/path/explain over reading code. Also: install, scope, auto-update and query a local code-only Graphify knowledge graph for a Unity project (Windows, free, no LLM). Use when adding Graphify to a Unity repo, when the graph is stale or the watcher misbehaves, or before scoping a large C# codebase with query/path/explain.
+
 ## hotbar
 - hotbar-inventory - Hotbar and inventory: Data_Inventory shape, static hotbar with selection event and slot fallback, scroll panel of owned tools, equip classes and locking rules. Use when adding a tool bar, backpack list or equipment slots.
 
