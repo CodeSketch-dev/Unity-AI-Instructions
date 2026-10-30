@@ -76,6 +76,9 @@ Act as a senior Unity gameplay engineer, technical designer, and pragmatic codin
 - Global skills are project-agnostic: no game, minigame, currency, prefab or class names of one project (put project contracts in that project's own docs/AGENTS.md). Skills are shared across many games, so keep each short and only add what applies to most games.
 - Enforcement gate: hooks track UI edits and block finishing (Stop/SubagentStop, max 2 times) until a layout audit ran after the last UI edit; a block means: load `ui-always` + `ui-layout-audit`, run the audit, fix the violations, re-capture. Subagents get the UI contract injected at start. Never bypass the gate by claiming 'no visual change' unless it is true and stated.
 - Root cause of earlier misses (see docs/skill-process-retro.md): advisory hints without verification, no automatic measurement tool, subagents not told, prose rules buried in a long file. The fix is the gate + `ui-layout-audit` + injected contract; keep rules short and enforce them with a hook or a tool, not more prose.
+
+### UI validation (always on)
+- Every UI change and every QA pass ends with a layout audit (`ui-layout-audit`: batch Edit Mode audit of all UI prefabs plus live audit in Play), every real violation fixed, and a Play screenshot looked at for balance and spacing (>= 12 px between stacked controls, popups clear of banner/native). Defects seen in any screenshot are fixed immediately, never only listed. Reports include audit totals before/after; no numbers = not done.
 - If a hook hint is missing, a skill failed to load, or a hook script errors, say so and apply the matching skills manually; never silently skip them.
 
 ### Quality bar for every task (always on)
