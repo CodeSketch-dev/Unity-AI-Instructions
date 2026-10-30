@@ -26,6 +26,16 @@ namespace Game
             return Rect.MinMaxRect(Mathf.Min(a.x, c.x), Screen.height - Mathf.Max(a.y, c.y), Mathf.Max(a.x, c.x), Screen.height - Mathf.Min(a.y, c.y));
         }
 
+        // Source prefab asset + path inside it, so Qa_InkFix can write the correction back to the prefab (empty for runtime-built objects).
+        static string PrefabJson(Transform t)
+        {
+            GameObject root = PrefabUtility.GetNearestPrefabInstanceRoot(t.gameObject);
+            if (root == null) return "\"prefab\":\"\",\"rel\":\"\"";
+            string asset = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(t.gameObject);
+            string rel = t == root.transform ? "" : AnimationUtility.CalculateTransformPath(t, root.transform);
+            return "\"prefab\":\"" + asset + "\",\"rel\":\"" + rel + "\"";
+        }
+
         static string R(Rect r) => "[" + r.xMin.ToString("F1") + "," + r.yMin.ToString("F1") + "," + r.xMax.ToString("F1") + "," + r.yMax.ToString("F1") + "]";
 
         static bool Visible(Rect r) => r.width > 4f && r.height > 4f && r.xMax > 0 && r.yMax > 0 && r.xMin < Screen.width && r.yMin < Screen.height;
@@ -70,7 +80,7 @@ namespace Game
                 bool hlg = s.GetComponentInChildren<HorizontalLayoutGroup>(false) != null || s.GetComponentInParent<HorizontalLayoutGroup>() != null;
                 if (!first) sb.Append(','); first = false;
                 sb.Append("{\"kind\":\"button\",\"name\":\"").Append(s.name).Append("\",\"path\":\"").Append(Path(s.transform)).Append("\",\"rect\":").Append(R(rect))
-                  .Append(",\"hlg\":").Append(hlg ? "true" : "false").Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3"))
+                  .Append(',').Append(PrefabJson(s.transform)).Append(",\"hlg\":").Append(hlg ? "true" : "false").Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3"))
                   .Append(",\"parts\":[").Append(string.Join(",", parts)).Append("]}");
             }
             foreach (TMP_Text t in Object.FindObjectsByType<TMP_Text>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
@@ -91,7 +101,7 @@ namespace Game
                 if (limit < float.MaxValue) probe = (ink.xMax + limit) * 0.5f;
                 if (!first) sb.Append(','); first = false;
                 sb.Append("{\"kind\":\"title\",\"name\":\"").Append(t.name).Append("\",\"path\":\"").Append(Path(t.transform)).Append("\",\"rect\":").Append(R(ink))
-                  .Append(",\"probeX\":").Append(probe.ToString("F0")).Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3")).Append(",\"parts\":[]}");
+                  .Append(',').Append(PrefabJson(t.transform)).Append(",\"probeX\":").Append(probe.ToString("F0")).Append(",\"scale\":").Append((canvas != null ? canvas.scaleFactor : 1f).ToString("F3")).Append(",\"parts\":[]}");
             }
             sb.Append("]}");
             System.IO.File.WriteAllText(path, sb.ToString());

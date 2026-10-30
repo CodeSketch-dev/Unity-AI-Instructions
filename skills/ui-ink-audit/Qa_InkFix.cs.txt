@@ -1,0 +1,76 @@
+using System.Collections.Generic;
+using System.IO;
+using TMPro;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Game
+{
+    // Applies the corrections ink_audit.py wrote to Temp/InkAudit/fixes.json (only items that FAILED; aligned UI is never touched) to the SOURCE prefabs.
+    // Edit Mode only. Button with a HorizontalLayoutGroup: padding right/bottom grow by 2*d/scale (the group centres, so the pair moves by d). No group:
+    // the icon/label children move by -d. Title: the label moves by -dy. Run again in Play afterwards: the watcher must report 0 fail.
+    public static class Qa_InkFix
+    {
+        [System.Serializable] sealed class Fix { public string kind, prefab, rel; public float dx, dy, scale; }
+        [System.Serializable] sealed class FixList { public List<Fix> fixes = new List<Fix>(); }
+
+        [MenuItem("Tools/Qa/Apply Ink Fixes")]
+        public static void RunMenu() => Debug.Log(Run());
+
+        public static string Run()
+        {
+            if (EditorApplication.isPlaying) return "[InkFix] stop Play Mode first";
+            string file = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Temp", "InkAudit", "fixes.json"));
+            if (!File.Exists(file)) return "[InkFix] no fixes.json";
+            var list = JsonUtility.FromJson<FixList>(File.ReadAllText(file));
+            var byPrefab = new Dictionary<string, List<Fix>>();
+            int skipped = 0;
+            foreach (Fix f in list.fixes)
+            {
+                if (string.IsNullOrEmpty(f.prefab)) { skipped++; continue; }
+                if (!byPrefab.TryGetValue(f.prefab, out var l)) byPrefab[f.prefab] = l = new List<Fix>();
+                l.Add(f);
+            }
+            int applied = 0;
+            foreach (var kv in byPrefab)
+            {
+                GameObject root = PrefabUtility.LoadPrefabContents(kv.Key);
+                try
+                {
+                    foreach (Fix f in kv.Value)
+                    {
+                        Transform t = string.IsNullOrEmpty(f.rel) ? root.transform : root.transform.Find(f.rel);
+                        if (t == null) { skipped++; continue; }
+                        float sc = f.scale > 0.01f ? f.scale : 1f;
+                        if (f.kind == "title") Shift(t, 0f, -f.dy / sc);
+                        else ApplyButton(t, f.dx / sc, f.dy / sc);
+                        applied++;
+                    }
+                    PrefabUtility.SaveAsPrefabAsset(root, kv.Key);
+                }
+                finally { PrefabUtility.UnloadPrefabContents(root); }
+            }
+            File.Delete(file);
+            return "[InkFix] applied " + applied + " fix(es) to " + byPrefab.Count + " prefab(s), skipped " + skipped + " (runtime-built or missing)";
+        }
+
+        static void Shift(Transform t, float dx, float dyUp) { var rt = (RectTransform)t; rt.anchoredPosition += new Vector2(dx, dyUp); }
+
+        static void ApplyButton(Transform button, float dx, float dyDown)
+        {
+            // ink lower than the face centre by dyDown (units) -> raise the pair; ink right by dx -> move it left
+            var hlg = button.GetComponent<HorizontalLayoutGroup>() ?? button.GetComponentInChildren<HorizontalLayoutGroup>(true);
+            if (hlg != null)
+            {
+                RectOffset p = hlg.padding;
+                if (dyDown > 0) p.bottom += Mathf.RoundToInt(2f * dyDown); else p.top += Mathf.RoundToInt(-2f * dyDown);
+                if (dx > 0) p.right += Mathf.RoundToInt(2f * dx); else p.left += Mathf.RoundToInt(-2f * dx);
+                hlg.padding = p;
+                return;
+            }
+            foreach (Transform c in button)
+                if (c.GetComponent<TMP_Text>() != null || (c.GetComponent<Image>() != null && c.name != "Background" && c.name != "Frame")) Shift(c, -dx, dyDown);
+        }
+    }
+}

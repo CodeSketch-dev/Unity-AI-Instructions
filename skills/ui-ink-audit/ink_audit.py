@@ -72,7 +72,10 @@ def ink_bbox(parts, face):
     return [min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes)]
 
 
-fails, oks = [], []
+fails, oks, fixes = [], [], []
+fixes_path = None
+if "--fixes" in args:
+    i = args.index("--fixes"); fixes_path = args[i + 1]; del args[i:i + 2]
 buttons = [i for i in data["items"] if i["kind"] == "button"]
 for it in buttons:
     parts = it["parts"]
@@ -95,6 +98,7 @@ for it in buttons:
         if abs(dy) > tol: fix.append(f"HLG padding {'bottom' if dy > 0 else 'top'} +{abs(dy) * 2 / sc:.1f} units")
         if abs(dx) > tol: fix.append(f"HLG padding {'right' if dx > 0 else 'left'} +{abs(dx) * 2 / sc:.1f} units")
         fails.append(msg + " -> " + "; ".join(fix))
+        fixes.append({"kind": "button", "prefab": it.get("prefab", ""), "rel": it.get("rel", ""), "dx": dx if abs(dx) > tol else 0, "dy": dy if abs(dy) > tol else 0, "scale": sc})
     else:
         oks.append(msg)
     if ink[0] < box[0] + 2 or ink[2] > box[2] - 2 or ink[1] < box[1] + 1 or ink[3] > box[3] - 1:
@@ -120,9 +124,16 @@ for it in (i for i in data["items"] if i["kind"] == "title"):
     msg = f"{it['path']}: title ink centre vs band centre dy={ty - c:+.1f}px (band {top}-{bottom})"
     if abs(ty - c) > tol:
         fails.append(msg + f" -> move title {'up' if ty > c else 'down'} {abs(ty - c) / (it['scale'] or 1):.1f} units")
+        fixes.append({"kind": "title", "prefab": it.get("prefab", ""), "rel": it.get("rel", ""), "dx": 0, "dy": ty - c, "scale": it["scale"] or 1})
     else:
         oks.append(msg)
 
+if fixes_path and fixes:
+    import os
+    old = json.load(open(fixes_path)) if os.path.exists(fixes_path) else {"fixes": []}
+    seen = {(f["prefab"], f["rel"], f["kind"]) for f in old["fixes"]}
+    old["fixes"] += [f for f in fixes if f["prefab"] and (f["prefab"], f["rel"], f["kind"]) not in seen]
+    json.dump(old, open(fixes_path, "w"))
 for o in oks: print("OK  ", o)
 for f in fails: print("FAIL", f)
 print(f"{len(oks)} ok, {len(fails)} fail")
