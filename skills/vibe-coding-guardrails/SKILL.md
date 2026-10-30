@@ -25,6 +25,7 @@ Each rule comes from a real mistake. Follow the habit, it is cheaper than the re
 - Renaming assets: `git mv` the file AND its `.meta` (keeps GUID), then update string references (`Resources.Load("...")`, builders, tests, `m_Name` of the prefab root). Grep the old name afterwards and compile.
 - Removing a component from a prefab family: check variants/nested instances and every consumer (`GetComponent`, serialized fields) first; use an Editor migrator, never YAML surgery. Back up (`git diff > docs/backup-*.patch` + copy prefabs outside Assets) before bulk changes.
 - Python may be missing or user-site only: `python -m pip install --user`, then run without `-I`. Git Bash paths are `/d/...`. `sed -i` on CRLF files is fine but keep line endings; PowerShell 5.1 reads BOM-less files as ANSI, so keep `.ps1` hook scripts ASCII (use `\uXXXX` in regexes).
+- Run Python helper scripts from a clean folder (not `%TEMP%`/`/tmp`: stray files such as `copy.py` there shadow the standard library and crash imports); keep reusable scripts under the repo's `tools/`.
 - Runtime-built UI (shops that clone or rebuild cards at runtime) cannot be judged from the prefab: verify in Play Mode.
 
 ## UI work is never "small"

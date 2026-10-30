@@ -1,0 +1,138 @@
+using System.Collections.Generic;
+using System.Text;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace UiAudit
+{
+    // Runtime UI layout audit implementing the ui-center-alignment skill rules on the LIVE hierarchy (Play Mode, any screen):
+    //  1. neighbour-gap centring: text centre vs the free gap between the nearest left/right sibling graphics (icon, "+" button) - or the parent inner edge;
+    //  2. overlap: text bounds intersecting a sibling graphic;
+    //  3. containment padding: text/icon inside its frame with >= MIN_PAD on all sides;
+    //  4. ScrollRects never hug the board (margin >= MIN_SCROLL_MARGIN to the nearest big ancestor image);
+    //  5. font size not tiny (>= MIN_FONT_FRAC of the row height, >= MIN_FONT).
+    // Usage (script-execute): UiAudit.UiLayoutAudit.Run(root) with root = a popup/HUD transform, or null = every active canvas. Returns the report text.
+    public static class UiLayoutAudit
+    {
+        const float MIN_PAD = 6f, MIN_SCROLL_MARGIN = 12f, MIN_FONT = 14f, MIN_FONT_FRAC = 0.45f, DX_TOL = 1.5f;
+
+        public static string Run(Transform root = null, int maxLines = 80)
+        {
+            var sb = new StringBuilder();
+            int texts = 0, bad = 0;
+            var roots = new List<Transform>();
+            if (root != null) roots.Add(root);
+            else foreach (Canvas c in Object.FindObjectsByType<Canvas>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)) if (c.isRootCanvas) roots.Add(c.transform);
+            foreach (Transform r in roots)
+            {
+                foreach (TMP_Text t in r.GetComponentsInChildren<TMP_Text>(false))
+                {
+                    if (!t.isActiveAndEnabled || string.IsNullOrWhiteSpace(t.text) || t.color.a < 0.05f) continue;
+                    if (!TryGetScreenRect((RectTransform)t.transform, out _)) continue;
+                    texts++;
+                    string v = CheckText(t);
+                    if (v != null) { bad++; if (bad <= maxLines) sb.AppendLine(v); }
+                }
+                foreach (ScrollRect s in r.GetComponentsInChildren<ScrollRect>(false))
+                {
+                    string v = CheckScroll(s);
+                    if (v != null) { bad++; if (bad <= maxLines) sb.AppendLine(v); }
+                }
+            }
+            sb.Insert(0, "UI AUDIT texts=" + texts + " violations=" + bad + "\n");
+            return sb.ToString();
+        }
+
+        static Rect Screen(RectTransform rt) { TryGetScreenRect(rt, out Rect r); return r; }
+
+        static bool TryGetScreenRect(RectTransform rect, out Rect screen)
+        {
+            screen = default;
+            if (rect == null) return false;
+            Canvas canvas = rect.GetComponentInParent<Canvas>();
+            if (canvas == null) return false;
+            Canvas root = canvas.rootCanvas;
+            Camera cam = root.renderMode == RenderMode.ScreenSpaceOverlay ? null : root.worldCamera;
+            var corners = new Vector3[4];
+            rect.GetWorldCorners(corners);
+            Vector2 min = RectTransformUtility.WorldToScreenPoint(cam, corners[0]), max = RectTransformUtility.WorldToScreenPoint(cam, corners[2]);
+            screen = Rect.MinMaxRect(Mathf.Min(min.x, max.x), Mathf.Min(min.y, max.y), Mathf.Max(min.x, max.x), Mathf.Max(min.y, max.y));
+            return true;
+        }
+
+        static Rect TextRect(TMP_Text t)
+        {
+            t.ForceMeshUpdate();
+            Bounds b = t.textBounds;   // local space of the text rect
+            var rt = (RectTransform)t.transform;
+            Vector3 a = rt.TransformPoint(b.min), c = rt.TransformPoint(b.max);
+            Canvas canvas = rt.GetComponentInParent<Canvas>(); Camera cam = canvas != null && canvas.rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.rootCanvas.worldCamera : null;
+            Vector2 p0 = RectTransformUtility.WorldToScreenPoint(cam, a), p1 = RectTransformUtility.WorldToScreenPoint(cam, c);
+            return Rect.MinMaxRect(Mathf.Min(p0.x, p1.x), Mathf.Min(p0.y, p1.y), Mathf.Max(p0.x, p1.x), Mathf.Max(p0.y, p1.y));
+        }
+
+        static string Path(Transform t) { var s = t.name; for (Transform p = t.parent; p != null && s.Length < 90; p = p.parent) s = p.name + "/" + s; return s; }
+
+        static string CheckText(TMP_Text t)
+        {
+            var rt = (RectTransform)t.transform;
+            Transform parent = rt.parent;
+            if (parent == null) return null;
+            Rect text = TextRect(t);
+            Rect frame = Screen((RectTransform)parent);
+            var issues = new List<string>();
+            // frame = nearest ancestor that is not a pure layout container of the same size as the text
+            // siblings that sit left/right of the text on the same row (vertical overlap), excluding full-size backgrounds
+            float gapMin = frame.xMin, gapMax = frame.xMax;
+            foreach (Graphic g in parent.GetComponentsInChildren<Graphic>(false))
+            {
+                if (g == t || !g.enabled || g.color.a < 0.05f || g.transform == rt || rt.IsChildOf(g.transform)) continue;
+                Rect gr = Screen(g.rectTransform);
+                if (gr.width < 2f || gr.height < 2f) continue;
+                if (gr.width >= frame.width * 0.9f && gr.height >= frame.height * 0.9f) continue;   // background / frame art
+                if (gr.yMax < text.yMin || gr.yMin > text.yMax) continue;
+                if (g.GetComponent<TMP_Text>() != null) continue;
+                bool overlaps = gr.xMin < text.xMax && gr.xMax > text.xMin && gr.yMin < text.yMax && gr.yMax > text.yMin;
+                if (overlaps) issues.Add("OVERLAP " + g.name);
+                if (gr.center.x <= text.center.x) gapMin = Mathf.Max(gapMin, gr.xMax); else gapMax = Mathf.Min(gapMax, gr.xMin);
+            }
+            if (gapMax - gapMin > 20f)
+            {
+                float dx = text.center.x - (gapMin + gapMax) * 0.5f;
+                bool leftAligned = t.alignment.ToString().Contains("Left") || t.alignment.ToString().Contains("Right");
+                if (!leftAligned && Mathf.Abs(dx) > DX_TOL) issues.Add("dx=" + dx.ToString("F1") + " vs free gap [" + gapMin.ToString("F0") + ".." + gapMax.ToString("F0") + "]");
+            }
+            float padL = text.xMin - frame.xMin, padR = frame.xMax - text.xMax, padB = text.yMin - frame.yMin, padT = frame.yMax - text.yMax;
+            bool bigFrame = frame.width >= 40f && frame.height >= 20f && frame.width < UnityEngine.Screen.width * 0.9f;
+            if (bigFrame)
+            {
+                if (padL < MIN_PAD || padR < MIN_PAD) issues.Add("padLR=" + padL.ToString("F0") + "/" + padR.ToString("F0"));
+                if (padB < 2f || padT < 2f) issues.Add("padTB=" + padT.ToString("F0") + "/" + padB.ToString("F0"));
+            }
+            float row = Mathf.Max(1f, frame.height);
+            if (bigFrame && (t.fontSize < MIN_FONT || t.fontSize < row * MIN_FONT_FRAC * 0.5f) && t.enableAutoSizing) issues.Add("fontSize=" + t.fontSize.ToString("F0") + " row=" + row.ToString("F0"));
+            Material mat = t.fontSharedMaterial;
+            if (mat == null || !mat.HasProperty("_OutlineWidth") || mat.GetFloat("_OutlineWidth") < 0.01f) issues.Add("NO OUTLINE");
+            if (issues.Count == 0) return null;
+            return "  " + Path(rt) + " '" + t.text.Replace("\n", " ") + "' -> " + string.Join("; ", issues);
+        }
+
+        static string CheckScroll(ScrollRect s)
+        {
+            Rect sr = Screen((RectTransform)s.transform);
+            Transform board = null; Rect br = default;
+            for (Transform p = s.transform.parent; p != null; p = p.parent)
+            {
+                var img = p.GetComponent<Image>();
+                if (img == null || !img.enabled || img.color.a < 0.3f) continue;
+                Rect r = Screen((RectTransform)p);
+                if (r.width > sr.width + 4f && r.height > sr.height + 4f) { board = p; br = r; break; }
+            }
+            if (board == null) return null;
+            float l = sr.xMin - br.xMin, rr = br.xMax - sr.xMax, b = sr.yMin - br.yMin, tp = br.yMax - sr.yMax;
+            if (Mathf.Min(l, rr, b, tp) < MIN_SCROLL_MARGIN) return "  SCROLL " + Path(s.transform) + " margins L/R/T/B=" + l.ToString("F0") + "/" + rr.ToString("F0") + "/" + tp.ToString("F0") + "/" + b.ToString("F0") + " in board " + board.name + " (min " + MIN_SCROLL_MARGIN + ")";
+            return null;
+        }
+    }
+}

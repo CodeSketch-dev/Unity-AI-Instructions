@@ -49,8 +49,25 @@ function Register-ObserveHook($settings, [string]$event, [string]$matcher) {
 }
 Register-ObserveHook $s 'PreToolUse' '.*update_plan.*'
 Register-ObserveHook $s 'PostToolUse' 'mcp__ai-game-developer__(screenshot|tests-run|console-get-logs).*|mcp__Claude_Browser__computer'
+# Enforcement hooks (skill_enforce_hook.ps1): PostToolUse tracking, Stop/SubagentStop gate, SubagentStart UI contract.
+$enfScript = Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_enforce_hook.ps1'
+$enfCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $enfScript + '"'
+function Register-EnforceHook($settings, [string]$event, [string]$matcher) {
+  if (-not ($settings.hooks.PSObject.Properties.Name -contains $event)) { $settings.hooks | Add-Member -NotePropertyName $event -NotePropertyValue @() }
+  $found = $false
+  foreach ($e in @($settings.hooks.$event)) { foreach ($h in @($e.hooks)) { if ($h.command -like '*skill_enforce_hook*') { $found = $true; if ($h.command -ne $enfCmd) { $h.command = $enfCmd } } } }
+  if (-not $found) {
+    $entry = [pscustomobject]@{ hooks = @([pscustomobject]@{ type = 'command'; command = $enfCmd; timeout = 15 }) }
+    if ($matcher) { $entry | Add-Member -NotePropertyName matcher -NotePropertyValue $matcher }
+    $settings.hooks.$event = @($settings.hooks.$event) + $entry
+  }
+}
+Register-EnforceHook $s 'PostToolUse' 'Skill|Edit|Write|MultiEdit|NotebookEdit|mcp__ai-game-developer__.*'
+Register-EnforceHook $s 'Stop' ''
+Register-EnforceHook $s 'SubagentStop' ''
+Register-EnforceHook $s 'SubagentStart' ''
 # Fail loudly if an installed hook script does not parse (a silent parse error once disabled the whole skill router).
-foreach ($hs in @($hookScript, $editScript, $obsScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'))) {
+foreach ($hs in @($hookScript, $editScript, $obsScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'), $enfScript)) {
   if (Test-Path -LiteralPath $hs) {
     $errs = $null; $tok = $null
     [void][Management.Automation.Language.Parser]::ParseFile($hs, [ref]$tok, [ref]$errs)
