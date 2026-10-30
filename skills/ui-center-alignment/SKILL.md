@@ -46,3 +46,8 @@ Read this for every UI task. A UI is not done until it is measured as centred, n
 
 ## Always-on
 - This skill applies in every project and to every UI task (new popups, edits, clones), referenced from `AGENTS.md`; the user should never have to ask for centring.
+
+## Balance and distribution (harmony, not just centring)
+- Several items in one row/column (reward chips, currency + XP, stat rows, tab strips) are distributed with EQUAL gaps and the whole group is centred in the free space between its outer neighbours (left icon .. right button); items have the same height and y centre; text sizes match across items.
+- The visual weight is balanced: no cluster glued to one side, no tiny text beside a big button, no item whose size differs from its siblings without a reason. Prefer one layout group (spacing + padding + child alignment) over hand positions.
+- Check by script: gaps between consecutive items (max - min <= 2 px), group centre vs free-gap centre (<= 1 px), heights equal, then LOOK at the screenshot for harmony.
