@@ -298,6 +298,7 @@
 
 ## shop
 - shop-skin-preview - Skin shop preview: default baked thumbnails, optional live 3D stage with own layer, camera, RenderTexture, light and drag-rotate, pooled lifecycle and stale-load token. Use when a shop must show characters, pets or weapons.
+- shop-tab-page-checklist - Use when building or fixing any in-game shop with a tab column and card pages (gem/cash/offers/treadmill/trail): tab spacing, tab label size and gap-centring, card ordering by price, sparkle fx only on the best card, header currency text. Lessons from fixing a shop three times.
 
 ## simple
 - simple-boss-patrol-chase - Cheap boss/hazard enemy without pathfinding: rectangle patrol, detector trigger, chase, contact kill via the collision registry. Use for obby bosses, patrolling hazards and simple chasers.
