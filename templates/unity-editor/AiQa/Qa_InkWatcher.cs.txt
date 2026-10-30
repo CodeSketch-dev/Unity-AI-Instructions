@@ -120,9 +120,7 @@ namespace AiQa
                     {
                         // apply what can be fixed right now (source prefabs, no need to stop Play) and leave a note for the agent hook (ink_audit_notify.ps1)
                         string fixRes = EditorPrefs.GetBool(AUTOFIX_KEY, true) ? Qa_InkFix.Run(true) : "auto-fix disabled";
-                        File.WriteAllText(Path.Combine(_dir, "pending.txt"), "Screen: " + _label + "
-" + report + "InkFix: " + fixRes + "
-");
+                        File.WriteAllText(Path.Combine(_dir, "pending.txt"), "Screen: " + _label + "\n" + report + "InkFix: " + fixRes + "\n");
                     }
                     File.AppendAllText(Path.Combine(_dir, "report.txt"), System.DateTime.Now.ToString("HH:mm:ss") + " " + _label + " " + fails + " fail\n" + report);
                 }
