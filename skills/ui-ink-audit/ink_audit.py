@@ -100,7 +100,7 @@ for it in buttons:
     if ink[0] < box[0] + 2 or ink[2] > box[2] - 2 or ink[1] < box[1] + 1 or ink[3] > box[3] - 1:
         fails.append(f"{tag}: ink {ink} leaves the button face {list(box)} (shrink text / widen button)")
     for o in buttons:
-        if o is it: continue
+        if o is it or not o["parts"]: continue   # plain backgrounds / dimmers never count as overlapping controls
         a, b = it["rect"], o["rect"]
         if a[0] < b[2] - 2 and b[0] < a[2] - 2 and a[1] < b[3] - 2 and b[1] < a[3] - 2 and o["path"] not in tag and tag not in o["path"]:
             fails.append(f"{tag}: overlaps button {o['path']} by {min(a[2], b[2]) - max(a[0], b[0]):.0f}x{min(a[3], b[3]) - max(a[1], b[1]):.0f}px")

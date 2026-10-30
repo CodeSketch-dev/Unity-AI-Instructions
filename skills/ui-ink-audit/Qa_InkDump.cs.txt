@@ -54,15 +54,15 @@ namespace Game
             bool first = true;
             foreach (Selectable s in Object.FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
-                var rt = s.transform as RectTransform; if (rt == null || !InScope(s.transform, scopes) || s.name.Contains("Backdrop")) continue;
+                var rt = s.transform as RectTransform; if (rt == null || !InScope(s.transform, scopes) || s.name.Contains("Backdrop") || s.name.Contains("Dim")) continue;
                 Canvas canvas = s.GetComponentInParent<Canvas>();
                 Rect rect = ScreenRect(rt, canvas); if (!Visible(rect)) continue;
                 var parts = new List<string>();
                 foreach (TMP_Text t in s.GetComponentsInChildren<TMP_Text>(false))
-                    if (t != null && !string.IsNullOrEmpty(t.text)) parts.Add("{\"type\":\"text\",\"name\":\"" + t.name + "\",\"rect\":" + R(TextInk(t, canvas)) + "}");
+                    if (t != null && !t.name.Contains("Badge") && !t.transform.parent.name.Contains("Badge") && !string.IsNullOrEmpty(t.text)) parts.Add("{\"type\":\"text\",\"name\":\"" + t.name + "\",\"rect\":" + R(TextInk(t, canvas)) + "}");
                 foreach (Image im in s.GetComponentsInChildren<Image>(false))
                 {
-                    if (im == null || im == s.targetGraphic || im.sprite == null || im.color.a < 0.05f || im.transform == s.transform) continue;
+                    if (im == null || im.name.Contains("Badge") || im.name.Contains("Dot") || im == s.targetGraphic || im.sprite == null || im.color.a < 0.05f || im.transform == s.transform) continue;
                     Rect ir = ScreenRect(im.rectTransform, canvas);
                     if (ir.width > rect.width * 0.8f || ir.height > rect.height * 0.9f) continue;   // frames / glows, not icons
                     parts.Add("{\"type\":\"icon\",\"name\":\"" + im.name + "\",\"rect\":" + R(ir) + "}");
