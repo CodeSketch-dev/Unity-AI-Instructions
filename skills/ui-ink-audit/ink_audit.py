@@ -72,6 +72,7 @@ def ink_bbox(parts, face):
     return [min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes)]
 
 
+SKIP_NAMES = ("Panel", "Currency", "Attack", "Joystick", "Dot", "Badge")   # currency bars / touch controls / badges have their own contracts
 fails, oks, fixes = [], [], []
 fixes_path = None
 if "--fixes" in args:
@@ -83,6 +84,14 @@ for it in buttons:
     if not (has_text or has_icon): continue
     sc = it["scale"] or 1.0
     tag = it["path"]
+    if any(k in it["name"] for k in SKIP_NAMES): continue
+    # icon and label on the same row? (vertical overlap > 50% of the smaller one). Otherwise the icon overhangs/stacks by design (HUD tiles): only the label is checked.
+    side = False; stacked = False
+    if has_icon and has_text:
+        ic = [p["rect"] for p in parts if p["type"] == "icon"][0]; tx = [p["rect"] for p in parts if p["type"] == "text"][0]
+        ov = min(ic[3], tx[3]) - max(ic[1], tx[1])
+        side = ov > 0.5 * min(ic[3] - ic[1], tx[3] - tx[1])
+        if not side: parts = [p for p in parts if p["type"] == "text"]; has_icon = False; stacked = True
     if has_icon and has_text and not it["hlg"]:
         fails.append(f"{tag}: icon + label without a HorizontalLayoutGroup -> wrap in ONE HLG (icon first, label Capline)")
     fb = face_box(it["rect"])
@@ -90,8 +99,10 @@ for it in buttons:
     box, face = fb[:4], fb[4]
     ink = ink_bbox(parts, face)
     if not ink: continue
+    if box[3] - box[1] < 24: continue   # face not found reliably (gradient / tiny sprite)
     dx = (ink[0] + ink[2]) / 2 - (box[0] + box[2]) / 2
     dy = (ink[1] + ink[3]) / 2 - (box[1] + box[3]) / 2
+    if stacked: dy = 0.0   # label sits on a lower bar under an overhanging icon: only the horizontal centre is meaningful
     msg = f"{tag}: pair centre vs medium face dx={dx:+.1f} dy={dy:+.1f}px"
     if abs(dx) > tol or abs(dy) > tol:
         fix = []
@@ -104,7 +115,7 @@ for it in buttons:
     if ink[0] < box[0] + 2 or ink[2] > box[2] - 2 or ink[1] < box[1] + 1 or ink[3] > box[3] - 1:
         fails.append(f"{tag}: ink {ink} leaves the button face {list(box)} (shrink text / widen button)")
     for o in buttons:
-        if o is it or not o["parts"]: continue   # plain backgrounds / dimmers never count as overlapping controls
+        if o is it or not o["parts"] or o["path"].split("/")[0] != it["path"].split("/")[0]: continue   # plain backgrounds / dimmers / other canvases never count
         a, b = it["rect"], o["rect"]
         if a[0] < b[2] - 2 and b[0] < a[2] - 2 and a[1] < b[3] - 2 and b[1] < a[3] - 2 and o["path"] not in tag and tag not in o["path"]:
             fails.append(f"{tag}: overlaps button {o['path']} by {min(a[2], b[2]) - max(a[0], b[0]):.0f}x{min(a[3], b[3]) - max(a[1], b[1]):.0f}px")
