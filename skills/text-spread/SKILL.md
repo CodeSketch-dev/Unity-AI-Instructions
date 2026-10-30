@@ -50,3 +50,6 @@ For markup, use `<sprite name="money">+25` when the icon is part of the same tex
 - Recreating TMP Sprite Assets per prefab: use one shared atlas/asset and stable sprite names.
 - Forgetting to clear the previous `<sprite>` markup on pool reuse: reset the full TMP text before assigning the next value.
 - Using world-space coordinates for a screen-space spread without an explicit camera conversion.
+
+## Size of spread texts
+- Spread/pop numbers that fan out of a character (steps, XP, income) are small feedback, not headlines: keep them to roughly 4-6% of the screen height (about 45-65 px at 1080p) and let the animation, not the size, carry the emphasis. Keep ONE shared size constant for all modes (a style class) instead of per-prefab scales, and verify with a Play screenshot while the character is moving on the payout spot.
