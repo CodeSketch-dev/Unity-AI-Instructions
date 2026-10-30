@@ -25,6 +25,39 @@ if (-not $have) {
   $entry = [pscustomobject]@{ hooks = @([pscustomobject]@{ type = 'command'; command = $cmd }) }
   $s.hooks.UserPromptSubmit = @($s.hooks.UserPromptSubmit) + $entry
 }
+# PreToolUse: one-time UI reminder when a UI-looking file/prefab is about to change (backs up the prompt router; never blocks)
+$editScript = Join-Path $ClaudeHome 'pipeline-hooks\hooks\ui_edit_reminder.ps1'
+$editCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $editScript + '"'
+if (-not ($s.hooks.PSObject.Properties.Name -contains 'PreToolUse')) { $s.hooks | Add-Member -NotePropertyName PreToolUse -NotePropertyValue @() }
+$haveEdit = $false
+foreach ($e in @($s.hooks.PreToolUse)) { foreach ($h in @($e.hooks)) { if ($h.command -like '*ui_edit_reminder*') { $haveEdit = $true; if ($h.command -ne $editCmd) { $h.command = $editCmd } } } }
+if (-not $haveEdit) {
+  $entry = [pscustomobject]@{ matcher = 'Edit|Write|MultiEdit|NotebookEdit|mcp__.*(prefab|gameobject).*'; hooks = @([pscustomobject]@{ type = 'command'; command = $editCmd; timeout = 10 }) }
+  $s.hooks.PreToolUse = @($s.hooks.PreToolUse) + $entry
+}
+# Observation hooks: plan creation (PreToolUse on update_plan) and screenshots / test runs / console reads (PostToolUse) feed skill routing automatically.
+$obsScript = Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_observe_hook.ps1'
+$obsCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $obsScript + '"'
+function Register-ObserveHook($settings, [string]$event, [string]$matcher) {
+  if (-not ($settings.hooks.PSObject.Properties.Name -contains $event)) { $settings.hooks | Add-Member -NotePropertyName $event -NotePropertyValue @() }
+  $found = $false
+  foreach ($e in @($settings.hooks.$event)) { foreach ($h in @($e.hooks)) { if ($h.command -like '*skill_observe_hook*') { $found = $true; if ($h.command -ne $obsCmd) { $h.command = $obsCmd }; if ($e.matcher -ne $matcher) { $e.matcher = $matcher } } } }
+  if (-not $found) {
+    $entry = [pscustomobject]@{ matcher = $matcher; hooks = @([pscustomobject]@{ type = 'command'; command = $obsCmd; timeout = 15 }) }
+    $settings.hooks.$event = @($settings.hooks.$event) + $entry
+  }
+}
+Register-ObserveHook $s 'PreToolUse' '.*update_plan.*'
+Register-ObserveHook $s 'PostToolUse' 'mcp__ai-game-developer__(screenshot|tests-run|console-get-logs).*|mcp__Claude_Browser__computer'
+# Fail loudly if an installed hook script does not parse (a silent parse error once disabled the whole skill router).
+foreach ($hs in @($hookScript, $editScript, $obsScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'))) {
+  if (Test-Path -LiteralPath $hs) {
+    $errs = $null; $tok = $null
+    [void][Management.Automation.Language.Parser]::ParseFile($hs, [ref]$tok, [ref]$errs)
+    if ($errs -and $errs.Count -gt 0) { Write-Host ("ERROR: hook script does not parse: " + $hs + " -> " + $errs[0].Message) -ForegroundColor Red; $hookParseFailed = $true }
+    elseif (([IO.File]::ReadAllBytes($hs) | Where-Object { $_ -gt 127 } | Measure-Object).Count -gt 0) { Write-Host ("WARNING: hook script is not ASCII (PowerShell 5.1 may misread it): " + $hs) -ForegroundColor Yellow }
+  }
+}
 $removed = @()
 if ($s.PSObject.Properties.Name -contains 'skillOverrides') {
   foreach ($p in @($s.skillOverrides.PSObject.Properties)) {

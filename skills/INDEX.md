@@ -13,6 +13,9 @@
 ## analytics
 - analytics-events-taxonomy - Analytics event taxonomy: naming rules, parameter limits, standard event groups, funnels, per-game docs/analytics-events.md. Use before adding any logged event.
 
+## art
+- art-volume-bloom-parity - Diagnose glare on ported models: compare the scene's post Volume with the reference's before touching materials or runtime exposure hacks; find leftover root renderers after a model swap. Use when pets or characters bloom too much.
+
 ## asset
 - asset-transfer-closure - Copy prefabs/models/VFX/UI/audio between Unity projects with full dependency closure and original GUIDs via a resolver script. Use for any cross-project asset move, or when Missing/pink materials appear after a copy.
 
@@ -35,6 +38,9 @@
 
 ## camera
 - camera-occlusion-fade - Cheap third-person occluder fade: segment-vs-bounds test on a registered target list every 0.05-0.1 s, hysteresis, shared transparent twin material, instant or timed fade. Use when props or models block the player view.
+
+## char
+- char-animator-reference-parity - Make a ported character animate exactly like the reference when bone names differ: keep the reference controller, retarget clips, port its parameter driver, verify with a play-mode state probe. Use when animation breaks after a rig swap.
 
 ## character
 - character-emotes-nametags - Emotes (animator trigger layer, emote wheel) and nametags (single world-space label with a CullingGroup band). Use when the GDD has emotes, player names over heads, or chat-bubble style labels.
@@ -111,6 +117,8 @@
 - game-orchestrator - Run the GDD-to-Unity-game pipeline end to end: lint the GDD, generate the task graph, dispatch subagents by lane, enforce gates and definition of done, keep resumable state. Use when the user hands over a GDD or says build, continue or resume a game clone.
 
 ## gameplay
+- gameplay-pause-input-gate - Pause with Time.timeScale 0 while waiting for a player action that a physics step must run: resume on the press, not the result, or the game freezes. Use for tutorial pauses and freeze-until-tap prompts.
+- gameplay-polish-recipes - Small reusable recipes: counted input lock, wall-edge decor kit, re-placing ported props, test hygiene traps. Use when locking input during sequences, adding decor to baked maps, or fixing crowded ported layouts.
 - gameplay-video-analysis - Turn gameplay videos, play notes and screenshots into a structured flow/UI/economy/FTUE analysis. Use when given a YouTube link, "I played it and noticed...", or timestamps of a reference game.
 
 ## gdd
@@ -122,7 +130,7 @@
 - genre-playbooks - Map a Roblox genre (obby, tower climb, simulator, tycoon, pet collector, steal, escape, racing, mining, arena) to the systems and skills a clone needs. Use at planning when the GDD names a genre.
 
 ## graphify
-- graphify-workflow - ALWAYS ON: bootstrap Graphify (install, build graph, single watcher) at session start without asking and prefer graphify query/path/explain over reading code. Also: install, scope, auto-update and query a local code-only Graphify knowledge graph for a Unity project (Windows, free, no LLM). Use when adding Graphify to a Unity repo, when the graph is stale or the watcher misbehaves, or before scoping a large C# codebase with query/path/explain.
+- graphify-workflow - Always-on for Unity projects - at session start bootstrap Graphify (install, build graph, start the single watcher) without asking, and prefer graphify query/path/explain over reading code. Also covers scope, auto-update and watcher fixes. Install, scope, auto-update and query a local code-only Graphify knowledge graph for a Unity project (Windows, free, no LLM). Use when adding Graphify to a Unity repo, when the graph is stale or the watcher misbehaves, or before scoping a large C# codebase with query/path/explain.
 
 ## hotbar
 - hotbar-inventory - Hotbar and inventory: Data_Inventory shape, static hotbar with selection event and slot fallback, scroll panel of owned tools, equip classes and locking rules. Use when adding a tool bar, backpack list or equipment slots.
@@ -185,6 +193,9 @@
 ## multi
 - multi-agent-coexistence - Protocol so Claude, Codex, subagents, the human and the Editor do not overwrite each other (re-read before edit, snapshot/check/claim via workspace_guard.py). Use at session start in shared repos and when files change unexpectedly.
 
+## native
+- native-ad-beside-popup - Show a native ad next to a popup without gaps or covered content: ready-check first, pure layout, slide the popup, then show. Use when adding side/half native ads to popups or debugging an empty gap or an overlapped HUD.
+
 ## nav
 - nav-traversal-link-tool - Editor tool and runtime rules for NavMesh traversal links: two-click authoring with snap, scripted parabola traversal, agent-body sync, ladder links. Use when bots must cross gaps, jumps or ladders that the baked navmesh does not connect.
 
@@ -200,6 +211,9 @@
 ## one
 - one-material-world-shader - Render the whole world with one opaque material (plus one alpha) by moving per-part variation into vertex data, with the Game/RobloxWorld shader contract. Use when setting up world art, writing the world shader, or fixing material counts and draw calls.
 
+## parallel
+- parallel-qa-fanout - How to QA and fix many screens, modes or minigames with subagents on a single-writer Unity Editor without running out of turns or losing the Editor lock. Use when asked to QA or fix several modes, shops or screens in parallel.
+
 ## platform
 - platform-kit - Reactive platform recipes (trampoline, conveyor, fade, glass bridge, force zone, kill zone, moving platform) built on the collision registry and KCC hooks. Use when building obby/tower platforms.
 
@@ -209,6 +223,12 @@
 
 ## pool
 - pool-everything - Pool anything spawned repeatedly (fx, floating text, projectiles, pickups) with PoolPrefabGlobal and PoolPrefabConfig, including adding a pooled fx. Use whenever code would Instantiate or Destroy in a gameplay loop.
+
+## pooled
+- pooled-ranked-fx - Per-object quality/rarity effects and cues on many world objects without a particle system each: register sources, one manager ranks at 5 Hz, lends pooled views to the top N for the device tier. Use for auras, glows, best-pick markers on large populations.
+
+## price
+- price-button-contract - Contract for every in-game currency price button, card or unlock row (icon + price as one centred group, red when unaffordable, attention pulse, sold/owned state, top-up flow, no store component for soft currency). Use when building or fixing any shop, price button, card or unlock row.
 
 ## procedural
 - procedural-mesh-generator - Generate primitive and voxel meshes from spec tables in an Editor tool, saved as .asset with stud-scale UVs. Use when building world parts, props or eggs without hand-modelled FBX.
@@ -311,24 +331,28 @@
 - tutorial-phase-system - Tutorial phase system: persisted phase int, per-phase HUD visibility and locks, spotlight guidance, rewards once, resume safety. Use when building the first-time tutorial.
 
 ## ui
+- ui-9slice-buttons - How to cut sprite 9-slice borders (TextureImporter spriteBorder) for UI buttons, tabs and plates so Image Type=Sliced stretches with no notch, seam, dark line or broken outline at any size. Use when importing, restyling or fixing any button/tab/plate sprite, when a button shows artifacts at some size, or when a button sprite has zero borders. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-always - MANDATORY first step for ANY Unity UI work - creating or editing buttons, text/labels/TMP, icons, popups, shops, tabs, HUD, currency bars, price plates, scroll boards, prefab layout or UI screenshots (nut, chu, bang, giao dien), including work delegated to subagents. Loads the required UI skill set and the measured-centring gate; never skip, never defer to the user asking.
 - ui-builder - Describe a screen as a ui-spec (layout contract), lint it, convert it to anchors, and build the prefab with an idempotent Editor builder. Use when a GDD or reference defines a screen's elements and it must come out right from one prompt.
-- ui-button-anatomy - Required components and behavior of every button: press scale, click sfx on pointer down, grayscale disabled, per-state variants, notify dot, hit areas. Use when creating or auditing any button, tab or HUD icon.
-- ui-clone - UI hub for recreating a reference UI (HUD, popups, shops, boards) and routing to the other UI skills. Use when UI must look/behave like another game or shows wrong 9-slice/anchors/overlap/mirrored text.
+- ui-button-anatomy - Required components and behavior of every button: press scale, click sfx on pointer down, grayscale disabled, per-state variants, notify dot, hit areas. Use when creating or auditing any button, tab or HUD icon. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-center-alignment - Mandatory centring audit for any Unity UI work (bars, pills, buttons, icon+text, currency bars, popups, tabs). Use whenever you build or edit UI; verify by script that content is geometrically centred before finishing. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-clone - UI hub for recreating a reference UI (HUD, popups, shops, boards) and routing to the other UI skills. Use when UI must look/behave like another game or shows wrong 9-slice/anchors/overlap/mirrored text. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-design-tokens - Quantized UI sizes, spacing, insets and design principles mined from reference prefabs, to build consistent screens from a spec alone. Use when choosing sizes or spacing for any new UI element and no mockup supplies them.
 - ui-feedback-toasts - Timing recipes for toasts, announcement banners, warning messages, count-up counters and attention loops. Use when a screen needs transient feedback (reward received, error, warning, currency change).
-- ui-center-alignment - Mandatory centring audit for ANY Unity UI work (popups, bars, buttons, tabs, icon+text, currency bars, headers); measure content vs container and widget vs parent by script and fix offsets yourself. Use on every UI task, in every project.
-- ui-icon-label-layout - Lay out icon + label inside buttons, pills and price plates with a HorizontalLayoutGroup child instead of hand offsets. Use when a button has an icon and text, a currency price, or the text looks off-centre.
+- ui-icon-label-layout - Lay out icon + label inside buttons, pills and price plates with a HorizontalLayoutGroup child instead of hand offsets. Use when a button has an icon and text, a currency price, or the text looks off-centre. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-localization - Localization setup for UI text: Unity Localization tables, TMP localize components, per-locale fonts, RTL, glyph coverage. Use when adding languages, new UI text, or fixing missing or unreadable glyphs.
 - ui-naming-conventions - Naming and folder conventions for UI prefabs and objects (Btn_, Text_, Root, Board, State_*). Use when creating UI hierarchies so builders, validators and scripts can find objects by name.
-- ui-pattern-library - Reusable game-independent UI patterns (shops, settings, daily login, gacha, jackpot, rating, revive, inventory, rebirth, wheel, quests...) with layout contract, states, behavior and variants. Use before building any shop, list, popup or page, or when told "same format as our other games".
-- ui-popup-anatomy - Popup prefab tree, animation modules and timings, dim, Escape stack and page-vs-popup distinction. Use when building or fixing any popup, confirm dialog or full page.
+- ui-notification-dots - Default red notification dots on HUD buttons, tabs and item cards when the player can afford a better stat item or claim something. Use when starting any new game and whenever building or changing a shop, upgrade, collection or reward screen; add it without being asked. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-pattern-library - Reusable game-independent UI patterns (shops, settings, daily login, gacha, jackpot, rating, revive, inventory, rebirth, wheel, quests...) with layout contract, states, behavior and variants. Use before building any shop, list, popup or page, or when told \"same format as our other games\". Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-popup-anatomy - Popup prefab tree, animation modules and timings, dim, Escape stack and page-vs-popup distinction. Use when building or fixing any popup, confirm dialog or full page. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-popup-from-demo - Build popups/HUD buttons that match demo screenshots 1:1 via an idempotent editor builder and screenshot compare loop, generating only missing icons. Use when given demo images or "match the demo exactly".
-- ui-scroll-board - Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview.
-- ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on "UI looks ugly/uneven".
-- ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections.
-- ui-text-tmp - TextMeshPro conventions: fonts, outline materials, autosize, colors, raycast, number formats, optical vertical centring. Use when creating labels, titles, counters, or fixing text that overflows, sits high/low in its button, or looks unlike the reference.
-- ui-validator - Check a UI prefab numerically for structure, overlap, safe area, text fit, raycast, 9-slice, missing references and more at several aspect ratios, with reasoned exceptions. Use after building or changing any popup, HUD or page, before screenshots.
-- ui-visual-qa - Capture a screen at several aspect ratios, diff it against a mockup or approved golden image (pixels, SSIM, edge map) and measure text contrast, with a stdlib PNG toolchain. Use after ui-validator passes, or when a build must match a reference image.
+- ui-scroll-board - Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on \"UI looks ugly/uneven\". Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-text-autofit-system - MANDATORY for any UI, popup, HUD, button, world-canvas or code-built text work in a Unity project. Installs/uses the automatic TMP text fitting system (auto size, padding from frames, no overflow) so text never needs manual alignment passes or reminders. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-text-tmp - TextMeshPro conventions: fonts, outline materials, autosize, colors, raycast, number formats, optical vertical centring. Use when creating labels, titles, counters, or fixing text that overflows, sits high/low in its button, or looks unlike the reference. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-validator - Check a UI prefab numerically for structure, overlap, safe area, text fit, raycast, 9-slice, missing references and more at several aspect ratios, with reasoned exceptions. Use after building or changing any popup, HUD or page, before screenshots. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-visual-qa - Capture a screen at several aspect ratios, diff it against a mockup or approved golden image (pixels, SSIM, edge map) and measure text contrast, with a stdlib PNG toolchain. Use after ui-validator passes, or when a build must match a reference image. Part of the ui-always set: read skills/ui-always first for any UI task.
 
 ## unity
 - unity-batch-build - Local Unity batch builds and QA gates: BuildCli, pinned Editor, environment signing, size budgets, local runner template and capped claude -p fix loop. Use when building AAB/APK or automating local build checks.
@@ -340,7 +364,7 @@
 - unity-mcp-workflow - Drive the Unity Editor through MCP safely: discover tools, inspect read-only first, edit prefab assets not scene overrides, batch, save, compile, read Console, screenshot, fallback. Use for any scene/prefab/asset/Play Mode/Console task.
 - unity-project-bootstrap - Set up a new Unity 6 mobile project: packages, folders, asmdefs, URP tiers, platform settings, scene flow, git ignore/LFS, first compile check. Use when starting a game or \"init the project\".
 - unity-qa-playtest - Plan and run QA for a feature or build: test matrix, Play Mode via MCP, aspect ratios, fresh/saved data, interruptions, perf sanity, bug reports. Use on \"test it\", \"QA this\", before milestones or human playtests.
-- unity-ui - Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab.
+- unity-ui - Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab. Part of the ui-always set: read skills/ui-always first for any UI task.
 
 ## user
 - user-corrections-ledger - Ledger of recurring user corrections and standing decisions with reasons, to avoid repeating past mistakes. Use at the start of a build, when planning a feature, or when the user corrects something similar to a past correction.
@@ -350,10 +374,15 @@
 
 ## vfx
 - vfx-budget-rules - Particle and FX budgets for low-end mobile: caps per prefab, pooling, shared one-shot emitters, vendor pack hygiene. Use when adding or auditing particle effects.
+- vfx-material-recipes - Shader/material recipes and traps: voxel dissolve for teleports, per-sequence material twins, MaterialPropertyBlock clobber, ported materials silently on another shader. Use for dissolve/teleport FX, material swaps during sequences, or black/flat ported skins.
+
+## vibe
+- vibe-coding-guardrails - Always-on checklist of basic AI mistakes in Unity vibe coding (guessing, huge greps, Editor timeouts, wrong rename/delete scope, skipped UI skills, unverified claims, token waste) with the habit that prevents each. Use at the start of every task and before reporting done.
 
 ## world
 - world-batching-culling - Make big static worlds cheap on low-end mobile: bake meshes/materials, chunked distance culling, parity and render-stat checks. Use when a map has thousands of renderers, high draw calls, or on \"optimize the map\".
 - world-canvas-ui - World-space canvas boards and slot layouts: strip imported layout groups, scale pixel layouts with pixelsPerUnitMultiplier, z-order, capacity at least data count. Use when building boards, signs or slot grids in the 3D world.
+- world-label-recipes - World-space and HUD text rules: one rich-text label with rarity/size/time languages, distance size cap, TMP sprite icons, calm count-up readouts, invisible restyled text, banner backing. Use when building nameplates, egg/pet labels, money/speed pills.
 
 ## zone
 - zone-level-design - Lay out zones, bases, hubs and levels for Roblox-style mobile games: progression gating, scale, walkability, landmarks, kit reuse, performance budgets. Use when building a map/zone or when the layout is cramped, empty or off-scale.

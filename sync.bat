@@ -71,6 +71,10 @@ if exist "%REPO%\skills" (
     call :install_skills "%CODEX_HOME%\skills"
 )
 
+rem ---- 3b. skill router data: every skill (also future ones) becomes auto-routable by the prompt hook
+where python >nul 2>&1
+if not errorlevel 1 if exist "%REPO%\tools\build_skill_router.py" python "%REPO%\tools\build_skill_router.py" "%REPO%\skills" "%REPO%\skill_router.json"
+
 rem ---- 4. pipeline agents, commands and hook scripts -> Claude only ------------------------
 if exist "%REPO%\agents" call :install_tree "%REPO%\agents" "%CLAUDE_HOME%\agents" "agents"
 if exist "%REPO%\commands" call :install_tree "%REPO%\commands" "%CLAUDE_HOME%\commands" "commands"

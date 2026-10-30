@@ -27,5 +27,16 @@ Read this for every UI task. A UI is not done until it is measured as centred, n
 - Siblings in the same strip (back button, title, currency bar) share one y centre.
 - Make this a reusable check in any project: when you add or move a child into a parent, run the bounds comparison before reporting done.
 
+## Neighbour-relative centring (text next to icons / buttons) - the rule that was repeatedly missed
+- A label is centred in the FREE GAP between its visible neighbours, never in the parent frame: gap = [rightEdge(left neighbour: icon/badge) + pad, leftEdge(right neighbour: "+" button, arrow, price icon) - pad]. If a side has no neighbour, that side is the parent frame's inner edge. Centre the rendered text (`textBounds`), not the RectTransform, in that gap.
+- Cross axis: icon, label and buttons on a row share one y centre; in a stack they share left/right/top/bottom alignment (align every edge the design implies, never eyeball). Currency bars: icon left, "+" right, number centred in the gap between them.
+- No overlap ever: text bounds must not intersect any sibling graphic's bounds (icons, badges, shadows, "+" buttons); keep >= 6 px clearance.
+- Not too small: autosize may shrink text only to ~45% of the row height (never below a readable min such as 14 px at 1080p); if it still does not fit, widen the container or shorten the string instead of shrinking more. Report the resulting font size.
+- Script (run on every bar/pill/button changed): per text collect sibling graphics' world rects (`GetWorldCorners`, active, alpha > 0.05, not a full-size background), compute gapMin/gapMax as above, print `dx = textBounds.center.x - (gapMin+gapMax)/2`, `dy = textBounds.center.y - row.center.y`, overlap yes/no, fontSize. Fail if |dx| or |dy| > 1 px, overlap, or font below the min.
+- Fix in the layout, not per label: icon + label + button as a HorizontalLayoutGroup (label flexibleWidth 1, centred) so the gap logic holds for any value width.
+
+## Auto-fix loop (no asking, no waiting)
+- Whenever ANY screenshot, Play capture, test dump or review shows text off-centre, overlapping an icon, clipped, too small, or edges not aligned: stop, load `ui-always` + this skill, fix the layout, re-measure, re-capture; repeat until the numbers pass. Do this even when the task was something else (QA, shop logic, balance). Never just list it as a finding for the user, unless the fix needs a design decision.
+
 ## Always-on
 - This skill applies in every project and to every UI task (new popups, edits, clones), referenced from `AGENTS.md`; the user should never have to ask for centring.
