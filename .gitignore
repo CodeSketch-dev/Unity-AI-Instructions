@@ -8,3 +8,6 @@ _unity-pilots/roblox-shader-kit-pilot/
 
 # publish.ps1 conflict backups
 .publish-backup/
+
+# OMC runtime state is local session data
+.omc/
