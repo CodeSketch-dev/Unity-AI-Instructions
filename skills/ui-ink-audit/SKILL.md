@@ -1,6 +1,6 @@
 ---
 name: ui-ink-audit
-description: Use automatically in EVERY Unity project, on any UI edit, Play test or screenshot: an Editor watcher audits the whole game's UI (every popup, HUD, shop, minigame screen) by pixels - icon+text centred on the MEDIUM button face, titles on their colour band, no overlaps - and reports [InkAudit] FAIL lines to fix.
+description: "Use on any UI edit, Play test or screenshot in every Unity project: audit UI by pixels (icon+text centred on the button face, titles on their band, no overlaps) and fix the [InkAudit] FAIL lines it reports."
 triggers: align, canh giua, lech, button, icon text, hatch, claim, price, pill, title, header, popup, hud, shop, shadow, outline, ink, screenshot, ui audit, play test, qa
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: shop-tab-page-checklist
-description: Use when building or fixing any in-game shop with a tab column and card pages (gem/cash/offers/treadmill/trail): tab spacing, tab label size and gap-centring, card ordering by price, sparkle fx only on the best card, header currency text. Lessons from fixing a shop three times.
+description: "Use when building or fixing any in-game shop with a tab column and card pages (gem, cash, offers, trail): tab spacing, label size and gap-centring, card order by price, sparkle on the best card, header currency text."
 triggers: shop, tab, offers, tab text, card order, sparkle, pack, gem pack, shop tab, cua hang, sap xep, goi
 ---
 

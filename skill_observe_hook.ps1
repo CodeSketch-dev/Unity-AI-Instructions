@@ -21,9 +21,11 @@ function Throttled([string]$key, [int]$seconds) {
 if ($ev -eq 'PreToolUse' -and $tool -like '*update_plan*') {
   $text = ''
   try { $text = (($j.tool_input.items | ForEach-Object { [string]$_.content }) -join ' . ') } catch {}
-  $skills = Get-RoutedSkills $text 10
+  $skills = Get-RoutedSkills $text 5
   if ($skills.Count -gt 0) {
-    $msg = 'Plan skill routing: these plan steps match skills - load the ones each step needs BEFORE starting that step (no user prompt needed): ' + ($skills -join ', ') + '. Any UI step: ui-always first. Keep vibe-coding-guardrails in mind.'
+    $hint = Get-RoutedHint $text 5
+    if ($hint -like 'no strong match*') { $msg = 'Plan skill routing: ' + $hint + ' - read skills/INDEX.md for a better fit or proceed with the general rules; never invent a skill name.' }
+    else { $msg = 'Plan skill routing: these plan steps match skills - load the ones each step needs BEFORE starting that step (no user prompt needed): ' + ($skills -join ', ') + '. Any UI step: ui-always first. Keep vibe-coding-guardrails in mind.' }
   }
 }
 elseif ($ev -eq 'PostToolUse') {

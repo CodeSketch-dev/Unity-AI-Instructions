@@ -21,3 +21,9 @@ Audio is a large share of perceived polish and a classic source of mobile memory
 
 ## Verify
 EditMode tests for the helper logic (same-track ignore, fallback, channel scaling, cooldowns, null-safety); Play Mode from the real entry flow: BGM starts, crossfades, respects mute/volume, key SFX trigger once per event, no Console errors, memory/active-source count bounded after 2 minutes of rapid actions.
+
+## Added from open-project-1 (2026-11-02)
+Source: third-party example (Unity open-project-1, Apache-2.0), ideas only.
+- Cue asset + request channel: gameplay code asks "play cue X at position" and one audio manager owns pooled emitters; callers get a key to stop looping cues.
+- A cue holds a clip group with sequence mode (random, random-no-repeat, sequential): covers variation without code (see `sfx-variation-ducking`).
+- Looping cues must be stopped in the caller's `OnDisable`; delayed play-on-start must re-check the object is still active.

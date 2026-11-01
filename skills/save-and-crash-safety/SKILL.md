@@ -1,6 +1,7 @@
 ---
 name: save-and-crash-safety
 description: "Save safety and crash basics: backup file rotation, checksum header, version migration chain, recovery events, safe-boot flag, crash reporting. Use when touching persistence or release readiness."
+triggers: save data, lost save, save lost, luu du lieu, mat du lieu, migration
 ---
 
 # Save and crash safety
@@ -21,3 +22,9 @@ Source: third-party example. Inspired by: gamedev-skills/awesome-gamedev-agent-s
 - Stamp a version from v1 and keep migrations in an ordered chain; write temp then rename, keep a .bak.
 - Treat the file as untrusted: validate, clamp, fall back to backup. Keep saves plain data (no object instantiation on load).
 - Autosave on safe boundaries to its own slot; never mid-action. Use locale-invariant number serialization.
+
+## Added from open-project-1 (2026-11-02)
+Source: third-party example (Unity open-project-1, Apache-2.0), counter-example.
+- Its save system writes JSON straight to the final file in `persistentDataPath` and creates an empty file on first read: a crash mid-write corrupts the save. Do NOT copy that.
+- Keep our rule: write to a temp file, flush, then rename over the target and rotate a backup.
+- Idea worth keeping: serialise item/ScriptableObject references by stable GUID/id (a `SerializableScriptableObject` base with a generated Guid) instead of by name or index.

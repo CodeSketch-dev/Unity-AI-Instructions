@@ -1,6 +1,7 @@
 """Build skill_router.json (ASCII) from skills/*/SKILL.md so the UserPromptSubmit router can match ANY skill, including future ones.
 
 Usage: python tools/build_skill_router.py [skills-dir] [out-json]
+Optional `not:` frontmatter (comma separated phrases) lists NEGATIVE triggers: each phrase found in the prompt subtracts 3 from that skill (stored as "x"; omitted when empty, so old skills are unchanged).
 Keyword sources per skill: optional `triggers:` frontmatter (comma separated, weight 3), name tokens (weight 3),
 description words (weight 1). Vietnamese prompts are matched through VI_MAP after diacritics are stripped by the hook.
 """
@@ -15,7 +16,7 @@ from skill_lint import parse_frontmatter  # noqa: E402
 STOP = set("""a an and any are as at be by for from has have how in into is it its of on or per so that the their them then this to use used uses using when where which while with without within your you all each every more most not only also but can may must should will one two new via vs etc such than too out off over under after before during both other another same still just like make makes made get gets set sets add adds adding added build builds building create creates creating need needs needed instead rather work works working
 skill skills rule rules template templates recipe recipes system systems basic common generic general project projects game games unity mobile android low end per task tasks step steps file files code asset assets data
 """.split())
-NAME_STOP = {"game", "skill", "rule", "template", "recipe", "recipes", "system", "basic", "common", "generic", "kit", "and", "the"}
+NAME_STOP = {"game", "skill", "rule", "template", "recipe", "recipes", "system", "basic", "common", "generic", "kit", "and", "the", "not", "for"}
 
 # Vietnamese (diacritics already stripped, lowercase) -> English trigger words
 VI_MAP = {
@@ -27,7 +28,7 @@ VI_MAP = {
     "loi": "bug error", "toi uu": "perf optimize", "dung hinh": "port clone reference", "giong": "clone reference port", "cua hang": "shop",
     "huong dan": "tutorial", "camera": "camera", "bo cuc": "layout", "canh bao": "toast warning", "thong bao": "toast notification",
     "phan thuong": "reward", "nhiem vu": "quest", "cap do": "level progression", "dem nguoc": "timer countdown", "ngon ngu": "localization",
-    "xoa": "remove delete", "doi ten": "rename", "tab": "tab", "icon": "icon", "anim": "animation tween", "phong to": "scale pulse animation",
+    "xoa": "remove delete", "doi ten": "rename", "tab": "tab", "icon": "icon", "anim": "animation tween", "ban mau": "prototype keep kill", "phong to": "scale pulse animation",
 }
 
 
@@ -49,11 +50,15 @@ def main():
         name = fm.get("name") or folder
         desc = fm.get("description", "")
         explicit = [t.strip().lower() for t in fm.get("triggers", "").split(",") if t.strip()]
+        neg = sorted(set(t.strip().lower() for t in fm.get("not", "").split(",") if t.strip()))
         ntok = [t for t in re.split(r"[-_]", name.lower()) if len(t) >= 3 and t not in NAME_STOP]
         use = re.split(r"(?i)\buse (?:when|before|at|after|for|it|this)\b", desc, maxsplit=1)
         dsrc = use[1] if len(use) > 1 else desc
         dwords = sorted(set(words(dsrc)) - set(ntok))[:40]
-        skills.append({"n": name, "t": sorted(set(explicit)), "w": ntok, "d": dwords})
+        entry = {"n": name, "t": sorted(set(explicit)), "w": ntok, "d": dwords}
+        if neg:
+            entry["x"] = neg
+        skills.append(entry)
     data = {"vi": VI_MAP, "skills": skills}
     with open(out, "w", encoding="ascii", newline="\n") as f:
         json.dump(data, f, ensure_ascii=True, separators=(",", ":"))

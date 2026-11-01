@@ -1,6 +1,6 @@
 ---
 name: ui-visual-qa
-description: "Capture a screen at several aspect ratios, diff it against a mockup or approved golden image (pixels, SSIM, edge map) and measure text contrast, with a stdlib PNG toolchain. Use after ui-validator passes, or when a build must match a reference image. Part of the ui-always set: read skills/ui-always first for any UI task."
+description: "Capture a screen at several aspect ratios, diff against a mockup or golden image (pixels, SSIM, edges) and measure text contrast. Use after ui-validator passes or when a build must match a reference image. Part of the ui-always set."
 ---
 
 # UI visual QA

@@ -1,6 +1,6 @@
 ---
 name: ui-currency-bar-contract
-description: Contract for every currency bar (cash, gems, speed, jump count...) in HUDs, shop headers and popups: one shared bar prefab where the icon OVERHANGS the left edge of the frame, number in the free gap, optional plus button; never an icon squeezed inside the frame. Use when building, copying or fixing any currency bar, shop header bar or balance pill.
+description: "Contract for every currency bar (cash, gems, counters): one shared prefab, icon OVERHANGS the left frame edge, number in the free gap, optional plus. Use when building, copying or fixing a currency bar, shop header or balance pill."
 triggers: currency bar, balance bar, cash bar, gem bar, money bar, shop header, thanh tien, thanh gem, thanh cash, icon trong frame, header shop
 ---
 

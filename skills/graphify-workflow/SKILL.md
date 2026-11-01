@@ -1,6 +1,6 @@
 ---
 name: graphify-workflow
-description: Always-on for Unity projects - at session start bootstrap Graphify (install, build graph, start the single watcher) without asking, and prefer graphify query/path/explain over reading code. Also covers scope, auto-update and watcher fixes. Install, scope, auto-update and query a local code-only Graphify knowledge graph for a Unity project (Windows, free, no LLM). Use when adding Graphify to a Unity repo, when the graph is stale or the watcher misbehaves, or before scoping a large C# codebase with query/path/explain.
+description: "Always-on for Unity projects: bootstrap Graphify (install, build graph, single watcher) without asking and prefer graphify query/path/explain over reading code. Use at session start, when the graph is stale, or before scoping large C# code."
 ---
 
 # Graphify workflow (always on, no prompt needed)

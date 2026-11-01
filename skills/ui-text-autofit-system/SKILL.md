@@ -1,6 +1,6 @@
 ---
 name: ui-text-autofit-system
-description: "MANDATORY for any UI, popup, HUD, button, world-canvas or code-built text work in a Unity project. Installs/uses the automatic TMP text fitting system (auto size, padding from frames, no overflow) so text never needs manual alignment passes or reminders. Part of the ui-always set: read skills/ui-always first for any UI task."
+description: "MANDATORY for any UI, popup, HUD, button, world-canvas or code-built text: install/use the automatic TMP fitting system (auto size, padding, no overflow). Part of the ui-always set; read ui-always first."
 ---
 
 # UI text auto-fit system (automatic, every project)

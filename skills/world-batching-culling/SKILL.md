@@ -25,3 +25,10 @@ Most mobile frame time in a Roblox-style world is renderer/material count, not t
 - Segment joints must align (no steps between modular segments); verify after widening or changing segments.
 - Decor placed behind walls is invisible and wasted; place it where the gameplay camera can see it.
 - Keep gameplay paths clear: decor must not sit on routes, spawn points or interaction areas (`zone-level-design`).
+
+
+## Added from AutoLOD (2026-11-02)
+Source: third-party example (Unity-Technologies/AutoLOD, idea-only), our wording. Full workflow: `lod-automation-workflow`.
+- Before culling far geometry, consider hierarchical LOD: one merged proxy per chunk, swapped by distance with hysteresis, built as an idempotent undo-safe Editor bake like the chunk bake above.
+- LODGroups only on a few large meshes seen near and far; never on tiny props or meshes already combined.
+- Runtime QualitySettings.lodBias per device tier is the cheapest quality lever.

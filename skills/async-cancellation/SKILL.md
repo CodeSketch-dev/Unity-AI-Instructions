@@ -25,3 +25,6 @@ void OnDisable() => _cancel.Cancel();
 - Unity API stays on the main thread: no `Task.Run` for gameplay.
 - Prefer an event or `WaitUntil` with cancellation over polling every frame.
 - Also kill owned tweens and return pooled objects in the same teardown.
+
+## Added from UniTask (2026-11-02)
+Source: third-party example (Cysharp/UniTask, MIT). Timing, timeouts and no-throw cancel: `unitask-timing-and-timeouts`; callbacks and streams: `unitask-callbacks-and-streams`.

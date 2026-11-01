@@ -1,6 +1,7 @@
 ---
 name: recipe-add-skin-or-item
 description: Add a character skin or item entry (asset, factory registration, unlock type, events, shop, save check). Use when adding purchasable or unlockable cosmetics or items.
+not: localization, language, translate, ngon ngu
 ---
 
 # Recipe: add a skin or item

@@ -1,6 +1,7 @@
 ---
 name: bot-path-follow-smoothing
 description: "Fix jittery bots on waypoint paths at speed: corner-pass test, speed hint, last-leg easing, turn-rate limit, fresh direction between throttled ticks, jitter harness. Use when bots wobble, orbit waypoints or snap their facing."
+triggers: bots wobble, waypoints, jitter, orbit waypoint, bot giat
 ---
 
 # Bot path-follow smoothing

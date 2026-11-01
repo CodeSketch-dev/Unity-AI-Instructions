@@ -26,3 +26,7 @@ A short table: finding, evidence (profiler/numbers or "static scan only"), fix, 
 ## Added from Unity official guidance (2026-11-02)
 Source: official (Unity-Technologies/skills), our wording. Deep dives: `tmp-font-optimization` (text atlases, autosize, world text), `sprite-atlas-v2` (UI draw calls), `audio-import-and-mixer-optimization` (audio RAM and DSP), `urp-postprocessing-volumes` (full-screen passes), `project-auditor-triage` (static scan), `physics-callback-troubleshooting`.
 - Add to the audit table: TMP font asset mode/atlas size, UI atlas batch count, clip load type and rate, mixer depth, number of post-processing passes, Project Auditor high-severity count.
+
+
+## Added from AutoLOD (2026-11-02)
+Source: third-party example (AutoLOD, idea-only). In the Rendering step: if vertices drawn is the proven bottleneck, use LODs on large meshes and lodBias per tier (`lod-automation-workflow`); otherwise fix batches first.

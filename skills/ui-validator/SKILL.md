@@ -1,6 +1,6 @@
 ---
 name: ui-validator
-description: "Check a UI prefab numerically for structure, overlap, safe area, text fit, raycast, 9-slice, missing references and more at several aspect ratios, with reasoned exceptions. Use after building or changing any popup, HUD or page, before screenshots. Part of the ui-always set: read skills/ui-always first for any UI task."
+description: "Check a UI prefab numerically at several aspect ratios: structure, overlap, safe area, text fit, raycast, 9-slice, missing references. Use after building or changing a popup, HUD or page, before screenshots. Part of the ui-always set."
 ---
 
 # UI validator (static, from prefab YAML)

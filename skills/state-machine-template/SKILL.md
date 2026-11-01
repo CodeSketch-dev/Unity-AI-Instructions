@@ -28,3 +28,7 @@ States live in `Logic/<Feature>/State/<Feature>_State_<Name>.cs`; implement `Ini
 - Unregistered label -> `KeyNotFoundException`. Transition to the same state re-runs stop/start.
 - It is not a MonoBehaviour: the owner must forward `Update`/`FixedUpdate` and call `Dispose()` in `OnDestroy`.
 - `AddState` calls `Init()` immediately.
+
+## Added from open-project-1 (2026-11-02)
+Source: third-party example (Unity open-project-1, Apache-2.0), IDEA-ONLY.
+- Its designer-authored SO state machine (State = actions + transition table of condition lists, conditions cached per frame) suits content-heavy NPC behaviour tuned by non-programmers. Our default stays the framework `StateMachine<TEnum>`; adopt the SO form only when designers must author many behaviours.

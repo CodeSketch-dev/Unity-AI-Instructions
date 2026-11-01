@@ -1,6 +1,7 @@
 ---
 name: ui-always
-description: "MANDATORY first step for ANY Unity UI work - creating or editing buttons, text/labels/TMP, icons, popups, shops, tabs, HUD, currency bars, price plates, scroll boards, prefab layout or UI screenshots (nut, chu, bang, giao dien), including work delegated to subagents. Loads the required UI skill set and the measured-centring gate; never skip, never defer to the user asking."
+description: "MANDATORY first step for ANY Unity UI work: buttons, text/TMP, icons, popups, shops, tabs, HUD, currency bars, price plates, prefab layout, UI screenshots (nut, chu, bang, giao dien), also in subagents. Loads the UI skill set and the measured-centring gate."
+triggers: ui, hud, popup, button, label, text, icon, shop, tab, layout, toast, currency bar, price plate, nut, chu, bang, giao dien, can giua, cua hang
 ---
 
 # UI always (hub, mandatory gate)

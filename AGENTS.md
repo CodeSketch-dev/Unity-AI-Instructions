@@ -372,3 +372,32 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - HARD GATE, icon + text (every button, pill, price plate, ad/hatch/free button, header): build it as ONE HorizontalLayoutGroup (icon first, label second, Capline centre, bottom padding = the sprite lip) and, before replying, measure the INK from a Play screenshot (pixel scan: face rows of the button vs white text rows vs icon rows) - the pair centre must be within 2 px of the button FACE centre (not the rect centre) horizontally and vertically, and titles within 2 px of the colour band centre (`ui-title-band-centering`, `band_scan.py`). A hand-positioned icon beside a stretched label is a defect. Fix and re-measure until it passes; report the dx/dy numbers. The user must never have to screenshot and ask again.
 - UI AUDIT (manual, never a background watcher: it made the PC lag): `skills/ui-ink-audit` ships `Qa_InkDump` + `Qa_InkFix` (Editor) + `ink_audit.py`. After UI work or a Play test, audit the screens you touched (dump + screenshot + `ink_audit.py`), LOOK at the screenshot, fix on the source prefab, re-run until `0 fail`, and list screens audited with counts. Never leave a visible misalignment for the user to find.
 - Ads: one global banner service (Ads_Banner style): always on, ShowBanner via AdsHelper every 15 s, immediately after a native closes or a scene loads; no local interstitial cooldown (the Bounce SDK owns spacing).
+
+## AUTOMATIC SKILL TRIGGERS (always on)
+The owner only prompts. Match the request to a cue below (plus the router hint and `skills/INDEX.md`), load the listed skills yourself, and finish only with the listed evidence. Names are skill folders; no evidence = not done.
+
+| Cue in the task or in what you see | Mandatory skills | Completion evidence |
+|---|---|---|
+| Any UI, HUD, popup, layout, text, button, icon, tab, shop, toast (even one value) | `ui-always`, `ui-center-alignment`, `ui-layout-audit`, `ui-scaling-safe-area-checklist`, `ui-text-tmp`, `tmp-font-optimization` | measured dx/dy <= 1 px, audit totals, Play screenshot looked at |
+| Art, icon, skybox, 3D, Blender generation | `art-direction-asset-pipeline` (+ `clone-ip-safety`) | style card, in-engine screenshot, provenance line |
+| Slow, FPS, hitch, heat, memory | `perf-triage-ladder`, `mobile-perf-audit`, `profiling-evidence` | profiler numbers, or "not measured on device" |
+| Economy, prices, offline, rebirth, rewards | `simulator-pacing-checks`, `economy-progression-design`, `consistency-check` | sim run before/after, pacing within tolerance |
+| Saves, data, migration | `save-and-crash-safety`, `data-persistence-facts` | old save loads, migration test |
+| Text strings, languages | `localization-pipeline` | key count per language, no hard-coded text |
+| URP, render, post, lighting, shaders | `urp-postprocessing-volumes`, `urp-renderer-feature-review` | pipeline asset diff, device-tier check |
+| Triggers, collisions, hits | `collision-registry`, `physics-callback-troubleshooting` | no per-object OnTrigger+GetComponent |
+| Pathfinding, bots moving | `ai-navigation-setup` | agent reaches target in Play |
+| Audio files, mixer | `audio-import-and-mixer-optimization` | import settings table |
+| Atlas, sprites, draw calls | `sprite-atlas-v2` | draw-call count before/after |
+| New feature or system | `spec-then-plan`, `config-and-factory-authoring`, `done-means-wired` | spec/plan, wired in scene, used in game |
+| Level or map layout | `level-whitebox-checklist` | walk test, composition screenshot |
+| New idea, mechanic, risky experiment | `prototype-keep-kill` | keep/kill verdict |
+| Every finish | `test-evidence-review`, `regression-suite` | tests actually run, PASS/SKIP counts, empty Console |
+| Phase ends ("ready for next phase") | `gate-check` | PASS/CONCERNS/FAIL with evidence list |
+| Cleaning, deleting old code | `tech-debt` | unused-proof (GUID/path scan), separate commit |
+| Long session, many scene or mode switches | `soak-test` | repeated flow, no leaks |
+| Writing or editing a skill | `skill-quality-rubric`, `spec-then-plan` | lint 0 errors, publish run |
+
+- `rigor:` line. Default `rigor: minimal` (solo/live games, see `rigor-switch`): no ceremony for small, clear tasks. Live games and any UI, save or IAP change never drop below the safety rules in this file (no data loss, tests run, Play verification, parental gate in front of money).
+- Research first, skills stay out of context until needed: inspect the project and read the one or two matching skills at the moment a cue fires (names and descriptions are the only preloaded text). Drop a skill when its step ends and re-route when the work pivots. If no skill matches, say "no matching skill; closest: X" and proceed with the general rules; never invent a skill name.
+- Observation cues count as prompts: a misaligned screenshot, a failing test, a console error or a slow frame loads the matching skills at once (`systematic-debugging`, `unity-log-triage`, `ui-always`).

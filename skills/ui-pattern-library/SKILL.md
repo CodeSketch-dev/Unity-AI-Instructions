@@ -1,6 +1,6 @@
 ---
 name: ui-pattern-library
-description: "Reusable game-independent UI patterns (shops, settings, daily login, gacha, jackpot, rating, revive, inventory, rebirth, wheel, quests...) with layout contract, states, behavior and variants. Use before building any shop, list, popup or page, or when told \"same format as our other games\". Part of the ui-always set: read skills/ui-always first for any UI task."
+description: "Game-independent UI patterns (shop, settings, daily login, gacha, jackpot, rating, revive, inventory, rebirth, wheel, quests) with layout contract, states and variants. Use before building any shop, list, popup or page. Part of the ui-always set."
 ---
 
 # UI pattern library

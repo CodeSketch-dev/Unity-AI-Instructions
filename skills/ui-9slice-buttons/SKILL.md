@@ -1,6 +1,6 @@
 ---
 name: ui-9slice-buttons
-description: "How to cut sprite 9-slice borders (TextureImporter spriteBorder) for UI buttons, tabs and plates so Image Type=Sliced stretches with no notch, seam, dark line or broken outline at any size. Use when importing, restyling or fixing any button/tab/plate sprite, when a button shows artifacts at some size, or when a button sprite has zero borders. Part of the ui-always set: read skills/ui-always first for any UI task."
+description: "Cut sprite 9-slice borders (spriteBorder) for buttons, tabs and plates so Sliced images stretch with no notch, seam or broken outline. Use when importing or restyling a button sprite, or one shows artifacts at some size. Part of the ui-always set."
 ---
 
 # 9-slice buttons (cut borders from pixels, never by eye)

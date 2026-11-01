@@ -1,6 +1,7 @@
 ---
 name: data-persistence-facts
 description: Facts about how DataBlock saves and loads (triggers, path, key, failure behavior, serializer). Use when debugging lost saves, save timing, migrations or a data change that did not persist.
+triggers: save data, save lost, luu du lieu, mat save
 ---
 
 # Data persistence facts

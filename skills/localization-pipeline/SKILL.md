@@ -1,6 +1,7 @@
 ---
 name: localization-pipeline
 description: "Localization workflow: keys only in code, CSV export and import, lint for missing keys and length, fonts per locale, RTL, glyph preload. Use when a GDD needs more than one language."
+triggers: localization, languages, translate, translation, strings, i18n, ngon ngu, dich
 ---
 
 # Localization pipeline

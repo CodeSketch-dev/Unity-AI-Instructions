@@ -1,7 +1,7 @@
 ---
 name: art-direction-asset-pipeline
 description: "Art-direction pipeline for cohesive icons, UI, skyboxes and 3D props: style card, hero target, family batches, deterministic cleanup, in-engine check, provenance. Use when generating or sourcing a set of game art with Codex image tools or Blender."
-triggers: art direction, style bible, style card, icon set, cohesive art, skybox set, ui kit art, asset manifest, hero asset, drift, codex image, imagegen, blender props, asset family, phong cach, bo icon, dong bo hinh, tao anh, tao icon
+triggers: art direction, style bible, style card, icon set, cohesive art, skybox set, ui kit art, asset manifest, hero asset, drift, codex image, imagegen, blender props, asset family, phong cach, bo icon, dong bo hinh, tao anh, tao icon, skybox, icons, generate icons, generate art, sprite sheet, tao skybox
 ---
 
 # Art-direction asset pipeline

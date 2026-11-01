@@ -1,0 +1,29 @@
+# Router upgrade (2026-11-02)
+
+Scope: items 2 (cap), 4 (negative triggers), 7 (gap statement) from AWESOME-GAMEDEV-REPORT.md; item 5 (lint errors) fixed. Item 3 (pivot detection) and composition ordering (item 2 ordering) were NOT applied: they need per-session state in the hooks and cannot be verified by calling the PowerShell function alone.
+
+## Changes
+- `tools/build_skill_router.py`: optional `not:` frontmatter (comma list). Stored as `"x"` only when non-empty, so skills without `not:` produce identical JSON entries. Name tokens `not` and `for` added to the name stop list (they made `rule-port-not-invent` and every `*-for-*` skill match unrelated prompts).
+- `skill_router_lib.ps1`: new `Get-RoutedMatch` (cap 5, negative triggers subtract 3 per phrase and only when the skill already scored, `strong` = best score >= 6) and `Get-RoutedHint` (names when strong, otherwise `no strong match; closest: X`, empty when nothing scores). `Get-RoutedSkills` keeps its signature and now returns the capped, negative-aware names.
+- `skill_observe_hook.ps1`: plan-routing message uses the hint and says not to invent skill names when there is no strong match. `ui_gate_reminder.ps1` has its own copy of the scoring and was left unchanged (documented, not verified).
+- Triggers added where tests showed a miss: ui-always, localization-pipeline, bot-path-follow-smoothing, art-direction-asset-pipeline, save-and-crash-safety, data-persistence-facts. `not:` added to recipe-add-skin-or-item/minigame/pickup (localization) and price-button-contract (perf words).
+- VI_MAP: `ban mau` -> prototype keep kill (it still also fires `ban` -> shop; limitation of the substring map).
+
+## Test table (PowerShell function run on sample prompts; before = old lib + old json, after = new)
+| Prompt | Before | After | Hint after |
+|---|---|---|---|
+| fix the shop popup button text not centered | [10] ui-ink-audit,shop-tab-page-checklist,ui-text-autofit-system,rule-port-not-invent,ui-text-tmp,price-button-contract,ui-popup-anatomy,ui-title-band-centering,ui-style-rules,ui-popup-from-demo | [5] ui-always,ui-ink-audit,shop-tab-page-checklist,ui-text-autofit-system,ui-text-tmp | ui-always, ui-ink-audit, shop-tab-page-checklist, ui-text-autofit-system, ui-text-tmp |
+| can giua chu trong nut mua o cua hang | [10] price-button-contract,shop-tab-page-checklist,ui-icon-label-layout,ui-center-alignment,ui-text-tmp,ui-text-autofit-system,text-spread,world-label-recipes,shop-skin-preview,ui-layout-audit | [5] ui-always,price-button-contract,shop-tab-page-checklist,ui-icon-label-layout,ui-center-alignment | ui-always, price-button-contract, shop-tab-page-checklist, ui-icon-label-layout, ui-center-alignment |
+| game bi giat lag tren may android yeu, toi uu fps | [4] perf-triage-ladder,mobile-perf-audit,price-button-contract,character-perf-budgets | [3] perf-triage-ladder,mobile-perf-audit,character-perf-budgets | perf-triage-ladder, mobile-perf-audit, character-perf-budgets |
+| balance the economy prices and offline income for rebirth | [7] simulator-pacing-checks,economy-progression-design,settings-pause-offline,ui-ink-audit,auto-balance-loop,economy-loop-archetypes,auto-balance-game | [5] economy-autobalance-simulator,simulator-pacing-checks,economy-progression-design,unity-offline-compile-gate,ui-ink-audit | economy-autobalance-simulator, simulator-pacing-checks, economy-progression-design, unity-offline-compile-gate, ui-ink-audit |
+| add localization for 7 languages | [5] ui-localization,recipe-add-skin-or-item,localization-pipeline,recipe-add-minigame,recipe-add-pickup | [2] localization-pipeline,ui-localization | localization-pipeline, ui-localization |
+| the bots wobble on waypoints | [4] bots-as-players,npc-bots-and-enemies,bot-brain-waypoints,bot-path-follow-smoothing | [5] bot-path-follow-smoothing,npc-bots-and-enemies,npc-fake-multiplayer-pattern,bot-brain-waypoints,bots-as-players | bot-path-follow-smoothing, npc-bots-and-enemies, npc-fake-multiplayer-pattern, bot-brain-waypoints, bots-as-players |
+| import a skybox and generate icons with codex | [3] scene-authored-prefabs,audio-import-and-mixer-optimization,import-presets | [5] art-direction-asset-pipeline,scene-authored-prefabs,ui-always,day-night-world-reset-pattern,audio-import-and-mixer-optimization | art-direction-asset-pipeline, scene-authored-prefabs, ui-always, day-night-world-reset-pattern, audio-import-and-mixer-optimization |
+| luu du lieu bi mat save data lost after update | [4] data-persistence-facts,save-and-crash-safety,item-data-driven-behavior,data-block-template | [5] data-persistence-facts,save-and-crash-safety,data-block-template,item-data-driven-behavior,hot-loop-data-batching | data-persistence-facts, save-and-crash-safety, data-block-template, item-data-driven-behavior, hot-loop-data-batching |
+| make a pizza recipe for dinner | [0]  | [0]  | (silent) |
+| ban mau y tuong moi co che nay | (not in baseline run) | [4] prototype-keep-kill,shop-tab-page-checklist,shop-skin-preview,character-pack-skin-shop | prototype-keep-kill, shop-tab-page-checklist, shop-skin-preview, character-pack-skin-shop |
+| add a leaderboard with ranks | (not in baseline run) | [3] recipe-add-skin-or-item,recipe-add-pickup,recipe-add-minigame | no strong match; closest: recipe-add-skin-or-item |
+| make the dig feel more satisfying | (not in baseline run) | [1] game-feel-polish | no strong match; closest: game-feel-polish |
+
+Notes: "pizza" prompt is silent in both (no false match). The localization prompt no longer returns recipe-add-* (negative triggers). Weak-match hints appear for prompts whose best score is 3-5 (leaderboard, dig feel): the agent is told the gap instead of being handed three loosely related recipes as if strong.
+Known weakness: the 'strong' threshold (6) is a heuristic from these 12 prompts; revisit with more data.

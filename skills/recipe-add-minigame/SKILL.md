@@ -1,6 +1,7 @@
 ---
 name: recipe-add-minigame
 description: Add a minigame or mode (enum id, scene, selection asset, factory, data, UI entry, verification). Use when a GDD adds a new playable mode or stage type.
+not: localization, language, translate, ngon ngu
 ---
 
 # Recipe: add a minigame

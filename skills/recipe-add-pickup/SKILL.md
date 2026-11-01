@@ -1,6 +1,7 @@
 ---
 name: recipe-add-pickup
 description: Add a collectible (coin, gem, boost) with registry collision, data write, sfx, respawn and prefab. Use when a GDD or request adds a new pickup type.
+not: localization, language, translate, ngon ngu
 ---
 
 # Recipe: add a pickup

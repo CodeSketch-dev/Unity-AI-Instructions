@@ -2,6 +2,7 @@
 name: price-button-contract
 description: Contract for every in-game currency price button, card or unlock row (icon + price as one centred group, red when unaffordable, attention pulse, sold/owned state, top-up flow, no store component for soft currency). Use when building or fixing any shop, price button, card or unlock row.
 triggers: price button, shop card, unlock button, buy button, currency price, gem button, nut mua, gia, cua hang, nut gia
+not: fps, lag, profiler, optimize, giat, toi uu
 ---
 
 # Price button contract (any game)

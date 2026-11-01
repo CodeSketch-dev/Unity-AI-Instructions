@@ -1,6 +1,6 @@
 ---
 name: ui-layout-audit
-description: Run an automatic layout audit on the live UI in Play Mode (text centred in the free gap between icons/buttons, overlap, padding, ScrollRect margins, missing outline, tiny fonts) and fix every violation at its shared source. Use after ANY UI change, on any screenshot showing a UI defect, and before reporting UI work done.
+description: "Automatic layout audit of live UI in Play Mode (text centred in the free gap, overlap, padding, ScrollRect margins, missing outline, tiny fonts); fix every violation at its shared source. Use after ANY UI change and before reporting UI done."
 triggers: audit, ui audit, layout audit, check ui, kiem tra ui, can giua, outline, padding, overlap, lech, tran vien
 ---
 
