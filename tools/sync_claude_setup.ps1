@@ -11,7 +11,15 @@ $settingsPath = Join-Path $ClaudeHome 'settings.json'
 $hookScript = Join-Path $ClaudeHome 'pipeline-hooks\hooks\ui_gate_reminder.ps1'
 $cmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $hookScript + '"'
 if (Test-Path $settingsPath) {
-  $raw = Get-Content -Raw -LiteralPath $settingsPath
+  $fi = Get-Item -LiteralPath $settingsPath
+  if ($fi.Length -gt 5MB) {
+    $bigBak = $settingsPath + '.corrupt-' + (Get-Date -Format yyyyMMddHHmmss)
+    Write-Host ("settings.json is " + $fi.Length + " bytes (corrupt); moving to " + $bigBak + " and restoring from the first backup")
+    Move-Item -LiteralPath $settingsPath -Destination $bigBak
+    $good = $settingsPath + '.before-ai-instructions'
+    if (Test-Path $good) { Copy-Item -LiteralPath $good -Destination $settingsPath } else { [IO.File]::WriteAllText($settingsPath, '{}', $utf8) }
+  }
+  $raw = [IO.File]::ReadAllText($settingsPath, $utf8)
   if ([string]::IsNullOrWhiteSpace($raw)) { $s = [pscustomobject]@{} } else { $s = $raw | ConvertFrom-Json }
   $bak = $settingsPath + '.before-ai-instructions'
   if (-not (Test-Path $bak)) { Copy-Item -LiteralPath $settingsPath -Destination $bak }
