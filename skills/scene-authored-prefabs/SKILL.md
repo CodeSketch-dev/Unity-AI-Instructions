@@ -24,3 +24,11 @@ Why: the owner vibe-codes. Everything must be findable and hand-tunable in the H
 
 ## Done check
 Prefab exists, scene instance is a prefab instance, scene saved, compile clean, Play 5 s with empty Console.
+
+## Role suffixes (Knife Tower)
+- `<X>_Asset` ScriptableObject entry (in `Configs/<Feature>/`); `Factory_<X>` ScriptableObjectSingleton registry; `Data_<X>` DataBlock; `<X>_Config` tuning; `<X>_Component : MonoCached` base that resolves the owner and is the parent of every sub-part (`Character_Dead`, `_Fx`, `_Sfx`, `_Renderer`); `<X>_Static` helpers; `<X>_Type` enum; `<X>_Manager` / `_Master`; `<X>_State_<Name>`; `<X>_Item/_Tab/_Popup/_Button/_UI`; `Event_<Feature>_<Noun>_<Verb>`.
+- A game owns a prefix (`Dig_`, `SKB_`): `Logic/<Game>/<Sub>/<Prefix>_<Sub>_<Part>.cs`, e.g. `Logic/Dig/Rush/Dig_Rush_Clock.cs`.
+- One MonoBehaviour per file, file name == class name. A class in a differently named file bakes into prefabs as a MISSING script.
+
+## UI prefabs
+- Page prefab (script on root: `_scrollRect`, `_itemPrefab`) spawns an item prefab per entry. Item prefab root = Button (`Image, Button, UIPressPrimeTween, AudioButtonSfx, <Feature>_Item`), children `Frame_*`, `Thumbnail`, `Btn_*`, `Text_*`. Fields `_btnX/_txtX/_imgX/_goX`. Use prefab variants for items that differ only by art/labels. Prefab folders mirror features (`Prefabs/Shop/Skin`).
