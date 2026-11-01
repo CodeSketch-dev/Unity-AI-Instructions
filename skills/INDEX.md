@@ -370,6 +370,7 @@
 - unity-mcp-workflow - Drive the Unity Editor through MCP safely: discover tools, inspect read-only first, edit prefab assets not scene overrides, batch, save, compile, read Console, screenshot, fallback. Use for any scene/prefab/asset/Play Mode/Console task.
 - unity-project-bootstrap - Set up a new Unity 6 mobile project: packages, folders, asmdefs, URP tiers, platform settings, scene flow, git ignore/LFS, first compile check. Use when starting a game or \"init the project\".
 - unity-qa-playtest - Plan and run QA for a feature or build: test matrix, Play Mode via MCP, aspect ratios, fresh/saved data, interruptions, perf sanity, bug reports. Use on \"test it\", \"QA this\", before milestones or human playtests.
+- unity-script-migration - Use when mass-renaming or moving Unity C# scripts into a feature folder layout (Logic/<Game>/<Feature>/<Prefix>_<Feature>_<Part>.cs) without breaking scenes, prefabs, tests or saves. Ships a GUID-safe rename tool with a C# lexer.
 - unity-ui - Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab. Part of the ui-always set: read skills/ui-always first for any UI task.
 
 ## user
