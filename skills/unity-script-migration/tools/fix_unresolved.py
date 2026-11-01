@@ -1,9 +1,11 @@
-"""Heal references to old type names: map unresolved PascalCase identifiers to the declared Dig_<Feature>_<Part> type with the same normalized key.
+"""Heal references to old type names: map unresolved PascalCase identifiers to the declared <Prefix>_<Feature>_<Part> type with the same normalized key.
 usage: python fix_unresolved.py [--apply]"""
 import os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cs_lex import lex
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Assets', '_Game'))
+import migration_config as cfg
+P = cfg.prefix
+ROOT = cfg.game_root
 TYPE_RE = re.compile(r'\b(?:class|struct|enum|interface|delegate\s+\w+)\s+(\w+)')
 files = []
 for d, _, fs in os.walk(ROOT):
@@ -15,11 +17,11 @@ declared = set()
 for t in texts.values():
     declared.update(TYPE_RE.findall(t))
 def key(n):
-    n = re.sub(r'^I(?=Dig_)', '', n)
-    return re.sub(r'_|Dig', '', n).lower()
+    n = re.sub(r'^I(?=' + P + '_)', '', n)
+    return re.sub('_|' + P, '', n).lower()
 by_key = {}
 for n in declared:
-    if n.startswith(('Dig_', 'IDig_')):
+    if n.startswith((P + '_', 'I' + P + '_')):
         by_key.setdefault(key(n), set()).add(n)
 fix = {}
 for k, v in by_key.items():
@@ -34,12 +36,12 @@ for p, t in texts.items():
         if is_code:
             def rep(m):
                 w = m.group(0)
-                if w in declared or w.startswith(('Dig_', 'IDig_')):
+                if w in declared or w.startswith((P + '_', 'I' + P + '_')):
                     return w
                 k = key(w)
-                if k in fix and (re.match(r'^I?Dig[A-Z]', w)) and len(k) > 6:
+                if k in fix and (re.match(r'^I?' + P + '[A-Z]', w)) and len(k) > 6:
                     report[w] = fix[k]
-                    return fix[k] if not (w.startswith('I') and fix[k].startswith('IDig_')) else fix[k]
+                    return fix[k] if not (w.startswith('I') and fix[k].startswith('I' + P + '_')) else fix[k]
                 return w
             seg = tok.sub(rep, seg)
         out.append(seg)

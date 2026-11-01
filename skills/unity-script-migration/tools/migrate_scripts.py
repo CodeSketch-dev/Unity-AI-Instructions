@@ -1,19 +1,20 @@
 #!/usr/bin/env python
-"""Rename + move C# classes (file and .meta together) and rewrite identifiers outside string literals.
+"""Rename + move C# classes (file and .meta together, GUID kept) and rewrite identifiers in code (not in strings/comments).
 
-usage: python migrate_scripts.py mapping.json [--apply]
-mapping.json: {"OldClass": "Runtime/Logic/Dig/Rush/Dig_Rush_Clock", ...}   (path relative to Assets/_Game/DigEgg, no .cs, e.g. Runtime/Logic/Dig/Rush/Dig_Rush)
-Without --apply it only prints the plan.
+usage: python migrate_scripts.py mapping.json [--apply] [--strings-only]
+mapping.json: {"OldClass": "Scripts/Logic/<Prefix>/Rush/<Prefix>_Rush_Clock", ...}   (path relative to gameRoot, no .cs)
+Without --apply it only prints the plan. --strings-only keeps files where they are and only rewrites references.
+Project settings (prefix, namespace, roots): see migration_config.py / Tools/migration.json.
 """
 import json, os, re, sys, shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cs_lex import lex
+import migration_config as cfg
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-ASSETS = os.path.join(ROOT, 'Assets')
-SCRIPTS = os.path.join(ASSETS, '_Game')   # mapping paths are relative to Assets/_Game, e.g. Scripts/Logic/Dig/Rush/Dig_Rush
-SEARCH_ROOTS = [os.path.join(ASSETS, '_Game'), os.path.join(ASSETS, 'SketchSdk')]
-STR_RE = re.compile(r'(\$@"(?:[^"]|"")*"|@"(?:[^"]|"")*"|\$"(?:\.|[^"\\n])*"|"(?:\.|[^"\\n])*"|//[^\n]*)')
+ROOT = cfg.PROJECT_ROOT
+SCRIPTS = cfg.game_root
+SEARCH_ROOTS = cfg.search_roots
+NS = re.escape(cfg.namespace + '.')
 
 
 def all_cs():
@@ -24,86 +25,78 @@ def all_cs():
                     yield os.path.join(d, f)
 
 
+def move_with_meta(src, dst):
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    shutil.move(src, dst)
+    if os.path.exists(src + '.meta'):
+        shutil.move(src + '.meta', dst + '.meta')
+
+
 def main():
     mapping = json.load(open(sys.argv[1], encoding='utf8'))
     apply = '--apply' in sys.argv
+    strings_only = '--strings-only' in sys.argv
     files = {}
     for p in all_cs():
-        base = os.path.basename(p)[:-3]
-        files.setdefault(base, []).append(p)
+        files.setdefault(os.path.basename(p)[:-3], []).append(p)
     assets = []
-    for d, _, fs in os.walk(os.path.join(ASSETS, '_Game')):
-        for f in fs:
-            if f.endswith('.asset'):
-                assets.append(f)
+    for r in SEARCH_ROOTS:
+        for d, _, fs in os.walk(r):
+            assets.extend(f for f in fs if f.endswith('.asset'))
     ren = {}
-    extra = {}   # partial companions: 'Old.Suffix' -> new path
+    extra = {}   # partial companions: 'Old.Suffix' -> (new file base, new path)
     for old, newpath in mapping.items():
         if any(old in a for a in assets):
-            print('SKIP (asset named after class):', old); continue
+            print('SKIP (asset named after class):', old)
+            continue
+        if strings_only:
+            ren[old] = (os.path.basename(newpath), newpath)
+            continue
+        if old not in files or len(files[old]) != 1:
+            print('SKIP (missing/ambiguous file):', old, files.get(old))
+            continue
+        ren[old] = (os.path.basename(newpath), newpath)
         for b in list(files):
             if b.startswith(old + '.') and len(files[b]) == 1:
                 extra[b] = (os.path.basename(newpath) + b[len(old):], newpath + b[len(old):])
-        if '--strings-only' in sys.argv:
-            ren[old] = (os.path.basename(newpath), newpath); continue
-        if old not in files or len(files[old]) != 1:
-            print('SKIP (missing/ambiguous file):', old, files.get(old)); continue
-        new = os.path.basename(newpath)
-        ren[old] = (new, newpath)
-    # string literals equal to an old name -> report
-    pat = re.compile(r'\b(' + '|'.join(sorted(map(re.escape, ren), key=len, reverse=True)) + r')\b') if ren else None
-    texts = {}
-    for p in all_cs():
-        t = open(p, encoding='utf-8-sig').read()
-        texts[p] = t
-        if pat:
-            for m in STR_RE.finditer(t):
-                s = m.group(0)
-                if s.startswith('"') and pat.search(s):
-                    print('NOTE string literal mentions old name:', os.path.relpath(p, ROOT), s[:80])
+    if not ren:
+        print('nothing to do')
+        return
+    names = '|'.join(sorted(map(re.escape, ren), key=len, reverse=True))
+    pat = re.compile(r'\b(' + names + r')\b')
+    refl = re.compile(r'(' + NS + r')(' + names + r')\b')
+    texts = {p: open(p, encoding='utf-8-sig').read() for p in all_cs()}
+    for p, t in texts.items():
+        for is_code, seg in lex(t):
+            if not is_code and seg.startswith('"') and pat.search(seg) and cfg.namespace + '.' not in seg:
+                print('NOTE string literal mentions an old name:', os.path.relpath(p, ROOT), seg[:80])
     print('plan:', len(ren), 'renames')
     for o, (n, pth) in ren.items():
         print(' ', o, '->', pth)
-    if not apply or not ren:
+    if not apply:
         return
     for p, t in texts.items():
-        refl = re.compile(r'(Game\.DigEgg\.)(' + '|'.join(sorted(map(re.escape, ren), key=len, reverse=True)) + r')')
         out = []
         for is_code, seg in lex(t):
             if is_code:
                 out.append(pat.sub(lambda m: ren[m.group(1)][0], seg))
-            elif seg.startswith('"') and 'Game.DigEgg.' in seg:
+            elif seg.startswith('"') and cfg.namespace + '.' in seg:
                 out.append(refl.sub(lambda m: m.group(1) + ren[m.group(2)][0], seg))
             else:
                 out.append(seg)
         nt = ''.join(out)
         if nt != t:
             open(p, 'w', encoding='utf-8', newline='').write(nt)
-    if '--strings-only' in sys.argv:
-        print('strings fixed'); return
+    if strings_only:
+        print('references rewritten')
+        return
     for old, (new, newpath) in ren.items():
-        src = files[old][0]
-        dst = os.path.join(SCRIPTS, newpath.replace('/', os.sep) + '.cs')
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        shutil.move(src, dst)
-        if os.path.exists(src + '.meta'):
-            shutil.move(src + '.meta', dst + '.meta')
+        move_with_meta(files[old][0], os.path.join(SCRIPTS, newpath.replace('/', os.sep) + '.cs'))
     for b, (nb, np_) in extra.items():
         src = files[b][0]
-        if not os.path.exists(src):
-            continue
-        dst = os.path.join(SCRIPTS, np_.replace('/', os.sep) + '.cs')
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        shutil.move(src, dst)
-        if os.path.exists(src + '.meta'):
-            shutil.move(src + '.meta', dst + '.meta')
-    # reflection type names in strings: "Game.DigEgg.OldName," / "...OldName\""
-    new_by_old = {o: n for o, (n, _) in ren.items()}
-    for p2 in all_cs():
-        t2 = open(p2, encoding='utf-8-sig').read()
-        n2 = re.sub(r'(Game\.DigEgg\.)(\w+)(?=[,"])', lambda mm: mm.group(1) + new_by_old.get(mm.group(2), mm.group(2)), t2)
-        if n2 != t2:
-            open(p2, 'w', encoding='utf-8', newline='').write(n2)
+        if os.path.exists(src):
+            move_with_meta(src, os.path.join(SCRIPTS, np_.replace('/', os.sep) + '.cs'))
+    # reflection type names that were not in the mapping keys are left alone; the ones in it were handled above
     print('applied')
 
 

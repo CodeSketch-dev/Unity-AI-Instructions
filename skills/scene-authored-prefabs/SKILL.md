@@ -22,7 +22,7 @@ Why: the owner vibe-codes. Everything must be findable and hand-tunable in the H
 - Check `.gitignore` before naming a feature folder `Tutorial`, `HowTo`, `Examples` (Unity templates ignore them).
 
 ## Script naming (counted on Knife Tower, 579 Logic files)
-- `Logic/<Feature>/<Feature>.cs` and `<Feature>_<Part>.cs` (`Character`, `Character_Dead`, `AI_Renderer`); one extra folder level for sub-features. A game owns a prefix: `Logic/Dig/Rush/Dig_Rush_Clock.cs`. Namespace flat (`Game`), one type per file, file name == class name.
+- `Logic/<Feature>/<Feature>.cs` and `<Feature>_<Part>.cs` (`Character`, `Character_Dead`, `AI_Renderer`); one extra folder level for sub-features. A game owns a prefix: `Logic/<Game>/Rush/<Game>_Rush_Clock.cs`. Namespace flat (`Game`), one type per file, file name == class name.
 - Suffixes: `_Asset` ScriptableObject entry (21 files, assets in `Configs/<Feature>/`), `Factory_<X>` ScriptableObjectSingleton registry, `Data_<X>` DataBlock, `_Config`, `_Static` helpers, `_Type` enums, `_Component : MonoCached` base resolving the owner (most sub-parts derive from it), `_Manager`/`_Master`, `_State_<Name>`, `_Item/_Tab/_Popup/_Button/_UI/_GUI`, `_Detector`, `_Updater`, `_Receiver`. Interfaces `I<Name>`.
 - Events: `Event_<Feature>_<Noun>_<Verb>.cs` in `Scripts/Event/<Feature>/`.
 
@@ -30,7 +30,7 @@ Why: the owner vibe-codes. Everything must be findable and hand-tunable in the H
 - Cross-class notifications: `public class Event_X : IEvent` (payload by constructor, read-only properties); `StaticBus<Event_X>.Post(new Event_X(...))`; subscribe and unsubscribe symmetrically (OnEnable/OnDisable or Awake/OnDestroy); handler `StaticBus_<Name>(Event_X e)`.
 - Namespace `SketchEngine.Patterns.Observer`, assembly `SketchEngine.Patterns` (add to every asmdef that posts or subscribes).
 - Pure logic classes driven directly by unit tests may keep plain C# events.
-- Several instances of one facade can exist in tests: events raised by a facade carry `object Source` (`IDig_Source`), and tests subscribe with `Dig_TestBus.On<E>(source, handler)`, which filters by source and unsubscribes when the next test starts (static buses otherwise leak between tests). Templates in `skills/unity-script-migration/templates/`.
+- Several instances of one facade can exist in tests: events raised by a facade carry `object Source` (`I<Prefix>_Source`), and tests subscribe with `<Prefix>_TestBus.On<E>(source, handler)`, which filters by source and unsubscribes when the next test starts (static buses otherwise leak between tests). Templates in `skills/unity-script-migration/templates/`.
 
 ## UI pages (Shop as the model; verified by reading Knife Tower prefabs through MCP)
 - Page prefab: script on the root with `[SerializeField] ScrollRect _scrollRect; GameObject _itemPrefab;`, hierarchy `Root/Board/Content_BG/ScrollRect` + `Preview/...`, buttons `Button_*`. The page instantiates one item prefab per entry.

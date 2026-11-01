@@ -123,7 +123,7 @@ def lex(t):
 
 
 if __name__ == '__main__':
-    sample = 'int a = 1; // DigAds\nvar s = $"x {Foo(a ? "DigAds" : "b")} DigAds {DigAds.X}"; DigAds.Y(); char c=\'"\'; var v=@"DigAds ""q"" "; /* DigAds */ DigAds.Z();'
+    sample = 'int a = 1; // OldName\nvar s = $"x {Foo(a ? "OldName" : "b")} OldName {OldName.X}"; OldName.Y(); char c=\'"\'; var v=@"OldName ""q"" "; /* OldName */ OldName.Z();'
     for code, x in lex(sample):
         print(code, repr(x))
     assert ''.join(x for _, x in lex(sample)) == sample

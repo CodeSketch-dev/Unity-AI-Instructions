@@ -2,7 +2,7 @@
 """Convert the public `event Action<...>` members of one facade class to StaticBus events.
 
 usage: python events_to_bus.py <facade file> <EventFolderName> [--apply]
- - writes Scripts/Event/Dig/<EventFolderName>/Event_<Class>_<Name>.cs (payload names come from the trailing comment)
+ - writes <eventFolder>/<EventFolderName>/Event_<Prefix>_<Class>_<Name>.cs (payload names come from the trailing comment)
  - removes the declarations, turns `Name?.Invoke(a, b)` into `StaticBus<E>.Post(new E(a, b))`
  - rewrites method-group subscribers (`x.Name += Handler;` / `-=`) in other non-test files to StaticBus Subscribe/Unsubscribe and
    adds an adapter `void StaticBus_Handler(E e) => Handler(e.P1, ...)` above the handler definition
@@ -10,8 +10,11 @@ usage: python events_to_bus.py <facade file> <EventFolderName> [--apply]
 Lambdas and handlers defined in other partial files are reported; fix those by hand (compile errors list them too).
 """
 import os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import migration_config as cfg
 
-SCRIPTS = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Assets', '_Game', 'Scripts'))
+SCRIPTS = os.path.join(cfg.game_root, 'Scripts')
+P = cfg.prefix
 EV_DECL = re.compile(r'^(?P<ind>[ \t]*)public event (?:System\.)?Action(?:<(?P<types>[^;]*?)>)?\s+(?P<names>[\w, ]+);(?P<cmt>[ \t]*//[^\n]*)?[ \t]*\n', re.M)
 
 
@@ -48,7 +51,7 @@ def main():
     apply = '--apply' in sys.argv
     src = read(facade_path)
     cls = re.search(r'\bclass\s+(\w+)', src).group(1)
-    short = cls.replace('Dig_', '', 1)            # World_Steal
+    short = cls.replace(P + '_', '', 1)            # e.g. World_Steal
     events = []
     for m in EV_DECL.finditer(src):
         types = split_top(m.group('types')) if m.group('types') else []
@@ -65,7 +68,7 @@ def main():
                 props.append((t, nm))
             events.append((n, props))
     print(cls, 'events:', [(n, [p[1] for p in ps]) for n, ps in events])
-    evname = lambda n: 'Event_Dig_%s_%s' % (short, n)
+    evname = lambda n: cfg.event_prefix + '%s_%s' % (short, n)
     # all non-test sources
     files = {}
     for d, _, fs in os.walk(SCRIPTS):
@@ -76,13 +79,13 @@ def main():
     for t in files.values():
         for m in re.finditer(r'\b' + cls + r'\??\s+(\w+)', t):
             receivers.add(m.group(1))
-    for t in files.values():       # properties typed as the facade, e.g. `public Dig_World_Steal Steal { get; ... }` are covered above
+    for t in files.values():       # properties typed as the facade, e.g. `public <Prefix>_World_Steal Steal { get; ... }` are covered above
         pass
     print('receivers:', sorted(receivers))
     report = []
     new_files = {}
     for n, props in events:
-        body = ['using SketchEngine.Patterns.Observer;', '', 'namespace Game.DigEgg', '{', '    public class %s : IEvent, IDig_Source' % evname(n), '    {', '        public object Source { get; }']
+        body = ['using SketchEngine.Patterns.Observer;', '', 'namespace ' + cfg.namespace, '{', '    public class %s : IEvent, %s' % (evname(n), cfg.source_interface), '    {', '        public object Source { get; }']
         for t, nm in props:
             body.append('        public %s %s { get; }' % (t, nm))
         body.append('')
@@ -93,7 +96,7 @@ def main():
             body.append('            %s = %s;' % (nm, nm[:1].lower() + nm[1:]))
         body.append('        }')
         body += ['    }', '}', '']
-        new_files[os.path.join(SCRIPTS, 'Event', 'Dig', folder, evname(n) + '.cs')] = '\n'.join(body)
+        new_files[os.path.join(cfg.game_root, cfg.event_folder.replace('/', os.sep), folder, evname(n) + '.cs')] = '\n'.join(body)
     # facade rewrite
     nsrc = EV_DECL.sub('', src)
     for n, props in events:

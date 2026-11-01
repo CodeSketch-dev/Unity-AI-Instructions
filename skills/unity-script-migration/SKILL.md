@@ -6,17 +6,17 @@ triggers: rename scripts, move scripts, split classes, one class per file, refac
 
 # Unity script migration (GUID-safe, batch, verified)
 
-Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). They were written for a project whose game prefix is `Dig` and whose scripts live under `Assets/_Game`; for another game change the constants at the top of each file (`SEARCH_ROOTS`/`SCRIPTS`/`ROOT`, the `Dig_` prefix in `new_name()` and `gen_all.py`, `Event_Dig_` in `events_to_bus.py`). Test templates: `templates/Dig_TestBus.cs`, `templates/IDig_Source.cs`.
+Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). All project settings live in `Tools/migration.json` (copy `tools/migration.example.json`; keys documented in `migration_config.py`): game prefix, namespace, roots, runtime/editor/event folders. Test templates with `{{Prefix}}`/`{{Namespace}}` placeholders: `templates/Prefix_TestBus.cs`, `templates/IPrefix_Source.cs`.
 
 | Tool | Does |
 |---|---|
 | `migrate_scripts.py map.json [--apply] [--strings-only]` | rename classes + move `.cs/.meta` together (GUID kept), rewrite identifiers in code only (lexer), interpolation holes, reflection strings `"Ns.Old, Asm"`; skips classes that have a same-named `.asset`; moves partial companions |
 | `cs_lex.py` | C# lexer used by the others (code vs strings/comments/chars) |
-| `gen_all.py` | build `map.json` from `Dig<Feature><Part>` names |
+| `gen_all.py <folder>` | build `map.json` from flat `<Prefix><Feature><Part>` class names (editor files go to the editor folder) |
 | `split_types.py <folder> [--apply]` | one type per file; never moves `partial`; skips files with several namespaces / `#if` / `#region`; keeps the old name on collision; refuses to overwrite |
-| `fix_unresolved.py [--apply]` | heal leftover `DigXxx` identifiers by matching normalized names of declared types (only identifiers starting with `Dig`) |
+| `fix_unresolved.py [--apply]` | heal leftover `<Prefix>Xxx` identifiers by matching normalized names of declared types (only identifiers starting with `Dig`) |
 | `events_to_bus.py <facade.cs> <EventFolder> [--apply]` | facade `public event Action<..>` -> `Event_*` classes (with `Source`) + `StaticBus.Post`, rewrites method-group subscribers |
-| `tests_to_bus.py errors.txt` | rewrite test lambdas that subscribed to removed facade events into `Dig_TestBus.On<E>(source, e => ...)` (input = compile-error lines) |
+| `tests_to_bus.py errors.txt` | rewrite test lambdas that subscribed to removed facade events into `<Prefix>_TestBus.On<E>(source, e => ...)` (input = compile-error lines) |
 | `style_audit.py <root>` | per-feature counts: events, coroutines, Update(), MonoBehaviour, explicit private, #region, file != class |
 
 ## Loop (one batch = one feature or a handful; commit after each green batch)
@@ -41,4 +41,4 @@ Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). 
 - Duplicate truth: baked prefabs written by Editor bakers may already exist elsewhere; search for them (`AssetDatabase.FindAssets`) before converting scene objects to prefabs and keep one canonical copy.
 
 ## Review status (verified vs not)
-Verified on a 900-file project: GUID-safe moves, lexer renames, one-type-per-file splitting, StaticBus conversion of 4 facades, editor asmdef split; EditMode green after each step, scene and prefabs 0 missing scripts, 5 s Play clean. Not verified: other projects, Linux/macOS paths, PlayMode test suites (only a 5 s Play smoke), the tools' behaviour on `#if`-heavy files (they skip them).
+Verified on one 900-file project (a mobile Unity 6 game on SketchEngine): GUID-safe moves, lexer renames, one-type-per-file splitting, StaticBus conversion of 4 facades, editor asmdef split; EditMode green after each step, scene and prefabs 0 missing scripts, 5 s Play clean. Not verified: other projects, Linux/macOS paths, PlayMode test suites (only a 5 s Play smoke), the tools' behaviour on `#if`-heavy files (they skip them).

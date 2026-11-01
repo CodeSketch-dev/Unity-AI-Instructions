@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-"""Rewrite test subscriptions to removed facade events (`w.EggBroken += r => x = r;`) into Dig_TestBus.On<Event>(w, e => ...).
+"""Rewrite test subscriptions to removed facade events (`w.EggBroken += r => x = r;`) into <Prefix>_TestBus.On<Event>(w, e => ...).
 
-usage: python tests_to_bus.py <errors.txt>     (lines copied from the Unity console: path(line,col): error CS1061: 'Dig_World_X' does not contain a definition for 'Name' ...)
+usage: python tests_to_bus.py <errors.txt>     (lines copied from the Unity console: path(line,col): error CS1061: '<Prefix>_World_X' does not contain a definition for 'Name' ...)
 """
 import os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import migration_config as cfg
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-EV_DIR = os.path.join(ROOT, 'Assets', '_Game', 'Scripts', 'Event', 'Dig')
+EV_DIR = os.path.join(cfg.game_root, cfg.event_folder.replace('/', os.sep))
 
 
 def props_of(event_name):
@@ -33,7 +35,7 @@ def convert(stmt_rhs, props, ev):
 
 
 def main():
-    errs = re.findall(r'([^\s(\n][^()\n]*\.cs)\((\d+),(\d+)\).*?\'(Dig_World_\w+)\' does not contain a definition for \'(\w+)\'', open(sys.argv[1], encoding='utf-8').read())
+    errs = re.findall(r'([^\s(\n][^()\n]*\.cs)\((\d+),(\d+)\).*?\'(' + cfg.prefix + r'_World_\w+)\' does not contain a definition for \'(\w+)\'', open(sys.argv[1], encoding='utf-8').read())
     by_file = {}
     for path, ln, col, cls, name in errs:
         by_file.setdefault(path, []).append((int(ln), int(col), cls, name))
@@ -42,7 +44,7 @@ def main():
         lines = open(p, encoding='utf-8-sig').read().split('\n')
         for ln, col, cls, name in sorted(items, key=lambda x: (x[0], -x[1])):
             line = lines[ln - 1]
-            ev = 'Event_Dig_%s_%s' % (cls.replace('Dig_', '', 1), name)
+            ev = cfg.event_prefix + '%s_%s' % (cls.replace(cfg.prefix + '_', '', 1), name)
             props = props_of(ev)
             if props is None:
                 print('no event', ev)
@@ -70,7 +72,7 @@ def main():
                 print('multi-line handler, fix by hand', path, ln)
                 continue
             rhs = rest[:end]
-            new = 'Dig_TestBus.On<%s>(%s, %s);' % (ev, mm.group(1), convert(rhs, props, ev))
+            new = '%s.On<%s>(%s, %s);' % (cfg.test_bus, ev, mm.group(1), convert(rhs, props, ev))
             line = line[:mm.start()] + new + rest[end + 1:]
             lines[ln - 1] = line
         open(p, 'w', encoding='utf-8', newline='').write('\n'.join(lines))
