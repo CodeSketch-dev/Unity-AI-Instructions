@@ -32,3 +32,10 @@ Prefab exists, scene instance is a prefab instance, scene saved, compile clean, 
 
 ## UI prefabs
 - Page prefab (script on root: `_scrollRect`, `_itemPrefab`) spawns an item prefab per entry. Item prefab root = Button (`Image, Button, UIPressPrimeTween, AudioButtonSfx, <Feature>_Item`), children `Frame_*`, `Thumbnail`, `Btn_*`, `Text_*`. Fields `_btnX/_txtX/_imgX/_goX`. Use prefab variants for items that differ only by art/labels. Prefab folders mirror features (`Prefabs/Shop/Skin`).
+
+## Events: StaticBus recipe (verified)
+- Cross-class notifications: `Event_<Game>_<Feature>_<Noun>_<Verb> : IEvent` in `Scripts/Event/<Game>/<Feature>/`; payload via constructor, read-only properties. Post with `StaticBus<T>.Post(new T(...))`.
+- Subscribe/unsubscribe symmetrically (OnEnable/OnDisable or Awake/OnDestroy); handler method `StaticBus_<Name>(Event_... e)`.
+- asmdef projects must reference `SketchEngine.Patterns` (namespace `SketchEngine.Patterns.Observer`); add it to both the runtime and editor asmdef.
+- Pure logic classes driven by unit tests may keep plain C# events.
+- Editor scripts live in `Scripts/Editor/<Game>/<Feature>/` with their own editor-only asmdef (an `Editor` folder under a runtime asmdef would otherwise compile into the runtime assembly); tests that find editor types by reflection use `"Ns.Type, <EditorAsmdefName>"`.
