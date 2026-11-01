@@ -28,7 +28,13 @@ git add -A
 $dirty = git status --porcelain
 if ($dirty) {
   if (-not $Message) { $Message = 'skills: update ' + (Get-Date -Format 'yyyy-MM-dd HH:mm') + ' (' + $env:COMPUTERNAME + ')' }
-  git commit -q -m ($Message + $trailer)
+  $Message = $Message.Trim().Trim('"').Trim()
+  $msgFile = Join-Path $env:TEMP ('publish-msg-' + [guid]::NewGuid().ToString('N') + '.txt')
+  [System.IO.File]::WriteAllText($msgFile, ($Message + $trailer + "`n"), (New-Object System.Text.UTF8Encoding($false)))
+  git commit -q -F $msgFile
+  $rc = $LASTEXITCODE
+  Remove-Item $msgFile -ErrorAction SilentlyContinue
+  if ($rc -ne 0) { Write-Host 'git commit FAILED' -ForegroundColor Red; exit 1 }
   Write-Host ('committed: ' + $Message)
 } else { Write-Host 'nothing to commit' }
 
