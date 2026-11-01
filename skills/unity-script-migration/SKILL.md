@@ -27,3 +27,10 @@ Tools in `skills/unity-script-migration/tools/` (copy to the project's `Tools/`)
 - Asmdef: new folders must sit under the asmdef that already owns the files; move the asmdef itself last, in one step.
 - After tests, domain reload may be off: reopen the scene (`EditorSceneManager.OpenScene(path)`) before counting missing scripts; never leave a "save scene" dialog open.
 - Do big Unity calls (refresh after 250+ file moves) one at a time; the MCP may time out while Unity recompiles: wait, then check console.
+
+## Second pass: one type per file (split_types.py)
+- `split_types.py <folder> --apply` splits files with several top-level types into one file per type (new files named after the old type, then `migrate_scripts.py` renames/moves them). It never moves `partial` types, skips files with several namespace blocks / `#if` / `#region`, keeps the old name on collision, and refuses to overwrite.
+- If a run goes wrong, do NOT `git checkout`/`clean` broadly: `git stash push -u -m <why> -- <paths>` is recoverable.
+- `fix_unresolved.py --apply` heals identifiers (`Dig...`) left behind, using the compile errors as a guide; never let it touch non-prefixed names (it would turn Unity's `Resources` into your class).
+- Check `.gitignore` before creating folders named Tutorial/Examples/HowTo (Unity template ignores them): `git check-ignore -v <file>`.
+- Persisted classes (binary save) need `[assembly: BindTypeNameToType]`; a test over the save graph catches the ones you forgot.
