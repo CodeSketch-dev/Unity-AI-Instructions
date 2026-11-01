@@ -282,6 +282,7 @@
 - save-and-crash-safety - Save safety and crash basics: backup file rotation, checksum header, version migration chain, recovery events, safe-boot flag, crash reporting. Use when touching persistence or release readiness.
 
 ## scene
+- scene-authored-prefabs - Use when adding any manager, system, world piece, player/camera/GUI stack or skybox to a Unity project: build it as a prefab in Assets/_Game/Prefabs/<Feature>/ and place the instance in the scene; never spawn it at runtime. Also the folder and script naming layout.
 - scene-flow-loading - Scene flow and loading: boot scene order, loader screen with real plus fake progress, one-time costs behind loading, no blocking SDK init. Use when wiring scenes and startup.
 - scene-naming-conventions - Scene, prefab and asset naming conventions and folders for a clone project, checked by the naming lint. Use when creating scenes, prefabs or assets.
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints) callable from the menu and from Unity MCP. Use when a scene needs several bake steps run in the right order.
