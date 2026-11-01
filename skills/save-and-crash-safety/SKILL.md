@@ -14,3 +14,10 @@ Facts about the framework data layer come from `data-persistence-facts`; verify 
 - Safe boot: set a flag before init and clear it after the first frame; two failed boots in a row skip optional systems.
 - Crash tool in release builds (Crashlytics or Unity diagnostics) with a few custom keys; rate-limit duplicate exceptions.
 - Tests: kill during write, truncated file, zero-byte file, wrong version (`playmode-script-testing`). Editor menu to corrupt and restore a save helps QA.
+
+## Added from awesome-gamedev-agent-skills (2026-11-02)
+Source: third-party example. Inspired by: gamedev-skills/awesome-gamedev-agent-skills skills/disciplines/save-systems.
+- Save data and rebuild objects on load; never serialize scene object references or paths (renames break old saves).
+- Stamp a version from v1 and keep migrations in an ordered chain; write temp then rename, keep a .bak.
+- Treat the file as untrusted: validate, clamp, fall back to backup. Keep saves plain data (no object instantiation on load).
+- Autosave on safe boundaries to its own slot; never mid-action. Use locale-invariant number serialization.

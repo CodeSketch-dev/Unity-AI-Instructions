@@ -31,3 +31,11 @@ Zero damping with an instant (sharpness 1000) character gives the locked, snappy
 - Low-end: disable post-processing and depth texture per camera (`device-tier-policy`).
 
 Input wiring: `mobile-input-controls`. Intro flyover: `intro-camera-flyover`. Not verified in the Editor.
+
+## Added from awesome-gamedev-agent-skills (2026-11-02)
+Source: third-party example. Inspired by: gamedev-skills/awesome-gamedev-agent-skills skills/disciplines/camera-systems.
+- Frame-rate independent smoothing: use 1 - exp(-rate * dt) or SmoothDamp; a constant Lerp per frame is floaty at 30 fps and snappy at 144.
+- Follow after the target moved (LateUpdate or Cinemachine brain update method matching the mover) to avoid one-frame jitter.
+- Clamp pitch (about -80 to +45 deg orbit) and clamp bounds using the view half-size, not the center.
+- Compose smooth follow first, add shake as an additive offset last. On teleport/respawn either hard-cut and reset smoothing or fast-ease; never whip across the map.
+- Use a deadzone for twitchy games; decide box vs radial on purpose.

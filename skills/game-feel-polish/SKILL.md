@@ -40,3 +40,10 @@ Combat numbers (shake, punches, damage text, hit-stop proposal): `references/com
 
 ## Attention pulses stay subtle
 - Looping attention pulses (reward/watch-ad/CTA buttons) scale at most +3% with >= 1 s per half cycle (sine in/out); stronger reads as nervous and annoying (user feedback). Clamp the limits inside the pulse component so serialized prefab values cannot exceed them, and measure min/max scale in Play (sample for ~5 s).
+
+## Added from awesome-gamedev-agent-skills (2026-11-02)
+Source: third-party example. Inspired by: gamedev-skills/awesome-gamedev-agent-skills skills/disciplines/game-feel.
+- Shake from sampled noise times a decaying trauma value (amplitude = trauma squared), not a random offset per frame (buzzes like static). Shake the camera offset or a visual pivot, never the simulated transform.
+- Hit-stop must wait in real time (WaitForSecondsRealtime or UniTask ignoring time scale) or it never resumes at timeScale 0; trigger once per impact and let only the newest call restore time scale.
+- Ease almost everything; overshoot (back/elastic) for pops, ease-out for settle. Juice must return to rest; permanent exaggeration stops reading as feedback.
+- Feedback must never block input: keep it short and let input buffer through it. Offer a reduce shake/flash option.

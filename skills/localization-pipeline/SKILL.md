@@ -16,3 +16,12 @@ Components and key naming are in `ui-localization`; text components in `ui-text-
 7. Arabic and other RTL: shaping via the project's RTL component, numbers and progress bars stay LTR; verify with a screenshot pass at the longest locale and at RTL (`ui-visual-qa`).
 
 The GDD lists locales, string owner, max lengths per slot, and whether number formats localize. If a project has no localization yet, decide with the human before retrofitting; the UniText versus TMP experiment is separate (`ui-text-tmp`).
+
+## Added from Unity official guidance (2026-11-02)
+Source: official (Unity-Technologies/skills/localization), our wording; applies when the project uses com.unity.localization.
+- Switch locale only through the package (`LocalizationSettings.SelectedLocale`), never hand-rolled state; keep Editor preview and runtime selection separate.
+- Bind text with `LocalizeStringEvent`; persistent listeners must target a method on a UnityEngine.Object (lambdas are not serializable). A configured-but-unbound component is a dormant defect: check each one.
+- Qualify `UnityEngine.UI.*` types in editor builders to avoid name clashes; recompute layout after text changes with `LayoutRebuilder.ForceRebuildLayoutImmediate`.
+- Wrap lookups in one static helper so existing code changes minimally; when mapping existing strings to keys, match the longest strings first so short ones ("NO") do not hit inside long ones.
+- CJK: TMP essential resources must be imported first; use dynamic fallbacks (see `tmp-font-optimization`).
+- Table completeness check before done: every key exists in every locale, no empty entries, then run the Addressables content build and switch locale in the Editor to confirm.

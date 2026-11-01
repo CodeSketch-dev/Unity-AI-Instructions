@@ -41,3 +41,13 @@ Zone map, sizes and thumb rules: `mobile-hud-layout` (single source; do not dupl
 Changed prefabs/scenes, config values used, rules not verified, helpers created.
 
 **Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.
+
+## Added from Unity official guidance (2026-11-02)
+Source: official (Unity-Technologies/skills/ui-ugui), our wording.
+- CanvasScaler: Scale With Screen Size, a reference resolution that matches the project, match 0.5 unless the layout says otherwise. If an existing Canvas uses Constant Pixel Size, flag it before changing.
+- A Layout Group owns its children's size and anchors: do not hand-set them. Do not add a Layout Group to a fixed-size element.
+- ContentSizeFitter on the same object as a Layout Group with Control Child Size is a conflict; on a child of a controlling parent it is ignored. ScrollView Content = ContentSizeFitter + VerticalLayoutGroup (group controls children, fitter sizes Content).
+- Grid Layout Group needs an explicit Cell Size; Control Child Size off means children need explicit sizes.
+- Set the anchor preset first, then offsets, then verify non-zero size. After creating an element check it is visible, inside its parent and has a raycast target only if interactive.
+- Import TMP resources with `TMP_PackageResourceImporter.ImportResources()`, never `AssetDatabase.ImportPackage` (interactive dialog).
+- Split static and frequently changing UI into separate Canvases; see `tmp-font-optimization` for text rebuild cost.

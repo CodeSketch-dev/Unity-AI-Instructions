@@ -44,3 +44,11 @@ MCP calls that run too long time out **and are retried**, re-running your script
 
 ## When MCP is unavailable
 Say exactly what failed (connection refused, wrong project, tools missing). Do only safe file-based work, mark everything as unverified in the report, and give the smallest next step (e.g. "reopen the Editor and check the MCP window shows Connected"). Do not repeatedly ask for reinstalls of tools that already work, and never claim Editor verification that did not happen.
+
+## Added from Unity official guidance (2026-11-02)
+Source: official (Unity-Technologies/skills/unity-pipeline, unity-cli, project-auditor-fixes gotchas), our wording; applies to any tool that drives the Editor.
+- Async operations (recompile, test runs, builds, audits) need polling: never assume completion from the trigger response.
+- Recompile and tests can hang while the Editor is unfocused unless an editor tick/keep-alive is on; if a run stalls, check focus before retrying.
+- Code reload of a method needs Play Mode; player-only commands need a development Player, not the Editor.
+- When several Editors are open, target one instance or project path explicitly; confirm project name first.
+- Script snippets run through an eval tool: fully qualify types and avoid extension methods and `using` lines when the tool compiles statements as a body; class-shaped snippets go through the execute-class form. Check the tool's own rules before writing long scripts.

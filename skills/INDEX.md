@@ -7,6 +7,9 @@
 ## agent
 - agent-team-protocol - Coordinator rules for running many subagents on one Unity project: model tiering, brief template, FIFO Editor lock with heartbeat, keep-compiling, denial handling, report format. Use when dispatching or acting as a subagent on a shared Editor.
 
+## ai
+- ai-navigation-setup - Set up Unity AI Navigation: package check, NavMeshSurface bake, NavMeshAgent, obstacles, links, area costs, agent types, validation. Use when characters or bots must pathfind, an agent will not move, or two areas must connect.
+
 ## ambience
 - ambience-layers - Per-zone ambience: crossfaded loops, safe vs danger music, budgeted 3D loops, random one-shots with cooldown, ducking, tier-gated particles, toggle obedience. Use when zones or biomes should feel alive after the audio system exists.
 
@@ -14,6 +17,7 @@
 - analytics-events-taxonomy - Analytics event taxonomy: naming rules, parameter limits, standard event groups, funnels, per-game docs/analytics-events.md. Use before adding any logged event.
 
 ## art
+- art-direction-asset-pipeline - Art-direction pipeline for cohesive icons, UI, skyboxes and 3D props: style card, hero target, family batches, deterministic cleanup, in-engine check, provenance. Use when generating or sourcing a set of game art with Codex image tools or Blender.
 - art-volume-bloom-parity - Diagnose glare on ported models: compare the scene's post Volume with the reference's before touching materials or runtime exposure hacks; find leftover root renderers after a model swap. Use when pets or characters bloom too much.
 
 ## asset
@@ -22,9 +26,15 @@
 ## async
 - async-cancellation - Own UniTask work with CancelToken so it stops on disable, destroy or restart. Use when writing delays, waits, loops or loads that can outlive their owner.
 
+## audio
+- audio-import-and-mixer-optimization - Audio import and mixer tuning for mobile: load type, compression, sample rate, force mono for 3D, mixer depth and effects, snapshots, DSP buffer. Use when audio memory is high, DSP CPU spikes, 3D sound plays one channel or SFX load stalls.
+
 ## auto
 - auto-balance-game - Use when a Roblox clone needs all time-sensitive gameplay stats generated from a full-game playtime target, daily session budget, optional milestone timeline, or additional balance constraints.
 - auto-balance-loop - Use when a generated balance plan must be simulated, tuned within a bounded iteration cap, materialized into Unity configs and verified against a fresh-save PlayMode target.
+
+## birp
+- birp-to-urp-migration - Plan and run a Built-in to URP migration in phases with a rollback gate, material conversion, PPv2 to Volumes, lighting and custom-shader triage. Use when converting a project or scene to URP or fixing pink materials after the switch.
 
 ## boot
 - boot-sequence-setup - Set up or debug game boot order: data preload/warmup, one-time init hooks, settings-to-audio binding, static resets. Use when adding startup code or when a save, factory or manager is not ready at startup.
@@ -67,6 +77,9 @@
 ## config
 - config-and-factory-authoring - Author config ScriptableObject entries and register them in a Factory with validated lookups, naming and folders, plus a static registry audit. Use when adding authored data entries (skins, items, minigames, pools) to a project.
 - config-driven-feature - Build a feature end to end data-driven: persistent data, config assets, factory/registry, events, runtime consumer, wiring. Use when adding any system with tunable values, saved state or many entries (\"add X system\").
+
+## consistency
+- consistency-check - Cross-check shared values and names across design docs, code, configs and tests: constants, prices, rates, ids, labels. Use after balance or rename changes, before release, or when numbers in docs disagree with the game.
 
 ## cosmetic
 - cosmetic-slot-providers - Equippable cosmetic slots (aura, trail, wing, pet) with asset SO, data block, equip event and a provider that toggles pre-baked visuals; pet follow tick. Use when adding auras, trails, wings or pets to the character.
@@ -121,6 +134,9 @@
 - gameplay-polish-recipes - Small reusable recipes: counted input lock, wall-edge decor kit, re-placing ported props, test hygiene traps. Use when locking input during sequences, adding decor to baked maps, or fixing crowded ported layouts.
 - gameplay-video-analysis - Turn gameplay videos, play notes and screenshots into a structured flow/UI/economy/FTUE analysis. Use when given a YouTube link, "I played it and noticed...", or timestamps of a reference game.
 
+## gate
+- gate-check - Phase gate verdict (PASS/CONCERNS/FAIL) before moving prototype to vertical slice to content to polish to release, backed by an evidence list. Use when a phase ends, before starting the next, or on 'are we ready'.
+
 ## gdd
 - gdd-intake - Turn a Roblox game's videos, screenshots and play notes into a lint-clean GDD package: scaffold, evidence ingest, draft with unknowns, batched questions, UI layout contracts, reference match, lint loop and sign-off. Use when a human wants a clone and only has footage and notes.
 - gdd-schema - The machine-readable GDD package format: folder layout, ids, evidence tokens, fidelity and priority, per-system-type front-matter, UI layout contracts, templates and a worked example. Use when writing, reviewing or consuming a GDD for the clone pipeline.
@@ -160,6 +176,9 @@
 ## legacy
 - legacy-antipatterns - Catalogue of anti-patterns seen in the legacy projects (climb-tower, bike-obby, vendor modules) with fixes. Use when reading legacy code to port a mechanic, or reviewing code for these smells.
 - legacy-framework-mapping - Map legacy CFramework code to CodeSketch and SketchEngine equivalents when porting a mechanic from climb-tower or bike-obby. Use when a legacy script uses CDataBlock, CValue, delegate StateMachine or lowercase instance APIs.
+
+## level
+- level-whitebox-checklist - Whitebox-to-playable checklist for a map or level: player metrics, greybox first, critical path, tension and rest pacing, teach-then-test, gating, guidance, soft-lock check. Use when blocking out or reviewing a level layout, before any decoration.
 
 ## localization
 - localization-pipeline - Localization workflow: keys only in code, CSV export and import, lint for missing keys and length, fonts per locale, RTL, glyph preload. Use when a GDD needs more than one language.
@@ -214,6 +233,12 @@
 ## parallel
 - parallel-qa-fanout - How to QA and fix many screens, modes or minigames with subagents on a single-writer Unity Editor without running out of turns or losing the Editor lock. Use when asked to QA or fix several modes, shops or screens in parallel.
 
+## perf
+- perf-triage-ladder - Order of operations for a slow Unity mobile scene: set target, find CPU vs GPU side, fix the single biggest cost, re-measure, set budgets. Use when FPS is low or uneven, before choosing any optimization; pairs with mobile-perf-audit.
+
+## physics
+- physics-callback-troubleshooting - Diagnose PhysX 3D problems: OnCollisionEnter/OnTriggerEnter not firing, raycast misses, tunneling, ragdoll explosion, gaps, non-uniform scale. Use when a collision, trigger or raycast does not behave. First-match checklist, no guessing.
+
 ## platform
 - platform-kit - Reactive platform recipes (trampoline, conveyor, fade, glass bridge, force zone, kill zone, moving platform) built on the collision registry and KCC hooks. Use when building obby/tower platforms.
 
@@ -237,10 +262,14 @@
 - profiling-evidence - Rules and report format for claiming a performance change with evidence (what was measured, where, before and after). Use before reporting any FPS, draw-call, GC or memory improvement.
 
 ## project
+- project-auditor-triage - Run Unity Project Auditor and fix its findings in reviewable batches with a smoke test and step-by-step commits. Use when asked for a project audit, static analysis cleanup, settings diagnostics or a pre-release health pass.
 - project-context-map - Create/maintain docs/PROJECT-MAP.md with an auto-scan script so agents stop re-exploring the repo. Use at project/session start on an unfamiliar codebase, after refactors, or when onboarding Codex/Claude.
 
 ## projectsettings
 - projectsettings-baseline - Baseline Unity ProjectSettings, physics and URP values for low-end Android and an audit script that flags deviations. Use when setting up a project or when performance or timing looks wrong.
+
+## prototype
+- prototype-keep-kill - Timeboxed prototype process: one question, throwaway vs keep, greybox, instrumented playtest, written keep/kill criteria, rewrite on keep. Use when testing a new mechanic, minigame idea or vertical slice before committing production time.
 
 ## qa
 - qa-batch-and-fallbacks - Headless Unity runs and the QA degradation ladder: MCP, batchmode, static-only. Version pin and lock checks, NUnit parsing, ECONNREFUSED path. Use when the Editor or MCP is unavailable or for local batch runner.
@@ -260,17 +289,26 @@
 - reference-index - One-time searchable index of the reference projects in docs/clone-plan.md; find a prefab/script/scene/tool in one query. Use on "like the reference", before reference-port/asset transfer, or when searching big projects is slow.
 - reference-port - Port or match a feature from a reference project/screenshot faithfully: inspect first, compare side by side, adapt not blind-copy. Use on \"like the reference\", \"match 100%\", or \"ours looks different\".
 
+## regression
+- regression-suite - Choose and run the right regression checks after each change class (code, prefab/UI, balance, assets, settings) with EditMode, PlayMode and screenshot evidence, kept fast. Use after any change or when picking what to test.
+
 ## render
 - render-parity-debugging - Find why imported or cloned models look worse than in the reference project: shader, textures, MaterialPropertyBlock, vertex colour colour space, lighting parity. Use when a ported asset renders flat, washed out, textured wrong or differently lit.
 
 ## revive
 - revive-result-flow - Revive and result flow: timed revive popup, rewarded ad revive, give-up interstitial, result routing and rewards. Use for death, fail and win screens.
 
+## rigor
+- rigor-switch - Project-level 'rigor: minimal|standard|full' line in AGENTS.md that sets how much process agents apply. Use when starting a project, tuning process overhead, or deciding how much planning and testing a task needs.
+
 ## roblox
 - roblox-character-camera - Roblox-feel movement, jump, ragdoll, animation states and third-person camera in Unity, with stud/WalkSpeed/JumpPower conversions. Use when building or tuning player character/camera or fixing controller issues.
 - roblox-genre-patterns - Catalog of Roblox genres and selectable core-loop/system patterns. Use when planning a clone or deciding which systems it needs.
 - roblox-shader-kit - Routed Roblox/Lego environment foundation for visual recon, materialization, mesh baking, chunk/culling and render validation; load only when the current task needs those phases.
 - roblox-world-kit - Roblox-look world kit: stud scale, palette, surface registry, modular kit pieces, assembly rules and world validation. Use when building or cloning a Roblox-style map in Unity.
+
+## roguelite
+- roguelite-run-loop - Design a roguelite run loop for a mobile game: short run, seeded generation, risk and reward choices, permadeath with meta progression, loot tables, run summary. Use when adding a run-based mode, endless dive or procedurally varied levels.
 
 ## rule
 - rule-editor-tool-safety - Hard safety rules for Editor generators, bakers and MCP-driven scripts (iteration caps, nested prefabs, saves, NavMesh persistence, null checks). Use before writing or running any script that mutates many scenes, prefabs or assets.
@@ -288,6 +326,9 @@
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints) callable from the menu and from Unity MCP. Use when a scene needs several bake steps run in the right order.
 - scene-teardown-safety - Prevent teardown-order bugs when switching scenes or modes: destroyed pooled objects in OnDisable, surviving popup roots, leaked tweens/tasks/listeners, duplicate singletons. Use when adding scene or mode switching, pools, or after a MissingReferenceException on exit.
 
+## scope
+- scope-check - Detect feature creep: diff current work against the plan or backlog and flag additions with their cost. Use before merging a batch, when a task grows, or on 'did we drift from the plan'.
+
 ## senior
 - senior-tester - Act as a senior tester on any software or game: normal-user flows first, then exploratory, abuse, interruption, boundary and extreme-state testing, soak runs, unique bug signatures, fix-and-replay. Use when asked to test, find bugs, break it, QA, or before calling anything done or releasing.
 
@@ -304,9 +345,21 @@
 ## simple
 - simple-boss-patrol-chase - Cheap boss/hazard enemy without pathfinding: rectangle patrol, detector trigger, chase, contact kill via the collision registry. Use for obby bosses, patrolling hazards and simple chasers.
 
+## simulator
+- simulator-pacing-checks - Pacing and economy checks for simulator, idle and pet games: cost curves, buy-max, rebirth ratio, offline cap, big-number rollover, odds disclosure, save repair. Use when tuning or reviewing prices, rebirth, offline income or progress stalls.
+
+## skill
+- skill-quality-rubric - Score, lint, test and improve a SKILL.md: structural checklist, behavioural eval spec, test-fix-retest loop with keep/revert on score. Use when writing, reviewing or tuning a skill or adding an evals/ spec.
+
+## soak
+- soak-test - Long-run Play Mode stability recipe: fixed duration, sampled memory/GC/FPS via Unity MCP profiler, leak signs, scene reload loops. Use before release, after pooling or lifecycle changes, or on slowdown/crash reports.
+
 ## spec
 - spec-pdf-extract - Extract text and DEMO images from a PDF/sheet spec so nothing is missed. Use whenever the user attaches a PDF/sheet spec (GDD, ad script) before planning or coding.
 - spec-then-plan - Workflow for non-trivial work: clarify, compare approaches, spec, task plan with verification, review, execute with checkpoints. Use before any multi-step or risky feature, or on \"plan\"/\"spec\". Skip for small edits.
+
+## sprite
+- sprite-atlas-v2 - Sprite Atlas V2 setup: Sprite Packer mode, packables from Assets only, padding, prebuild generation, late-binding via Addressables. Use when UI or 2D sprites cause many draw calls, atlases are missing in builds or sprites show gaps.
 
 ## state
 - state-machine-template - Build a runtime mode with the framework StateMachine and IStateMachine state classes. Use for AI, game phases or character modes instead of boolean flag soup.
@@ -314,14 +367,23 @@
 ## static
 - static-bus-events - Define and use StaticBus events (IEvent classes, Post, Subscribe/Unsubscribe pairing). Use when many unrelated systems must react to one notification.
 
+## tech
+- tech-debt - Inventory dead code, duplicates, oversized files and stale assets, rank by cost, remove safely with a GUID/reference scan and separate revertable commits. Use when cleaning the project or before a refactor.
+
 ## teleporter
 - teleporter-pad - Teleporter pads and portals: paired or destination mode, fades, anti ping-pong, control-state restore, camera warp. Use when adding portals, zone travel pads or teleports between areas.
+
+## test
+- test-evidence-review - Audit whether tests, screenshots and logs actually prove a claim; list weak-evidence red flags and the missing proof. Use before reporting done, when reviewing a test report, or when a green result seems too easy.
 
 ## text
 - text-spread - Use when creating Unity screen-space or world-space reward/stat text such as +money, +speed, +luck, or damage with a left TMP Sprite icon and right TextMeshPro label.
 
 ## thrown
 - thrown-bomb-aoe - Thrown items and bombs: pooled arc or linear projectiles, fuse with blink, NonAlloc blast with falloff, owner safety, optional terrain dig. Use when adding grenades, bombs, shuriken, shields, hammers or banana throws.
+
+## tmp
+- tmp-font-optimization - TextMeshPro font and text performance: static main font plus dynamic fallbacks, padding ratio, atlas size, autosize cost, world text, CJK. Use when TMP atlases bloat memory, glyph weight differs, text spikes CPU or a multilingual build is large.
 
 ## token
 - token-efficient-workflow - Rules that cut tokens and time: read less, query indexes, batch calls, small outputs, delegate wide search, avoid rework, clean hand-off. Use at the start of long Unity/clone sessions or when slow/costly.
@@ -351,6 +413,7 @@
 - ui-pattern-library - Reusable game-independent UI patterns (shops, settings, daily login, gacha, jackpot, rating, revive, inventory, rebirth, wheel, quests...) with layout contract, states, behavior and variants. Use before building any shop, list, popup or page, or when told \"same format as our other games\". Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-popup-anatomy - Popup prefab tree, animation modules and timings, dim, Escape stack and page-vs-popup distinction. Use when building or fixing any popup, confirm dialog or full page. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-popup-from-demo - Build popups/HUD buttons that match demo screenshots 1:1 via an idempotent editor builder and screenshot compare loop, generating only missing icons. Use when given demo images or "match the demo exactly".
+- ui-scaling-safe-area-checklist - Checklist for UI that survives phone, tablet and notch aspect ratios: CanvasScaler, anchors and pivots, safe area, event-driven HUD, screen stack, text growth. Use when UI breaks on other resolutions or before sign-off of any screen.
 - ui-scroll-board - Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after building any popup, shop, HUD button or card, or on \"UI looks ugly/uneven\". Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections. Part of the ui-always set: read skills/ui-always first for any UI task.
@@ -372,6 +435,10 @@
 - unity-qa-playtest - Plan and run QA for a feature or build: test matrix, Play Mode via MCP, aspect ratios, fresh/saved data, interruptions, perf sanity, bug reports. Use on \"test it\", \"QA this\", before milestones or human playtests.
 - unity-script-migration - Use when mass-renaming, splitting or moving Unity C# scripts into a feature layout (Logic/<Game>/<Feature>/<Prefix>_<Feature>_<Part>.cs), converting events to StaticBus, or moving scripts under asmdefs, without breaking scenes, prefabs, tests or saves. Ships GUID-safe tools.
 - unity-ui - Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab. Part of the ui-always set: read skills/ui-always first for any UI task.
+
+## urp
+- urp-postprocessing-volumes - URP post-processing with Volumes: setup, scripting rules (overrideState, profile vs sharedProfile), debug checklist, mobile-safe recipes. Use when bloom, vignette or colour grading does not show, or when adding or scripting a Volume in URP.
+- urp-renderer-feature-review - Review a URP Render Graph ScriptableRenderPass or renderer feature: material and texture binding, static render function, PassData init, descriptor reuse, input requirements. Use when writing, porting or debugging a custom URP pass (Unity 6).
 
 ## user
 - user-corrections-ledger - Ledger of recurring user corrections and standing decisions with reasons, to avoid repeating past mistakes. Use at the start of a build, when planning a feature, or when the user corrects something similar to a past correction.
