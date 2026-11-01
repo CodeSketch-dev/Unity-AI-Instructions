@@ -282,7 +282,7 @@
 - save-and-crash-safety - Save safety and crash basics: backup file rotation, checksum header, version migration chain, recovery events, safe-boot flag, crash reporting. Use when touching persistence or release readiness.
 
 ## scene
-- scene-authored-prefabs - Use when adding any manager, system, world piece, player/camera/GUI stack or skybox to a Unity project: build it as a prefab in Assets/_Game/Prefabs/<Feature>/ and place the instance in the scene; never spawn it at runtime. Also the folder and script naming layout.
+- scene-authored-prefabs - Use when adding any manager, system, world piece, player/camera/GUI stack, skybox or UI page to a Unity project, or when naming scripts/folders/events: prefab in Assets/_Game/Prefabs/<Feature>/ placed in the scene (never runtime-spawned), Knife Tower folder and naming layout, StaticBus events.
 - scene-flow-loading - Scene flow and loading: boot scene order, loader screen with real plus fake progress, one-time costs behind loading, no blocking SDK init. Use when wiring scenes and startup.
 - scene-naming-conventions - Scene, prefab and asset naming conventions and folders for a clone project, checked by the naming lint. Use when creating scenes, prefabs or assets.
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints) callable from the menu and from Unity MCP. Use when a scene needs several bake steps run in the right order.
@@ -370,7 +370,7 @@
 - unity-mcp-workflow - Drive the Unity Editor through MCP safely: discover tools, inspect read-only first, edit prefab assets not scene overrides, batch, save, compile, read Console, screenshot, fallback. Use for any scene/prefab/asset/Play Mode/Console task.
 - unity-project-bootstrap - Set up a new Unity 6 mobile project: packages, folders, asmdefs, URP tiers, platform settings, scene flow, git ignore/LFS, first compile check. Use when starting a game or \"init the project\".
 - unity-qa-playtest - Plan and run QA for a feature or build: test matrix, Play Mode via MCP, aspect ratios, fresh/saved data, interruptions, perf sanity, bug reports. Use on \"test it\", \"QA this\", before milestones or human playtests.
-- unity-script-migration - Use when mass-renaming or moving Unity C# scripts into a feature folder layout (Logic/<Game>/<Feature>/<Prefix>_<Feature>_<Part>.cs) without breaking scenes, prefabs, tests or saves. Ships a GUID-safe rename tool with a C# lexer.
+- unity-script-migration - Use when mass-renaming, splitting or moving Unity C# scripts into a feature layout (Logic/<Game>/<Feature>/<Prefix>_<Feature>_<Part>.cs), converting events to StaticBus, or moving scripts under asmdefs, without breaking scenes, prefabs, tests or saves. Ships GUID-safe tools.
 - unity-ui - Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab. Part of the ui-always set: read skills/ui-always first for any UI task.
 
 ## user

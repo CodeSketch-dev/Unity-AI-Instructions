@@ -15,7 +15,7 @@ import os, re, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cs_lex import lex
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Assets', '_Game', 'DigEgg'))
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Assets', '_Game'))
 TYPE_RE = re.compile(r'\b(class|struct|enum|interface)\s+(\w+)')
 BOM = b'\xef\xbb\xbf'
 
@@ -165,7 +165,7 @@ def main():
         print(*row)
     print('mapping', len(mapping))
     if apply:
-        sub = 'Editor/Dig' if folder.startswith('Editor') else 'Runtime/Logic/Dig'
+        sub = 'Scripts/Editor/Dig' if 'Editor' in folder else 'Scripts/Logic/Dig'
         out = {k: sub + '/' + feature + '/' + v for k, v in mapping.items()}
         json.dump(out, open(os.path.join(os.path.dirname(__file__), 'migration', 'split_' + feature + '.json'), 'w'), indent=1)
 

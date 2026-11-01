@@ -331,6 +331,15 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - When a target is a prefab instance or appears under Prefab Mode in Context, modify the source prefab asset and apply/save it. Do not leave a scene-only override unless explicitly requested.
 - After wiring, inspect the source prefab and a scene instance, verify serialized references, refresh/compile Unity, and test the relevant Play Mode path before reporting completion.
 
+## Scene-authored prefabs, Knife Tower layout, SketchEngine first (mandatory, every project)
+
+- Load skill `scene-authored-prefabs` before adding any manager, system, world piece, player/camera/GUI stack, skybox, UI page, event or script folder; load `unity-script-migration` before renaming, splitting or moving scripts. The owner vibe-codes and must be able to find and hand-tune everything in the Hierarchy or Prefab Mode.
+- Managers and world pieces are prefabs in `Assets/_Game/Prefabs/<Feature>/` placed in the scene; never create them at runtime (`new GameObject`, `AddComponent`, `Instantiate`, `Resources.Load` spawn). UI pages are prefabs that spawn item prefabs into a ScrollRect.
+- Layout: `Assets/_Game/Scripts/{Core,Data,Editor,Event,Factory,Logic}`, `Logic/<Game>/<Feature>/<Prefix>_<Feature>_<Part>.cs`, one type per file with file name == class name, editor-only code in `Scripts/Editor/<Game>/<Feature>/` with its own asmdef, source art in `_Art/{2D,3D,Fx,Shader,Skyboxes}`, vendor packs in `Packages Fx` / `Packages Required`. Suffixes: `_Asset` ScriptableObject entry, `Factory_`, `Data_`, `_Component : MonoCached`, `_Static`, `_Type`, `Event_<Feature>_<Noun>_<Verb>`.
+- Prefer SketchEngine (the owner's own framework) before custom code: StaticBus + IEvent, MonoCached/MonoCachedFast/MonoCachedHub, DataBlock/DataValue, ScriptableObjectSingleton, pools, Opt* collision, audio, popup, CancelToken/UniTask helpers. Read `Packages/com.sketchengine/Runtime` for the concept first.
+- Every refactor batch ends green: compile, full EditMode (compare PASS and SKIP counts), reopen the scene and count missing scripts on scenes and prefabs, Play 5 s with an empty Console, then commit. Check `git check-ignore -v` for new folders.
+- When a skill, rule or guide is written or changed: plan it (spec-then-plan), review it against evidence (what is verified, what is not), then run `publish.bat`.
+
 ## Agent team and Play testing (mandatory)
 
 - Multi-agent work: follow `agent-team-protocol` (briefs, FIFO Editor lock with heartbeat, keep the project compiling, stop and report on a denied call, report file + short final answer).

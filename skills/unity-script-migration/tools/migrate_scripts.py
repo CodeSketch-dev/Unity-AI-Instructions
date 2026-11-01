@@ -11,7 +11,7 @@ from cs_lex import lex
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 ASSETS = os.path.join(ROOT, 'Assets')
-SCRIPTS = os.path.join(ASSETS, '_Game', 'DigEgg')   # asmdef lives in DigEgg/Runtime; moved to _Game/Scripts in one final step
+SCRIPTS = os.path.join(ASSETS, '_Game')   # mapping paths are relative to Assets/_Game, e.g. Scripts/Logic/Dig/Rush/Dig_Rush
 SEARCH_ROOTS = [os.path.join(ASSETS, '_Game'), os.path.join(ASSETS, 'SketchSdk')]
 STR_RE = re.compile(r'(\$@"(?:[^"]|"")*"|@"(?:[^"]|"")*"|\$"(?:\.|[^"\\n])*"|"(?:\.|[^"\\n])*"|//[^\n]*)')
 
