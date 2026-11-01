@@ -17,6 +17,7 @@ Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). 
 | `fix_unresolved.py [--apply]` | heal leftover `<Prefix>Xxx` identifiers by matching normalized names of declared types (only identifiers starting with `Dig`) |
 | `events_to_bus.py <facade.cs> <EventFolder> [--apply]` | facade `public event Action<..>` -> `Event_*` classes (with `Source`) + `StaticBus.Post`, rewrites method-group subscribers |
 | `tests_to_bus.py errors.txt` | rewrite test lambdas that subscribed to removed facade events into `<Prefix>_TestBus.On<E>(source, e => ...)` (input = compile-error lines) |
+| `event_audit.py [root]` | list every public event / static Action with the OTHER feature folders that subscribe (StaticBus candidates) |
 | `style_audit.py <root>` | per-feature counts: events, coroutines, Update(), MonoBehaviour, explicit private, #region, file != class |
 
 ## Loop (one batch = one feature or a handful; commit after each green batch)
@@ -42,3 +43,10 @@ Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). 
 
 ## Review status (verified vs not)
 Verified on one 900-file project (a mobile Unity 6 game on SketchEngine): GUID-safe moves, lexer renames, one-type-per-file splitting, StaticBus conversion of 4 facades, editor asmdef split; EditMode green after each step, scene and prefabs 0 missing scripts, 5 s Play clean. Not verified: other projects, Linux/macOS paths, PlayMode test suites (only a 5 s Play smoke), the tools' behaviour on `#if`-heavy files (they skip them).
+
+## Recipes added in later passes
+- Coroutines -> UniTask: `IEnumerator X()` -> `async UniTask X(CancellationToken ct)`; `StartCoroutine` -> `X(_cancel.Token).Forget()`; `yield return null` -> `UniTask.Yield(PlayerLoopTiming.Update, ct)`; waits -> `UniTask.Delay(TimeSpan, DelayType.UnscaledDeltaTime|DeltaTime, cancellationToken: ct)`; `StopCoroutine` -> `_cancel.Cancel()` (also cancel in OnDisable/OnDestroy and before restarting the same job); static starters use `host.GetCancellationTokenOnDestroy()`. EditMode tests that drained an `IEnumerator` synchronously hang on `UniTask.Yield` (no PlayerLoop): give the routine a `bool spreadOverFrames = true` switch and call it with `false` plus `.GetAwaiter().GetResult()`.
+- ScriptableObject entry -> `<X>_Asset`: (1) `AssetDatabase.RenameAsset` the `.asset` files first (GUID kept), (2) run `migrate_scripts.py` (it skips classes whose name is still in an asset file name), (3) patch the `Resources.Load("OldName")` / path strings with a lexer pass over string literals, (4) reload and check `Resources.Load(newName) != null`.
+- Delegating to subagents: only file-only agents on DISJOINT file lists; tell them "no MCP, no git, no Unity"; the director compiles once after all return, fixes call sites outside their lists, runs the gates and commits. Do not compile while they are editing (transient errors).
+- Before bulk-converting events, count cross-feature subscribers (`event_audit.py` idea: grep subscribers per feature). Knife Tower keeps object-owned C# events and uses StaticBus for cross-feature broadcasts; the receiver-name heuristics of `events_to_bus.py` can silently re-point a same-named event of another type: review its diff.
+- `MonoCached*` in SketchEngine are caching helpers (transform/gameObject/rect cache, `GetCached<T>()`, virtual Tick hooks), not a central updater: do not rebase every MonoBehaviour onto it without a measured GetComponent cost.
