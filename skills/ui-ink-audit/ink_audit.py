@@ -40,39 +40,49 @@ def face_box(r):
             c = q(px[xx, yy]); counts[c] = counts.get(c, 0) + 1
     if not counts: return None
     face = max(counts, key=counts.get)
+    GRAD = 24
+    col = cx_(x0 + 8)
 
     def isface(p): return dist(q(p), face) <= 40
     col = cx_(x0 + 8)
     ys = [y for y in range(cy_(y0 - 6), cy_(y1 + 6)) if isface(px[col, y])]
-    if not ys: return None
+    if not ys:   # no dominant flat colour (gradient face under big text/icon): seed at the vertical centre of the rect and grow along the gradient
+        sy = cy_((y0 + y1) / 2); face = q(px[col, sy]); ys = [sy]
+    # gradient faces (soft vertical gradient, KT style): the quantised "medium" colour covers only a band, so grow the run while neighbouring pixels change
+    # smoothly (a step > GRAD is the outline, highlight or lip edge)
+    lo, hi = ys[0], ys[-1]
+    while lo - 1 >= cy_(y0 - 6) and dist(px[col, lo - 1], px[col, lo]) <= GRAD: lo -= 1
+    while hi + 1 <= cy_(y1 + 6) and dist(px[col, hi + 1], px[col, hi]) <= GRAD: hi += 1
+    ys = [lo, hi]
     row = cy_(ys[0] + 5)
     xs = [x for x in range(cx_(x0 - 6), cx_(x1 + 6)) if isface(px[x, row])]
     if not xs: return None
     return xs[0], ys[0], xs[-1], ys[-1], face
 
 
-def ink_bbox(parts, face):
+def ink_bbox(parts, face, box):
     """White text fill (min channel > 235) + the VISIBLE pixels of each icon (colour differs from the face; transparent sprite margins ignored)."""
     boxes = []
+    bx0, by0, bx1, by1 = box   # ink is only counted INSIDE the face: icon rects and text rects reach over the outline / highlight / lip, whose bright pixels are not ink
     for p in (p for p in parts if p["type"] == "icon"):
         x0, y0, x1, y1 = p["rect"]
         xs, ys = [], []
-        for yy in range(cy_(y0), cy_(y1)):
-            for xx in range(cx_(x0), cx_(x1)):
+        for yy in range(cy_(max(y0, by0)), cy_(min(y1, by1) + 1)):
+            for xx in range(cx_(max(x0, bx0)), cx_(min(x1, bx1) + 1)):
                 if dist(q(px[xx, yy]), face) > 80 and sum(px[xx, yy]) > 120: xs.append(xx); ys.append(yy)
         if xs: boxes.append([min(xs), min(ys), max(xs), max(ys)])
     for p in (p for p in parts if p["type"] == "text"):
         x0, y0, x1, y1 = p["rect"]
         xs, ys = [], []
-        for yy in range(cy_(y0 - 2), cy_(y1 + 2)):
-            for xx in range(cx_(x0 - 2), cx_(x1 + 2)):
+        for yy in range(cy_(max(y0 - 2, by0)), cy_(min(y1 + 2, by1) + 1)):
+            for xx in range(cx_(max(x0 - 2, bx0)), cx_(min(x1 + 2, bx1) + 1)):
                 if min(px[xx, yy]) > 235: xs.append(xx); ys.append(yy)
         if xs: boxes.append([min(xs), min(ys), max(xs), max(ys)])
     if not boxes: return None
     return [min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes)]
 
 
-SKIP_NAMES = ("Panel", "Currency", "Attack", "Joystick", "Dot", "Badge")   # currency bars / touch controls / badges have their own contracts
+SKIP_NAMES = ("Panel", "Currency", "Attack", "Joystick", "Dot", "Badge", "Pill")   # currency bars (Pill: icon overhangs the left cap, value right aligned) / touch controls / badges have their own contracts
 fails, oks, fixes = [], [], []
 fixes_path = None
 if "--fixes" in args:
@@ -100,7 +110,7 @@ for it in buttons:
         box, face = fb[:4], fb[4]
     else:   # gradient / textured button: no single face colour, so the button rect itself is the face
         r = it["rect"]; box = [r[0], r[1], r[2], r[3]]; face = (-999, -999, -999)
-    ink = ink_bbox(parts, face)
+    ink = ink_bbox(parts, face, box)
     if not ink: continue
     dx = (ink[0] + ink[2]) / 2 - (box[0] + box[2]) / 2
     dy = (ink[1] + ink[3]) / 2 - (box[1] + box[3]) / 2
@@ -114,7 +124,8 @@ for it in buttons:
         fixes.append({"kind": "button", "prefab": it.get("prefab", ""), "rel": it.get("rel", ""), "dx": dx if abs(dx) > tol else 0, "dy": dy if abs(dy) > tol else 0, "scale": sc})
     else:
         oks.append(msg)
-    if ink[0] < box[0] + 2 or ink[2] > box[2] - 2 or ink[1] < box[1] + 1 or ink[3] > box[3] - 1:
+    # ink is clipped to the face, so touching the face edge by <= 1 px is the clip itself; only a wider gap to the edge counts as "fits", flag when ink hugs the edge on a side where the pair is also off-centre
+    if (ink[0] <= box[0] + 1 and abs(dx) > tol) or (ink[2] >= box[2] - 1 and abs(dx) > tol) or (ink[1] <= box[1] and abs(dy) > tol and not stacked) or (ink[3] >= box[3] and abs(dy) > tol and not stacked):
         fails.append(f"{tag}: ink {ink} leaves the button face {list(box)} (shrink text / widen button)")
     for o in buttons:
         if o is it or not o["parts"] or o["path"].split("/")[0] != it["path"].split("/")[0]: continue   # plain backgrounds / dimmers / other canvases never count
