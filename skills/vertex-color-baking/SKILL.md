@@ -22,3 +22,4 @@ No project has a shared palette; colours are scattered `Hex()` tables (report 18
 Merge existing prefabs with `mesh-merge-baker`; the shader side is `one-material-world-shader`.
 - Colour space: bake sRGB or linear once; a double conversion makes everything dark. Compare mean luminance with the reference.
 - A shared vertex-colour shader may need a per-renderer MaterialPropertyBlock (e.g. base colour) to match the reference look; renderers without it look different.
+- Tint ratios for a vertex-colour material come from the baked vertex colours of that mesh, not a fixed reference colour; check the shader actually reads the tint property (see `one-material-world-shader` gotchas).

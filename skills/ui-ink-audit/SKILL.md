@@ -29,3 +29,8 @@ Install: `sync.bat` copies `Qa_InkDump` and `Qa_InkFix` (`templates/unity-editor
 - Face = most common colour of the button centre: gradient/textured buttons need an eye check on a zoomed crop.
 - Ink = near-white text + visible icon pixels; coloured text needs the colour added in `ink_bbox`.
 - `ScreenCapture` covers overlay canvases; camera canvases need a game-view capture.
+
+## Gotchas (false positives seen)
+- The dump must include legacy `UnityEngine.UI.Text` labels, not only TMP; otherwise those buttons look label-less and offsets are reported falsely.
+- Never guess the button face by flat colour on gradient sprites: grow the face region along the smooth gradient (neighbour delta below a small threshold) instead.
+- Currency pills whose icon deliberately overhangs the frame edge must be skipped (see `ui-currency-bar-contract`), not flagged as off-centre.

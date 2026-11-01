@@ -23,3 +23,6 @@ No single Bootstrap object exists in the reference projects; init is spread over
 - Reset statics at `SubsystemRegistration`; static subscriptions made in `RuntimeInitializeOnLoadMethod` accumulate across Play sessions when domain reload is off.
 - Anything touching a DataBlock in `BeforeSplashScreen`/`SubsystemRegistration` loads it before the splash.
 - Unverified: whether `AfterSceneLoad` really precedes Home (Unity semantics, not tested in the Editor).
+
+## Gotchas (runtime manager to scene-authored)
+- Converting a runtime-created manager: serialize its reference on the Master, `FindSceneAuthored` first, and keep runtime creation only as an Editor/test fallback. See `scene-authored-prefabs`.

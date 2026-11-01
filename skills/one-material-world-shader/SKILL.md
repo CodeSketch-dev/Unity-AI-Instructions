@@ -29,3 +29,8 @@ Flag bits (superset of the working Problox 1/2/4/8/16): 1 texture, 2 stud top, 4
 Cost targets: plain surfaces need no texture fetch; studs are procedural (`frac` + `fwidth` AA, fake bevel from the light direction) with a texture fallback; patterns come from ONE atlas sampled once; lighting is main light Lambert/half-lambert + flat ambient + fog, no additional lights, no env reflection. A `_ROBLOX_LOWEND` keyword drops stud AA, atlas lookup and wrap light. The ALU budget (<= 40 on a Mali-G52 class GPU) and `fwidth` shimmer on Mali are UNVERIFIED: profile with the GPU vendor compiler/device before relying on it.
 
 Related: `roblox-world-kit` (surfaces, palette, parts), `mesh-merge-baker`, `world-batching-culling`.
+
+## Gotchas (tint)
+- A custom batched shader may ignore `_BaseColor` entirely: read the shader source before relying on material tint.
+- In Linear colour space `Material.SetColor` linearises the value, so store tint ratios through a linear-to-gamma step to get the intended result.
+- Compute tint ratios from the real mesh vertex colours, not a constant reference colour.

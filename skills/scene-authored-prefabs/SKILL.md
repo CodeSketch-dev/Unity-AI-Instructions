@@ -39,3 +39,6 @@ Why: the owner vibe-codes. Everything must be findable and hand-tunable in the H
 
 ## Done check
 Prefab exists once (no duplicate baked copy), scene instance is a prefab instance, scene saved, 0 missing scripts, compile clean, EditMode green, Play 5 s with an empty Console.
+
+## Gotchas (converting a runtime manager)
+- Add a serialized reference on the Master/root, bake the manager as its child, resolve with a scene-authored lookup first, and keep runtime creation only as a fallback for Editor tests. Verify in Play that the scene instance is the one used.

@@ -26,3 +26,9 @@ Reference facts, mostly VERIFIED from package source (report 01). Confirm agains
 
 ## Debugging checklist
 1. Is `base.Init()` called? 2. Did the change go through `DataValue.Value`? 3. Was the app killed before pause/quit (v1)? 4. Did a rename change the key? 5. Look at the file under persistentDataPath, not the Editor's cached object.
+
+## Gotchas (staged migrations)
+- Stage it: add the new DataBlocks, keep the legacy fields, migrate with a version marker.
+- Always overwrite on the first migration: warmup may already have created default values.
+- Delete the migration marker on save reset so the next run migrates again.
+- Verify by restoring a real legacy save in Play and checking the new blocks.

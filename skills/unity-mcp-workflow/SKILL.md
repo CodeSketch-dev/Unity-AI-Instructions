@@ -52,3 +52,5 @@ Source: official (Unity-Technologies/skills/unity-pipeline, unity-cli, project-a
 - Code reload of a method needs Play Mode; player-only commands need a development Player, not the Editor.
 - When several Editors are open, target one instance or project path explicitly; confirm project name first.
 - Script snippets run through an eval tool: fully qualify types and avoid extension methods and `using` lines when the tool compiles statements as a body; class-shaped snippets go through the execute-class form. Check the tool's own rules before writing long scripts.
+- Code in a default `Assembly-CSharp-Editor` folder cannot reference types in asmdef assemblies: call them by reflection, or move the tool into an asmdef-aware Editor assembly.
+- Play-mode timing and capture quirks (fixed screenshot size, retries after entering Play, reload before EditMode): see `playmode-driver-recipes`.

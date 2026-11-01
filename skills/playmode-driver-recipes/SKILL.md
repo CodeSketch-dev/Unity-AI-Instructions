@@ -21,3 +21,9 @@ Report numbers and screenshot paths; state what only a device can verify.
 - Tutorial gating can hide HUD buttons (alpha 0, no raycast): taps report "no hit" until it is complete or skipped.
 - Polling a result file written by a test runner (e.g. `Temp/test_results.txt` that says `running` then `done pass=N fail=M`): the file from the PREVIOUS run still says `done` until the new run rewrites it, so a poll started too early reports a stale result. Check the file mtime or wait until it has been seen as `running` once; re-arm a Monitor before it expires, since a full PlayMode suite can take ~17 min. A UI test run also leaves the Game View at the test's size: reset it afterwards.
 - Spawn/teleport spots in "never fall through the ground" tests must avoid dig pits and other holes: the legitimate floor there is lower and can move with the clock, so assert against the ground measured under the player (excluding its own collider), not a fixed y.
+
+## Gotchas (MCP capture and timing)
+- The MCP game-view screenshot tool renders at its own fixed size (e.g. 2160x1080); resizing the Game View does not change it, so portrait cannot be captured that way. Use an in-script capture at the wanted size instead.
+- Compositing a canvas into a RenderTexture under URP can return a blank frame; prefer `ScreenCapture` for overlay canvases.
+- `script-execute` right after entering Play can fail with "Failed to invoke ... after 10 retries" until the domain finishes loading: wait a few seconds and retry.
+- EditMode tests run after a Play session need `EditorUtility.RequestScriptReload()` first (statics survive with domain reload off).
