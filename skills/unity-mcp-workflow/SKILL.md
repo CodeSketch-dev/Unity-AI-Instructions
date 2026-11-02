@@ -59,3 +59,8 @@ Source: official (Unity-Technologies/skills/unity-pipeline, unity-cli, project-a
 - Never edit scripts while Play is running: stop Play first, wait until `IsPlaying` is false (the stop call often still reports true for a few seconds), then edit and refresh. Compiling during Play hung the Editor twice.
 - After any Play session `RequestScriptReload()` and wait ~45 s before EditMode; otherwise HUD layout tests fail on stale statics (not real regressions).
 - The first Play after an Editor restart can take 60+ s and MCP calls fail with "after 10 retries": wait and retry, do not kill the Editor.
+
+## Game View size and teleport gotchas (portrait / landscape QA)
+- Game View sizes are picked by INDEX, and the custom size list is reset after an Editor restart: an index that meant "1080x1920" can silently become "2160x1080 Landscape" (the audit helper then reports success while `Screen.width x height` stays landscape). After picking a size, always print `Screen.width x Screen.height` from a script; if it is wrong, list `GameViewSizes.currentGroup.GetDisplayTexts()` and set `GameView.selectedSizeIndex` to the entry you need by name.
+- Never teleport a test player to a guessed coordinate: it can land inside a prop or in a pet cage and the screenshot is useless. Read a real spawn / path position from the scene (or use a scene-view camera for environment reviews: set `SceneView.lastActiveSceneView.pivot/rotation/size` and call `screenshot-scene-view`).
+- Hot-looking audit failures that come from a hidden object (CanvasGroup alpha 0) are false positives: fix the audit tool, not the layout.
