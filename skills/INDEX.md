@@ -320,6 +320,9 @@
 ## render
 - render-parity-debugging - Find why imported or cloned models look worse than in the reference project: shader, textures, MaterialPropertyBlock, vertex colour colour space, lighting parity. Use when a ported asset renders flat, washed out, textured wrong or differently lit.
 
+## repo
+- repo-hygiene-gitignore-audit - Find first-party Unity files silently hidden from git (template .gitignore patterns like Demo*, Tutorial*, Sample*, singleton assets never added) so a fresh clone compiles. Use before pushing milestones, after adding a feature folder, or when a push 'works here' only.
+
 ## revive
 - revive-result-flow - Revive and result flow: timed revive popup, rewarded ad revive, give-up interstitial, result routing and rewards. Use for death, fail and win screens.
 
