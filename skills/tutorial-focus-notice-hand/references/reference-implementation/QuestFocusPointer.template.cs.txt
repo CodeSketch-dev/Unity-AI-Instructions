@@ -1,0 +1,98 @@
+// PORTABLE TEMPLATE (uGUI + Input System only, no project classes). Copy into a project as QuestFocusPointer.cs.
+// Reproduces the Knife Tower Quest_Focus_Pointer behaviour documented in ../../SKILL.md:
+//   Root overlay (own Canvas, sort above popups) > FocusDimBox (sized to the target rect) > Focus (stretched, offsets animate) > Top/Bottom/Left/Right dim panels
+//                                                > FocusHandBox (sized to the target rect, LAST sibling) > Hand (child, anchors 0.7/0, pivot on the fingertip 0.08/0.82, 150 px)
+// Usage: var p = QuestFocusPointer.Create(canvasTransform, handSprite); p.Show(targetRect); ... p.Hide();
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+
+public sealed class QuestFocusPointer : MonoBehaviour
+{
+    [Header("KT values")]
+    public float offsetValue = 1000f;          // KT _offsetValue: the dim hole starts this much larger than the target
+    public float duration = .35f;              // KT _duration, ease OutSine
+    public float dimAlpha = .6f;               // KT 0.96; keep the world readable. Panels never block input (raycastTarget off)
+    public Vector2 handAnchor = new(.7f, 0f);  // KT 0.8/0.3; 0.7/0 keeps the fingertip off the label of wide buttons
+    public Vector2 handPivot = new(.08f, .82f);// fingertip of Hand.png (the sprite points up-left)
+    public float handSize = 150f;              // KT 134 x 127 (sprite native); 150 square with preserveAspect works
+    public float handYoyoScale = 1.1f, handYoyoSeconds = .5f;   // KT scale sequence: 1 -> 1.1, 0.5 s, yoyo, loop forever
+
+    RectTransform _root, _dimBox, _dimFocus, _handBox, _hand;
+    Image[] _dim = new Image[4];
+    RectTransform _target;
+    float _t;                                  // 0..1 appear progress
+    readonly Vector3[] _c = new Vector3[4];
+
+    public static QuestFocusPointer Create(Transform canvasTransform, Sprite handSprite)
+    {
+        var go = new GameObject("QuestFocusPointer", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
+        go.layer = 5;
+        go.transform.SetParent(canvasTransform, false);
+        var canvas = go.GetComponent<Canvas>();
+        canvas.overrideSorting = true; canvas.sortingOrder = 310;   // above popups (300), below fades
+        var rt = (RectTransform)go.transform;
+        rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = rt.offsetMax = Vector2.zero;
+        var p = go.AddComponent<QuestFocusPointer>();
+        p.Build(rt, handSprite);
+        go.SetActive(false);
+        return p;
+    }
+
+    void Build(RectTransform root, Sprite handSprite)
+    {
+        _root = root;
+        _dimBox = NewRect("FocusDimBox", _root);
+        _dimFocus = NewRect("Focus", _dimBox);
+        _dimFocus.anchorMin = Vector2.zero; _dimFocus.anchorMax = Vector2.one; _dimFocus.offsetMin = _dimFocus.offsetMax = Vector2.zero;
+        const float BIG = 3500f;
+        _dim[0] = Panel("Top", new Vector2(.5f, 1f), new Vector2(.5f, 1f), new Vector2(.5f, 0f), new Vector2(BIG, BIG));
+        _dim[1] = Panel("Bottom", new Vector2(.5f, 0f), new Vector2(.5f, 0f), new Vector2(.5f, 1f), new Vector2(BIG, BIG));
+        _dim[2] = Panel("Left", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(1f, .5f), new Vector2(BIG, 0f));
+        _dim[3] = Panel("Right", new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, .5f), new Vector2(BIG, 0f));
+        _handBox = NewRect("FocusHandBox", _root);
+        _hand = NewRect("Hand", _handBox);
+        _hand.anchorMin = _hand.anchorMax = handAnchor; _hand.pivot = handPivot; _hand.sizeDelta = new Vector2(handSize, handSize);
+        var img = _hand.gameObject.AddComponent<Image>(); img.sprite = handSprite; img.preserveAspect = true; img.raycastTarget = false;
+    }
+
+    static RectTransform NewRect(string name, Transform parent)
+    {
+        var go = new GameObject(name, typeof(RectTransform)); go.layer = 5;
+        go.transform.SetParent(parent, false);
+        var rt = (RectTransform)go.transform; rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(.5f, .5f);
+        return rt;
+    }
+
+    Image Panel(string name, Vector2 aMin, Vector2 aMax, Vector2 pivot, Vector2 size)
+    {
+        var rt = NewRect(name, _dimFocus);
+        rt.anchorMin = aMin; rt.anchorMax = aMax; rt.pivot = pivot; rt.sizeDelta = size; rt.anchoredPosition = Vector2.zero;
+        var img = rt.gameObject.AddComponent<Image>(); img.color = new Color(0, 0, 0, dimAlpha); img.raycastTarget = false;
+        return img;
+    }
+
+    public void Show(RectTransform target) { _target = target; _t = 0f; gameObject.SetActive(true); _handBox.SetAsLastSibling(); _dimBox.SetAsFirstSibling(); }
+    public void Hide() { _target = null; gameObject.SetActive(false); }
+
+    void Update()
+    {
+        if (_target == null || !_target.gameObject.activeInHierarchy) { Hide(); return; }
+        float dt = Mathf.Clamp(Time.unscaledDeltaTime, 0f, .25f);
+        _t = Mathf.Min(1f, _t + dt / Mathf.Max(.01f, duration));
+        float eased = Mathf.Sin(_t * Mathf.PI * .5f);                         // OutSine
+        // the box is the target's OWN rect (not its overhanging icon): world corners of an overlay canvas are screen pixels
+        _target.GetWorldCorners(_c);
+        Vector2 min = _c[0], max = _c[2];
+        float sf = Mathf.Max(.0001f, _root.lossyScale.x);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(_root, (min + max) * .5f, null, out Vector2 centre);
+        Vector2 size = (max - min) / sf;
+        _dimBox.anchoredPosition = centre; _dimBox.sizeDelta = size;
+        _handBox.anchoredPosition = centre; _handBox.sizeDelta = size;
+        float off = offsetValue * (1f - eased);                               // KT: offsetMax = +v, offsetMin = -v, v: 1000 -> 0
+        _dimFocus.offsetMin = new Vector2(-off, -off); _dimFocus.offsetMax = new Vector2(off, off);
+        foreach (var d in _dim) { var col = d.color; col.a = dimAlpha * eased; d.color = col; }
+        float k = Mathf.PingPong(Time.unscaledTime / Mathf.Max(.01f, handYoyoSeconds), 1f);
+        _hand.localScale = Vector3.one * Mathf.Lerp(1f, handYoyoScale, Mathf.SmoothStep(0f, 1f, k));   // the ONLY animation of the hand
+    }
+}

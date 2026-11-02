@@ -1,0 +1,48 @@
+- Quest_Focus_Pointer
+   anchorMin {x: 0.5, y: 0.5} anchorMax {x: 0.5, y: 0.5} anchoredPos {x: 0, y: 0} sizeDelta {x: 325, y: 125} pivot {x: 0.5, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(_offsetValue=1000, _duration=0.35)
+- Quest_Focus_Pointer/Bottom
+   anchorMin {x: 0.5, y: 0} anchorMax {x: 0.5, y: 0} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 1} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+- Quest_Focus_Pointer/BtnBlockingFocusBox
+   anchorMin {x: 0, y: 0} anchorMax {x: 1, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 0, y: 0} pivot {x: 0.5, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 1, g: 1, b: 1, a: 0}, m_Type=1, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Pointer/Focus
+   anchorMin {x: 0, y: 0} anchorMax {x: 1, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 0, y: 0} pivot {x: 0.5, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+- Quest_Focus_Pointer/Focus/Bottom
+   anchorMin {x: 0.5, y: 0} anchorMax {x: 0.5, y: 0} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 1} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.9607843}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Pointer/Focus/Left
+   anchorMin {x: 0, y: 0} anchorMax {x: 0, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 1, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.9607843}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Pointer/Focus/Pointer
+   anchorMin {x: 0.8, y: 0.3} anchorMax {x: 0.8, y: 0.3} anchoredPos {x: 0, y: 0} sizeDelta {x: 134.3471, y: 127.00001} pivot {x: 0.1, y: 0.78} scale {x: 1, y: 1, z: 1} active 1
+- Quest_Focus_Pointer/Focus/Pointer/Icon
+   anchorMin {x: 0.8, y: 0.3} anchorMax {x: 0.8, y: 0.3} anchoredPos {x: -94.04297, y: 60.960022} sizeDelta {x: 134.3471, y: 127.00001} pivot {x: 0.1, y: 0.78} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 1, g: 1, b: 1, a: 1}, m_Type=0, m_RaycastTarget=0, m_PreserveAspect=1)
+    MB(_duration=0.5)
+- Quest_Focus_Pointer/Focus/Right
+   anchorMin {x: 1, y: 0} anchorMax {x: 1, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 0, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.9607843}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Pointer/Focus/TextMsg
+   anchorMin {x: 0.5, y: 0.5} anchorMax {x: 0.5, y: 0.5} anchoredPos {x: 0, y: -100} sizeDelta {x: 400, y: 150} pivot {x: 0.5, y: 0.5} scale {x: 1, y: 1, z: 1} active 0
+    MB(color={r: 1, g: 1, b: 1, a: 1}, m_RaycastTarget=0, m_text=A really big message text, m_fontSize=36, m_fontSizeMin=18, m_fontSizeMax=72, m_HorizontalAlignment=2, m_VerticalAlignment=512, m_TextWrappingMode=1, m_fontStyle=0)
+    comp225
+    MB()
+- Quest_Focus_Pointer/Focus/Top
+   anchorMin {x: 0.5, y: 1} anchorMax {x: 0.5, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 0} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.9607843}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Pointer/Left
+   anchorMin {x: 0, y: 0} anchorMax {x: 0, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 1, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+- Quest_Focus_Pointer/Right
+   anchorMin {x: 1, y: 0} anchorMax {x: 1, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 0, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+- Quest_Focus_Pointer/Top
+   anchorMin {x: 0.5, y: 1} anchorMax {x: 0.5, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 0} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)

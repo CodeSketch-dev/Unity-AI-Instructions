@@ -1,0 +1,145 @@
+using SketchEngine.Mono;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using Game.DigEgg;
+
+namespace Game
+{
+    // Knife Tower Quest_Focus_Msg: the short text bubble that sits next to the highlighted button (here: one icon + one short localized word, no sentences, kids-first).
+    // KT behaviour kept: it fades in over 0.3 s and is positioned above/beside the focus; the pooled bubble is never destroyed (KT destroys its singleton, ours is reused).
+    // The same prefab layout serves the PROMPT bubble (blue KT button plate) and the PRAISE bubble (green plate, pops in, holds, fades). No per-frame allocation, unscaled time.
+    // Sizes come from Dig_Focus_Math (shared with the legacy ring so both paths look identical); width follows the text, height is fixed.
+    public sealed class Quest_FocusMessage : MonoCached
+    {
+        [Header("References")]
+        [SerializeField] Image _plate;
+        [SerializeField] Image _icon;
+        [SerializeField] TextMeshProUGUI _text;
+        [SerializeField] CanvasGroup _group;
+
+        [Header("Config (KT: 0.3 s OutSine)")]
+        [SerializeField] float _appearSeconds = .3f;
+        [SerializeField] bool _praise;               // praise bubble: fixed spot, pop-in scale, fade-out over its last PRAISE_FADE seconds
+
+        const float ICON_PAD = 12f, NOTICE_EXTRA_W = 150f;   // AGENTS.md ICON PADDING: >= 12 px from the inner face of the plate
+
+        RectTransform _rect;
+        Vector2 _size = new(Dig_Focus_Math.BUBBLE_MIN_W, Dig_Focus_Math.BUBBLE_H);
+        string _shown;
+        float _age, _praiseLeft, _praiseAge;
+        bool _on;
+
+        public RectTransform Rt => _rect != null ? _rect : (_rect = (RectTransform)transform);
+        public Vector2 Size => _size;
+        public bool On => _on;
+        public string Shown => _shown;
+        public bool IsPraise => _praise;
+
+        void Awake()
+        {
+            _rect = (RectTransform)transform;
+            if (_text != null) _text.fontSharedMaterial = Dig_Resources.UiTmpOutlineMaterial(_text.fontSize);   // runtime TMP outline instance cannot live in a prefab
+            if (!_praise && _plate != null && Dig_Ui.Rounded != null)
+            {
+                // Owner 2026-11-02: the prompt is a NOTICE, not a button: a translucent black rounded frame (Steal / Break style), never the blue "tap me" plate.
+                _plate.sprite = Dig_Ui.Rounded;
+                _plate.type = Image.Type.Sliced;
+                _plate.pixelsPerUnitMultiplier = 1f;
+                _plate.color = new Color(0f, 0f, 0f, .85f);
+                _plate.raycastTarget = false;
+            }
+        }
+
+        // Lays the plate out for `text` + `icon`; no-op while neither changed. Returns true when the text changed (the caller pops the bubble).
+        public bool Set(string text, Sprite icon)
+        {
+            bool hasIcon = icon != null;
+            bool changed = !string.Equals(_shown, text);
+            if (_icon.sprite != icon) { _icon.sprite = icon; changed = true; }
+            if (!changed) return false;
+            _shown = text;
+            _text.text = text;
+            Sprite plateSprite = _plate.sprite;
+            bool kit = plateSprite != null && Dig_Ui_Kit.IsKit(plateSprite);
+            float padX = Dig_Focus_Math.BUBBLE_PAD, lipV = 0f, faceLipBottom = 0f, faceLipTop = 0f;
+            if (kit)
+            {
+                Vector4 b = plateSprite.border;                         // L, B, R, T of the slice
+                Vector4 lp = Dig_Ui_Kit.Lips(plateSprite);
+                padX = Mathf.Max(padX, Mathf.Max(b.x, b.z) + ICON_PAD);
+                lipV = lp.y + lp.w;
+                faceLipBottom = lp.y; faceLipTop = lp.w;
+            }
+            float iconSize = Mathf.Min(Dig_Focus_Math.BUBBLE_ICON, Dig_Focus_Math.BUBBLE_H - lipV - 2f * ICON_PAD);
+            float pref = _text.GetPreferredValues(text).x;
+            float width = Dig_Focus_Math.BubbleWidth(pref, hasIcon) + 2f * (padX - Dig_Focus_Math.BUBBLE_PAD) + (hasIcon ? iconSize - Dig_Focus_Math.BUBBLE_ICON : 0f);
+            if (!_praise) width += NOTICE_EXTRA_W;   // a long notice frame is easier to notice than a tight plate
+            _size = new Vector2(width, Dig_Focus_Math.BUBBLE_H);
+            Rt.sizeDelta = _size;
+            _icon.gameObject.SetActive(hasIcon);   // an inactive child drops out of the HLG, so the lone label stays centred
+            // ONE centred HorizontalLayoutGroup (icon first, label second) spans the plate FACE (bottom lip excluded, top lip trimmed): no hand-placed x offsets.
+            RectTransform group = Group;
+            group.anchorMin = Vector2.zero; group.anchorMax = Vector2.one;
+            group.offsetMin = new Vector2(padX, lipV > 0f ? faceLipBottom : 0f);
+            group.offsetMax = new Vector2(-padX, lipV > 0f ? -faceLipTop : 0f);
+            var hlg = group.GetComponent<HorizontalLayoutGroup>();
+            if (hlg != null) { hlg.spacing = Dig_Focus_Math.BUBBLE_GAP; hlg.childAlignment = TextAnchor.MiddleCenter; hlg.padding = new RectOffset(0, 0, 0, 0); }
+            if (hasIcon) SetPreferred(_icon.gameObject, iconSize, iconSize);
+            SetPreferred(_text.gameObject, pref, -1f);
+            _text.alignment = TextAlignmentOptions.Capline;
+            return true;
+        }
+
+        RectTransform Group => _icon.transform.parent != transform ? (RectTransform)_icon.transform.parent : (RectTransform)transform;
+
+        static void SetPreferred(GameObject go, float w, float h)
+        {
+            var le = go.GetComponent<LayoutElement>();
+            if (le == null) le = go.AddComponent<LayoutElement>();
+            le.minWidth = 0f; le.preferredWidth = w;
+            if (h > 0f) { le.minHeight = le.preferredHeight = h; }
+        }
+
+        public void SetActive(bool on)
+        {
+            if (_on == on && gameObject.activeSelf == on) return;
+            _on = on;
+            if (on) { _age = 0f; if (_group != null) _group.alpha = _praise ? 1f : 0f; }
+            gameObject.SetActive(on);
+        }
+
+        public void Forget() { _shown = null; }
+
+        // Prompt bubble: KT fade-in (0.3 s). Call once per frame while shown.
+        public void TickAppear()
+        {
+            if (!_on || _group == null || _praise) return;
+            if (_age >= _appearSeconds) { if (_group.alpha < 1f) _group.alpha = 1f; return; }
+            _age += Mathf.Clamp(Time.unscaledDeltaTime, 0f, .25f);
+            _group.alpha = Mathf.Sin(Mathf.Clamp01(_age / Mathf.Max(.01f, _appearSeconds)) * Mathf.PI * .5f);   // OutSine
+        }
+
+        // Praise: pops in at the fixed top spot, holds, fades.
+        public void PlayPraise(float seconds)
+        {
+            _praiseLeft = seconds;
+            _praiseAge = 0f;
+            SetActive(true);
+            Rt.localScale = Vector3.one * .5f;
+            if (_group != null) _group.alpha = 1f;
+        }
+
+        public void TickPraise(Rect canvas)
+        {
+            if (!_on || !_praise) return;
+            float dt = Time.unscaledDeltaTime;
+            _praiseLeft -= dt;
+            _praiseAge += dt;
+            if (_praiseLeft <= 0f) { SetActive(false); return; }
+            Rt.anchoredPosition = Dig_Focus_Math.BubbleFixed(_size, canvas);
+            Rt.localScale = Vector3.one * Dig_Focus_Math.PraiseScale(_praiseAge);
+            if (_group != null) _group.alpha = Dig_Focus_Math.PraiseAlpha(_praiseLeft);
+        }
+    }
+}

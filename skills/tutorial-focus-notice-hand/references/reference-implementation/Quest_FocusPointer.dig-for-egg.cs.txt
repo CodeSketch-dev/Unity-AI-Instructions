@@ -1,0 +1,203 @@
+using SketchEngine.Mono;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using Game.DigEgg;
+
+namespace Game
+{
+    // Port of Knife Tower Quest_Focus_Pointer (read from KT Assets/_Game/Prefabs/Quest/Quest_Focus_Pointer.prefab, 2026-11-02): a FOCUS BOX the size of the target with 4 dim panels
+    // (Top / Bottom / Left / Right, 3500 px, KT anchors + pivots) whose hole shrinks onto the button (offsets +-1000 -> 0, 0.35 s OutSine); the HAND is a child of the focus box with
+    // anchors (0.8, 0.3), pivot on the fingertip (0.08, 0.82), size 150, scale yoyo 1 -> 1.1 over 0.5 s (KT AnimationSequence on Icon). Dim: raycast OFF here (kids must still walk/dig) and
+    // alpha 0.6 instead of KT 0.96. Original header: a focus ring + echo ring + pointing hand around ONE highlighted UI button, on its own overlay canvas (prefab Quest_Focus_Pointer,
+    // sort order 310 = above the popups at 300, below the teleport fade). KT behaviour kept: the focus box eases in over 0.3 s OutSine (the ring shrinks from a wide
+    // margin onto the target while it fades in), the hand points at the target and bobs, the target is followed every frame. Differences (kids-first, see AGENTS.md):
+    // the overlay NEVER blocks input (no dim, no block-click buttons: a child can always tap anywhere, the assist ladder owns rescue), a tap inside the target dismisses
+    // the ring until the key changes, and the hand never sits in the bottom 200 px banner band or on the joystick. Messages are separate (Quest_FocusMessage).
+    // Placement maths is shared with the legacy ring (Dig_Focus_Math). Unscaled time, no allocation per frame.
+    public sealed class Quest_FocusPointer : MonoCached
+    {
+        public const int SORT_ORDER = 310;
+
+        [Header("References")]
+        [SerializeField] RectTransform _root;
+        [SerializeField] RectTransform _ring;
+        [SerializeField] RectTransform _echo;
+        [SerializeField] RectTransform _hand;
+        [SerializeField] Image _ringImage;
+        [SerializeField] Image _echoImage;
+        [SerializeField] Image _handImage;
+
+        [Header("Config (KT: 0.3 s OutSine)")]
+        [SerializeField] float _appearSeconds = .3f;
+        [SerializeField] float _appearFrom = 1.6f;       // ring starts this much larger and eases onto the target
+        [SerializeField] float _offsetValue = 1000f;     // KT _offsetValue: the dim hole starts this much larger and shrinks onto the target
+        [SerializeField] float _dimAlpha = .6f;          // KT .96; lower here: the world must stay readable
+        [SerializeField] Vector2 _handAnchorKt = new(.7f, .0f);   // KT .8 / .3; our rail buttons carry the label across the whole plate, so the fingertip rests on the bottom edge (y 0) instead of y .25, never on the label. Tune here.
+        [SerializeField] Vector2 _handPivotKt = new(.08f, .82f);    // fingertip of Hand.png (owner-checked)
+        [SerializeField] float _handSize = 150f;
+        [SerializeField] float _handYoyoScale = 1.1f, _handYoyoSeconds = .5f;   // KT Icon scale sequence
+        [SerializeField] Color _ringColor = new(1f, .82f, .12f, 1f);
+
+        readonly Vector3[] _corners = new Vector3[4];
+        RectTransform _target;
+        int _key = -1, _dismissedKey = -1;
+        bool _ringShown;
+        float _appear = 1f;
+        RectTransform _dimBox, _dimFocus, _handBox;
+        readonly Image[] _dim = new Image[4];
+
+        public RectTransform Root => _root;
+        public bool RingShown => _ringShown;
+        public RectTransform Target => _target;
+        public int Key => _key;
+        public bool Dismissed => _key >= 0 && _key == _dismissedKey;   // the child tapped the highlighted button
+
+        void Awake()
+        {
+            if (_root == null) _root = (RectTransform)transform;
+            if (_ringImage != null) _ringImage.color = _ringColor;
+            BuildBoxes();
+            SetRing(false);
+        }
+
+        // KT hierarchy, built once: dimBox (first sibling) > Focus (stretched, offsets animate) > Top/Bottom/Left/Right; handBox (last sibling) > Hand.
+        void BuildBoxes()
+        {
+            if (_dimBox != null || _root == null) return;
+            _dimBox = NewRect("FocusDimBox", _root);
+            _dimBox.SetAsFirstSibling();
+            _dimFocus = NewRect("Focus", _dimBox);
+            _dimFocus.anchorMin = Vector2.zero; _dimFocus.anchorMax = Vector2.one; _dimFocus.offsetMin = _dimFocus.offsetMax = Vector2.zero;
+            const float BIG = 3500f;
+            _dim[0] = NewPanel("Top", _dimFocus, new Vector2(.5f, 1f), new Vector2(.5f, 1f), new Vector2(.5f, 0f), new Vector2(BIG, BIG));
+            _dim[1] = NewPanel("Bottom", _dimFocus, new Vector2(.5f, 0f), new Vector2(.5f, 0f), new Vector2(.5f, 1f), new Vector2(BIG, BIG));
+            _dim[2] = NewPanel("Left", _dimFocus, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(1f, .5f), new Vector2(BIG, 0f));
+            _dim[3] = NewPanel("Right", _dimFocus, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, .5f), new Vector2(BIG, 0f));
+            _handBox = NewRect("FocusHandBox", _root);
+            if (_hand != null)
+            {
+                _hand.SetParent(_handBox, false);
+                _hand.anchorMin = _hand.anchorMax = _handAnchorKt;
+                _hand.pivot = _handPivotKt;
+                _hand.sizeDelta = new Vector2(_handSize, _handSize);
+                _hand.anchoredPosition = Vector2.zero;
+                _hand.localRotation = Quaternion.identity;
+                _hand.localScale = Vector3.one;
+            }
+        }
+
+        static RectTransform NewRect(string name, Transform parent)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.layer = 5;
+            go.transform.SetParent(parent, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(.5f, .5f);
+            return rt;
+        }
+
+        Image NewPanel(string name, Transform parent, Vector2 aMin, Vector2 aMax, Vector2 pivot, Vector2 size)
+        {
+            RectTransform rt = NewRect(name, parent);
+            rt.anchorMin = aMin; rt.anchorMax = aMax; rt.pivot = pivot; rt.sizeDelta = size; rt.anchoredPosition = Vector2.zero;
+            var img = rt.gameObject.AddComponent<Image>();
+            img.color = new Color(0f, 0f, 0f, _dimAlpha);
+            img.raycastTarget = false;
+            return img;
+        }
+
+        // Highlights `target` (a null / destroyed / inactive target hides the ring). `key` identifies WHAT is highlighted (tap-dismissal is per key).
+        public void Show(RectTransform target, int key)
+        {
+            if (key != _key) { _key = key; if (_dismissedKey != key) _dismissedKey = -1; }
+            _target = target;
+        }
+
+        public void Hide()
+        {
+            _target = null; _key = -1; _dismissedKey = -1;
+            SetRing(false);
+        }
+
+        // Stuck assist: the hand + ring appear again for the current target even if the child already tapped it.
+        public void Rearm() { _dismissedKey = -1; }
+
+        void SetRing(bool on)
+        {
+            if (on && !_ringShown) _appear = 0f;   // KT: the focus box eases in every time it appears
+            _ringShown = on;
+            if (_ring == null) return;
+            _ring.gameObject.SetActive(on);
+            _echo.gameObject.SetActive(on);
+            bool hand = on && _handImage != null && _handImage.sprite != null;
+            _hand.gameObject.SetActive(hand);
+            if (_dimBox != null) { _dimBox.gameObject.SetActive(on); _handBox.gameObject.SetActive(on); }
+            if (on && _handBox != null) _handBox.SetAsLastSibling();   // the hand is the top-most thing of the overlay: never behind the ring, the message bubble or any other UI
+        }
+
+        // Driven from the presenter. The canvas must be active (its rect is only valid then). Returns true while the ring is on the target.
+        public bool Tick(out Vector2 local, out Vector2 size, out bool handBelow)
+        {
+            local = default; size = default; handBelow = true;
+            if (_target == null || !_target.gameObject.activeInHierarchy || _key == _dismissedKey) { SetRing(false); return false; }
+            Dig_Focus_Math.VisibleBounds(_target, _corners, out Vector2 min, out Vector2 max);   // overlay canvases: world corners are screen pixels; hugs plate + icon of rail buttons
+            if (max.x - min.x < 4f || max.y - min.y < 4f) { SetRing(false); return false; }
+            if (TappedInside(min, max)) { _dismissedKey = _key; SetRing(false); return false; }
+            if (!_ringShown) SetRing(true);
+
+            float dt = Mathf.Clamp(Time.unscaledDeltaTime, 0f, .25f);
+            if (_appear < 1f) _appear = Mathf.Min(1f, _appear + dt / Mathf.Max(.01f, _appearSeconds));
+            float eased = Mathf.Sin(_appear * Mathf.PI * .5f);   // OutSine
+            float grow = Mathf.Lerp(_appearFrom, 1f, eased);
+
+            float sf = Mathf.Max(.0001f, _root.lossyScale.x);   // screen px per canvas unit
+            Vector2 centre = (min + max) * .5f;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_root, centre, null, out local);
+            size = Dig_Focus_Math.RingSize(new Vector2(max.x - min.x, max.y - min.y) / sf);
+            float t = Time.unscaledTime;
+
+            _ring.anchoredPosition = local;
+            _ring.sizeDelta = size;
+            _ring.localScale = Vector3.one * (Dig_Focus_Math.RingScale(t) * grow);
+            Color rc = _ringColor; rc.a = eased;
+            _ringImage.color = rc;
+
+            float phase = Dig_Focus_Math.EchoPhase(t);
+            _echo.anchoredPosition = local;
+            _echo.sizeDelta = size;
+            _echo.localScale = Vector3.one * (Dig_Focus_Math.EchoScale(phase) * grow);
+            Color ec = _ringColor; ec.a = Dig_Focus_Math.EchoAlpha(phase) * eased;
+            _echoImage.color = ec;
+
+            // KT focus box: target-sized rect at the target centre carries the dim hole (offsets shrink 1000 -> 0) and the hand (anchors 0.8 / 0.3, pivot on the fingertip).
+            // KT sizes the box from the target's OWN rect (uiTarget.rect), not from its overhanging icon: the 150 x 88 plan rect of a rail button, so the hand anchors land on the plate
+            _target.GetWorldCorners(_corners);
+            Vector2 rmin = _corners[0], rmax = _corners[2];
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_root, (rmin + rmax) * .5f, null, out Vector2 boxLocal);
+            Vector2 boxSize = new((rmax.x - rmin.x) / sf, (rmax.y - rmin.y) / sf);
+            _dimBox.anchoredPosition = boxLocal; _dimBox.sizeDelta = boxSize;
+            _handBox.anchoredPosition = boxLocal; _handBox.sizeDelta = boxSize;
+            float off = _offsetValue * (1f - eased);
+            _dimFocus.offsetMin = new Vector2(-off, -off); _dimFocus.offsetMax = new Vector2(off, off);
+            for (int i = 0; i < 4; i++) { Color c = _dim[i].color; c.a = _dimAlpha * eased; _dim[i].color = c; }
+            if (_hand.gameObject.activeSelf)
+            {
+                // yoyo 1 -> 1.1 -> 1 over 0.5 s each way (KT scale sequence), around the fingertip pivot; nothing else moves
+                float k = Mathf.PingPong(t / Mathf.Max(.01f, _handYoyoSeconds), 1f);
+                _hand.localScale = Vector3.one * Mathf.Lerp(1f, _handYoyoScale, Mathf.SmoothStep(0f, 1f, k));
+            }
+            handBelow = true;
+            return true;
+        }
+
+        static bool TappedInside(Vector2 min, Vector2 max)
+        {
+            Pointer p = Pointer.current;
+            if (p == null || !p.press.wasPressedThisFrame) return false;
+            return Dig_Focus_Math.Contains(min, max, p.position.ReadValue());
+        }
+
+        void OnDisable() { _ringShown = false; }
+    }
+}

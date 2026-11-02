@@ -1,0 +1,37 @@
+- Quest_Focus_Msg
+   anchorMin {x: 0.5, y: 0.5} anchorMax {x: 0.5, y: 0.5} anchoredPos {x: 0, y: 0} sizeDelta {x: 325, y: 125} pivot {x: 0.5, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(_offsetValue=1000, _duration=0.35)
+- Quest_Focus_Msg/Bottom
+   anchorMin {x: 0.5, y: 0} anchorMax {x: 0.5, y: 0} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 1} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+- Quest_Focus_Msg/Focus
+   anchorMin {x: 0, y: 0} anchorMax {x: 1, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 0, y: 0} pivot {x: 0.5, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+- Quest_Focus_Msg/Focus/Bottom
+   anchorMin {x: 0.5, y: 0} anchorMax {x: 0.5, y: 0} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 1} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.98039216}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Msg/Focus/Left
+   anchorMin {x: 0, y: 0} anchorMax {x: 0, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 1, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.98039216}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Msg/Focus/Right
+   anchorMin {x: 1, y: 0} anchorMax {x: 1, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 0, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.98039216}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Msg/Focus/TextMessage
+   anchorMin {x: 0.5, y: 0} anchorMax {x: 0.5, y: 0} anchoredPos {x: 0, y: -25} sizeDelta {x: 500, y: 200} pivot {x: 0.5, y: 1} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 1, g: 1, b: 1, a: 1}, m_RaycastTarget=0, m_text=This pet increases the money you earn while climbing., m_fontSize=32, m_fontSizeMin=18, m_fontSizeMax=32, m_HorizontalAlignment=2, m_VerticalAlignment=256, m_TextWrappingMode=1, m_fontStyle=0)
+    MB()
+- Quest_Focus_Msg/Focus/Top
+   anchorMin {x: 0.5, y: 1} anchorMax {x: 0.5, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 0} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0.98039216}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+    MB(m_Interactable=0, m_Transition=0)
+- Quest_Focus_Msg/Left
+   anchorMin {x: 0, y: 0} anchorMax {x: 0, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 1, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+- Quest_Focus_Msg/Right
+   anchorMin {x: 1, y: 0} anchorMax {x: 1, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 0} pivot {x: 0, y: 0.5} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
+- Quest_Focus_Msg/Top
+   anchorMin {x: 0.5, y: 1} anchorMax {x: 0.5, y: 1} anchoredPos {x: 0, y: 0} sizeDelta {x: 3500, y: 3500} pivot {x: 0.5, y: 0} scale {x: 1, y: 1, z: 1} active 1
+    MB(color={r: 0, g: 0, b: 0, a: 0}, m_Type=0, m_RaycastTarget=1, m_PreserveAspect=0)
