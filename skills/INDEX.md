@@ -423,6 +423,7 @@
 - tuning-by-probe - Tune a curve, force, speed or knockback by measuring the real outcome first: seeded probe, before/after table, reference shape scaled to the world, bounds tests. Use before editing any gameplay curve or number copied from a reference.
 
 ## tutorial
+- tutorial-focus-notice-hand - Use when building or fixing a tutorial / FTUE focus layer: translucent black notice frame, focus ring on the target button, pointing hand rules (pivot, mirror, scale-only), notice placement. Keeps every game's tutorial visuals consistent.
 - tutorial-phase-system - Tutorial phase system: persisted phase int, per-phase HUD visibility and locks, spotlight guidance, rewards once, resume safety. Use when building the first-time tutorial.
 
 ## ui
