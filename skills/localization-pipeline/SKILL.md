@@ -26,3 +26,5 @@ Source: official (Unity-Technologies/skills/localization), our wording; applies 
 - Wrap lookups in one static helper so existing code changes minimally; when mapping existing strings to keys, match the longest strings first so short ones ("NO") do not hit inside long ones.
 - CJK: TMP essential resources must be imported first; use dynamic fallbacks (see `tmp-font-optimization`).
 - Table completeness check before done: every key exists in every locale, no empty entries, then run the Addressables content build and switch locale in the Editor to confirm.
+- Per-language font assets are dead weight until wired: baking a ja/ko font and storing it on the language entry is not enough. Add the selected language's font to the main UI font's `fallbackFontAssetTable` on language change (remove the previous one), otherwise CJK labels show boxes. Verify by switching language in Play and screenshotting a label (the fallback material has no outline: check it). Re-bake the subset fonts after every string wave.
+- Labels built once keep the old language until rebuilt: either rebuild on the language-changed event or tell the player to reopen the game.
