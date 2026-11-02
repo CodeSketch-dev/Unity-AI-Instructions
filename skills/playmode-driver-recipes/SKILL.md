@@ -27,3 +27,4 @@ Report numbers and screenshot paths; state what only a device can verify.
 - Compositing a canvas into a RenderTexture under URP can return a blank frame; prefer `ScreenCapture` for overlay canvases.
 - `script-execute` right after entering Play can fail with "Failed to invoke ... after 10 retries" until the domain finishes loading: wait a few seconds and retry.
 - EditMode tests run after a Play session need `EditorUtility.RequestScriptReload()` first (statics survive with domain reload off).
+- Opening a modal that needs progression (rebirth, premium shop) for a screenshot: in Play, read the save's private data via reflection, remember the original values, set the minimum (gear mask, cash), invoke the HUD's private press handler, capture, then WRITE THE ORIGINALS BACK before leaving Play. A daily/welcome modal may cover the target: deactivate it by name first. The modal screenshot can land mid fade-in (translucent): judge layout, not colour.
