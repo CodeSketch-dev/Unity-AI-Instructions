@@ -54,3 +54,8 @@ Source: official (Unity-Technologies/skills/unity-pipeline, unity-cli, project-a
 - Script snippets run through an eval tool: fully qualify types and avoid extension methods and `using` lines when the tool compiles statements as a body; class-shaped snippets go through the execute-class form. Check the tool's own rules before writing long scripts.
 - Code in a default `Assembly-CSharp-Editor` folder cannot reference types in asmdef assemblies: call them by reflection, or move the tool into an asmdef-aware Editor assembly.
 - Play-mode timing and capture quirks (fixed screenshot size, retries after entering Play, reload before EditMode): see `playmode-driver-recipes`.
+
+## Play Mode discipline (hang avoidance)
+- Never edit scripts while Play is running: stop Play first, wait until `IsPlaying` is false (the stop call often still reports true for a few seconds), then edit and refresh. Compiling during Play hung the Editor twice.
+- After any Play session `RequestScriptReload()` and wait ~45 s before EditMode; otherwise HUD layout tests fail on stale statics (not real regressions).
+- The first Play after an Editor restart can take 60+ s and MCP calls fail with "after 10 retries": wait and retry, do not kill the Editor.

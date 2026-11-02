@@ -24,3 +24,8 @@ Create `Button/Content/IconLabelGroup` rather than placing the icon and TMP dire
 ## Artwork icons: centre the focal point, not the sprite rect
 - Pack/item/hero icons (chest, bag, gem pile) are centred by their VISIBLE content: the alpha bounding box / centre of mass must sit on the centre of the art area (horizontal: card or free box left of the price button; vertical: free band between the top value text and the bonus line/price button), tolerance <= 2 px. Generated or downloaded art often has uneven transparent margins: crop/re-centre the PNG (alpha centroid) before import instead of nudging per card, and remove inherited template offsets.
 - Verify per card by script (icon world centre vs art-area centre) and by screenshot; check every tier (small, wide, big card), not just one.
+
+## Two-line labels and secondary buttons on one slot
+- A two-line label (name + price/count) needs about 2 x font x 1.46 px of height (Unity UI Text line height). A 30 pt max in an 84 px box spills the second line over the bottom lip: cap the fit max at <= 24 for two lines in a ~96 px button, raise the label box a few px, and verify with `preferredHeight` vs rect height in Play, not by eye.
+- When a card slot holds two alternative buttons (e.g. a gem unlock and an ON/OFF toggle), the layout code must place BOTH on relayout. Keeping only the last one in a single field leaves the other at its first-build position and it overlaps the main CTA after a profile (portrait/landscape) change. Track a second reference or a list.
+- A tag that repeats the title bar (e.g. "REBIRTH" over a card already titled "REBIRTH 0") and sits beside a single CTA pulls that CTA off-centre: hide the tag and centre the one button.
