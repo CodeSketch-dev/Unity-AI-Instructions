@@ -21,7 +21,7 @@ Operating manual; see `editor-lane-single-writer` (what is serial) and `multi-ag
 - Hold for one batch only (compile + run + screenshots), leave Edit Mode.
 
 ## Keep the project compiling
-- One whole Write/Edit per file; no half-edited state between calls. Do not edit scripts while Play runs (compile stalls): exit Play, edit, recompile.
+- One whole Write/Edit per file; no half-edited state between calls. Do not edit scripts while Play runs (compile stalls): exit Play, edit, recompile. This includes file-only subagents: never launch a script-editing agent while the Editor is in or entering Play (a recompile during Play hung the Editor for 20+ min; only a force-kill recovers, which may need the owner's approval). Order: stop Play, run the agents, wait for them, refresh/compile, then Play.
 - Compile under the lock, read the Console, fix your own errors before release. Others' errors: report, do not fix.
 - Patch scripts must be idempotent (check for double-applied blocks). Never save a scene with Play-created objects (`playmode-driver-recipes`).
 
