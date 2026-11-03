@@ -29,3 +29,8 @@ Create `Button/Content/IconLabelGroup` rather than placing the icon and TMP dire
 - A two-line label (name + price/count) needs about 2 x font x 1.46 px of height (Unity UI Text line height). A 30 pt max in an 84 px box spills the second line over the bottom lip: cap the fit max at <= 24 for two lines in a ~96 px button, raise the label box a few px, and verify with `preferredHeight` vs rect height in Play, not by eye.
 - When a card slot holds two alternative buttons (e.g. a gem unlock and an ON/OFF toggle), the layout code must place BOTH on relayout. Keeping only the last one in a single field leaves the other at its first-build position and it overlaps the main CTA after a profile (portrait/landscape) change. Track a second reference or a list.
 - A tag that repeats the title bar (e.g. "REBIRTH" over a card already titled "REBIRTH 0") and sits beside a single CTA pulls that CTA off-centre: hide the tag and centre the one button.
+
+## Mini buttons with a two-line label (owner fix 2026-11-04)
+- Icon (<= 40 px) at left, label box = free gap to the right edge with EQUAL margins (left = icon + 4..8, right ~10); vertical insets: top ~8, bottom ~16 (the sprite lip), so two lines sit on the FACE centre, not on the lip. Cap the font at 24 for 2 lines in an ~84 px button.
+- A two-state card (claimed / locked): darken the card plate, texts and icon tint (never grayscale the icon), and grey ONLY the button plate (`targetGraphic.material = GrayMaterial`), labelled CLAIMED / countdown.
+- Outline weight: heavy black outlines read as eye-straining; keep TMP outline <= ~0.36 (small) / ~0.52 (large) with a navy-black (#14172A-ish) colour and a soft underlay.
