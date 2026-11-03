@@ -28,7 +28,7 @@ Use this reference when implementing or repairing a studio splash, startup artwo
 
 Expose phase durations as serialized tuning. Two seconds of studio logo followed by five seconds of game loading is an example, not a global ad requirement. An alternative ad phase order is valid when specified and verified. Do not quietly change the user's chosen order.
 
-Measure minima from the moment the relevant view is presented. Real work may take longer. Use `Time.unscaledTime` or equivalent and UniTask delays with `ignoreTimeScale: true`; loading must work at timeScale zero. Never label a timed bar as actual disk/scene progress.
+Measure minima from the moment the relevant view is presented. Real work may take longer. Prefer `Time.realtimeSinceStartupAsDouble` for wall-clock minima across the first rendered frame, or an equivalent monotonic UniTask realtime delay. `Time.unscaledTime` can jump across Editor startup/frame initialization: verify measured wall durations instead of trusting the configured delay. Loading must also work at timeScale zero. Never label a timed bar as actual disk/scene progress.
 
 ## Extensible UniTask tasks
 
