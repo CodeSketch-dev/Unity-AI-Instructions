@@ -75,6 +75,9 @@
 - clone-ip-safety - Asset provenance and IP hygiene for clones: track asset origin, flag ripped/trademarked content, store-safe naming. Use when importing from a reference game, naming the game, or before a public build/store listing.
 - clone-pipeline - Entry point for cloning a Roblox-style game to Unity mobile: maps phase -> skills -> gates, and holds the per-game docs/clone-plan.md. Use at project start, \"what's next\", or when unsure which skill applies.
 
+## codex
+- codex-delegation - Delegate well-specified CODE-ONLY tasks to the Codex CLI (cheap model) as a managed worker to save Claude tokens: write a brief, run codex exec in the background, then compile/test/review yourself. Use for pure logic, tests, data tables, boilerplate; keep design and Editor work on Claude.
+
 ## collision
 - collision-registry - Route trigger and collision contacts through the framework OptCollisionRegister and OptCollisionSensor instead of per-object OnTrigger with GetComponent. Use when adding any pickup, platform, zone, checkpoint or hazard.
 
