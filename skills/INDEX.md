@@ -277,6 +277,9 @@
 ## pooled
 - pooled-ranked-fx - Per-object quality/rarity effects and cues on many world objects without a particle system each: register sources, one manager ranks at 5 Hz, lends pooled views to the top N for the device tier. Use for auras, glows, best-pick markers on large populations.
 
+## postfx
+- postfx-capture-recipe - Capture trustworthy Unity screenshots WITH post-processing: clone the Main Camera at runtime, disable its scripts, render to a RenderTexture, close auto-popups first. Use when judging environment/art quality or UI in Play; raw Scene View judgements are wrong.
+
 ## price
 - price-button-contract - Contract for every in-game currency price button, card or unlock row (icon + price as one centred group, red when unaffordable, attention pulse, sold/owned state, top-up flow, no store component for soft currency). Use when building or fixing any shop, price button, card or unlock row.
 
@@ -399,6 +402,9 @@
 ## static
 - static-bus-events - Define and use StaticBus events (IEvent classes, Post, Subscribe/Unsubscribe pairing). Use when many unrelated systems must react to one notification.
 
+## studio
+- studio-loop-runbook - Run an autonomous multi-hour studio session: cron wake every minute, backlog file as the single source of truth, code-only subagents + main agent owns the Editor, compile/test/commit gates, no-op while agents run. Use when the owner is away and work must continue until a backlog is done.
+
 ## tech
 - tech-debt - Inventory dead code, duplicates, oversized files and stale assets, rank by cost, remove safely with a GUID/reference scan and separate revertable commits. Use when cleaning the project or before a refactor.
 
@@ -411,11 +417,15 @@
 ## text
 - text-spread - Use when creating Unity screen-space or world-space reward/stat text such as +money, +speed, +luck, or damage with a left TMP Sprite icon and right TextMeshPro label.
 
+## third
+- third-party-pack-recon - Before designing anything on a purchased asset pack (characters, accessories), read its prefab structure on disk: where parts sit, which prefabs carry placements, what is loose at origin. Use before building shops/loadouts from a pack.
+
 ## thrown
 - thrown-bomb-aoe - Thrown items and bombs: pooled arc or linear projectiles, fuse with blink, NonAlloc blast with falloff, owner safety, optional terrain dig. Use when adding grenades, bombs, shuriken, shields, hammers or banana throws.
 
 ## tmp
 - tmp-font-optimization - TextMeshPro font and text performance: static main font plus dynamic fallbacks, padding ratio, atlas size, autosize cost, world text, CJK. Use when TMP atlases bloat memory, glyph weight differs, text spikes CPU or a multilingual build is large.
+- tmp-sprite-icons - One shared TextMeshPro Sprite Asset for inline icons (cash, gem, power, egg, star) used by world TextMeshPro text via sprite tags, built by an Editor baker, with a pure string helper. Use when text must carry a currency/stat icon in 3D or world-space labels.
 
 ## token
 - token-efficient-workflow - Rules that cut tokens and time: read less, query indexes, batch calls, small outputs, delegate wide search, avoid rework, clean hand-off. Use at the start of long Unity/clone sessions or when slow/costly.

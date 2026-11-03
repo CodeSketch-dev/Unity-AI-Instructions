@@ -33,4 +33,9 @@ Create `Button/Content/IconLabelGroup` rather than placing the icon and TMP dire
 ## Mini buttons with a two-line label (owner fix 2026-11-04)
 - Icon (<= 40 px) at left, label box = free gap to the right edge with EQUAL margins (left = icon + 4..8, right ~10); vertical insets: top ~8, bottom ~16 (the sprite lip), so two lines sit on the FACE centre, not on the lip. Cap the font at 24 for 2 lines in an ~84 px button.
 - A two-state card (claimed / locked): darken the card plate, texts and icon tint (never grayscale the icon), and grey ONLY the button plate (`targetGraphic.material = GrayMaterial`), labelled CLAIMED / countdown.
-- Outline weight: heavy black outlines read as eye-straining; keep TMP outline <= ~0.36 (small) / ~0.52 (large) with a navy-black (#14172A-ish) colour and a soft underlay.
+- Outline weight: heavy black outlines read as eye-straining; keep TMP outline <= ~0.36 (small) / ~0.52 (large) / ~0.26 (world text) with a navy-black (#14172A-ish) colour and a soft underlay, via cached material INSTANCES (never edit the shared asset).
+
+## Audit false positives and layout facts (2026-11-04)
+- Ink audits count ANY child graphic or text as button ink: notification dots, badge counts and glow images must be named so the audit skips them (names containing Dot or Badge), otherwise they shift the measured pair centre. Fix the name, not the layout.
+- A runtime icon swap with a raw sprite that has transparent margins shifts the pair: use the tight (alpha-trimmed) sprite and re-fit the HorizontalLayoutGroup after every swap.
+- Stacked tile (name / icon / count): the count goes in its OWN row below the icon (>= 6 px gap), the block centred on the tile face using the sprite lip; never put the count over the art.

@@ -28,3 +28,6 @@ Source: third-party example (Unity open-project-1, Apache-2.0), counter-example.
 - Its save system writes JSON straight to the final file in `persistentDataPath` and creates an empty file on first read: a crash mid-write corrupts the save. Do NOT copy that.
 - Keep our rule: write to a temp file, flush, then rename over the target and rotate a backup.
 - Idea worth keeping: serialise item/ScriptableObject references by stable GUID/id (a `SerializableScriptableObject` base with a generated Guid) instead of by name or index.
+
+## Golden fixture rule (2026-11-04)
+- Keep a golden save fixture per schema generation. Adding save fields intentionally breaks the deep-compare golden test: KEEP the old bytes as `golden_<version>_<tag>.bytes` with a test that they still load and the new block is null-safe after Normalize, THEN regenerate the current golden. Never regenerate to hide an accidental change. Rebalances also require updating the tests that assert old numbers, with the reason.
