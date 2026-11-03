@@ -43,3 +43,5 @@ button, text, label, popup, shop, tab, HUD, icon, price plate, currency bar, pre
 
 ## Subagents
 When delegating UI work, put in the brief: "Read skills/ui-always/SKILL.md first and the skills it lists, then apply its gate." Paste file paths, not summaries. Reject a subagent report that has no skill list and no dx/dy numbers.
+
+- Toasts, notifications, cash/currency values and any meaningful text: ICON LEFT + TextMeshPro RIGHT (UI = TextMeshProUGUI, world text = TextMeshPro + TMP sprite tag). See `ui-icon-text-everywhere`.
