@@ -23,3 +23,9 @@ REVIEW THE TESTS, not just the code: Codex wrote a "simulation" whose key metric
 - Other CLIs (kimi etc.): same wrapper with `AGENT_CMD='<cli reading stdin, printing final message>'`; the contract (brief on stdin, status file, out/log files, manager reviews diff, compiles, tests, commits) stays identical.
 - Model: terra (smarter) for logic/tests touching real APIs; luna for mechanical edits. Briefs name files to read, owned paths, exact signatures; the worker never touches git/Unity.
 - Commit only owned paths (`git add <paths>`): the Editor regenerates baked assets that a broad add sweeps in.
+
+## Reviewing worker output (lessons from a 10-task session)
+- Run the worker's tests RED-FIRST in the Editor: they exposed real bugs in the worker's code (RectOffset argument order put padding on the wrong side) and real gaps in the design (a dive scan shorter than the deepest swing), but also test-only defects (objects not on block origin, missing save in a test world, NUnit shares one fixture instance so per-test lists must be cleared in [SetUp]). Triage each failure: worker test bug vs code bug vs design gap.
+- After ANY prefab edit run the FULL EditMode suite before committing: a MonoBehaviour that builds a Unity object (MaterialPropertyBlock, Material) in a field initializer passes unit tests but throws when the prefab loads; `testFilter` may not filter, so read the totals.
+- Worker UI fixes need a measured audit after the change, not a green unit test: a "fix" made the measured offset worse. Root cause of the last UI bug sat in the baked prefab (a Label with no preferred width claimed the whole row), not in the builder code the worker kept editing. Inspect the real prefab hierarchy first and hand the worker the numbers plus the hierarchy dump.
+- Quota: workers hit usage limits; the wrapper reports final=USAGE_LIMIT(retry time). Do not burn turns polling: log the blocker, resume after the time.
