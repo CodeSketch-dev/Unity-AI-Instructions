@@ -1,3 +1,5 @@
+// HISTORICAL EVIDENCE: project-specific snapshot; not a current portable template.
+// Raw-down dismissal, runtime builders and local dim/hand values are superseded by ../../SKILL.md.
 using SketchEngine.Mono;
 using UnityEngine;
 using UnityEngine.InputSystem;

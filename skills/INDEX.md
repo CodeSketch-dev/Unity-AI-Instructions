@@ -235,7 +235,7 @@
 - multi-agent-coexistence - Protocol so Claude, Codex, subagents, the human and the Editor do not overwrite each other (re-read before edit, snapshot/check/claim via workspace_guard.py). Use at session start in shared repos and when files change unexpectedly.
 
 ## native
-- native-ad-beside-popup - Show a native ad next to a popup without gaps or covered content: ready-check first, pure layout, slide the popup, then show. Use when adding side/half native ads to popups or debugging an empty gap or an overlapped HUD.
+- native-ad-beside-popup - Fit native ads beside popups and inside fixed loading slots. Use when adding native half/rect ads or debugging wrong native size, empty gaps, or covered content.
 
 ## nav
 - nav-traversal-link-tool - Editor tool and runtime rules for NavMesh traversal links: two-click authoring with snap, scripted parabola traversal, agent-body sync, ladder links. Use when bots must cross gaps, jumps or ladders that the baked navmesh does not connect.
@@ -349,7 +349,7 @@
 
 ## scene
 - scene-authored-prefabs - Use when adding any manager, system, world piece, player/camera/GUI stack, skybox or UI page to a Unity project, or when naming scripts/folders/events: prefab in Assets/_Game/Prefabs/<Feature>/ placed in the scene (never runtime-spawned), Knife Tower folder and naming layout, StaticBus events.
-- scene-flow-loading - Scene flow and loading: boot scene order, loader screen with real plus fake progress, one-time costs behind loading, no blocking SDK init. Use when wiring scenes and startup.
+- scene-flow-loading - Build gated Unity splash and loading flows. Use when startup needs a studio logo, game artwork, progress, async tasks, app-open/native ads, or delayed scene activation.
 - scene-naming-conventions - Scene, prefab and asset naming conventions and folders for a clone project, checked by the naming lint. Use when creating scenes, prefabs or assets.
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints) callable from the menu and from Unity MCP. Use when a scene needs several bake steps run in the right order.
 - scene-teardown-safety - Prevent teardown-order bugs when switching scenes or modes: destroyed pooled objects in OnDisable, surviving popup roots, leaked tweens/tasks/listeners, duplicate singletons. Use when adding scene or mode switching, pools, or after a MissingReferenceException on exit.
@@ -423,7 +423,7 @@
 - tuning-by-probe - Tune a curve, force, speed or knockback by measuring the real outcome first: seeded probe, before/after table, reference shape scaled to the world, bounds tests. Use before editing any gameplay curve or number copied from a reference.
 
 ## tutorial
-- tutorial-focus-notice-hand - Use when building or fixing a tutorial / FTUE focus layer (Quest_Focus_Pointer style): dim overlay with a hole that shrinks onto the target button, pointing hand with fingertip pivot, black notice frame, ground arrow. Exact values, hierarchy dumps, a portable script and screenshots are in references/.
+- tutorial-focus-notice-hand - Use when a tutorial spotlight, pointing hand, notice or quest-focus overlay needs visual parity or the highlighted button misses its first tap. Covers focus-hole geometry, real click delivery and measured Play checks.
 - tutorial-phase-system - Tutorial phase system: persisted phase int, per-phase HUD visibility and locks, spotlight guidance, rewards once, resume safety. Use when building the first-time tutorial.
 
 ## ui

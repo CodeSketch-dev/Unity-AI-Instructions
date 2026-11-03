@@ -1,3 +1,5 @@
+// HISTORICAL EVIDENCE: project-specific snapshot; not a current portable template.
+// Raw pointer polling and local placement choices are superseded by ../../SKILL.md and ../input-verification.md.
 using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;

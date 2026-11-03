@@ -1,3 +1,5 @@
+// HISTORICAL EVIDENCE: project-specific snapshot; not a current portable template.
+// Preserve provenance; adopt the current skill's serialized UI/input contract instead of copying dependencies.
 using SketchEngine.Mono;
 using TMPro;
 using UnityEngine;

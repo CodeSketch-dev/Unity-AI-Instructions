@@ -1,22 +1,42 @@
 ---
 name: scene-flow-loading
-description: "Scene flow and loading: boot scene order, loader screen with real plus fake progress, one-time costs behind loading, no blocking SDK init. Use when wiring scenes and startup."
+description: "Build gated Unity splash and loading flows. Use when startup needs a studio logo, game artwork, progress, async tasks, app-open/native ads, or delayed scene activation."
+triggers: loading screen, splash screen, studio logo, startup flow, loading tasks, scene activation, app open loading, man loading, man hinh tai, thanh loading, logo studio, tai scene, splash
 ---
 
-# Scene flow and loading
+# Splash, loading and scene activation
 
-- Boot order: splash, consent on first launch only, init in the background after the first frame, then the first scene straight into gameplay for new players. See `boot-sequence-setup`.
-- Loader screen: fade, real progress to the target, short fake fill to 100%, minimum hold, tips from localization.
-- Transition ownership: expose a single busy gate (`IsBusy` or equivalent) shared by fade and load entry points; reject re-entry while a transition is active. Clear it in `finally`/completion handling so an exception, cancelled operation, or missing scene cannot soft-lock navigation.
-- For externally started async scene work, register/monitor the operation with that same gate instead of creating a parallel loader state.
-- Pay one-time costs here: Addressables, glyph atlases, pool warm-up, mesh combining (`mesh-scene-combiner`).
-- Cold start budget is a measured target on a low-end device, not a promise (`profiling-evidence`).
-- Scene names follow `scene-naming-conventions`; transitions go through one loader API.
+Use the existing loader before introducing another. Read [the detailed contract](references/loading-screen.md) for implementation or a startup defect. This skill owns transition orchestration; `boot-sequence-setup` owns framework initialization order.
 
-## Added from open-project-1 (2026-11-02)
-Source: third-party example (Unity open-project-1, Apache-2.0), rewritten as ideas.
-- Persistent-managers pattern: an initialisation scene loads the managers scene additively once, then the first content scene; content scenes never contain managers.
-- Loader takes load requests through one entry point (request carries target scene, "show loading screen", "fade" flags); a fade channel/service brackets unload and load so the player never sees a pop.
-- Unload the previous scene only after the fade-out completes, activate the new one before fade-in; reset the busy gate in `finally`.
-- Editor convenience: when a content scene is opened directly in the Editor, the loader detects it and loads the managers scene so Play works from any scene.
-- Skip (INCOMPATIBLE with our stack): its coroutine and `AsyncOperationHandle.Completed` plumbing; use UniTask (`unitask-callbacks-and-streams`).
+## 1. Inspect and record the contract
+1. Verify the connected Editor project, build scene order, actual entry component, installed UniTask/framework, SDK provider, save flags and existing loader callers. Read a requested reference through its own MCP; label source-only observations accordingly.
+2. Record the phases, minimum durations, ad opportunity, task registration lifetime, activation point and ownership in the task plan. A studio 2 s + game artwork 5 s sequence is one configurable product choice, never a universal default.
+3. Split tasks into **before activation** and **after activation**. A target scene's `Awake` cannot register work before that scene activates. Move such prerequisites into the boot/persistent owner or keep the overlay while postactivation tasks finish.
+
+## 2. Implement one transition owner
+1. Use one shared busy gate for synchronous entry points, UniTask APIs, fades and externally started loads. Set it before awaiting; clear it in `finally`. Reject duplicate requests.
+2. Use scene-authored prefabs and serialized view references (`scene-authored-prefabs`); load `ui-always` before changing their UI. Separate studio logo, game art, progress and reserved native slot. Never runtime-build the loading hierarchy.
+3. Expose cancellable task registration with progress, for example `Func<IProgress<float>, CancellationToken, UniTask>`. Register before the owner's task window closes; clear completed/stale registrations and reset static state on `SubsystemRegistration`.
+4. Render the overlay before heavy work. Use unscaled UniTask timing and monotonic progress; reserve 100% for completed gates, never for elapsed time alone.
+5. Validate the scene before loading. Stage `LoadSceneAsync` with `allowSceneActivation = false`, normalize its loading progress by 0.9, then enable activation only when all preactivation gates finish. Keep the overlay/input blocker until postactivation tasks also finish.
+6. Guard cancellation, task failure, missing scenes, duplicate instances and scene teardown. Unity scene operations cannot be cancelled: follow the explicit interruption policy in the reference instead of abandoning an operation at 0.9.
+
+## 3. Integrate existing ads safely
+1. Preserve the installed mediation/provider. Do not add another network just to obtain a loading flow. Read saved consent, remove-ads and applicable active entitlements before any ad attempt; retain explicit refusals.
+2. Treat ad readiness as a bounded opportunity during loading. No inventory skips the ad; it never traps startup. A shown app-open holds activation until its close/failure callback resolves exactly once. Never timeout an actively visible ad into gameplay.
+3. Measure the authored native slot after layout; convert screen pixels to the provider's actual logical units using SDK device scale, never physical `Screen.dpi`. Keep native clear of progress/text and hide it before fullscreen ads or exit. Apply `native-ad-beside-popup` for SDK sizing details.
+4. Own launch app-open in one place. Suppress legacy launch overlays; prevent resume logic from showing another fullscreen ad after the launch ad closes. Clean up native and temporary audio ducking on every exit.
+
+## 4. Verify before reporting
+- [ ] Compile; inspect serialized references, missing scripts and Console through Unity MCP.
+- [ ] Play from build scene 0 with a backed-up/restored save; record studio/game phase durations, task completion, app-open close, activation and overlay-hidden timestamps.
+- [ ] Assert target scene `Awake` occurs after every preactivation gate; assert controls unlock only after required postactivation tasks finish.
+- [ ] Exercise no inventory, saved refusal/remove-ads, duplicate request, task failure, cancellation, direct scene Play and domain-reload-off restart. Repeat scene transitions per `scene-teardown-safety`.
+- [ ] Run layout/ink audits and inspect Play screenshots at project aspect ratios: report counts, dx/dy, text bounds and native slot/requested/actual rectangles.
+- [ ] Verify real native/fullscreen callbacks on device; Editor mock readiness is not device evidence. Report measured total loading time and any unverified Android behavior.
+
+## Behavioural routing checks
+- "Logo 2 seconds, then art/native 5 seconds; wait before entering the game" -> load this skill plus UI/ads skills; inspect real entry scene and prove activation ordering.
+- "Add a loading task that reports progress" -> classify pre/postactivation, pass cancellation and verify failure/reentry cleanup.
+- "Scene opens behind the bar while app-open is showing" -> inspect activation gate and duplicate launch/resume ownership before editing.
+- "Only change the gameplay enemy's damage" -> do not route here; select gameplay/combat skills.
