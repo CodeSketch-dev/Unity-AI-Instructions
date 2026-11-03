@@ -227,7 +227,7 @@
 
 ## monetization
 - monetization-integration - Monetization hooks behind interfaces: rewarded/interstitial ads, IAP, daily reward, offline earnings, consent/ATT/GDPR, kids constraints, Editor mocks. Use when adding ads, IAP, shop, boosters or store compliance.
-- monetization-value-ladder - Price/reward design for free-to-play mobile games: gem anchor price, 1-3 rewarded-video route that feels like the best deal, escalating cash sinks, IAP packs, honest-offer guardrails. Use when pricing items, designing shop cards, rewarded placements, gem/cash faucets or IAP products.
+- monetization-value-ladder - Price/reward design for free-to-play mobile games: two options gem + reward, 1-3 rewarded-video route that feels like the best deal, escalating cash sinks, IAP packs, honest-offer guardrails. Use when pricing items, designing shop cards, rewarded placements, gem/cash faucets or IAP products.
 
 ## mono
 - mono-singleton-template - Write a MonoSingleton scene or persistent manager correctly (Instance vs SafeInstance, base calls, quit guard). Use when adding a manager component that must exist once.
