@@ -47,4 +47,11 @@ Five blocks, invariant first: PURPOSE, SUBJECT, VIEW, ART DIRECTION (from the st
 - Trusting generated grids or transparency: always script-verify.
 - Skipping the in-game screenshot.
 
+## Iterating a studio avatar or store icon
+- Treat the user's supplied icon as the style anchor; infer neither flat branding nor realism from the word "logo". Record whether they want an emblem, mascot or full game-art avatar before rendering.
+- Keep a compact approved/rejected ledger. Edit the latest approved composition, lock its accepted parts, and change only the requested parts; stop obsolete generations instead of presenting them after a correction.
+- Judge anatomy and hard-surface geometry at full size (hands, saddle contact, weapon head/shaft, perspective), then inspect 48/64 px previews. A detailed glow cannot repair a broken silhouette or impossible grip.
+- Assign distinct hue/value roles to character, mount, emblem and background. Blur and simplify the stylized background; concentrate bloom/FX at focal edges without erasing geometry or the face.
+- Research current popularity before claiming a character is trending. Public visibility is not evidence of advertising spend; label that uncertainty and keep character provenance in the asset manifest.
+
 Related: `ui-always` (UI work gate), `blender-procedural-assets`, `vertex-color-baking`, `game-feel-polish`.
