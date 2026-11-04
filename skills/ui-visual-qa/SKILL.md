@@ -29,3 +29,6 @@ Limits: only 8-bit non-interlaced PNG; the Editor capture template was not compi
 Snapshot popup-root children before create, destroy only the new ones after capture, wait for the open tween, and claim blocking popups (offers, offline reward) with a real tap first; they respawn on resize/focus.
 
 **Mandatory centring:** after any change here, follow `ui-center-alignment` - measure content vs container bounds by script (<= 1 px), and also each widget vs its parent strip (header, plate, row). Fix misalignment yourself; never wait for the user to ask.
+
+## Numbers never replace looking (owner rule)
+An audit/validator pass is NOT proof a screen is right. Audits cannot see a missing icon, a price with no money icon, an item that does not say what it is, or art spilling out of its frame. Before reporting UI done: save a Play screenshot of every changed screen, LOOK at it, and check by eye: (1) every icon fully inside its frame, (2) every price/amount has its currency icon, (3) every card shows what the item is (icon + name), (4) nothing clipped or overlapping. Never mark a visible defect 'accepted' or 'by design' without a side-by-side with the reference game.
