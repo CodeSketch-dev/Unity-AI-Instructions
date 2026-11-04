@@ -31,3 +31,11 @@ REVIEW THE TESTS, not just the code: Codex wrote a "simulation" whose key metric
 - Quota: workers hit usage limits; the wrapper reports final=USAGE_LIMIT(retry time). Do not burn turns polling: log the blocker, resume after the time.
 - Content/economy picks are design, not code: a worker asked to "bundle existing cosmetics" picked items already owned by other routes (pass, wheel, VIP exclusives), and used id 0 which the grant helper rejects. Put the sellability/exclusivity rules and the grant-helper preconditions in the brief, or keep the pick on the manager side; always read the claimed ids against the definitions before accepting.
 - Never launch the wrapper as `( ... &)`: the outer command exits at once and the harness reports a fake "completed". Run the wrapper itself with run_in_background and trust only `<name>.status`.
+
+## Smarter orchestration (2026-11-05, 40+ worker runs)
+- Fan out: one brief per disjoint owned path set, 3-6 workers at once (audits, Blender scripts, plans, test fixes); the manager owns Editor/Play. Audit-type tasks (read-only, write a doc) are the safest first use of luna.
+- Art/model workers need a MEASURABLE brief: min HSV saturation, strictly increasing tri counts, labelled contact sheet that is uncropped (re-open it and say how cut-off was checked). A first pass without these came back flat, single-colour and indistinguishable per tier (graded 3/10): send it back with the failing numbers, never import it.
+- Spot-check 3 cited file:line claims of every audit before trusting it; drop findings you cannot reproduce.
+- `Temp/` is wiped by an Editor restart: a running brief then reads empty ("No prompt provided via stdin"). Keep briefs in `docs/**/briefs` or recreate and rerun; check `.status` before waiting.
+- One owner per file: if two workers need the same file, serialize them. Commit worker output only after compile + tests + diff review.
+- Worker verdict log: luna = audits, plans, Blender scripts, mechanical edits, test scaffolds (good); UI measurement fixes and economy picks (bad without the numbers/rules in the brief).

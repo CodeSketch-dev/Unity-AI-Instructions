@@ -9,3 +9,5 @@ triggers: tests-run timeout, testrunnerapi, stuck tests, phantom failures, stale
 - Stale builds: force `RequestScriptCompilation`, wait until the dll is newer than the .cs, delete the results file before each run. All tests failing with TypeLoadException = stale build.
 - PlayMode leaves an unnamed empty scene: reopen the game scene before screenshots.
 - After Play with domain reload off, request a script reload before EditMode.
+- Run PlayMode in small class groups (Filter groupNames/testNames), delete the results file first, wait for "done pass=N fail=M"; a full run can hang >10 min.
+- Order-dependent PlayMode failures with domain reload off: suspect a persistent singleton (`PersistAcrossScenes`) whose reloaded-scene duplicate self-destroys. `Find()` helpers using FindFirstObjectByType can return the doomed duplicate (destroyed input/audio); prefer `HasInstance ? Instance : Find...`. Diagnose with a state probe, do not guess static leaks.
