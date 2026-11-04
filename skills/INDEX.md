@@ -208,6 +208,13 @@
 - kcc-advanced-movement - Use when a game needs rope swing, wall jump, sink zones, force zones, fly carpet or jetpack movement states.
 - kcc-character-controller - Build the Roblox-feel character with the KinematicCharacterController: states, callback pipeline, SO tuning profiles, jump graceand input structs. Use when creating or tuning the player or bot movement controller.
 
+## kit
+- kit-assets-config-shaders - Use when setting up non-prefab building blocks: config ScriptableObject + Factory singleton, audio/pool configs, mobile URP tier with shader keyword, TMP outline presets and locale fonts, sprite atlases/9-slice, localization, locked-item silhouette, weighted reward asset.
+- kit-characters-skins-ai - Use when building or porting the actor stack: one gameplay actor with swappable skin prefabs, skin assets/unlock/equip/shop, guarded animator contract, bot tiers and spawner, trails and burst FX, checkpoints/revive. Includes the skin-not-applying-in-another-mode regression lesson.
+- kit-maps-stages-optimizer - Use when authoring stage/floor chunk prefabs in a scene container, ordering stages, adding checkpoints/zones, or setting up the per-scene optimizer (combine, cull, navmesh, waypoints). Chunk anatomy, stage order = hierarchy order, three optimizer generations.
+- kit-minigame-platforms - Use when adding a game mode/minigame shell or reusable platform/obstacle prefabs: mode registration, mode master with policy functions, HUD loader, collision dispatch, fade tile, conveyor, trampoline, kill zone, teleporter, checkpoint; plus serialization-drift pitfalls.
+- kit-ui-services - Use when building or importing reusable UI service prefabs from the studio kit: popup shell and facade, currency bar and fly-in, tabbed shop, IAP card, daily login, revive, settings, rating, quest arrow/focus, toast. Opt-in kit; pick the parts you need.
+
 ## ladder
 - ladder-climb - Ladder climbing for the KCC character: ladder collider and cache, BoxCast probe, enter/middle/exit states, jump-off and a bot nav link. Use when a map needs ladders or vertical climbs.
 
@@ -309,6 +316,9 @@
 
 ## postfx
 - postfx-capture-recipe - Capture trustworthy Unity screenshots WITH post-processing: clone the Main Camera at runtime, disable its scripts, render to a RenderTexture, close auto-popups first. Use when judging environment/art quality or UI in Play; raw Scene View judgements are wrong.
+
+## prefab
+- prefab-kit-catalog - Use when choosing what to reuse from the studio reference prefab kit: index of kit groups, which kit-* skill to load, top reusable items, import rules (dependency closure, GUID-referrer scan first), genre-neutral vs optional genre packs.
 
 ## price
 - price-button-contract - Contract for every in-game currency price button, card or unlock row (icon + price as one centred group, red when unaffordable, attention pulse, sold/owned state, top-up flow, no store component for soft currency). Use when building or fixing any shop, price button, card or unlock row.
@@ -448,6 +458,7 @@
 - studio-non-negotiables - The short list of studio gates no agent may skip (verification, UI measurement, prefab-first, proof before delete, single Editor writer, no unrequested commit...), each with how it is enforced and what evidence proves it. Use at the start of every task (pre-flight) and before reporting done.
 - studio-org-chart - Studio roles in three tiers (directors, leads, specialists), their domain boundaries, escalation paths and which agent to spawn for which task. Use when dispatching agents, writing briefs, or deciding who reviews a result.
 - studio-self-training - End-of-task retro that makes the studio smarter: turn lessons into skills, merge duplicates, publish, and bootstrap new projects with sync.bat. Use at the end of every task, when the owner corrects you, or when starting a new project.
+- studio-toolbox-guide - Use when starting a feature and unsure which studio kit or skill applies: opt-in knowledge map 'when building X, load skill Y' over the prefab kit and existing skills. Not a default load list; genre-neutral first, genre packs optional.
 
 ## tech
 - tech-debt - Inventory dead code, duplicates, oversized files and stale assets, rank by cost, remove safely with a GUID/reference scan and separate revertable commits. Use when cleaning the project or before a refactor.

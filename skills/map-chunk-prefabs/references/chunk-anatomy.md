@@ -14,7 +14,7 @@ Scene
 |   '- Stage_N [P]
 '- <Game>_Master [P]             master + GUI loader + Optimizer child (see optimizer-stack.md)
 ```
-Depth: scene -> container -> chunk -> group -> art prefab -> mesh. Keep nesting depth <= 8 and a chunk root free of gameplay logic except the zone/cull component.
+Depth: scene -> container -> chunk -> group -> art prefab -> mesh. Keep nesting depth <= 9 (real chunks measured 2-3 for plain geometry, 7-9 with embedded safe zones, bosses or characters) and a chunk root free of gameplay logic except the zone/cull component.
 
 ## 2. Budgets (soft defaults; a project may set its own numbers in its config)
 | Metric | Default budget | Why |

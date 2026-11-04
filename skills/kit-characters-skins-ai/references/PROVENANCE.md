@@ -1,0 +1,2 @@
+# Provenance
+Derived from the Knife Tower style catalog (character, skin, AI, item, FX, checkpoint prefabs; scripts and git history read). Reference stats: 77 skin assets in 8 families, 61 commits on bots, the skin-in-other-mode fix theme at 3 dates. Reference actor file is ~985 lines and references mode statics: copy the shape only. Reference used CodeSketch v1; SketchEngine is the upgraded form.

@@ -1,0 +1,2 @@
+# Provenance
+Derived from the Knife Tower style catalog (53 tower prefabs, 96 lane-game prefabs, 32 prop prefabs; scenes and scripts read; git history reviewed). Numbers: 48 stage prefabs, ~86 MB YAML total, depth 2/7/9 cases measured by tree dumps. The optimizer history (three generations) is from commit subjects; the reasons are partly inferred. Reference used CodeSketch v1; SketchEngine is the upgraded form.

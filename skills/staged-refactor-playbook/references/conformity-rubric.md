@@ -63,7 +63,7 @@ Commands are file-only (grep/find/python) unless marked Editor. Budget 0 means t
 | M04 | No generated mesh > 20 MB or > 200k vertices; large cells are split. | `find Assets/_Game -name '*.asset' -size +20M` | major |
 | M05 | Every generated mesh/asset is referenced (0 orphans after a bake; builders delete stale output). | GUID scan: unreferenced files under Meshes | major |
 | M06 | Static decor is combined at edit time per material by a combiner prefab; dynamic/animated excluded (Tag_SkipMeshSceneCombiner). | combiner prefab present in scene; renderer count per scene | minor |
-| M07 | Map prefab roots carry the per-zone far-clip/culling component; prefab nesting depth <= 8. | `python -I` prefab stats script | minor |
+| M07 | Map prefab roots carry the per-zone far-clip/culling component; prefab nesting depth <= 9. | `python -I` prefab stats script | minor |
 | M08 | Editor builders are idempotent and write prefabs (not scene-only objects); a second run yields 0 diffs. | run builder twice, `git status` clean | major |
 
 ## 5. Prefab organisation

@@ -1,0 +1,2 @@
+# Provenance
+Derived from the Knife Tower style catalog (6 shells, 19 platform and 5 obstacle prefabs, git history read). The reference's mode master, selection asset and static policy class are the source of the shell contract; the reference used CodeSketch v1 and SketchEngine is the upgraded form. Platform numbers (fade 0.75/2/0.75 s, trampoline multiplier 1.5, countdown 3 s) are tuning starting points only.
