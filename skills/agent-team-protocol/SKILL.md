@@ -35,3 +35,8 @@ Operating manual; see `editor-lane-single-writer` (what is serial) and `multi-ag
 
 ## Report
 `docs/reports/<task>.md`: status (DONE / DONE_WITH_CONCERNS / BLOCKED), files, checks run with numbers, unverified items, what others must reload. Final answer: status + path.
+
+## Brief checks (added after an agent skipped its required skills)
+- The brief makes the agent's FIRST notes line `Skills read: <names + one fact from each>`; the coordinator rejects a report with `Skills read: none`.
+- A "before/after" evidence pair must be two different captures. A copy or a missing "after" capture = the fix is NOT verified, whatever the agent concludes.
+- An agent that classifies audit findings as false positives must name the checker rule and show numbers (pair centre vs frame); the checker is then fixed (measure icon+label pairs) instead of ignoring the finding.
