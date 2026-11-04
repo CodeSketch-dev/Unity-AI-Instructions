@@ -16,6 +16,7 @@ This skill exists because the UI skills were being skipped. Any task that adds, 
 5. `ui-icon-label-layout` - icon + label as a HorizontalLayoutGroup content group; icon <= ~50% of the button's shorter side.
 6. `ui-button-anatomy` - press feedback, click sfx, grayscale disabled, notify dot.
 7. `ui-9slice-buttons` - cutting sprite borders for Sliced buttons/tabs/plates (no notch/seam at any size); read when importing or fixing a button sprite.
+8. `ui-edit-mode-authoring` - new art/size/text goes into the source prefab in Edit Mode; runtime only shows/hides and fills data (item icons, names, counts are fine at runtime); never old placeholder art swapped at runtime; delete the replaced old UI.
 Add by task: popups `ui-popup-anatomy`, title/header centring on the colour band `ui-title-band-centering`; tabs `ui-tabs`; lists/shops `ui-scroll-board`; HUD `mobile-hud-layout`; reward / watch-ad buttons `ads-popup-flow`; verification `ui-validator`, `ui-visual-qa`.
 If a skill file cannot be read, say so in the report; do not pretend it was applied.
 
