@@ -452,6 +452,9 @@
 ## static
 - static-bus-events - Use when many unrelated systems must react to one notification: define IEvent classes, Post, symmetric Subscribe/Unsubscribe, handler naming, folders, test-bus filtering, asmdef reference. Not for a single owner talking to its own children.
 
+## store
+- store-capture-pipeline - Capture store screenshots and UA video from a running Unity game: photo mode (hide HUD/world labels, free camera), exact-size ScreenCapture, frame-sequence recorder with Time.captureFramerate, ffmpeg encode, and the traps that wasted time. Use for Play Store / App Store assets and ad creatives.
+
 ## studio
 - studio-boss-quality-bar - Boss-level quality gate: judge every result harshly with superpowers skills, never accept mediocre art/feel/perf, replan and redo until excellent. Use before reporting done, when reviewing agent output, when a result looks average, or for any polish, juice, game feel task.
 - studio-loop-runbook - Run an autonomous multi-hour studio session: cron wake every minute, backlog file as the single source of truth, code-only subagents + main agent owns the Editor, compile/test/commit gates, no-op while agents run. Use when the owner is away and work must continue until a backlog is done.
