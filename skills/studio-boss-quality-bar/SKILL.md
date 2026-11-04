@@ -23,3 +23,14 @@ Role: you are a senior in every discipline (gameplay, tech art, UI/UX, VFX, audi
 - Light: pooled spawns, no per-frame allocations, few draw calls, short loads, low-end Android friendly; measure before claiming.
 - Faithful when cloning (`clone-research-autonomy`), polished when original; no invented UI the reference lacks.
 - Retention: clear goals, satisfying numbers, rarity reveals and rewards with anticipation.
+
+## Strict process rules (learned the hard way; extend this list every time the owner corrects an agent)
+1. **Reference first**: when the owner says "like X / same as X / follow the original", read X (project, prefab, video frames, wiki) BEFORE designing. Never invent UI, products, FX, numbers or layouts the reference does not show; if unclear, list candidates with evidence instead of guessing.
+2. **Reuse before create**: shared components, icons, currency bars, popups and shop systems of the game come first; new art only for what does not exist, generated crisp (never blurry placeholders) and registered with proper import settings.
+3. **Definition of Done by task type**: UI = audit numbers + overlap check + Play screenshot at 1920x1080; gameplay/FX = Play capture of every stage next to reference frames; shader/art = A/B capture + pixel diff + draw-call/vertex numbers (label desktop numbers as such); code = compiles, console clean, wired in scene/prefab; economy = simulator run. Missing evidence = not done.
+4. **Review delegated work yourself**: read the diff, compile, run Play, compare to the brief's acceptance numbers; a report that says "unverified" is a TODO, not a result. Send it back with failing evidence and a sharper brief; do not silently fix and hide the gap.
+5. **Never idle while agents run**: poll the disk (report files, `hubctl.py progress`) in bounded waits, review each result the moment it lands, keep the next task queued; one Editor writer at a time, queue the rest.
+6. **Fix root causes**: reproduce, find the cause with evidence (logs, A/B tests, pixel samples), then fix; no stacking workarounds. Record the lesson in a skill (`studio-self-training`).
+7. **Protect the project**: back up before risky batch edits, watch scene/prefab size, keep the Console clean, never leave the Editor in Play Mode or a dirty scene, no commits unless asked.
+8. **Owner time is sacred**: no questions answerable from the repo or references; decide small things yourself; report briefly with what was verified, what was not, and what is next.
+
