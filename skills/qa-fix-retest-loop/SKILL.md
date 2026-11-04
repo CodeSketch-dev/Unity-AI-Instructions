@@ -16,6 +16,9 @@ Setup validity comes from `rule-qa-validity`; verdict words from `rule-qa-verdic
 6. **Route** REAL failures to the owning agent with signature and reproduction; QA never edits game code. Retest from the failed stage, then once from S1 when code changed.
 7. **Verdict:** `qa_run.py verdict --task NAME --rung mcp|batch|static --save fresh|fixture`.
 
+## Token-lean UI round (owner order)
+Never loop open/close of the same popup in Play to "look again". One round = (A) static scan in Edit Mode, once, violations written to a notes file; (B) fix ALL real violations at the source prefabs in one batch (Edit Mode); (C) ONE Play pass, each changed popup opened once per width, read the audit warnings, screenshot only popups that still fail; (D) failures remain: note them, fix as one batch, one more Play pass; none: stop. Full gate once at the end. Do not re-measure a case unless a fix happened in between. Do not call an audit finding "by design" without a side-by-side against the reference.
+
 ## Cap and escalation
 - `record` warns on the second identical signature (change strategy: re-read the failing path) and on the third (escalate). Overall cap: 5 iterations, 3 for UI-only.
 - Escalate also when a decision is needed (design, API, economy intent), a destructive action is required, a test would have to be weakened, or only a device can answer. Give the human one screen: verdict, the blocking item, what was tried, the smallest decision, evidence paths.

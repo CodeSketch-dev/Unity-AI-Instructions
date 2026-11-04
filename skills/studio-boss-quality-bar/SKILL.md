@@ -37,3 +37,4 @@ The studio runs itself: 100% automation while keeping the BEST quality, speed, l
 7. **Protect the project**: back up before risky batch edits, watch scene/prefab size, keep the Console clean, never leave the Editor in Play Mode or a dirty scene, no commits unless asked.
 8. **Owner time is sacred**: no questions answerable from the repo or references; decide small things yourself; report briefly with what was verified, what was not, and what is next.
 
+9. **Audit findings are fixed, not excused**: never call an audit/QA violation "by design" or a "false positive" without evidence (side-by-side screenshot vs the reference, measured numbers). Visible defects (label over icon, off-centre text, margin below minimum) are fixed at the source prefab. Measure each case once (one audit per popup per width); looping the same measurement wastes Editor time.
