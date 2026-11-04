@@ -40,3 +40,7 @@ Troubleshooting
 3. *.backup-* files are normal. Restore by copying one back over CLAUDE.md or AGENTS.md.
 4. Claude reads a project's AGENTS.md only when the project has no CLAUDE.md. If it has one, add the line "@AGENTS.md" to it.
 5. Skill helper scripts need Python on PATH. sync.bat itself does not.
+
+NEW PROJECT / SELF-TRAINING
+- Put the Unity project next to this repo (the parent folder is scanned) or add its folder to projects.txt, then run sync.bat /nopause. The project gets the shared rules (CLAUDE.md block + .claude/ai-instructions.md), all skills, agents, hooks and the skill router; Codex gets the same rules via ~/.codex/AGENTS.md.
+- Agents train the studio themselves: at the end of every task they update or add skills (see "Studio self-training loop" in AGENTS.md and skill studio-self-training), then run publish.bat. Other agents and the other machine read those skills after sync.bat.

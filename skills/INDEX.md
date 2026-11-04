@@ -410,6 +410,7 @@
 
 ## studio
 - studio-loop-runbook - Run an autonomous multi-hour studio session: cron wake every minute, backlog file as the single source of truth, code-only subagents + main agent owns the Editor, compile/test/commit gates, no-op while agents run. Use when the owner is away and work must continue until a backlog is done.
+- studio-self-training - End-of-task retro that makes the studio smarter: turn lessons into skills, merge duplicates, publish, and bootstrap new projects with sync.bat. Use at the end of every task, when the owner corrects you, or when starting a new project.
 
 ## tech
 - tech-debt - Inventory dead code, duplicates, oversized files and stale assets, rank by cost, remove safely with a GUID/reference scan and separate revertable commits. Use when cleaning the project or before a refactor.
