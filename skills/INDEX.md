@@ -123,6 +123,7 @@
 - economy-progression-design - Use when a clone needs economy or progression behavior but the GDD has missing, partial, or conflicting prices, rewards, drops, timers, or progression values.
 
 ## editor
+- editor-bake-safety - Use when an Editor tool bakes many assets (thumbnails, meshes, atlases) from script-execute or a menu: chunk caps, memory checks, one reusable rig, transparency via two-background matte, and what crashed Unity once.
 - editor-lane-single-writer - Rule: one Unity Editor is one project and one writer; only one agent mutates scenes, prefabs, assets and settings at a time, others work in file-lane worktrees. Use when dispatching parallel agents or when two agents might touch the same scene or prefab.
 - editor-tool-authoring - Write safe, idempotent, chunked Editor tools (bakers, builders, installers) run via MCP, with guards, file results and saved scenes. Use for any script that generates/mutates many objects or assets, or after a hang/duplicate/lost-scene.
 
