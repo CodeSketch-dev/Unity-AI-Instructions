@@ -80,6 +80,9 @@
 ## codex
 - codex-delegation - Delegate well-specified CODE-ONLY tasks to the Codex CLI (cheap model) as a managed worker to save Claude tokens: write a brief, run codex exec in the background, then compile/test/review yourself. Use for pure logic, tests, data tables, boilerplate; keep design and Editor work on Claude.
 
+## coding
+- coding-discipline-karpathy - Four coding-discipline rules for every code task: surface assumptions, simplest code that works, surgical changes (every changed line traces to the request), goal-driven execution with verifiable success criteria. Inspired by Andrej Karpathy's observations on LLM coding pitfalls; adapted to the studio's autonomy rules.
+
 ## collision
 - collision-registry - Route trigger and collision contacts through the framework OptCollisionRegister and OptCollisionSensor instead of per-object OnTrigger with GetComponent. Use when adding any pickup, platform, zone, checkpoint or hazard.
 
