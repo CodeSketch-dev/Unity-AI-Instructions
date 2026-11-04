@@ -5,7 +5,7 @@ description: "Check a UI prefab numerically at several aspect ratios: structure,
 
 # UI validator (static, from prefab YAML)
 
-Replaces "does it look right?" with numbers (report 17 sec 5). Run it after every build/edit; it is fast, read-only and works with the Editor closed.
+Replaces "does it look right?" with numbers. Run it after every build/edit; it is fast, read-only and works with the Editor closed.
 
 `py -I <skills>/ui-validator/scripts/ui_validator.py <file.prefab> [--kind popup|page|hud|canvas|none] [--hud] [--project <unity-project>] [--reference ref.prefab] [--exceptions qa/ui-exceptions.json] [--dump-rects texts.json] [--ref 1920x1080] [--banner 200] [--margin 24]`
 

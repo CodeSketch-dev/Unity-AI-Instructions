@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Rewrite test subscriptions to removed facade events (`w.EggBroken += r => x = r;`) into <Prefix>_TestBus.On<Event>(w, e => ...).
+"""Rewrite test subscriptions to removed facade events (`w.Completed += r => x = r;`) into <Prefix>_TestBus.On<Event>(w, e => ...).
 
 usage: python tests_to_bus.py <errors.txt>     (lines copied from the Unity console: path(line,col): error CS1061: '<Prefix>_World_X' does not contain a definition for 'Name' ...)
 """

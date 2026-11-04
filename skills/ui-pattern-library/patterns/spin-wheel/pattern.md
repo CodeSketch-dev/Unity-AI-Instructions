@@ -1,6 +1,6 @@
 # Pattern: spin-wheel
 
-NOT mined from a reference: the reference projects have only the slot machine (`jackpot-slot`). This contract is a DESIGN (INFERRED) built from `recipe-spin-wheel` (report 20); positions and sizes are placeholders to be replaced from the target game's capture. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`.
+NOT mined from a reference: the reference projects have only the slot machine (`jackpot-slot`). This contract is a DESIGN (INFERRED) built from `recipe-spin-wheel`; positions and sizes are placeholders to be replaced from the target game's capture. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`.
 
 ## Behavior and hooks
 - Wheel asset: slots (reward, weight, colour, icon), free spin cooldown, ad spin allowance. The result slot is chosen first (weights + optional pity), then the wheel animates to it with ease-out and a small overshoot, then the reward flows (`currency-spread-fx`).

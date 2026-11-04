@@ -8,7 +8,7 @@ Resolves every RectTransform to a rect in canvas units (CanvasScaler Expand) at 
 aspect ratios and applies numeric rules. FAIL (exit 1) rules: UI-OVERLAP, UI-SAFE, UI-BANNER (--hud),
 UI-CHILD-EQ-PARENT, UI-RAYCAST, UI-TEXT-FIT and UI-CONTENT-CONTAINMENT. WARN rule: UI-TOUCH (needs a reasoned exception to silence).
 Elements under Layout Groups / ContentSizeFitter are reported as UI-UNKNOWN and skipped (their size
-needs the runtime validator). Rule ids follow report 17 section 5.3.
+needs the runtime validator). Rule ids follow the studio evidence notes.
 """
 import json
 import os
@@ -24,7 +24,7 @@ VEC_RE = re.compile(r"\{x:\s*(-?[\d.eE+-]+),\s*y:\s*(-?[\d.eE+-]+)")
 EXEMPT = ("background", "backdrop", "dim", "overlay", "blocker", "block", "bg", "fill", "viewport", "mask", "frame", "glow")
 CONTENT_INSET_MIN = 10
 ASPECTS = [(1920, 1080), (2400, 1080), (1600, 1200)]
-# notch + gesture bar simulation (pixels) for the wide aspect, per report 17: left/right 132, bottom 63
+# notch + gesture bar simulation (pixels) for the wide aspect, per the studio evidence notes: left/right 132, bottom 63
 SAFE_PX = {(2400, 1080): (132, 0, 132, 63)}
 
 

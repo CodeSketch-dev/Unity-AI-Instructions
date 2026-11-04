@@ -5,7 +5,7 @@ description: Author a new persistent data domain with DataBlock and DataValue (D
 
 # DataBlock template
 
-Use the installed framework's `DataBlock<T>` and `DataValue<T>`; never add PlayerPrefs wrappers or another save layer (AGENTS.md). Detect the version first (`framework-version-map`): accessor is `Instance` (v1) or `INSTANCE` (v2).
+Use the installed framework's `DataBlock<T>` and `DataValue<T>`; never add PlayerPrefs wrappers or another save layer (AGENTS.md). Check the installed package API first (`framework-version-map`): in SketchEngine the accessor is `INSTANCE`.
 
 ```csharp
 namespace Game
@@ -15,7 +15,7 @@ namespace Game
         [SerializeField] DataValue<double> _gem;
         [SerializeField] Dictionary<string, bool> _flags;
 
-        public static DataValue<double> Gem => INSTANCE._gem;   // v1: Instance
+        public static DataValue<double> Gem => INSTANCE._gem;   
 
         protected override void Init()
         {
@@ -27,7 +27,7 @@ namespace Game
 }
 ```
 
-## Rules and why (report 01)
+## Rules and why
 - `??=` every field in `Init`: deserialization does not run initializers, so a field added in an update is null for existing players.
 - Keyed records: `Dictionary<string, DataValue<T>>` + `TryAdd` lazily, return the stored record.
 - Store IDs and numbers only. No scene objects or `UnityEngine.Object` refs (binary serializer fails), no behavior, no transient runtime state.

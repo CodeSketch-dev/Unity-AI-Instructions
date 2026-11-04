@@ -20,6 +20,29 @@ def tail(path, n):
         return []
 
 
+def backlog_tail(root):
+    """Newest docs/factory/STUDIO-LOOP-*.md: open-task count, first open task, last LOG lines. Plus the rigor line."""
+    out = []
+    fdir = os.path.join(root, "docs", "factory")
+    try:
+        files = sorted((f for f in os.listdir(fdir) if f.startswith("STUDIO-LOOP-") and f.endswith(".md")),
+                       key=lambda f: os.path.getmtime(os.path.join(fdir, f)))
+    except OSError:
+        files = []
+    if files:
+        lines = tail(os.path.join(fdir, files[-1]), 100000)
+        open_tasks = [ln.strip() for ln in lines if ln.lstrip().startswith("- [ ]")]
+        out += ["## backlog %s: %d open" % (files[-1], len(open_tasks))]
+        out += ["next: " + open_tasks[0][:160]] if open_tasks else []
+        out += ["LOG tail:"] + [ln[:200] for ln in lines[-8:]]
+    for rel in ("studio.yaml", "AGENTS.md"):
+        for ln in tail(os.path.join(root, rel), 400):
+            if ln.strip().startswith("rigor:"):
+                out.append("## rigor (%s): %s" % (rel, ln.strip()))
+                return out
+    return out
+
+
 def main():
     event = hooklib.read_event()
     root = hooklib.project_dir(event)
@@ -32,6 +55,7 @@ def main():
     handoff = tail(os.path.join(root, "docs", "agent-handoff.md"), 25)
     if handoff:
         out += ["## docs/agent-handoff.md (tail)"] + handoff
+    out += backlog_tail(root)
     sp = os.path.join(root, "docs", "orchestrator", "state.json")
     if os.path.isfile(sp):
         try:

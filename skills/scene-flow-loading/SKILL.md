@@ -6,7 +6,7 @@ triggers: loading screen, splash screen, studio logo, startup flow, loading task
 
 # Splash, loading and scene activation
 
-Use the existing loader before introducing another. Read [the detailed contract](references/loading-screen.md) for implementation or a startup defect. This skill owns transition orchestration; `boot-sequence-setup` owns framework initialization order.
+Use the existing loader before introducing another. Read [the detailed contract](references/loading-screen.md) for implementation or a startup defect. This skill owns transition orchestration; `boot-sequence-setup` owns framework initialization order; `persistent-root-prefab` owns the object that hosts the loaders. Studio standard: scenes are loaded in Single mode only (no additive scenes, no streaming) through TWO loaders that live in the persistent root: a heavy loading screen (progress, task queue) and a light fade transition loader. Contract of both: [two-loaders.md](references/two-loaders.md).
 
 ## 1. Inspect and record the contract
 1. Verify the connected Editor project, build scene order, actual entry component, installed UniTask/framework, SDK provider, save flags and existing loader callers. Read a requested reference through its own MCP; label source-only observations accordingly.

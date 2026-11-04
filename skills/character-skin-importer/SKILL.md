@@ -5,7 +5,7 @@ description: "Validate and import a new skin: catalog and prefab checker (skelet
 
 # Character skin importer
 
-Design from report 19 sec 3.4 and `SkinnedMesh_Bone_Binder` (monkey-escape). Two layers: a stdlib checker that works on text YAML without Unity, and an Editor tool (template) that needs the Unity Editor.
+Design from the studio evidence notes and `SkinnedMesh_Bone_Binder` (monkey-escape). Two layers: a stdlib checker that works on text YAML without Unity, and an Editor tool (template) that needs the Unity Editor.
 
 ## Static checker (tested)
 `py -I <skills>/character-skin-importer/scripts/skin_validator.py catalog character-catalog.json` checks the DATA file (`assets/character-catalog.example.json`: rigs, skin types, skins, allowed types per mode, budgets, bot names): duplicate ids, unknown rig/type, unlock rules (Free price 0, Gem/Coin price from config or auto-balance, IAP needs id), slots pointing at rig bones, rig bone limit, duplicate order.

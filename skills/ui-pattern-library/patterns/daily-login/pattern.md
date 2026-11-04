@@ -1,6 +1,6 @@
 # Pattern: daily-login (page)
 
-Source: report 07 sec 4 row 2 (`Daily_Login_Popup` + item; sizes VERIFIED). Layout contract: `spec.yaml`; wireframe: `mockups/wireframe.png`. Retention logic: `recipe-retention-timers` (clock guard, reset).
+Source: the studio evidence notes (`Daily_Login_Popup` + item; sizes VERIFIED). Layout contract: `spec.yaml`; wireframe: `mockups/wireframe.png`. Retention logic: `recipe-retention-timers` (clock guard, reset).
 
 ## Regions
 Page, not popup: title bar (~175) with `Btn_Back`, a horizontal ScrollRect (700 high) of cards, scrollbar under it. Card 431x617: thumbnail 235 (y+35), title text, value text; the Today card is larger (455x632) with an outline.

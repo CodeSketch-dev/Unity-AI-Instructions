@@ -1,6 +1,6 @@
 # Pattern: revive-result
 
-Source: report 07 sec 4 row 6 (`Result_Revive_Checkpoint` and variants; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Ad flow: `ads-popup-flow`.
+Source: the studio evidence notes (`Result_Revive_Checkpoint` and variants; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Ad flow: `ads-popup-flow`.
 
 ## Regions
 Scale 748x725 > Board 665x512; title, description (525x50), countdown ring 147 (fill 174) in the centre, one revive button 275x105 (`Btn_Revive` rewarded ad or `Btn_Revive_Free`, same slot), `Btn_NoThanks` 275x85 hanging below the board.

@@ -5,7 +5,7 @@ description: "Rule: one Unity Editor is one project and one writer; only one age
 
 # Editor lane, single writer
 
-Why: one Unity Editor instance controls one project directory and the Unity MCP drives that one Editor. The Editor can hold an older scene/prefab than disk and save over newer work; two agents entering Play Mode blocked compiles three times; two agents editing one builder collided (thunder-break-egg notes).
+Why: one Unity Editor instance controls one project directory and the Unity MCP drives that one Editor. The Editor can hold an older scene/prefab than disk and save over newer work; two agents entering Play Mode blocked compiles three times; two agents editing one builder collided (earlier project notes).
 
 1. **Editor lane = serial.** Scenes, prefabs, ScriptableObject assets, import settings, ProjectSettings, compile, Play Mode and screenshot tests belong to ONE agent at a time (builder or UI agent). Queue the rest.
 2. **File lane = parallel (max 4)**: C# code, EditMode tests, editor-tool scripts, tables, docs, Python, in worktrees with no Unity open.

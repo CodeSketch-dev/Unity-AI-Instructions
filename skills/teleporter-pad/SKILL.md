@@ -5,7 +5,7 @@ description: "Teleporter pads and portals: paired or destination mode, fades, an
 
 # Teleporter pad
 
-From knife-tower `Teleporter.cs` (report 04 sec 8.3, VERIFIED; static guard not reset there: INFERRED risk).
+From knife-tower `Teleporter.cs` (VERIFIED; static guard not reset there: INFERRED risk).
 
 - `Teleporter : OptCollisionRegister` + `ICharacterCollidable`; either a paired `_otherTeleporter` or a `_destination` transform.
 - Sequence with UniTask: block control (save the character's `ControlState`), fade out 0.2 s, move (position and rotation), fade in 0.2 s, restore control in a `finally` block so an exception never leaves the player frozen. Cancel on destroy (`async-cancellation`).

@@ -5,7 +5,7 @@ description: "Capture a screen at several aspect ratios, diff against a mockup o
 
 # UI visual QA
 
-Order: build (`ui-builder`) -> numeric check (`ui-validator`) -> pixel diff and contrast (this skill) -> fix named regions -> repeat, with an iteration cap (report 17: stop and escalate after 3-5 loops with the same failure signature).
+Order: build (`ui-builder`) -> numeric check (`ui-validator`) -> pixel diff and contrast (this skill) -> fix named regions -> repeat, with an iteration cap (the studio evidence notes: stop and escalate after 3-5 loops with the same failure signature).
 
 ## Capture
 Per (screen, aspect) in 1920x1080, 2400x1080, 1600x1200 (+ portrait if the game is portrait): fixed seed, `timeScale 1`, wait for entrance animations (2 frames + tween count 0 or ~1 s unscaled), same fonts, freeze particles/animated backgrounds, lossless PNG into `qa/artifacts/`. Preferred: the Editor capture template `assets/Qa_Capture.cs.txt` (UNCOMPILED; `Qa_Capture.CaptureAll(prefabPath, outDir, sizes)` renders through a ScreenSpace-Camera canvas into a RenderTexture at exact sizes). Fallback: the MCP Game-view screenshot (resolution follows the Game view window; costs tokens, so view only crops). The reference image is captured at 1920x1080 only; other aspects are covered by rules and by golden regression (first approved capture per aspect in `qa/golden/<aspect>/`).

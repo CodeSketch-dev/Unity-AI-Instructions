@@ -31,5 +31,8 @@ Monetization must reinforce the progression loop, never replace it: rewarded boo
 - Always use SDK **test mode/test IDs** in development; never commit real app IDs/keys or secrets; load production ids from ignored config.
 - Never auto-play paid flows in tests; use sandbox accounts.
 
+## Related
+Service checklist and install order: `app-services-bootstrap`. Gate matrix and real-device rule: `ads-layer-generic`. Offline gate: `internet-gate-popup`. Rating timing: `rating-prompt-flow`.
+
 ## Verify
 Editor mock flows (success, failure, cancel); rewards granted exactly once; entitlements persist after restart; no gameplay blocking when ads fail to load; no ads in the FTUE; `done-means-wired` wiring check for the buttons.

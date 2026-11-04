@@ -1,11 +1,11 @@
 ---
 name: legacy-framework-mapping
-description: Map legacy CFramework code to CodeSketch and SketchEngine equivalents when porting a mechanic from climb-tower or bike-obby. Use when a legacy script uses CDataBlock, CValue, delegate StateMachine or lowercase instance APIs.
+description: Map legacy CFramework code to CodeSketch and SketchEngine equivalents when porting a mechanic from an older legacy project. Use when a legacy script uses CDataBlock, CValue, delegate StateMachine or lowercase instance APIs.
 ---
 
 # Legacy framework mapping
 
-CFramework (embedded folder, namespace `CFramework`) is the oldest era of the same framework family; CodeSketch and SketchEngine are later versions (report 10). Concepts map 1:1 in most cases; names and some behaviors differ. Never mass-replace namespaces; inspect the installed package and asmdefs (`framework-version-map`).
+CFramework (embedded folder, namespace `CFramework`) is the oldest era of the same framework family; CodeSketch and SketchEngine are later versions. Concepts map 1:1 in most cases; names and some behaviors differ. Never mass-replace namespaces; inspect the installed package and asmdefs (`framework-version-map`).
 
 | Concept | CFramework | CodeSketch / SketchEngine | Port note |
 |---|---|---|---|

@@ -5,7 +5,7 @@ description: "Run the GDD-to-Unity-game pipeline end to end: lint the GDD, gener
 
 # Game orchestrator
 
-You are the producer. Goal: turn a lint-clean GDD into a complete local Unity mobile game in about one day, mostly unattended, with humans only at taste checkpoints. Everything durable lives in files (state, log, GDD, notes), never only in chat. Design: report 21; tools are in `scripts/`.
+You are the producer. Goal: turn a lint-clean GDD into a complete local Unity mobile game in about one day, mostly unattended, with humans only at taste checkpoints. Everything durable lives in files (state, log, GDD, notes), never only in chat. Design: the studio evidence notes; tools are in `scripts/`.
 
 ## Start or resume (always in this order)
 1. Read `docs/agent-handoff.md`, `docs/feedback-notes.md`, then `py -I <skills>/game-orchestrator/scripts/orchestrator.py status --project <root>`. No state yet? Go to "Start".
@@ -37,4 +37,4 @@ H1 scope summary; H2 after the core loop (play 3 min, say feel ok/faster/floatie
 ## Budget and scope
 Starting guesses per phase in `references/phases-and-gates.md` (recalibrate after the pilot). Over 30% phase overrun: cut P2 automatically and say so. Prefer cutting scope to cutting verification.
 
-Also see: `gdd-schema`, `gdd-intake`, `auto-balance-game`, `auto-balance-loop`, `clone-pipeline` (phase to skills map), `multi-agent-coexistence`, `token-efficient-workflow`, `mcp-session-loop`.
+Also see: `gdd-schema`, `gdd-intake`, `auto-balance-game`, `auto-balance-loop`, `clone-pipeline` (phase to skills map), `multi-agent-coexistence`, `token-efficient-workflow`.

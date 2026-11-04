@@ -1,0 +1,48 @@
+// Cinemachine v2 skeleton of the follow + lens + shake drivers (generic; compile in the adopting project).
+using Cinemachine;
+using UnityEngine;
+
+namespace Game
+{
+    public class CameraRig : MonoBehaviour
+    {
+        [SerializeField] CinemachineFreeLook _freeLook;
+        [SerializeField] Transform _follow;                 // FollowTransform
+        [SerializeField] Vector3 _offset = new(0f, 1f, 0f);
+        Transform _target;
+        float _shakeEnd;
+
+        public void Follow(Transform t) => _target = t;
+
+        void LateUpdate()
+        {
+            if (_target)
+            {
+                _follow.rotation = _target.rotation;
+                _follow.position = _target.TransformPoint(_offset);
+            }
+            if (_shakeEnd > 0f && Time.unscaledTime >= _shakeEnd) { SetNoise(0f, 0f); _shakeEnd = 0f; }
+        }
+
+        public void Look(Vector2 d) { _freeLook.m_XAxis.m_InputAxisValue = d.x; _freeLook.m_YAxis.m_InputAxisValue = d.y; }
+        public void SetFov(float f) => _freeLook.m_Lens.FieldOfView = f;     // lens, never Camera
+        public void SetFar(float f) => _freeLook.m_Lens.FarClipPlane = f;
+
+        public void Shake(float amp = 0.4f, float freq = 3.5f, float dur = 0.2f)
+        {
+            SetNoise(amp, freq);
+            _shakeEnd = Time.unscaledTime + dur;
+        }
+
+        void SetNoise(float amp, float freq)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                var n = _freeLook.GetRig(i).GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+                n.m_AmplitudeGain = amp; n.m_FrequencyGain = freq;
+            }
+        }
+        // Respawn: after the camera-reset event, await UniTask.Yield(), then
+        // _freeLook.ForceCameraPosition(_target.TransformPoint(0, 10, -20), _target.rotation);
+    }
+}

@@ -5,7 +5,7 @@ description: "Cheap boss/hazard enemy without pathfinding: rectangle patrol, det
 
 # Simple boss: patrol and chase
 
-From monkey-escape `Boss_SimpleTransformMove` and `Boss_TargetDetector` (report 04 sec 6, VERIFIED).
+From monkey-escape `Boss_SimpleTransformMove` and `Boss_TargetDetector` (VERIFIED).
 
 - No pathfinding: a transform mover with an inner `IStateMachine` (`Patrol`, `Chase`) (`state-machine-template`).
 - Patrol: random points inside a rectangle within the parent bounds (`_patrolRangeX` 1, `_patrolRangeZ` 0.5, padding 10%), speed 2, rotation smoothness 6, arrival distance 0.1.

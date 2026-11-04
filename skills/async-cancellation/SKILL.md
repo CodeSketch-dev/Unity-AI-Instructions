@@ -5,7 +5,7 @@ description: Own UniTask work with CancelToken so it stops on disable, destroy o
 
 # Async cancellation
 
-`CancelToken` wraps a `CancellationTokenSource`: `Token` creates the source lazily; `Cancel()` cancels, disposes and nulls it so the next `Token` is fresh (report 01, VERIFIED).
+`CancelToken` wraps a `CancellationTokenSource`: `Token` creates the source lazily; `Cancel()` cancels, disposes and nulls it so the next `Token` is fresh.
 
 ```csharp
 CancelToken _cancel = new CancelToken();

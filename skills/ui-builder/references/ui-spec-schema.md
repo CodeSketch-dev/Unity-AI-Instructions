@@ -1,6 +1,6 @@
 # ui-spec schema (layout contract)
 
-Source: report 21 section 1.4. YAML subset or JSON.
+Source: the studio evidence notes. YAML subset or JSON.
 
 ```yaml
 id: UI-10-skin-shop                 # required, stable

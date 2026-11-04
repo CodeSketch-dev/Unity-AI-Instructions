@@ -5,7 +5,7 @@ description: Describe a screen as a ui-spec (layout contract), lint it, convert 
 
 # UI builder (spec -> prefab)
 
-Why: UI that is guessed drifts or overlaps; a numbered layout contract plus a deterministic builder gives the same result every run (report 21 sec 1.4, report 17). The contract is data, the builder is code, the validator (next task) judges the result.
+Why: UI that is guessed drifts or overlaps; a numbered layout contract plus a deterministic builder gives the same result every run (the studio evidence notes). The contract is data, the builder is code, the validator (next task) judges the result.
 
 ## Flow
 1. **Write the spec** (`references/ui-spec-schema.md`): one file per screen, positions and sizes in the reference capture's pixels, elements numbered, names unique (names are the builder's keys, `ui-naming-conventions`). Unknown numbers are `?` and the fidelity drops; never invent.

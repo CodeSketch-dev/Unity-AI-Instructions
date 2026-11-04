@@ -1,0 +1,48 @@
+// Scripts/Editor/Tools/Data_Menu.cs  - save reset + play helpers. Backup/restore protects the dev save.
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+
+namespace Game.Editor
+{
+    public static class Data_Menu
+    {
+        static string BackupDir => Path.Combine(Path.GetDirectoryName(Application.dataPath), "Temp", "SaveBackup");
+
+        [MenuItem("Tools/Data/Backup Save")]
+        static void Backup()
+        {
+            if (Directory.Exists(BackupDir)) Directory.Delete(BackupDir, true);
+            CopyDir(Application.persistentDataPath, BackupDir);
+            Debug.Log("[Data] saved backup to " + BackupDir);
+        }
+
+        [MenuItem("Tools/Data/Restore Save")]
+        static void Restore()
+        {
+            if (!Directory.Exists(BackupDir)) { Debug.LogWarning("[Data] no backup"); return; }
+            Wipe();
+            CopyDir(BackupDir, Application.persistentDataPath);
+        }
+
+        [MenuItem("Tools/Data/Clear Game Data")]
+        static void Wipe()
+        {
+            PlayerPrefs.DeleteAll();
+            foreach (var f in Directory.GetFiles(Application.persistentDataPath)) File.Delete(f);
+            foreach (var d in Directory.GetDirectories(Application.persistentDataPath)) Directory.Delete(d, true);
+            Debug.Log("[Data] cleared " + Application.persistentDataPath);
+        }
+
+        [MenuItem("Tools/Data/Open Data Folder")] static void Open() => EditorUtility.RevealInFinder(Application.persistentDataPath);
+        [MenuItem("Tools/Game/Pause or Resume _F2")] static void Pause() => EditorApplication.isPaused = !EditorApplication.isPaused;
+        [MenuItem("Tools/Game/Slow or Resume _F3")] static void Slow() => Time.timeScale = Time.timeScale < 1f ? 1f : 0.1f;
+
+        static void CopyDir(string from, string to)
+        {
+            Directory.CreateDirectory(to);
+            foreach (var f in Directory.GetFiles(from)) File.Copy(f, Path.Combine(to, Path.GetFileName(f)), true);
+            foreach (var d in Directory.GetDirectories(from)) CopyDir(d, Path.Combine(to, Path.GetFileName(d)));
+        }
+    }
+}

@@ -5,7 +5,7 @@ description: Reactive platform recipes (trampoline, conveyor, fade, glass bridge
 
 # Platform kit
 
-All reactive platforms derive the framework register + `ICharacterCollidable` (`collision-registry`): no per-platform `OnTriggerEnter` + `GetComponent`. Numbers are the reference defaults (report 04 sec 7, VERIFIED); expose them as serialized config and override per game.
+All reactive platforms derive the framework register + `ICharacterCollidable` (`collision-registry`): no per-platform `OnTriggerEnter` + `GetComponent`. Numbers are the reference defaults (VERIFIED); expose them as serialized config and override per game.
 
 | Platform | Mechanic and defaults |
 |---|---|

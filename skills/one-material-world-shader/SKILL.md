@@ -5,15 +5,15 @@ description: Render the whole world with one opaque material (plus one alpha) by
 
 # One material, data in vertices
 
-Goal (user decision): world = 1 opaque material + 1 alpha material; per-family materials are the fallback only when one material cannot render correctly (reports 11, 18).
+Goal (user decision): world = 1 opaque material + 1 alpha material; per-family materials are the fallback only when one material cannot render correctly.
 
 ## Why
-The Roblox clones' per-part look (`TextureTypeComponent`, `[ExecuteAlways]`) clones a material per instance: thunder-break-egg had 3767 renderers / 149 materials. Moving the data to vertices gave 1 material per segment (decor 1290/97 -> 146/1; 93 batches in Play Mode, Editor, not measured on a device) (report 11, VERIFIED). A combiner can only merge one material, and MaterialPropertyBlock removes a renderer from the SRP Batcher, so colour must live in vertices.
+The Roblox clones' per-part look (`TextureTypeComponent`, `[ExecuteAlways]`) clones a material per instance: one reference project had 3767 renderers / 149 materials. Moving the data to vertices gave 1 material per segment (decor 1290/97 -> 146/1; 93 batches in Play Mode, Editor, not measured on a device) (VERIFIED). A combiner can only merge one material, and MaterialPropertyBlock removes a renderer from the SRP Batcher, so colour must live in vertices.
 
 ## Rules
 - No per-instance material builders, no MPB on static renderers; a tiny MPB only on a handful of dynamic objects.
 - Exceptions that stay separate: alpha (Glass/Ice/ForceField), character skins (OmniShade), hull outline, FX/trails, sky.
-- The shader declares everything in one `CBUFFER_START(UnityPerMaterial)`, `multi_compile_instancing`, `multi_compile_fog`. Passes: Forward + ShadowCaster + DepthOnly (+ GBuffer only if a Deferred renderer is active, as on BSE's PC renderer). Fade/alpha variants are a SEPARATE shader (property-driven blend loses the SRP Batcher).
+- The shader declares everything in one `CBUFFER_START(UnityPerMaterial)`, `multi_compile_instancing`, `multi_compile_fog`. Passes: Forward + ShadowCaster + DepthOnly (+ GBuffer only if a Deferred renderer is active, as on a reference PC renderer). Fade/alpha variants are a SEPARATE shader (property-driven blend loses the SRP Batcher).
 - Validate: `Shader.IsSRPBatcherCompatible`, material census of world renderers, no MPB on static.
 
 ## `Game/RobloxWorld` channel contract (design, INFERRED; unproven in the Editor)

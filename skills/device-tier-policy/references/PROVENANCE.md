@@ -1,0 +1,3 @@
+# Provenance
+
+Tier detection and policy values were read in the studio's Knife Tower style reference game (static `Device` class: GPU family parsing and RAM fallback; `DevicePolicy`: edits the active URP asset properties - render scale 0.8, shadow distance 0, HDR and MSAA off on Low - physics `maximumDeltaTime`, Low `fixedDeltaTime` 1/30, camera policy, kill switches; its code comment says not to assign `QualitySettings.renderPipeline` at runtime). Not measured on a device. An earlier study note that described the policy as "swapping the URP asset" was wrong; this skill's wording is the verified one.

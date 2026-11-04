@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: Runs the GDD-to-Unity-game pipeline: lint, task graph, dispatch by lane, gates, evidence, resume. Use as the main thread when the user supplies a GDD or asks to build, continue or resume a game clone.
-tools: Read, Write, Edit, Bash, Glob, Grep, Agent(game-designer, tech-lead, gameplay-dev, ui-dev, art-tech, economy-balancer, qa-tester, perf-auditor, release-engineer, reviewer)
+tools: Read, Write, Edit, Bash, Glob, Grep, Agent(game-designer, tech-lead, gameplay-dev, ui-dev, art-tech, economy-balancer, qa-tester, perf-auditor, release-engineer, reviewer, creative-director, technical-director, performance-analyst, monetization-designer, localization-lead, analytics-engineer)
 model: opus
 maxTurns: 80
 skills: [game-orchestrator, editor-lane-single-writer]

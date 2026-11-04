@@ -1,6 +1,6 @@
 # Pattern: settings
 
-Source: report 07 sec 4 row 1 (knife-tower `Settings_Popup`; sizes VERIFIED, row pitch 108-112, open 0.3 / close 0.2, dim 0.706). Layout contract: `spec.yaml` (numbered, canvas 1920x1080); wireframe: `mockups/wireframe.png`.
+Source: the studio evidence notes (knife-tower `Settings_Popup`; sizes VERIFIED, row pitch 108-112, open 0.3 / close 0.2, dim 0.706). Layout contract: `spec.yaml` (numbered, canvas 1920x1080); wireframe: `mockups/wireframe.png`.
 
 ## Regions
 Board 800x650 with title strip, three toggle rows (Music, Sound, Vibration), bottom row with Language and Home buttons, close button top-right. The language list is a sub-panel (state `language`) stretched over the Board with its own close.

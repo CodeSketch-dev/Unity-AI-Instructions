@@ -5,7 +5,7 @@ description: "Bots that run an obby course: same character with an AI driver, cl
 
 # Bot brain (waypoints)
 
-Extends `npc-bots-and-enemies` (population, tiers) with the movement brain from knife-tower and monkey-escape (report 04 sec 5, VERIFIED).
+Extends `npc-bots-and-enemies` (population, tiers) with the movement brain from knife-tower and monkey-escape (VERIFIED).
 
 ## Same character, different driver
 Bots use the player's character prefab (type Npc). `AI : MonoCachedFast` writes the same input struct in `Update` (`CharacterKCInputAI {MoveVector, LookVector, Jump}`) and calls `SetInputs(ref)`; clear the input while a nav link is being traversed; an external-move override exists for scripted moves (`kcc-character-controller`).

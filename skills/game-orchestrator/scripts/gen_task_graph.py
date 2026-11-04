@@ -5,7 +5,7 @@ Reads the GDD (see gdd_lint.load_gdd), instantiates the task template of every s
 tasks (bootstrap, gates, audits, build), resolves `depends_on`, assigns phases, groups and estimates, and cuts scope
 (P2 then P1) when the wall-clock estimate exceeds the day budget. Emits task-graph.json and task-graph.md.
 Agents: P producer, D dev (file lane, worktree), B builder (Editor lane, serial), U UI agent, T tester.
-Estimates are starting guesses (report 21 sec 3.6) to be recalibrated after the pilot.
+Estimates are starting guesses to be recalibrated after the pilot.
 """
 import json
 import os

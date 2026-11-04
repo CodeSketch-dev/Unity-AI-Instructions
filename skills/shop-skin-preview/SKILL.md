@@ -5,7 +5,7 @@ description: "Skin shop preview: default baked thumbnails, optional live 3D stag
 
 # Shop skin preview
 
-Default (knife-tower, climb-tower, problox): a baked thumbnail sprite in an `Image`; the pattern is `skin-shop` in `ui-pattern-library` (selection event, action button per unlock type). Choose live 3D only when the GDD needs rotate-to-inspect or an animated preview. The only 3D precedent mined is knife-tower's trail preview (Kamgam `WorldImage`, skin spawned at (10000, 0, 0)); drag-rotate was not found in game code, so the stage below is a design (INFERRED; template `assets/PreviewStageDrag.cs.txt`, UNCOMPILED).
+Default (three reference projects): a baked thumbnail sprite in an `Image`; the pattern is `skin-shop` in `ui-pattern-library` (selection event, action button per unlock type). Choose live 3D only when the GDD needs rotate-to-inspect or an animated preview. The only 3D precedent mined is knife-tower's trail preview (Kamgam `WorldImage`, skin spawned at (10000, 0, 0)); drag-rotate was not found in game code, so the stage below is a design (INFERRED; template `assets/PreviewStageDrag.cs.txt`, UNCOMPILED).
 
 ## Baked thumbnails
 Render a transparent 256x256 PNG per skin from the preview stage in the importer (`character-skin-importer`), assign `Thumbnail` and `Avatar`. Locked items: black silhouette via ONE shared flat material, not a property block per renderer. Zero runtime cost.

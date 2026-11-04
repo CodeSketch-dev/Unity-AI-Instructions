@@ -5,7 +5,7 @@ description: Add pitch/clip variation, per-config cooldowns and music ducking to
 
 # SFX variation and ducking
 
-A gap in the reference projects (report 09): none of them vary pitch or clip, or duck music. Extend the existing `AudioConfig` and `game-audio-system`; do not load clips ad hoc.
+A gap in the reference projects: none of them vary pitch or clip, or duck music. Extend the existing `AudioConfig` and `game-audio-system`; do not load clips ad hoc.
 
 1. **Variation**: add a `Vector2 pitchRange` (e.g. 0.95-1.05) to the config or play call; optional clip array picked without repeating the last clip.
 2. **Cooldown**: per-config minimum interval (and a max concurrent voices) so rapid events (coins, hits) do not stack.

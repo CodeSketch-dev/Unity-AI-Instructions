@@ -1,6 +1,6 @@
 # Pattern: iap-carousel
 
-Source: report 07 sec 4 row 10 (`IAP_NoAds_Popup`; ScrollRect full width h631, Content = HLG + ContentSizeFitter of pack cards, close anchored near (705,375); VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Purchase mechanics: `unity-iap-port`, `monetization-integration`.
+Source: the studio evidence notes (`IAP_NoAds_Popup`; ScrollRect full width h631, Content = HLG + ContentSizeFitter of pack cards, close anchored near (705,375); VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Purchase mechanics: `unity-iap-port`, `monetization-integration`.
 
 ## Behavior and hooks
 - No board: dimmed backdrop, cards slide in. Each card is a codeless IAP button bound to a product id (store-localized price text), with a "best value" ribbon variant.

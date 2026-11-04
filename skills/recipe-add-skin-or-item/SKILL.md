@@ -10,7 +10,7 @@ Use the target framework profile and active GDD to identify its asset, registry,
 
 1. **Reference prefab**: use the GDD-selected render/rig contract. Share mesh/material resources only when skeleton/render compatibility is verified by the target importer.
 2. **Asset**: create the target-defined config entry with a stable unique persisted ID, GDD-selected unlock channel, and only the required presentation references.
-3. **Register** in the target registry and build/cache lookup through its normal initialization hook. Reject duplicate IDs (`config-registry-audit`); extend type/category definitions only when the target architecture and GDD require it.
+3. **Register** in the target registry and build/cache lookup through its normal initialization hook. Reject duplicate IDs (`config-and-factory-authoring`); extend type/category definitions only when the target architecture and GDD require it.
 4. **Persistence**: use the target persistent-data API for owned/equipped state; do not introduce a parallel save path (`data-block-template`).
 5. **Presentation**: surface entries only through GDD-enabled UI/catalog flows.
 6. **Events**: post target-defined unlock/equip state changes; the target switcher applies the compatible visual state. Entitlement expiry/fallback follows the GDD and platform policy.

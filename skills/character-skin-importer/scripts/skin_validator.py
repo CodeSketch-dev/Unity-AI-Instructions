@@ -11,7 +11,7 @@ prefab checks: skeleton = ordered SkinnedMeshRenderer bones equal the rig's requ
 missing/extra; equal -> info shared-mesh-ok with the skeleton hash), bone and material budgets, exactly one Animator,
 bot culling mode CullCompletely (WARN), bot shadows off (WARN), updateWhenOffscreen off (WARN), no baked Rigidbody/Joint
 (baked-ragdoll), no Camera/Light, no missing scripts. stats.json ({"tris": n, "texture": px}) comes from the Editor
-importer (report 19 sec 3.4) because triangle counts are not stored in prefab YAML. Budgets are INFERRED starting values.
+importer because triangle counts are not stored in prefab YAML. Budgets are INFERRED starting values.
 """
 import json
 import os

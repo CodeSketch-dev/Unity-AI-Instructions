@@ -6,10 +6,13 @@
 - [Portable view](reference-implementation/QuestFocusPointer.template.cs.txt): scene-authored serialized-reference example. Source text only; compile and exercise it in the adopting project.
 
 ## Historical evidence - do not copy as current defaults
-`prefab-dumps/` contains Knife Tower source hierarchy/material snapshots. Preserve them as provenance. Their transparent blockers describe a dismiss/block mode and must not silently reappear in pass-through mode.
+`prefab-dumps/` contains source hierarchy/material snapshots of the reference game (see PROVENANCE.md). Preserve them as provenance. Their transparent blockers describe a dismiss/block mode and must not silently reappear in pass-through mode.
 
-`images/` includes earlier Dig for Egg iterations, including rejected placements and an owner-specific fingertip adjustment. Filenames containing `before` or `too-far` are failure examples. Even `final` records approval at that time, not a shared global design rule.
+`images/` includes iterations of an earlier port, including rejected placements and an owner-specific fingertip adjustment. Filenames containing `before` or `too-far` are failure examples. Even `final` records approval at that time, not a shared global design rule.
 
-`reference-implementation/Quest_FocusMessage.dig-for-egg.cs.txt`, `Ftue_KtPresenter.dig-for-egg.cs.txt` and `Quest_FocusPointer.dig-for-egg.cs.txt` are historical full-game examples with project dependencies. They may use raw pointer polling, runtime hierarchy construction, a different dim/hand profile or first-tap dismissal. Do not treat them as safe current production templates. Follow the main skill and current project's accepted-action/scene-authoring rules instead.
+`reference-implementation/Quest_FocusMessage.example-game.cs.txt`, `Ftue_Presenter.example-game.cs.txt` and `Quest_FocusPointer.example-game.cs.txt` are historical full-game examples with project dependencies. They may use raw pointer polling, runtime hierarchy construction, a different dim/hand profile or first-tap dismissal. Do not treat them as safe current production templates. Follow the main skill and current project's accepted-action/scene-authoring rules instead.
 
-`assets/Hand.png` is the archived reference hand art. Reusing it still follows the target project's asset provenance rules; this archive does not certify distribution rights.
+`assets/Hand.png` (in this folder) is the archived reference hand art. Reusing it still follows the target project's asset provenance rules; this archive does not certify distribution rights.
+
+## New in this revision
+[dim-hole-numbers](dim-hole-numbers.md) (technique numbers, Hand.png import settings), [two-layer-dim](two-layer-dim.md), [step-driver](step-driver.md), [quest-arrow](quest-arrow.md), [PROVENANCE](PROVENANCE.md).

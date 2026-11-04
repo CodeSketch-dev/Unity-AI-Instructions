@@ -23,8 +23,8 @@ namespace Game
 ```
 Use `SerializedScriptableObjectSingleton<T>` only when you need Odin (dictionaries, polymorphism). Source files in `Assets/_Game/Scripts/Factory/`.
 
-## Wiring (facts from report 01)
-- Loaded lazily with `Resources.Load("<Root>/<full type name>")`, so the asset name is `Game.Factory_Currency.asset` under `Resources/CodeSketch/ScriptableObjectSingletons/` (v1) or `Resources/SketchEngine/ScriptableObjectSingletons/` (v2). Under `Assets/_Game/Resources/` is fine.
+## Wiring
+- Loaded lazily with `Resources.Load("<Root>/<full type name>")`, so the asset name is `Game.Factory_Currency.asset` under `Resources/SketchEngine/ScriptableObjectSingletons/` (verify the root folder in the installed `ScriptableObjectSingleton`). Under `Assets/_Game/Resources/` is fine.
 - In the Editor a missing asset is silently auto-created EMPTY in `Assets/Resources/...`; in a build it is null and the first access throws. After adding a factory: create or move the asset with Unity MCP/AssetDatabase (never hand-write YAML or .meta), assign the serialized fields, then verify the asset exists and fields are non-null.
 - `OnInitialize` runs once after load, before `Instance` returns. Do not let a factory and a DataBlock read each other during init (A -> B -> A leaves half-built caches).
 - Renaming the class or namespace breaks the lookup name: rename the asset too (GUID references stay).

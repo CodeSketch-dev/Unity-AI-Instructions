@@ -20,6 +20,12 @@ Principle: measure first, remove work first, then batch, then cache, then micro-
 6. **Memory/loading**: pool spawned things, avoid loading heavy content mid-gameplay, keep one-time costs behind the loading screen.
 7. **Rank findings** by (frame-time saved x ease), fix the top few, **re-measure**, and report before/after numbers with the test conditions.
 
+## Studio stack checks (add to the audit table)
+- Tiering: is there one runtime `Device`/policy that edits the active URP asset in place (never swap the asset), `maximumDeltaTime` 0.1, frame cap 60 (`device-tier-policy`)?
+- Content scaling by tier (NPCs, floating text, decor); global mip limit decided on purpose; ASTC overrides; no mips on UI.
+- Combine runs as a loading task with a ms budget and bake lists are fresh (`mesh-scene-combiner`); chunk/culling distances per tier (`world-batching-culling`).
+- Gaps worth adding (absent in the reference stack): thermal and low-memory handling, dynamic resolution, import presets. Details: `world-batching-culling/references/perf-stack.md`.
+
 ## Output
 A short table: finding, evidence (profiler/numbers or "static scan only"), fix, risk. Mark each as measured or unmeasured.
 

@@ -2,7 +2,7 @@
 
 Usage: py -I gdd_lint.py <gdd-dir> [--out _generated] [--state docs/orchestrator/state.json] [--no-fs] [--day-h 16]
 Reads `gdd/` (00-index.md, systems/, ui/, economy/, assets/, captures/index.md, qa/golden-path.md), applies rules
-L001-L015 (report 21 sec 2.3) and writes `<out>/lint-report.md`, `questions.md` (open `?` values) and, with no BLOCK,
+L001-L015 and writes `<out>/lint-report.md`, `questions.md` (open `?` values) and, with no BLOCK,
 `gdd.json` + a content hash. Exit 1 when any BLOCK remains. Severity: BLOCK stops the pipeline, WARN becomes a
 recorded assumption, INFO is a hint. Nothing is invented: an unknown value must stay `?`.
 """

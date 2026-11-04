@@ -1,6 +1,7 @@
 ---
 name: ads-popup-flow
 description: Implement an ad/monetization sheet (interstitial/rewarded popups, boosters, show-conditions, placements) on top of the project ads SDK wrapper. Use when given an ad placement sheet or asked for inter/reward popups or boosters.
+triggers: ad popup, interstitial popup, rewarded popup, booster, ads sheet, placement sheet, break ads, countdown ad, popup quang cao, nut xem quang cao
 ---
 
 # Ads popup flow
@@ -33,11 +34,18 @@ Use with `spec-pdf-extract` (read the sheet + demo first), `monetization-integra
 - Ladder UI states: done (check) / current (gold) / locked (lock); the offer shown = the next tier.
 - Ads removed: skip the inter, keep rewards free, hide the countdown UI.
 
+## 3b. Gates and where they live
+- Show-conditions that depend on game state (tutorial done, level, popup open, scene, time since install/last ad) belong in the data-driven gate matrix of `ads-layer-generic` (`references/ads-gate-matrix.md`), not in each popup. The popup asks the policy; it never re-implements gates.
+- Ad requests run the internet gate first (`internet-gate-popup`); rewarded failure = toast + `callback(false)`.
+- The tutorial-done flag blocks native ads, interstitial popups and rating prompts (`tutorial-phase-system`, `rating-prompt-flow`).
+
 ## 4. Traps found in practice
 - A notification helper whose prefab is null throws and aborts the reward callback: use the project toast event inside ad paths.
 - `Popup.Close()` is ignored while the open animation plays: close through a retry helper or the popup stays stuck with its buttons disabled.
 - Do not edit generated HUD prefab output by hand; fix the builder and re-run it.
 - In the Editor rewarded/inter return immediately (mock), so test timing by overriding the countdown, not by waiting.
+
+- Real-device rule: Editor mocks return immediately, so timing, native close, consent and app-open are only proven on a device with test ad units. Never copy SDK keys between apps; use the app's own ignored config.
 
 ## 5. Report
 List what was verified in Play Mode (claim path, unclaimed path, rewarded path, decline path, booster grant, UI screenshots vs the demo), what needs a device with real ad IDs, and every sheet row not implemented (with the reason).

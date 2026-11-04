@@ -1,6 +1,6 @@
 """List public events / static Actions and how many OTHER feature folders subscribe to them.
 
-Cross-feature broadcasts are StaticBus candidates; events consumed only inside the owner's own feature (like Knife Tower's
+Cross-feature broadcasts are StaticBus candidates; events consumed only inside the owner's own feature (like an actor's own
 `Character.EventDead += ...`) stay plain C# events.
 usage: python event_audit.py [scripts root]
 """

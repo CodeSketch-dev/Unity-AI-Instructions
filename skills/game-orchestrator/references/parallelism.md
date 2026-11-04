@@ -1,4 +1,4 @@
-# Parallelism model: one Editor, many hands (report 21 sec 3.4)
+# Parallelism model: one Editor, many hands
 
 Hard fact: one Unity Editor == one project directory, and the Unity MCP controls that one Editor.
 

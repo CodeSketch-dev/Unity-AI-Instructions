@@ -1,6 +1,6 @@
 # Pattern: side-tab-shop
 
-Source: report 07 sec 4 row 8 (`Shop_All`, `Shop_All_Tab_Item`; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Tabs mechanism: `ui-tabs`; grids inside: `ui-scroll-board`; item entries: `skin-shop`.
+Source: the studio evidence notes (`Shop_All`, `Shop_All_Tab_Item`; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Tabs mechanism: `ui-tabs`; grids inside: `ui-scroll-board`; item entries: `skin-shop`.
 
 ## Regions
 Page: title bar (~175) with back button, left `ScrollRect_Tab` 285x740 with tabs 222x82 (icon 101x81 left, label, notify dot top-right), content area to the right holding one stacked panel per tab (Speed, Trails, Offers, Sounds...).

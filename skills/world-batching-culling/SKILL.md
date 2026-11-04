@@ -19,7 +19,15 @@ Most mobile frame time in a Roblox-style world is renderer/material count, not t
 9. **Re-measure** and report before/after: renderers, materials, batches, set-pass, active chunks, vertices drawn, memory of baked meshes, and load/bake time. Say whether it was measured on a device.
 10. **Stability**: save the scene after each chunk; bake one segment per MCP call.
 
+## Studio stack additions (verified in the reference stack)
+- **Chunked single-mesh content** (biggest win for huge repetitive grids): prebake chunks of at most about 256 elements per mesh, plan the grid into the fewest bands, animate in the shader via vertex data, one `CullingGroup` sphere per chunk toggling the MeshRenderer. Chunk distance comes from the device tier (Low 45 / Medium 80 / High 150 m defaults, `device-tier-policy`).
+- **CullingGroup for world sprites and TMP**: one distance band (about 85 m), bounding sphere per target, `onStateChanged` toggles `enabled`; exclude always-visible text; dispose in `OnDestroy`; fill target lists with an Editor "fetch from prefabs" button. Registering chunks at runtime should still go through a scene-authored manager prefab.
+- **Single-LOD groups as a size cull**: one LOD level with a `screenRelativeHeight` (about 0.1 or 0.2) hides small props far away at no extra mesh cost.
+- **Far-clip zones** per stage on top (all tiers); Low additionally clamps camera far (about 200).
+- Impact order: chunk system > scene combiner > pre-merged variants > device tier policy > content scaling > world shader > global mip limit > distance culling > pool prewarm > player settings. Details: [references/perf-stack.md](references/perf-stack.md).
+
 ## Pitfalls
+- Baked renderer lists live as scene overrides: re-bake after any stage edit or sources stay uncombined.
 - Static flag on a combined object re-merges stale meshes.
 - Overwriting a mesh asset in place can leave a stale GPU mesh (delete + recreate).
 - Segment joints must align (no steps between modular segments); verify after widening or changing segments.

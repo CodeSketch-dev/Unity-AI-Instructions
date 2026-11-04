@@ -5,7 +5,7 @@ description: "TextMeshPro conventions: fonts, outline materials, autosize, color
 
 # UI text (TMP)
 
-Facts from report 07 (KT 451 TMPs, VERIFIED); defaults, not law.
+Facts from the studio evidence notes (KT 451 TMPs, VERIFIED); defaults, not law.
 
 - **Outline via material presets**, not the Outline component: a bold display font with outline widths ~0.35/0.75/1.0 and a heavier font 15-50, white face, black outline/underlay. World-space text uses the instancing/billboard variant.
 - **Autosize on** (about 80% of labels): min 18 almost always, max by role (36-52 common, 72 titles). Use no-wrap and Center/Middle alignment ~88%; do not use Overflow to hide a label that does not fit. Vertical centring: see Optical centring below; set it once in the text factory, never a per-label nudge.
@@ -18,7 +18,7 @@ Facts from report 07 (KT 451 TMPs, VERIFIED); defaults, not law.
 
 ## Optical centring (label looks high or low)
 
-Cause: button/header sprites are 9-sliced with a thicker bottom lip, so the visible face centre sits above the RectTransform centre, and TMP Middle/Midline centres on font metrics, not cap height. Seen in thunder-break-egg: titles about 5 units low, labels with a fixed +5 up to 3 high.
+Cause: button/header sprites are 9-sliced with a thicker bottom lip, so the visible face centre sits above the RectTransform centre, and TMP Middle/Midline centres on font metrics, not cap height. Seen in a reference project: titles about 5 units low, labels with a fixed +5 up to 3 high.
 
 - **Target**: cap-height centre of the text = face centre of the nearest Sliced Image ancestor = rect centre + (border.bottom - border.top) / 2 / (sprite ppu / 100 x pixelsPerUnitMultiplier). Symmetric sprite = 0. Cap centre = baseline + `font.faceInfo.capLine` x font scale / 2.
 - **New UI**: set vertical alignment to **Capline** once in the text factory/builder. Measured in Unity: Capline puts the cap centre exactly on the rect centre for any size and string; Middle sits about 0.033 x fontSize high; Geometry/Midline vary with the string. Then the y offset is only the face offset above (0 on symmetric plates). No hand "+5" per label.
@@ -27,13 +27,13 @@ Cause: button/header sprites are 9-sliced with a thicker bottom lip, so the visi
 - **Verify**: Play, open the popup, screenshot; label centre within about 1 px of the face. Restart Play Mode first: popups created before the edit keep the old layout.
 - Leave third-party UI sets alone (different atlases/ppu, measured deltas unreliable).
 
-Default from thunder-break-egg; override when the project's own reference shows otherwise.
+Default from a reference project; override when the project's own reference shows otherwise.
 
 ## Fit contract
 
 Put every label inside its owner’s padded content area, not directly against a button, Board or Frame border. Resolve TMP preferred bounds after layout: at the configured minimum font, text must remain inside its inset and must not cover another content/control sibling. A button may grow for its preferred icon+label size only while it remains inside its parent content area and leaves required sibling gaps. If neither Auto Size nor safe expansion fits the text, stop with a layout failure and request a content or design decision; never clip, overlap, or add a one-off baseline offset.
 
-Text component: TextMeshPro is the default in the primary references (knife-tower, monkey-escape). UniText is an EXPERIMENT in thunder-break-egg, not a team decision: the user is testing whether it performs better than TMP and whether its right-to-left support (Arabic etc.) makes localization easier. thunder-break-egg has no localization yet and nothing has been measured, so neither is proven better. Use the component the current project already uses; do not migrate between them or claim a performance or RTL advantage without a measurement (`profiling-evidence`). Keep text creation behind one shared factory so the choice can be swapped, and fix the baseline offset there, not per label.
+Text component: TextMeshPro is the default in the primary references (knife-tower, monkey-escape). UniText is an EXPERIMENT in one reference project, not a team decision: the user is testing whether it performs better than TMP and whether its right-to-left support (Arabic etc.) makes localization easier. that project has no localization yet and nothing has been measured, so neither is proven better. Use the component the current project already uses; do not migrate between them or claim a performance or RTL advantage without a measurement (`profiling-evidence`). Keep text creation behind one shared factory so the choice can be swapped, and fix the baseline offset there, not per label.
 
 ## Automatic fitting
 

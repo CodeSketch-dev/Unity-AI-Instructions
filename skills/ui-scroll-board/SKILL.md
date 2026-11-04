@@ -16,7 +16,7 @@ Frame (thick sliced border)
          │   └─ Content grid: spacing ~18-20 % of the cell, padding top 12-16, bottom 60-100 (last row can scroll clear of the edge)
          └─ Scrollbar slim (12-16 px) living in the right band
 ```
-reference's measured values: scroll inset 25 px, grid cell 266 x 267 with spacing 49 / 55, bottom padding 100, scrollbar 22 px wide, elastic movement 0.1, inertia deceleration 0.135, auto-hide bar. Reproduce the proportions, scaled to the new cell size.
+Measured values on the reference shop: scroll inset 25 px, grid cell 266 x 267 with spacing 49 / 55, bottom padding 100, scrollbar 22 px wide, elastic movement 0.1, inertia deceleration 0.135, auto-hide bar. Reproduce the proportions, scaled to the new cell size.
 
 ## Rules
 1. **Scroll area smaller than the board, always.** A sliced frame has a thick border: content clipped at the frame edge draws over the border. Verify the bottom row in a screenshot.

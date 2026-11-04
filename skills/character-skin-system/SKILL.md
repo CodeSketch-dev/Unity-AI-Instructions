@@ -5,7 +5,7 @@ description: "Character skin chain: Character_Skin_Asset, rig asset, Factory_Cha
 
 # Character skin system
 
-Based on knife-tower / monkey-escape (VERIFIED) with the platform changes from report 19 sec 3 (INFERRED). Adding one skin: `recipe-add-skin-or-item`; validating it: `character-skin-importer`; rig rules: `character-rig-and-animation-contract`.
+Based on knife-tower / monkey-escape (VERIFIED) with the platform changes from the studio evidence notes (INFERRED). Adding one skin: `recipe-add-skin-or-item`; validating it: `character-skin-importer`; rig rules: `character-rig-and-animation-contract`.
 
 ## Chain
 - `Character_Skin_Asset : ScriptableObject` per skin under `Configs/Character/<Type>/`: ID = asset name (validated unique), localization key, `Character_Skin_Type`, rig, prefab, thumbnail/avatar sprites (baked by the importer), unlock type (Free / Gem / IAP none-consumable / IAP subscription / Ads / Daily) + price + IAP id, order, optional stat bonuses (e.g. speed bonus), read-only derived fields (UseSharedMesh, triangles, bones, materials).

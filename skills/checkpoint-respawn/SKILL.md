@@ -5,7 +5,7 @@ description: "Checkpoints, fall detection and the revive loop: ICheckpoint, mana
 
 # Checkpoint and respawn loop
 
-From knife-tower and monkey-escape `Checkpoint/*`, `CharacterFallDetector`, `Character_Dead` (report 04 sec 3.4, 8.2, VERIFIED).
+From knife-tower and monkey-escape `Checkpoint/*`, `CharacterFallDetector`, `Character_Dead` (VERIFIED).
 
 ## Pieces
 - `ICheckpoint {Index, Transform}`; `Checkpoint : OptCollisionRegister` posts `Event_Checkpoint_Enter`; for the player only, when `_index > Data_Checkpoint.Value` it saves and plays fx, sfx and haptic (`Taptic.Success`).

@@ -1,5 +1,5 @@
 {
-  "_note": "Example catalog (DATA). Numbers are INFERRED starting budgets (report 19 sec 4), not measured on a device. Replace rigs, skins and budgets per game.",
+  "_note": "Example catalog (DATA). Numbers are INFERRED starting budgets, not measured on a device. Replace rigs, skins and budgets per game.",
   "skin_types": ["Normal", "Squid", "VIP", "Event"],
   "rigs": {
     "humanoid": {

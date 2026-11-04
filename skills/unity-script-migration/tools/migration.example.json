@@ -3,7 +3,7 @@
   "namespace": "Game",
   "gameRoot": "Assets/_Game",
   "searchRoots": ["Assets/_Game"],
-  "runtimeFolder": "Scripts/Logic/MyGame",
+  "runtimeFolder": "Scripts/Logic/Minigame/MyGame",
   "editorFolder": "Scripts/Editor/MyGame",
   "eventFolder": "Scripts/Event/MyGame",
   "testsFolder": "Assets/_Game/Tests"

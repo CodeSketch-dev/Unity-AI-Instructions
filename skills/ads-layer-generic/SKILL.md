@@ -1,6 +1,7 @@
 ---
 name: ads-layer-generic
-description: "Provider-agnostic ads: adapter, policy and static facade layers, fake Editor provider, consent state, placement enum. Use when adding or porting ads to any game."
+description: "Provider-agnostic ads: adapter, policy and static facade layers, data-driven gate matrix, fake Editor provider, consent, placement enum, real-device test rule. Use when adding or porting ads to any game."
+triggers: ads, rewarded, interstitial, banner, native ad, app open, ads gate, gate matrix, consent, ump, att, placement, quang cao, chan quang cao, remove ads
 ---
 
 # Ads layer (generic)
@@ -22,8 +23,17 @@ Mechanism is shared by every app; only the keys differ per app. Extends `ads-pop
 ## Fake provider (Editor and tests)
 A full-screen overlay with Reward, Close, "simulate no-fill" and "simulate fail" controls, so no-fill and closed-early paths are exercised. Add debug-menu rows through `debug-cheats-menu`.
 
+## Gate matrix (data, not scattered ifs)
+Specify the gates up front as a table, scene x tutorial x level x popup x time since install/last ad/last native, and keep it in config: [ads-gate-matrix](references/ads-gate-matrix.md). The policy reads the table; remote config overlays the numbers from the first commit. A table-driven EditMode test walks every row. Reference facts (gate order, default timings): `app-services-bootstrap/references/ads-gates.md`.
+
 ## Consent
-`IConsentService` with `Unknown/Granted/Denied/NotRequired`; denied passes limited-ads to the provider. Kids audience or region rules are a human decision.
+Design target (a studio addition: the reference game keeps consent inside its ad-network manager and has no consent interface): `IConsentService` with `Unknown/Granted/Denied/NotRequired`; denied passes limited-ads to the provider. Kids audience or region rules are a human decision.
+- Every consent outcome (granted, denied, error, not required) converges on ONE guarded `StartAdsInit(reason)`; never call the SDK init from several branches, and init even if consent failed.
+- Init and show calls on the main thread; retry load after 2 s; refresh native about every 30 s.
+- iOS: read the tracking status inside the request callback; right after the request it is still "not determined".
+
+## Real-device rule
+The Editor fake provider cannot prove native ads, consent, app-open or close behaviour. Test them on a real Android device before calling ads done; one reference bug ("native does not close") passed in the Editor and failed on a phone. Keep SDK keys in ignored per-app config assets; never copy keys from another app or a repo.
 
 ## Done means
-Every placement in the GDD has a call site, a fallback when no ad, and a logged event (`analytics-events-taxonomy`).
+The gate-matrix test is green and the real-device checklist ran. Every placement in the GDD has a call site, a fallback when no ad, and a logged event (`analytics-events-taxonomy`).

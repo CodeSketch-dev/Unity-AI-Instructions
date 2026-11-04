@@ -5,7 +5,7 @@ Usage:
   py -I ui_spec_tool.py build <spec.yaml|json> --canvas 1920x1080 [--out ui-spec.json]
   py -I ui_spec_tool.py rects <spec.yaml|json> [--out rects.json]   (absolute rects for wireframes/validators)
 
-The spec follows report 21 section 1.4 (layout contract in reference-canvas pixels).
+The spec follows the studio evidence notes (layout contract in reference-canvas pixels).
 `build` converts positions/sizes to Unity RectTransform values for the game canvas and
 writes JSON that the Editor builder (assets/UiSpecBuilder.cs.txt) reads. YAML support is
 a deliberate subset: block maps/lists, flow maps/lists, scalars, comments.

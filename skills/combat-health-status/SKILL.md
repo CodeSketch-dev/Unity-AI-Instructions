@@ -5,7 +5,7 @@ description: "HP, damage, shield, status effects and boss HP phases: IDamageable
 
 # Health, damage and status
 
-The references have NO generic player HP: knife-tower hits cause ragdoll knockback or one-shot kills, numeric HP exists only on eggs (TBE) and the boss event (percent) (report 15 sec 1, VERIFIED). Everything about player HP numbers is a proposal (INFERRED): tune with the balance loop.
+The references have NO generic player HP: knife-tower hits cause ragdoll knockback or one-shot kills, numeric HP exists only on eggs in one reference and the boss event (percent) (VERIFIED). Everything about player HP numbers is a proposal (INFERRED): tune with the balance loop.
 
 ## Model
 - `IDamageable { ApplyDamage(in DamageInfo) }`; `DamageInfo` struct: Amount, Source, Tool, Knockback, Point, IsCrit, StatusId, Kind.

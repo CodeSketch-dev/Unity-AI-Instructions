@@ -11,6 +11,14 @@ A one-line dial so agents stop guessing how much ceremony to use.
 ## Declare
 In the project `AGENTS.md` add a line such as `rigor: minimal` (or `standard`, `full`). Missing line = `minimal` for solo or live games, `standard` for team projects. A task note may override for one task (`rigor: full` on a risky migration).
 
+Optional `studio.yaml` at the project root (same `rigor:` key plus knobs) when a project needs more than the one line; the session-start hook prints whichever it finds (`studio.yaml` first). Knobs are only ever overrides of the level table below, never new gates:
+```yaml
+rigor: minimal          # minimal | standard | full
+directors: gates        # none | touched-axis | gates  (who reviews: none / the touched axis / all at gates)
+evidence: screenshot    # screenshot | screenshot+numbers  (visual items always need a saved screenshot)
+```
+Do not set a knob unless the project needs to differ from its level; a pinned knob shadows the level.
+
 ## Levels
 **minimal** (default for solo/live): act directly; short plan only for multi-step work; compile + Console + one targeted Play check; log feedback; no spec docs; run `regression-suite` only for the touched row; report in a few lines.
 

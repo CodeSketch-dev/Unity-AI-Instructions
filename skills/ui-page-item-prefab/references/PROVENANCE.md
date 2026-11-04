@@ -1,0 +1,2 @@
+# Provenance
+Structure and numbers come from a read-only dissection of the studio's Knife Tower style reference prefabs (shop, daily, settings, rating, currency bar, HUD buttons). Component facts were verified in prefab YAML; the code sample is a SketchEngine-form rewrite checked against package type names, not compiled. `UIButtonBase` click override name must be confirmed in the installed package.

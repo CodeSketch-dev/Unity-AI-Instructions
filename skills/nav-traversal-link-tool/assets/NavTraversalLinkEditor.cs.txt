@@ -1,4 +1,4 @@
-// UNCOMPILED TEMPLATE (design: knife-tower/monkey-escape NavTraversalLinkEditor, report 04 sec 5.4).
+// UNCOMPILED TEMPLATE (design: knife-tower/monkey-escape NavTraversalLinkEditor).
 // Copy to Assets/_Game/Scripts/Editor/NavTraversalLinkEditor.cs, set GroundMask to the project's layers, compile via Unity MCP.
 // Requires the NavMeshComponents package (NavMeshLink). Idempotent: the link name encodes the two snapped positions.
 #if UNITY_EDITOR

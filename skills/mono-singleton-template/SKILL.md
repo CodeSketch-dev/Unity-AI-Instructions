@@ -14,7 +14,7 @@ public class GameSingleton : MonoSingleton<GameSingleton>
 }
 ```
 
-## Behavior (report 01, VERIFIED)
+## Behavior (VERIFIED)
 - `Instance`: cached, else finds one in the scene; does NOT create. Returns null and logs an error once destroyed or quitting.
 - `SafeInstance`: finds or creates `[Singleton] <T>`; use only for infrastructure that must exist (MonoCallback, AudioManager pool).
 - `HasInstance`: check this in teardown and quit paths instead of touching `Instance`.

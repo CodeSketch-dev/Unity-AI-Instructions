@@ -1,0 +1,41 @@
+# .github/workflows/unity-ci.yml  (idea; not run here. Needs a Unity license secret: ask the owner before wiring remote CI.)
+# A local runner script calling the same commands is the no-secret alternative (see unity-batch-build).
+name: unity-ci
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: false }
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-
+      - name: Static checks (no Unity needed)
+        run: |
+          bash tools/githooks/pre-commit
+          python3 -I tools/layout_audit.py --root . || true   # report only until the rubric is green
+      - uses: game-ci/unity-test-runner@v4
+        env: { UNITY_LICENSE: "${{ secrets.UNITY_LICENSE }}" }
+        with:
+          testMode: editmode
+          customParameters: -nographics
+      - name: Missing scripts / references
+        uses: game-ci/unity-builder@v4
+        env: { UNITY_LICENSE: "${{ secrets.UNITY_LICENSE }}" }
+        with:
+          buildMethod: Game.Editor.Check_MissingReferences.RunBatch
+          allowDirtyBuild: true
+  build:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: game-ci/unity-builder@v4
+        env: { UNITY_LICENSE: "${{ secrets.UNITY_LICENSE }}" }
+        with: { targetPlatform: Android, buildMethod: Game.Editor.BuildCli.BuildAndroidAab }

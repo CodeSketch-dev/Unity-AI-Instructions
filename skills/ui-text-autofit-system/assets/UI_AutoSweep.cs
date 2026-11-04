@@ -55,7 +55,8 @@ namespace Game
             if (s_canvas != null) UnityEngine.Object.DestroyImmediate(s_canvas);
             AssetDatabase.SaveAssets();
             string head = "prefabs " + s_paths.Count + " texts " + s_texts + " prefabsChanged " + s_changed + " unresolvedIssues " + s_issues + " skipped " + s_skipped;
-            string file = "D:/GitProject/thunder-break-egg/docs/ui-sweep-report.txt";
+            string file = Path.GetFullPath(Path.Combine(Application.dataPath, "../docs/ui-sweep-report.txt"));
+            Directory.CreateDirectory(Path.GetDirectoryName(file));
             File.WriteAllText(file, head + "\n" + s_report);
             Status = "done: " + head;
             Debug.Log("[UI_AutoSweep] " + head);

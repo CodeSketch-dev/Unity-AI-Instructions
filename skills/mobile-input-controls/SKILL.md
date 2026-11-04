@@ -29,4 +29,4 @@ On a phone the player has two thumbs and no mouse. Everything depends on assigni
 ## Verify
 Test with two simultaneous touches (joystick + camera drag + button) on a device or the Device Simulator; confirm no stuck movement after a popup opens, after an interruption, and after scene reload. Layout checks belong to `mobile-hud-layout`.
 
-How knife-tower/monkey-escape wire joystick, look drag, edge-triggered jump and pinch: `references/kt-me-input.md`. Camera values: `freelook-third-person-camera`.
+How knife-tower/monkey-escape wire joystick, look drag, edge-triggered jump and pinch: `references/touch-input-reference.md`. Camera values: `freelook-third-person-camera`.

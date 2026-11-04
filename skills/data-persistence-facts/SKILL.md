@@ -6,7 +6,7 @@ triggers: save data, save lost, luu du lieu, mat save
 
 # Data persistence facts
 
-Reference facts, mostly VERIFIED from package source (report 01). Confirm against the installed package version before relying on exact numbers.
+Reference facts, mostly VERIFIED from package source. Confirm against the installed package version before relying on exact numbers.
 
 ## When a save happens
 - Both versions: on app pause and quit (hooked in the base `Init`). Android `OnApplicationPause(true)` is the reliable point; do not use `OnApplicationFocus` (ad overlays and permission dialogs fire it).

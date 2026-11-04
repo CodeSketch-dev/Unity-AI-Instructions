@@ -5,7 +5,7 @@ description: "Numeric budgets for player and bot characters on low-end Android: 
 
 # Character performance budgets
 
-ALL numbers are INFERRED starting targets (report 19 sec 4); none was measured on a device. Measure on a mid device with the Profiler before claiming gains or tightening (`profiling-evidence`). The validator enforces them per catalog (`character-catalog.json` `budgets`, `skin_validator.py`).
+ALL numbers are INFERRED starting targets; none was measured on a device. Measure on a mid device with the Profiler before claiming gains or tightening (`profiling-evidence`). The validator enforces them per catalog (`character-catalog.json` `budgets`, `skin_validator.py`).
 
 | Item | Player | Bot / crowd |
 |---|---|---|

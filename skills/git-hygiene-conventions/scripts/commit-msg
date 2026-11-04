@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# tools/githooks/commit-msg  (git config core.hooksPath tools/githooks)
+# Accepts:  [vX.Y]: Area: subject      or      type(area): subject      (type = feat fix perf refactor chore docs test build revert)
+# Rejects low-information subjects ('.', 'update', 'doing', 'wip', 'fix' alone). Merge and revert commits pass.
+msg_file="$1"
+first=$(head -n 1 "$msg_file")
+case "$first" in Merge\ *|Revert\ *|fixup!*|squash!*) exit 0 ;; esac
+if echo "$first" | grep -Eq '^\[v[0-9]+(\.[0-9]+){1,2}\]: [A-Za-z0-9_ /-]+: .{6,}$'; then exit 0; fi
+if echo "$first" | grep -Eq '^(feat|fix|perf|refactor|chore|docs|test|build|revert)(\([A-Za-z0-9_/-]+\))?: .{6,}$'; then exit 0; fi
+echo "commit message rejected: '$first'"
+echo "use '[v1.22]: Area: what changed' or 'fix(area): what changed' (subject >= 6 chars, no '.', 'update', 'wip')"
+exit 1

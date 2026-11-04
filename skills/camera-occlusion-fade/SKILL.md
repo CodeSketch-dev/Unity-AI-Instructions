@@ -1,11 +1,11 @@
 ---
 name: camera-occlusion-fade
-description: "Cheap third-person occluder fade: segment-vs-bounds test on a registered target list every 0.05-0.1 s, hysteresis, shared transparent twin material, instant or timed fade. Use when props or models block the player view."
+description: "Studio-addition cheap third-person occluder fade (not in the reference game): segment-vs-bounds test on a registered target list every 0.05-0.1 s, hysteresis, shared transparent twin material, instant or timed fade. Use when props or models block the player view."
 ---
 
 # Camera occlusion fade
 
-Extends the occluder note in `freelook-third-person-camera`. Goal: things between camera and player turn translucent without physics queries or per-object material instances.
+Studio addition: the reference game has NO occlusion fade (its only occlusion handling is the Cinemachine collider pulling the camera forward, see `freelook-third-person-camera`). Build this only when props really block the view and pulling the camera is not enough. Goal: things between camera and player turn translucent without physics queries or per-object material instances.
 
 1. **Register, don't search**: fadeable objects (selected props, pets, big models) add their renderers to a static `OcclusionFade` list on enable and remove on disable. No raycasts, no `FindObjectsOfType`.
 2. **Test**: every 0.05-0.1 s (not per frame) test the segment camera -> player-focus point against each registered renderer's `bounds` (expanded slightly; skip those farther than the camera distance or behind the camera). Zero allocation, `sqrMagnitude` only.

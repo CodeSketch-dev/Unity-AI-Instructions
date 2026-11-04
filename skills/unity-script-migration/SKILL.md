@@ -1,12 +1,12 @@
 ---
 name: unity-script-migration
-description: "Use when mass-renaming, splitting or moving Unity C# scripts into a feature layout (Logic/<Game>/<Feature>/<Prefix>_<Feature>_<Part>.cs), converting events to StaticBus, or moving scripts under asmdefs, without breaking scenes, prefabs, tests or saves. Ships GUID-safe tools."
+description: "Use when mass-renaming, splitting or moving Unity C# scripts into the feature layout (Logic/<Feature>/<Prefix>_<Part>.cs, Logic/Minigame/<Name>/<XXX>_<Part>.cs), converting events to StaticBus, or fixing asmdef placement, without breaking scenes, prefabs, tests or saves. GUID-safe tools."
 triggers: rename scripts, move scripts, split classes, one class per file, refactor folders, migrate scripts, restructure, naming convention, missing script, staticbus, doi ten script, chuyen folder, cau truc script, tach class
 ---
 
 # Unity script migration (GUID-safe, batch, verified)
 
-Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). All project settings live in `Tools/migration.json` (copy `tools/migration.example.json`; keys documented in `migration_config.py`): game prefix, namespace, roots, runtime/editor/event folders. Test templates with `{{Prefix}}`/`{{Namespace}}` placeholders: `templates/Prefix_TestBus.cs`, `templates/IPrefix_Source.cs`.
+Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). Target layout: flat `Logic/<Feature>/<Prefix>_<Part>.cs`; per-minigame code `Logic/Minigame/<Name>/<XXX>_<Part>.cs` (set `runtimeFolder` accordingly); editor code in `Scripts/Editor/<Feature>`. All project settings live in `Tools/migration.json` (copy `tools/migration.example.json`; keys documented in `migration_config.py`): game prefix, namespace, roots, runtime/editor/event folders. Test templates with `{{Prefix}}`/`{{Namespace}}` placeholders: `templates/Prefix_TestBus.cs`, `templates/IPrefix_Source.cs`.
 
 | Tool | Does |
 |---|---|
@@ -14,11 +14,11 @@ Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). 
 | `cs_lex.py` | C# lexer used by the others (code vs strings/comments/chars) |
 | `gen_all.py <folder>` | build `map.json` from flat `<Prefix><Feature><Part>` class names (editor files go to the editor folder) |
 | `split_types.py <folder> [--apply]` | one type per file; never moves `partial`; skips files with several namespaces / `#if` / `#region`; keeps the old name on collision; refuses to overwrite |
-| `fix_unresolved.py [--apply]` | heal leftover `<Prefix>Xxx` identifiers by matching normalized names of declared types (only identifiers starting with `Dig`) |
+| `fix_unresolved.py [--apply]` | heal leftover `<Prefix>Xxx` identifiers by matching normalized names of declared types (only identifiers starting with the configured prefix) |
 | `events_to_bus.py <facade.cs> <EventFolder> [--apply]` | facade `public event Action<..>` -> `Event_*` classes (with `Source`) + `StaticBus.Post`, rewrites method-group subscribers |
 | `tests_to_bus.py errors.txt` | rewrite test lambdas that subscribed to removed facade events into `<Prefix>_TestBus.On<E>(source, e => ...)` (input = compile-error lines) |
 | `event_audit.py [root]` | list every public event / static Action with the OTHER feature folders that subscribe (StaticBus candidates) |
-| `to_mono_cached.py <folder> [--apply]` | rebase `class X : MonoBehaviour` onto SketchEngine `MonoCached`, bare `transform`/`gameObject` -> `TransformCached`/`GameObjectCached`, instance `Tick/LateTick/FixedTick()` -> `public override` |
+| `to_mono_cached.py <folder> [--apply]` | rebase `class X : MonoBehaviour` onto the installed SketchEngine `MonoCached`, bare `transform`/`gameObject` -> `TransformCached`/`GameObjectCached`, instance `Tick/LateTick/FixedTick()` -> `public override` |
 | `style_audit.py <root>` | per-feature counts: events, coroutines, Update(), MonoBehaviour, explicit private, #region, file != class |
 
 ## Loop (one batch = one feature or a handful; commit after each green batch)
@@ -39,7 +39,7 @@ Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). 
 - Binary saves (Odin) store type names: `[assembly: BindTypeNameToType("Ns.Old", typeof(New))]` for persisted classes; a test walking the save graph catches omissions. Optional if the owner accepts save loss.
 - If a run goes wrong do not `git checkout`/`git clean` broadly: `git stash push -u -m <why> -- <paths>` is recoverable (ignored files are NOT stashed).
 - A big refresh after hundreds of moves can leave the MCP unresponsive for minutes; wait for Editor.log to go idle. `ForceUpdate` reimports everything: avoid.
-- Asmdef: an `Editor` folder under a runtime asmdef compiles into the runtime assembly; give editor code its own editor-only asmdef and reference the runtime one. Move the runtime asmdef (with its `.meta`) in the same step as its scripts. Add `SketchEngine.Patterns` (StaticBus) to every asmdef that posts or subscribes.
+- Asmdef (ruling: first-party code compiles in the default assemblies, see `project-structure-layout`): do not introduce a custom runtime asmdef during a migration; if one already exists, move it (with its `.meta`) in the same step as its scripts, keep its `references` list real (StaticBus assembly, UniTask, TMP...) and never put an `Editor` folder under it expecting editor-only compilation. Test asmdefs must reference every assembly whose types they use (also `SketchEngine` for MonoCached).
 - Duplicate truth: baked prefabs written by Editor bakers may already exist elsewhere; search for them (`AssetDatabase.FindAssets`) before converting scene objects to prefabs and keep one canonical copy.
 
 ## Review status (verified vs not)
@@ -49,5 +49,9 @@ Verified on one 900-file project (a mobile Unity 6 game on SketchEngine): GUID-s
 - Coroutines -> UniTask: `IEnumerator X()` -> `async UniTask X(CancellationToken ct)`; `StartCoroutine` -> `X(_cancel.Token).Forget()`; `yield return null` -> `UniTask.Yield(PlayerLoopTiming.Update, ct)`; waits -> `UniTask.Delay(TimeSpan, DelayType.UnscaledDeltaTime|DeltaTime, cancellationToken: ct)`; `StopCoroutine` -> `_cancel.Cancel()` (also cancel in OnDisable/OnDestroy and before restarting the same job); static starters use `host.GetCancellationTokenOnDestroy()`. EditMode tests that drained an `IEnumerator` synchronously hang on `UniTask.Yield` (no PlayerLoop): give the routine a `bool spreadOverFrames = true` switch and call it with `false` plus `.GetAwaiter().GetResult()`.
 - ScriptableObject entry -> `<X>_Asset`: (1) `AssetDatabase.RenameAsset` the `.asset` files first (GUID kept), (2) run `migrate_scripts.py` (it skips classes whose name is still in an asset file name), (3) patch the `Resources.Load("OldName")` / path strings with a lexer pass over string literals, (4) reload and check `Resources.Load(newName) != null`.
 - Delegating to subagents: only file-only agents on DISJOINT file lists; tell them "no MCP, no git, no Unity"; the director compiles once after all return, fixes call sites outside their lists, runs the gates and commits. Do not compile while they are editing (transient errors).
-- Before bulk-converting events, count cross-feature subscribers (`event_audit.py` idea: grep subscribers per feature). Knife Tower keeps object-owned C# events and uses StaticBus for cross-feature broadcasts; the receiver-name heuristics of `events_to_bus.py` can silently re-point a same-named event of another type: review its diff.
+- Before bulk-converting events, count cross-feature subscribers (`event_audit.py` idea: grep subscribers per feature). The reference style keeps object-owned C# events and uses StaticBus for cross-feature broadcasts; the receiver-name heuristics of `events_to_bus.py` can silently re-point a same-named event of another type: review its diff.
+- Check who dispatches `Tick` in the installed version before rebasing, and never copy a project-local `MonoCached` shadow whose `Tick` is called by hand from a central updater: the package base only gives virtual `Tick/LateTick/FixedTick` hooks.
 - `MonoCached*` in SketchEngine are caching helpers (transform/gameObject/rect cache, `GetCached<T>()`, virtual Tick hooks), not a central updater. Rebasing is cheap and safe (script GUIDs do not change): `TransformCached` only calls `transform` while the field is null and the Unity null check is a managed pointer compare in builds, so it beats repeated `.transform`. Pitfalls seen: (1) a plain class in the same file that has its own `Tick()` must not become `override`; (2) a nested `MonoCached` class calling an outer static `Tick(x)` now resolves to the inherited `Tick()`: qualify the call; (3) every asmdef that references your types must also reference `SketchEngine` (test and play-test asmdefs too), otherwise CS0012 floods; (4) skip files where `transform`/`gameObject` is declared as a parameter or local (the tool reports them as `conflict`).
+
+## Used by
+`staged-refactor-playbook` runs this loop as stage 4 of a refactor (baseline counts, gates, rollback); `project-structure-layout` defines the target layout and its audit script.

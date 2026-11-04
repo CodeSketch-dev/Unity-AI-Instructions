@@ -1,6 +1,6 @@
 # Pattern: gacha-box
 
-Source: report 07 sec 4 row 3 (`Gacha_Box_Popup`, item, reveal in the HUD canvas; sizes VERIFIED). Economy: `economy-progression-design`; odds are the designer's decision (user decision 2026-10-15), tuned by the balance loop. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`.
+Source: the studio evidence notes (`Gacha_Box_Popup`, item, reveal in the HUD canvas; sizes VERIFIED). Economy: `economy-progression-design`; odds are the designer's decision (user decision 2026-10-15), tuned by the balance loop. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`.
 
 ## Regions
 Board 1154x769 with a title, an inset scroll area (940x454) listing contents, a 347x116 open button (price or ad), close. Reveal overlay (state) shows the item name/title dropping in, then `Btn_Equip` and `Btn_NoThanks`.

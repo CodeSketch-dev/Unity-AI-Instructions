@@ -5,7 +5,7 @@ description: "Rule: one Character_Rig_Asset per skeleton family, fixed Animator 
 
 # Rig and animation contract
 
-Design from report 19 sec 3 (knife-tower facts VERIFIED, contract INFERRED). Why: skins from different sources only swap safely when skeleton, parameters and slots are a contract, not a convention.
+Design from the studio evidence notes (knife-tower facts VERIFIED, contract INFERRED). Why: skins from different sources only swap safely when skeleton, parameters and slots are a contract, not a convention.
 
 ## Rig
 - One `Character_Rig_Asset` per skeleton family (humanoid, pet, ...): ordered required bone names, root bone, Generic or Humanoid flag, `SkeletonHash` (FNV-1a of the ordered names, `character-skin-importer/scripts/skin_validator.py`), the `RuntimeAnimatorController`, required parameters (name + type), slots `{id, bone, local offset}` (hat, hand_r, back/wing, tail, nametag), max bones (default <= 30; budgets in `character-perf-budgets`), local bounds.
@@ -20,7 +20,7 @@ Required clips (state names): Idle, Run (blend by Speed), Jump, Fall, Land, Clim
 Animator `CullingMode` CullCompletely for bots and far characters (the reference skin prefabs use 2), AlwaysAnimate for the player; update mode Normal; root motion off; display-only skins have no Animator.
 
 ## Forbidden
-- `renderer.material` / `.materials` in `Awake` for every skin (climb-tower, steal-an-egg): per-instance copies break batching and leak. Use shared materials; create a runtime copy lazily for ONE character's effect and destroy it in `OnDestroy` (knife-tower stealth/freeze).
+- `renderer.material` / `.materials` in `Awake` for every skin (older reference projects): per-instance copies break batching and leak. Use shared materials; create a runtime copy lazily for ONE character's effect and destroy it in `OnDestroy` (knife-tower stealth/freeze).
 - `GetComponentInChildren<Animator>` lookups at runtime; refs are serialized and filled by the importer.
 - Slot lookups by `Find`; resolve slot ids to transforms once at skin load (`Character_Slots`).
 - Rigidbodies baked into every skin (`character-perf-budgets`).

@@ -1,0 +1,2 @@
+# Provenance
+Derived from reading the Knife Tower style reference project's persistent root prefab (EventSystem, three overlay canvases with sort orders 2506 / 12506 / 20000, manager children, scene copies self-destroying through the framework singleton) and from the installed SketchEngine `MonoSingleton` source. Code samples are rewritten generically in the SketchEngine form; the reference itself runs the older CodeSketch v1 with the same concepts. Not verified: compilation of the samples and the audio-mixer usage of the reference.

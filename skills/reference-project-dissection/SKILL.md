@@ -1,6 +1,6 @@
 ---
 name: reference-project-dissection
-description: "Use when the owner points to a reference project/game as the standard: dissect it exhaustively on your own (structure, scenes, prefabs, singleton, services, cameras, UI, code patterns), build a pass/fail rubric, then write skills and a bootstrap so later agents reproduce it. The owner's examples are only examples."
+description: "Use when the owner points to a reference project/game as the standard: dissect it exhaustively (structure, scenes, prefabs, singleton, services, cameras, UI, code patterns), build a pass/fail rubric, then write skills and a bootstrap so later agents reproduce it."
 triggers: reference project, knife tower, giong, chuan, kien truc, mo xe, phan tich, rubric, bootstrap, game studio, self game studio
 ---
 

@@ -1,11 +1,12 @@
 ---
 name: ui-popup-anatomy
 description: "Popup prefab tree, animation modules and timings, dim, Escape stack and page-vs-popup distinction. Use when building or fixing any popup, confirm dialog or full page. Part of the ui-always set: read skills/ui-always first for any UI task."
+triggers: popup, dialog, modal, board, close button, dim, escape, back button, popup prefab, hop thoai, bang thong bao, nut dong, kt style, knife tower
 ---
 
 # Popup anatomy
 
-From knife-tower / monkey-escape (report 07, VERIFIED). The reference wins when it differs; the standing look defaults are in `ui-style-rules`.
+From the studio reference projects (verified in prefabs). The reference wins when it differs; the standing look defaults are in `ui-style-rules`.
 
 ## Tree
 `Feature_Popup (Popup + CanvasGroup, stretch) > Root (stretch) > [Scale (fixed size = board + margin, the scale-animation target)] > Board (sprite) > Btn_Close / Title / content (ScrollRect, Layout HLG, action Btn_*)`. 94% of popups have `Root`, 75% a `Board`. No Canvas on the popup. Instantiate per open under the popup root with `PopupManager.Create(prefab)` (HUD buttons use `PopupButtonOpen` with a serialized prefab, zero code); destroy on close, never pool.
@@ -13,7 +14,8 @@ From knife-tower / monkey-escape (report 07, VERIFIED). The reference wins when 
 ## Behavior (framework `Popup`)
 - Push on enable; `Close()` plays the sequence backwards then destroys. Not interactable until the open ends.
 - **Escape / Android Back closes the top popup only**; lower popups are disabled while one is on top. No per-screen Back handlers; HUD views have no back.
-- Modules: Background (full-stretch dim as a sibling behind, fades to its alpha, click closes), Scale (0.3 -> 1, OutBack), Fade (CanvasGroup). Defaults: open/close 0.1/0.1 (~70%), big popups 0.3/0.2; ignore-time-scale off. Dim alpha observed 0.94 (most), 0.86 inventory, 0.706 settings, 0.5 debug; the team default in `ui-style-rules` is black 220/255.
+- Modules: Background (full-stretch dim as a sibling behind, fades to its alpha; tap outside does NOT close in the reference, set close-on-click off unless the design wants it), Scale (0.3 -> 1, OutBack), Fade (CanvasGroup). Defaults: open/close 0.1/0.1 (~70%), big popups 0.3/0.2; ignore-time-scale off. Dim alpha observed 0.94 (most), 0.86 inventory, 0.706 settings, 0.5 debug; the team default in `ui-style-rules` is black 220/255.
+- Popups play no open/close sfx in the reference (sound comes from button components). Page structure and item lifecycle: `ui-page-item-prefab`.
 - Ad/revive popups add `PopupButtonNoThanks`: appears after open + 0.5 s, scale 0 -> 1 in 0.25 s.
 - Depth-of-field post trigger while open exists on 12 popups (optional).
 

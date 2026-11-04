@@ -1,6 +1,6 @@
 # Pattern: mode-select-card
 
-Source: report 07 sec 4 row 7 (`Minigame_Selection_Item` + `_Large`; sizes VERIFIED, thumbnail anchors (0.06,0.09)-(0.94,0.82)). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Registration chain: `recipe-add-minigame`.
+Source: the studio evidence notes (`Minigame_Selection_Item` + `_Large`; sizes VERIFIED, thumbnail anchors (0.06,0.09)-(0.94,0.82)). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Registration chain: `recipe-add-minigame`.
 
 ## Regions
 Card 488x357 (a button): thumbnail inset in anchors, a top title strip with the name on the left (0.03-0.72) and a status group on the right (0.76-0.975), `Frame` overlay for selection, `CommingSoon` full overlay. The Large variant is the same prefab bigger for the featured entry.

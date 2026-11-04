@@ -1,11 +1,11 @@
 ---
 name: legacy-antipatterns
-description: Catalogue of anti-patterns seen in the legacy projects (climb-tower, bike-obby, vendor modules) with fixes. Use when reading legacy code to port a mechanic, or reviewing code for these smells.
+description: Catalogue of anti-patterns seen in the legacy projects (older projects, vendor modules) with fixes. Use when reading legacy code to port a mechanic, or reviewing code for these smells.
 ---
 
 # Legacy anti-patterns (do not copy; copy concepts only)
 
-Source: report 10 (labels AP-01..AP-18, file examples VERIFIED there). knife-tower, monkey-escape and thunder-break-egg are the style source; climb-tower and bike-obby are legacy (layout and mechanic ideas, with these smells).
+Source: the studio evidence notes (labels AP-01..AP-18, file examples VERIFIED there). knife-tower, monkey-escape and one vibe-coded project are the style source; two older projects are legacy (layout and mechanic ideas, with these smells).
 
 | ID | Smell | Fix in house style |
 |---|---|---|

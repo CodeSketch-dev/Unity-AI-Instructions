@@ -15,6 +15,8 @@ Port details live in `unity-iap-port`; this skill is the design contract for a n
 - Restore is real: re-check entitlements for non-consumables and grant missing ones. A fake spinner is not restore.
 - Local-only games have no server validation; treat purchases as unverifiable and keep payouts idempotent.
 
+Reference-game notes (idempotency, silent restore, funnel logging, price variants): [reference-iap-notes](references/reference-iap-notes.md).
+
 ## From the GDD
 Per product: id, type, tier, exact payout, one-time or repeat, where it is offered and the show-when rule (starter pack, remove ads, VIP). A tier ladder and pack values are the designer's numbers: never invent them.
 

@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 # Manage the single Graphify watcher for this checkout's Unity project.
 # Usage: bash docs/tools/graphify_ctl.sh start|stop|restart|status|update
-# One watcher per checkout/worktree (the graph lives in <checkout>/break-and-steal-unity/graphify-out).
+# One watcher per checkout/worktree (the graph lives in <checkout>/<unity-project>/graphify-out; set GRAPHIFY_PROJECT=<folder name> or let it auto-detect the folder holding ProjectSettings/).
 set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJ="$(cd "$HERE/../../break-and-steal-unity" && pwd)"
+ROOT="$(cd "$HERE/../.." && pwd)"
+PROJ=""
+if [ -n "${GRAPHIFY_PROJECT:-}" ]; then PROJ="$ROOT/$GRAPHIFY_PROJECT"; else
+  for d in "$ROOT"/*/; do [ -d "${d}ProjectSettings" ] && { PROJ="${d%/}"; break; }; done
+fi
+[ -d "$PROJ" ] || { echo "Unity project not found under $ROOT (set GRAPHIFY_PROJECT)"; exit 1; }
 OUT="$PROJ/graphify-out"
 PID="$OUT/watcher.pid"
 LOG="$OUT/watcher.log"

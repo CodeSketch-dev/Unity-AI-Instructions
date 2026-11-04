@@ -1,6 +1,6 @@
 # Pattern: quests
 
-NOT mined from a reference (the projects only have tutorial pointers named `Quest_*`). This contract is a DESIGN (INFERRED) from `recipe-quests-achievements` (report 20); replace positions from the target game's capture. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`.
+NOT mined from a reference (the projects only have tutorial pointers named `Quest_*`). This contract is a DESIGN (INFERRED) from `recipe-quests-achievements`; replace positions from the target game's capture. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`.
 
 ## Behavior and hooks
 - Daily quest rows (3) from `Quest_Asset` (stat, target, reward, period); progress comes from one stat bus (`Stats.Add`, event-driven, no per-quest Update); claim posts the reward flow and marks claimed; all-claimed state shows the next reset time.

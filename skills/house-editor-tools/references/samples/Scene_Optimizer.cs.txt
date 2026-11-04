@@ -1,0 +1,44 @@
+// Scripts/Editor/Scene/Scene_Optimizer.cs  (editor-only orchestrator; menu + hotkey)
+// Components implement IEditorBakeable (runtime assembly, body guarded by #if UNITY_EDITOR).
+using System.Linq;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+namespace Game.Editor
+{
+    public static class Scene_Optimizer
+    {
+        [MenuItem("Tools/Scene Optimizer/Bake %#b", priority = 0)]
+        public static void Bake()
+        {
+            var scene = EditorSceneManager.GetActiveScene();
+            var bakeables = scene.GetRootGameObjects()
+                .SelectMany(r => r.GetComponentsInChildren<IEditorBakeable>(true))
+                .OrderBy(b => b.BakeOrder)
+                .ToList();
+            if (bakeables.Count == 0) { Debug.LogWarning("[Scene_Optimizer] no IEditorBakeable in the active scene"); return; }
+            try
+            {
+                for (int i = 0; i < bakeables.Count; i++)
+                {
+                    EditorUtility.DisplayProgressBar("Scene Optimizer", bakeables[i].GetType().Name, (float)i / bakeables.Count);
+                    bakeables[i].BakeInEditor();
+                }
+                EditorSceneManager.MarkSceneDirty(scene);
+                Debug.Log($"[Scene_Optimizer] baked {bakeables.Count} components. Save the scene.");
+            }
+            finally { EditorUtility.ClearProgressBar(); }
+        }
+    }
+}
+
+// Runtime assembly:
+namespace Game
+{
+    public interface IEditorBakeable
+    {
+        int BakeOrder { get; }      // combiner 0, cull lists 10, navmesh 20, waypoints 30
+        void BakeInEditor();        // implement the body inside #if UNITY_EDITOR
+    }
+}

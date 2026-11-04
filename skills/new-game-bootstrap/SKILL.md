@@ -1,6 +1,7 @@
 ---
 name: new-game-bootstrap
-description: "Create a new Unity game from the template with one scripted procedure: config, token replace, project settings applier, pinned packages, ignore rules, repo preflight, human TODO list. Use when starting a new clone project."
+description: "Create a new Unity game from the template with one scripted procedure: config, token replace, settings applier, pinned packages, ignore rules, preflight, FoundationInstaller (persistent root prefab, canvases, EventSystem, test asmdefs), TODO list. Use when starting a new project."
+triggers: new game, new project, template, bootstrap, foundation installer, persistent root install, game moi, du an moi, khoi tao du an, kt style
 ---
 
 # New game bootstrap
@@ -8,7 +9,7 @@ description: "Create a new Unity game from the template with one scripted proced
 Automation for `unity-project-bootstrap` (which lists the settings and why). Creating a new Unity project is a user decision: ask before creating one, and never write into a reference project.
 
 ## Template contract
-A game template repo holds: house folder layout (`Assets/_Game/...`), `Boot`/`Home`/`Game` scenes with Boot first in the build, asmdefs (`Game.Runtime`, `Game.Editor`, test asmdefs), null SDK services (`IAdsService`, `IAnalytics`, `IConsent` with no-op implementations so the game runs with zero SDKs), `Assets/Plugins/Android` gradle templates, `qa/gates.json`, `project.config.json` with `__TOKEN__` placeholders, `.gitignore`/`.gitattributes` from `assets/`, committed `Packages/packages-lock.json`, and the framework pinned to a tag or commit (never `#main`).
+A game template repo holds: house folder layout (`Assets/_Game/...`, `project-structure-layout`), `Splash` (index 0) + `Home` (index 1) + one `Minigame_<Name>` scene in the build, the persistent root prefab placed in each (created by the installer below), `Resources/<Framework>/ScriptableObjectSingletons/` for singleton assets, NO runtime asmdef until it has a real reference list (first-party code compiles in the default assemblies; the installer writes the asmdefs plus EditMode and PlayMode test asmdefs, which are required), null SDK services (`IAdsService`, `IAnalytics`, `IConsent` with no-op implementations so the game runs with zero SDKs), `Assets/Plugins/Android` gradle templates, `qa/gates.json`, `project.config.json` with `__TOKEN__` placeholders, `.gitignore`/`.gitattributes` from `assets/`, committed `Packages/packages-lock.json`, and the framework pinned to a tag or commit (never `#main`).
 
 ## Procedure
 1. `git status` clean, read AGENTS.md, copy the template into the new folder and re-init git (the template remote must be gone).
@@ -16,6 +17,7 @@ A game template repo holds: house folder layout (`Assets/_Game/...`), `Boot`/`Ho
 3. `py -I scripts/new_game.py --project . --config project.config.json --dry-run`, then without `--dry-run`. It replaces tokens in text files, writes docs stubs and prints the human TODO list. It refuses on a dirty tree or a template remote.
 4. In Unity (MCP or `-batchmode`): run `BuildCli.Bootstrap` (`unity-batch-build/assets/BuildCli.cs.txt` plus `BuildSettingsApplier.cs.txt` copied in through the Editor). Settings come from the config, never from hand-edited YAML.
 5. Verify: refresh and compile, Console clean, `projectsettings_audit.py` (`projectsettings-baseline`), `py -I scripts/project_preflight.py --project .`, EditMode tests green.
+5b. Foundation: copy `assets/FoundationInstaller.cs.txt` to `Assets/_Game/Scripts/Editor/Foundation/FoundationInstaller.cs` (through the Editor), compile, run `Tools/Foundation/Install Persistent Root` twice (first run writes `GameSingleton.cs`/`GameMasterInit.cs`, second builds `Prefabs/GameSingleton.prefab` with EventSystem, Manager, HUD 2506 / popup 12506 / transition 20000 canvases, loading/internet/native-slot shells, and places it in the open scene). Repeat the menu in every playable scene. Add the project's loader scripts, transition asset, pool and IAP components to the shells (`persistent-root-prefab`), the device policy hook (`device-tier-policy`) and the services checklist (`app-services-bootstrap`, if installed). When tests start, run `Install Test Asmdefs` on a compiling project (reference list built from installed assemblies; vendor SDK code in `Assembly-CSharp` cannot be referenced from an asmdef). Details: [references/foundation-installer.md](references/foundation-installer.md).
 6. Add the default notification dots (`ui-notification-dots`: helper, pure rule + test, query class) before the first shop or upgrade screen; do not wait for the user to ask.
 7. Record decisions in `docs/project-setup.md` and append to `docs/agent-handoff.md`.
 

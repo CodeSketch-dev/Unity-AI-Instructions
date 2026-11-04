@@ -165,7 +165,7 @@ class ManifestTests(unittest.TestCase):
         for c in cmds:
             m = re.search(r"hooks/scripts/(\w+\.py)", c)
             self.assertTrue(m and os.path.isfile(os.path.join(HOOKS, m.group(1))), c)
-        self.assertEqual(sorted(data["hooks"]), ["PostToolUse", "PreCompact", "PreToolUse", "SessionStart", "Stop"])
+        self.assertEqual(sorted(data["hooks"]), ["PostToolUse", "PreCompact", "PreToolUse", "SessionStart", "Stop", "SubagentStart", "SubagentStop"])
 
 
 if __name__ == "__main__":

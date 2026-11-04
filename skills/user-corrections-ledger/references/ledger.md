@@ -1,6 +1,6 @@
 # Corrections ledger (DATA)
 
-Format: `[tag] rule - why - source`. Sources: report 11 notes (N), handoff (H), this repo's feedback notes (F), user decisions 2026-10-15 (D). Dates ISO.
+Format: `[tag] rule - why - source`. Sources: the studio evidence notes (N), handoff (H), this repo's feedback notes (F), user decisions 2026-10-15 (D). Dates ISO.
 
 ## Art and assets
 - [art] Port reference UI/prefab/atlas 100%; generate new art only after proving the reference has none - "close enough" HUD, wrong tiles, improvised icons were rejected - N 2026-10-12
@@ -35,7 +35,7 @@ Format: `[tag] rule - why - source`. Sources: report 11 notes (N), handoff (H), 
 
 ## UI
 - [ui] Fix the text baseline globally in shared setup, not per-label nudges - N
-- [ui] UniText vs TMP is an EXPERIMENT (thunder-break-egg tries UniText for performance and easier RTL localization); not a decision, nothing measured, no localization there yet. Do not migrate or claim a winner without a measurement - D 2026-10-15
+- [ui] UniText vs TMP is an EXPERIMENT (one reference project tries UniText for performance and easier RTL localization); not a decision, nothing measured, no localization there yet. Do not migrate or claim a winner without a measurement - D 2026-10-15
 - [ui] UI must come out beautiful and consistent from the spec alone; mockup/art only supplies style - F 2026-10-14
 - [ui] `unity-ui` rules are the standard even when existing prefabs differ; existing prefabs supply parts and styles, not structure - F
 - [ui] Layout rules: principles + reason + soft defaults; only user-stated numbers are hard (bottom clearance 200, canvas sort order very high ~30000, joystick touch region 0.35x0.6) - F
@@ -43,7 +43,7 @@ Format: `[tag] rule - why - source`. Sources: report 11 notes (N), handoff (H), 
 ## Framework and project
 - [framework] SketchEngine = the user's optimized CodeSketch: one framework, versions v1/v2; document the delta - F, D
 - [framework] AGENTS.md is the user's experience-based intent; merge wording, do not treat as wrong - D
-- [project] knife-tower and monkey-escape hand-coded references; thunder-break-egg vibe-coded but keeps the controlled asset pipeline; climb-tower and bike-obby legacy - F, D
+- [project] knife-tower and monkey-escape hand-coded references; a third project is vibe-coded but keeps the controlled asset pipeline; two older projects are legacy - F, D
 - [project] Local-only games (no server); bots/fake leaderboards substitute for online features - D
 - [process] Finish every task item fully (no deferred "not implemented" lists); only Editor-, device- or screenshot-bound verification may remain, stated plainly - D 2026-10-15
 - [process] Build the automation (orchestrator, subagents, hooks, gates) rather than formula/calculator content or per-game number tables - D 2026-10-15

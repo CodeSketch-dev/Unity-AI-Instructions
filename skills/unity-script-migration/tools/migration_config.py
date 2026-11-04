@@ -1,14 +1,15 @@
 """Project configuration shared by the migration tools.
 
 Create `Tools/migration.json` in the Unity project (next to the tools). Every key is optional; defaults match a project that uses
-`Assets/_Game/Scripts/{Logic,Editor,Event}/<Prefix>/...`, a flat namespace and the game prefix `Game`:
+`Assets/_Game/Scripts/{Logic,Editor,Event}/<Prefix>/...` (the prefix folder is the feature or mode folder; a minigame uses
+`Scripts/Logic/Minigame/<Name>`), a flat namespace and the game prefix `Game`:
 
 {
   "prefix": "MyGame",                       # game prefix: classes become <prefix>_<Feature>_<Part>
   "namespace": "Game",            # namespace used for reflection strings and generated event classes
   "gameRoot": "Assets/_Game",            # mapping paths are relative to this folder
   "searchRoots": ["Assets/_Game"],       # folders scanned for identifiers (add embedded SDK folders if they reference your types)
-  "runtimeFolder": "Scripts/Logic/MyGame",  # relative to gameRoot
+  "runtimeFolder": "Scripts/Logic/Minigame/MyGame",  # relative to gameRoot; flat features use "Scripts/Logic/<Feature>"
   "editorFolder": "Scripts/Editor/MyGame",
   "eventFolder": "Scripts/Event/MyGame",
   "testsFolder": "Assets/_Game/Tests"

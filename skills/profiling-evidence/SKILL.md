@@ -5,7 +5,7 @@ description: Rules and report format for claiming a performance change with evid
 
 # Profiling evidence
 
-No profiler numbers exist in the reference repos for the registry or culling gains; only BSE batch counts (map 3767 renderers / 149 materials -> 1 / 1; 93 batches, 62 set-pass in Play Mode, not on a device) (report 02). Do not quote speedups you did not measure.
+No profiler numbers exist in the reference repos for the registry or culling gains; only one reference project's batch counts (map 3767 renderers / 149 materials -> 1 / 1; 93 batches, 62 set-pass in Play Mode, not on a device). Do not quote speedups you did not measure.
 
 ## Report every perf claim as
 | Change | Metric | Before | After | Where measured | Conditions |

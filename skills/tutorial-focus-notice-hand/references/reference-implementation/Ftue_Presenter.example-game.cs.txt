@@ -1,0 +1,205 @@
+// HISTORICAL EVIDENCE: project-specific snapshot; not a current portable template.
+// Raw pointer polling and local placement choices are superseded by ../../SKILL.md and ../input-verification.md.
+using System.Collections.Generic;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+namespace Game.Example
+{
+    // FTUE visuals in the the reference project quest style (TUTORIAL-PORT-PLAN.md): Quest_TargetArrow (ground strip), Quest_FocusPointer (ring + hand on the button to tap) and
+    // Quest_FocusMessage (icon + one short localized word). The three components are scene-authored prefabs (Quest_Arrow, Quest_Focus_Pointer which nests Quest_Focus_Msg
+    // and Quest_Focus_Praise; baked by Quest_Baker). Resolution: a scene instance first (hand tunable in the Hierarchy), else the baked prefab from Factory_Ui is
+    // instantiated under the FTUE host once. Null from TryCreate = a prefab is missing, the caller falls back to the legacy presenter (the FTUE never breaks).
+    public sealed class Ftue_Presenter : IFtuePresenter
+    {
+        public const string PREFAB_ARROW = "Quest_Arrow", PREFAB_POINTER = "Quest_Focus_Pointer", PREFAB_MESSAGE = "Quest_Focus_Msg", PREFAB_PRAISE = "Quest_Focus_Praise";
+
+        readonly Quest_TargetArrow _arrow;
+        readonly Quest_FocusPointer _pointer;
+        readonly Quest_FocusMessage _prompt, _praise;
+        readonly List<Rect> _protected = new(12);
+        Vector2 _protectedFor;
+        string _promptText;
+        Sprite _promptIcon;
+        bool _shown;
+
+        Ftue_Presenter(Quest_TargetArrow arrow, Quest_FocusPointer pointer, Quest_FocusMessage prompt, Quest_FocusMessage praise)
+        {
+            _arrow = arrow; _pointer = pointer; _prompt = prompt; _praise = praise;
+            _prompt.SetActive(false);
+            _praise.SetActive(false);
+            _arrow.Hide();
+            SetShown(false);
+        }
+
+        public bool UsesBeatMessages => true;
+        public System.Action PromptTapped { get; set; }
+        public Quest_TargetArrow Arrow => _arrow;
+        public Quest_FocusPointer Pointer => _pointer;
+        public Quest_FocusMessage Prompt => _prompt;
+        public Quest_FocusMessage PraiseBubble => _praise;
+
+        // Scene instances first, baked prefabs second; null when anything cannot be resolved.
+        public static Ftue_Presenter TryCreate(Transform parent)
+        {
+            Quest_TargetArrow arrow = Object.FindAnyObjectByType<Quest_TargetArrow>(FindObjectsInactive.Include);
+            if (arrow == null) arrow = Spawn<Quest_TargetArrow>(PREFAB_ARROW, parent);
+            Quest_FocusPointer pointer = Object.FindAnyObjectByType<Quest_FocusPointer>(FindObjectsInactive.Include);
+            if (pointer == null) pointer = Spawn<Quest_FocusPointer>(PREFAB_POINTER, parent);
+            if (arrow == null || pointer == null) return null;
+            Quest_FocusMessage prompt = null, praise = null;
+            foreach (Quest_FocusMessage m in pointer.GetComponentsInChildren<Quest_FocusMessage>(true))
+            {
+                if (m.IsPraise) { if (praise == null) praise = m; }
+                else if (prompt == null) prompt = m;
+            }
+            if (prompt == null) prompt = Spawn<Quest_FocusMessage>(PREFAB_MESSAGE, pointer.Root);
+            if (praise == null) praise = Spawn<Quest_FocusMessage>(PREFAB_PRAISE, pointer.Root);
+            if (prompt == null || praise == null) return null;
+            return new Ftue_Presenter(arrow, pointer, prompt, praise);
+        }
+
+        static T Spawn<T>(string prefabName, Transform parent) where T : Component
+        {
+            GameObject prefab = Factory_Ui.Prefab(prefabName);
+            if (prefab == null) return null;
+            GameObject go = Object.Instantiate(prefab, parent, false);
+            go.name = prefabName;
+            return go.GetComponent<T>();
+        }
+
+        // ---- ring + hand ------------------------------------------------------------------------------------------------------------------
+
+        public void Show(RectTransform target, int key) => _pointer.Show(target, key);
+
+        public void Hide() { _pointer.Hide(); RefreshShown(); }
+
+        public void Rearm() => _pointer.Rearm();
+
+        // ---- message ----------------------------------------------------------------------------------------------------------------------
+
+        public void SetPrompt(string text, Sprite icon)
+        {
+            _promptText = text;
+            _promptIcon = icon;
+            if (string.IsNullOrEmpty(text)) ClearPrompt();
+        }
+
+        public void ClearPrompt()
+        {
+            _promptText = null;
+            _prompt.SetActive(false);
+            _prompt.Forget();
+            RefreshShown();
+        }
+
+        public void PunchPrompt()
+        {
+            if (_prompt.On) Ex_Punch.Play(_prompt.Rt, .22f, .35f);
+        }
+
+        public void Praise(string text, Sprite icon, float seconds)
+        {
+            if (string.IsNullOrEmpty(text)) return;
+            _praise.Forget();
+            _praise.Set(text, icon);
+            _praise.PlayPraise(seconds);
+            SetShown(true);
+        }
+
+        // ---- per frame --------------------------------------------------------------------------------------------------------------------
+
+        public void Tick()
+        {
+            bool want = _pointer.Target != null || !string.IsNullOrEmpty(_promptText) || _praise.On;
+            if (!want) { SetShown(false); return; }
+            SetShown(true);   // the canvas must be live to measure its rect; RefreshShown turns it off again when nothing shows
+            bool ring = _pointer.Tick(out Vector2 ringLocal, out Vector2 ringSize, out bool handBelow);
+            TickPrompt(ring, ringLocal, ringSize, handBelow);
+            _praise.TickPraise(_pointer.Root.rect);
+            RefreshShown();
+        }
+
+        void TickPrompt(bool ring, Vector2 ringLocal, Vector2 ringSize, bool handBelow)
+        {
+            // a child already pressing the highlighted button needs no label; an unreachable target (still being built) falls back to the fixed spot
+            bool on = !string.IsNullOrEmpty(_promptText) && !(_pointer.Target != null && !ring && _pointer.Dismissed);
+            if (!on) { if (_prompt.On) _prompt.SetActive(false); return; }
+            Rect canvas = _pointer.Root.rect;
+            if (canvas.width < 10f || canvas.height < 10f) { if (_prompt.On) _prompt.SetActive(false); return; }   // canvas not laid out yet (first frame): try again next frame
+            bool fresh = !_prompt.On;
+            bool changed = _prompt.Set(_promptText, _promptIcon);
+            _prompt.SetActive(true);
+            _prompt.TickAppear();
+            _prompt.Rt.anchorMin = _prompt.Rt.anchorMax = new Vector2(.5f, .5f);   // default anchors; a notice may switch to fraction anchors below (reset every frame)
+            _prompt.Rt.anchoredPosition = ring
+                ? Ex_Focus_Math.BubbleCentre(ringLocal, ringSize, _prompt.Size, handBelow, canvas, ProtectedFor(canvas))
+                : Ex_Focus_Math.BubbleFixed(_prompt.Size, canvas);
+            if (ring && handBelow)
+            {
+                // a top-edge target has no room above it: the bubble lands on the hand's side, so it slides below the hand instead of sitting under the fingertip
+                Vector2 pos = _prompt.Rt.anchoredPosition;
+                if (pos.y < ringLocal.y && Mathf.Abs(pos.x - ringLocal.x) < _prompt.Size.x * .5f)
+                {
+                    // owner 2026-11-02: the notice sits HIGH, level with the top-edge button and beside it, never in the middle of the screen under the hand
+                    pos = new Vector2(ringLocal.x + ringSize.x * .5f + 24f + _prompt.Size.x * .5f, ringLocal.y);
+                    float maxX = canvas.xMax - 16f - _prompt.Size.x * .5f;
+                    if (pos.x > maxX) pos.x = ringLocal.x - ringSize.x * .5f - 24f - _prompt.Size.x * .5f;
+                    _prompt.Rt.anchoredPosition = pos;
+                }
+                // DIG (right side of the screen): the notice sits ABOVE the button, centred on it and kept inside the canvas
+                if (_pointer.Key == (int)Ex_Ftue_Focus.Action)
+                {
+                    // owner 2026-11-02: anchored by canvas fractions (x .70, y .25: near the bottom right); only nudged left when it would touch the button
+                    // DIG notice (owner-approved placement): above the button, centred on it, kept inside the canvas
+                    float px = Mathf.Min(ringLocal.x, canvas.xMax - 16f - _prompt.Size.x * .5f);
+                    _prompt.Rt.anchoredPosition = new Vector2(px, Mathf.Min(ringLocal.y + ringSize.y * .5f + 24f + _prompt.Size.y * .5f, canvas.yMax - 10f - _prompt.Size.y * .5f));
+                }
+                else
+                {
+                    // the hand hangs lower-right / lower-left of the ring: the notice rides above the ring centre line so the two never overlap
+                    pos = _prompt.Rt.anchoredPosition;
+                    if (Mathf.Abs(pos.y - ringLocal.y) < ringSize.y)
+                    {
+                        pos.y = Mathf.Min(ringLocal.y + _prompt.Size.y * .5f + 6f, canvas.yMax - 10f - _prompt.Size.y * .5f);
+                        _prompt.Rt.anchoredPosition = pos;
+                    }
+                }
+            }
+            if (fresh || changed) Ex_Punch.Play(_prompt.Rt, .22f, .35f);   // a new word pops in
+            if (PromptTapped != null)
+            {
+                UnityEngine.InputSystem.Pointer ptr = UnityEngine.InputSystem.Pointer.current;
+                if (ptr != null && ptr.press.wasPressedThisFrame)
+                {
+                    Ex_Focus_Math.VisibleBounds(_prompt.Rt, _tapCorners, out Vector2 pmin, out Vector2 pmax);
+                    if (Ex_Focus_Math.Contains(pmin, pmax, ptr.position.ReadValue())) PromptTapped.Invoke();
+                }
+            }
+        }
+
+        readonly Vector3[] _tapCorners = new Vector3[4];
+
+        List<Rect> ProtectedFor(Rect canvas)
+        {
+            var size = new Vector2(canvas.width, canvas.height);
+            if (_protected.Count == 0 || size != _protectedFor) { _protectedFor = size; Ex_Focus_Math.ProtectedRects(canvas, _protected); }
+            return _protected;
+        }
+
+        void RefreshShown() => SetShown(_pointer.RingShown || _prompt.On || _praise.On);
+
+        void SetShown(bool on)
+        {
+            if (_shown == on && _pointer.gameObject.activeSelf == on) return;
+            _shown = on;
+            _pointer.gameObject.SetActive(on);
+        }
+
+        // ---- ground arrow -----------------------------------------------------------------------------------------------------------------
+
+        public void ShowArrow(Vector3 feet, Vector3 target, Camera cam, float minViewY) => _arrow.Show(feet, target, cam, minViewY);
+
+        public void HideArrow() => _arrow.Hide();
+    }
+}

@@ -11,9 +11,10 @@ import miniyaml  # noqa: E402
 
 SKILLS = set(os.listdir(os.path.join(ROOT, "skills")))
 ROSTER = {"orchestrator", "game-designer", "tech-lead", "gameplay-dev", "ui-dev", "art-tech", "economy-balancer", "qa-tester",
-          "perf-auditor", "release-engineer", "reviewer"}
+          "perf-auditor", "release-engineer", "reviewer", "creative-director", "technical-director", "producer",
+          "performance-analyst", "monetization-designer", "localization-lead", "analytics-engineer"}
 KNOWN_KEYS = {"name", "description", "tools", "disallowedTools", "model", "maxTurns", "skills", "memory", "isolation", "color", "effort"}
-LEAVES = ROSTER - {"orchestrator"}
+LEAVES = ROSTER - {"orchestrator", "producer"}
 
 
 def frontmatter(path):

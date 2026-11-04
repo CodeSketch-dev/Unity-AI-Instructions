@@ -1,4 +1,4 @@
-// UNCOMPILED TEMPLATE (design: report 17 sec 5.4, mirrors the thunder-break-egg Dev_UiCapture idea). Copy to
+// UNCOMPILED TEMPLATE (design: the studio evidence notes, mirrors a reference Dev_UiCapture idea). Copy to
 // Assets/_Game/Scripts/Editor/Qa_Capture.cs, compile via Unity MCP, run for ONE prefab first and look at the PNG.
 // Renders a prefab under a ScreenSpace-Camera canvas into a RenderTexture of the exact pixel size and writes a lossless PNG.
 // Overlay canvases only render in the Game view, so a clone on a camera canvas is used. Entrance animations: call the

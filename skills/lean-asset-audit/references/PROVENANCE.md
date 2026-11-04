@@ -1,0 +1,3 @@
+# Provenance
+
+Derived from an audit of a 4.3 GB Unity 6 project compared with the studio's reference architecture (the "Knife Tower style" project, which itself is not lean: 10.9k asset files, 4.3k VFX pack files). The proof script is a generic, project-neutral rewrite of the junk-index builder used there; it was re-run on that project after the rewrite (146 dead-proven files, 1.14 GB for the categories selected). Verified: script syntax and a full run on one project. Not verified: other projects, macOS/Linux paths, projects using Addressables folder entries heavily, byte-scan layouts other than the one validated.

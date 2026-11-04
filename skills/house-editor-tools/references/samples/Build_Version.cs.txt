@@ -1,0 +1,33 @@
+// Scripts/Editor/Build/Build_Version.cs  - minimal version/build-number setter used before a build.
+// Full AAB/APK pipeline with signing from environment variables: see the unity-batch-build skill (BuildCli template).
+// Unity -batchmode -projectPath <p> -executeMethod Game.Editor.Build_Version.Apply -buildVersion 1.22 -buildNumber 22 -logFile -
+using System;
+using UnityEditor;
+using UnityEngine;
+
+namespace Game.Editor
+{
+    public static class Build_Version
+    {
+        public static void Apply()
+        {
+            string version = Arg("-buildVersion"), number = Arg("-buildNumber");
+            if (string.IsNullOrEmpty(version) || !int.TryParse(number, out int code))
+            { Debug.LogError("[Build_Version] need -buildVersion x.y and -buildNumber n"); EditorApplication.Exit(2); return; }
+            if (code <= PlayerSettings.Android.bundleVersionCode)
+            { Debug.LogError($"[Build_Version] build number must increase (current {PlayerSettings.Android.bundleVersionCode})"); EditorApplication.Exit(3); return; }
+            PlayerSettings.bundleVersion = version;
+            PlayerSettings.Android.bundleVersionCode = code;
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[Build_Version] {version} ({code})");
+            EditorApplication.Exit(0);
+        }
+
+        static string Arg(string name)
+        {
+            var a = Environment.GetCommandLineArgs();
+            for (int i = 0; i < a.Length - 1; i++) if (a[i] == name) return a[i + 1];
+            return null;
+        }
+    }
+}

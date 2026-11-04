@@ -5,7 +5,7 @@ description: "Required components and behavior of every button: press scale, cli
 
 # Button anatomy
 
-From report 07 (counts over 223 KT / 184 ME button objects, VERIFIED).
+From the studio evidence notes (counts over 223 KT / 184 ME button objects, VERIFIED).
 
 - **Every button = Image + Button + press-feedback script + click-sfx script** (about 85% of buttons have both). Search the installed package first (`UIPressPrimeTween`, `AudioButtonSfx`) and reuse it; never write a second press script. **Anything pressable gets it**: Button, Toggle, tab, HUD icon, custom touch area, and world sprite/text buttons. Add `UIPressPrimeTween` in every builder and runtime `AddComponent<Button>` (guard with GetComponent); backdrops/dim areas excluded.
 - Press feedback (verify: pointer down -> scale 0.9, up -> back to 1): scale to 0.9 in 0.1 s OutQuad, unscaled time, ignored when not interactable, reset on disable.

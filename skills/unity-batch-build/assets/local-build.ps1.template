@@ -11,7 +11,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$Skills = 'C:\Users\REPLACE_ME\.claude\skills'
+$Skills = Join-Path $env:USERPROFILE ".claude\skills"
 $Python = 'py'
 
 & $Python -I "$Skills\new-game-bootstrap\scripts\project_preflight.py" --project $Project

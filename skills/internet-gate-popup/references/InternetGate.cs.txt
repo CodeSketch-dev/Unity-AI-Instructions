@@ -1,0 +1,44 @@
+// Excerpt of a custom on-demand manager (the part the framework module lacks). Check the installed
+// SketchEngine.Internet module first. Idle loop, Try Again timing and view toggling: see SKILL.md.
+using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Networking;
+
+namespace Game
+{
+    public partial class InternetGate    // : MonoSingleton<InternetGate>, lives inside the persistent root
+    {
+        const string PRIMARY_URL = "https://captive.apple.com/hotspot-detect.html";
+        const string FALLBACK_URL = "https://1.1.1.1/cdn-cgi/trace";
+        const int TIMEOUT_SECONDS = 5;
+
+        static bool IsCheckEnabled =>
+            GameConfig.Remote.IsInternetRequired && !AdsHelper.IsAdsRemoved && !Vip.IsActive;
+
+        bool _checking;
+
+        async UniTask<bool> CheckOnlineAsync(CancellationToken ct)
+        {
+            if (!IsCheckEnabled) return true;                      // bypass = online
+            _checking = true;
+            try
+            {
+                if (Application.internetReachability == NetworkReachability.NotReachable) return false;
+                return await PingAsync(PRIMARY_URL, ct) || await PingAsync(FALLBACK_URL, ct);
+            }
+            finally { _checking = false; }
+        }
+
+        static async UniTask<bool> PingAsync(string url, CancellationToken ct)
+        {
+            using var request = UnityWebRequest.Get(url);          // GET: some endpoints reject HEAD
+            request.timeout = TIMEOUT_SECONDS;
+            try { await request.SendWebRequest().ToUniTask(cancellationToken: ct); }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception) { return false; }
+            return request.result == UnityWebRequest.Result.Success;
+        }
+    }
+}

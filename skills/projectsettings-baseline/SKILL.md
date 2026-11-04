@@ -5,14 +5,14 @@ description: Baseline Unity ProjectSettings, physics and URP values for low-end 
 
 # ProjectSettings baseline
 
-Audit with `py -I <skills>/projectsettings-baseline/scripts/projectsettings_audit.py <unity-project>` (read-only; exit 1 on any FAIL). Values are soft defaults from the reference projects (report 02); override with a stated reason.
+Audit with `py -I <skills>/projectsettings-baseline/scripts/projectsettings_audit.py <unity-project>` (read-only; exit 1 on any FAIL). Values are soft defaults from the reference projects; override with a stated reason.
 
 | Area | Baseline | Source note |
 |---|---|---|
 | Scripting / arch | IL2CPP, ARM64 | all three refs |
-| Graphics API Android | GLES3 + Vulkan (order per project; test both) | KT/ME GLES3 first, BSE Vulkan first |
+| Graphics API Android | GLES3 + Vulkan (order per project; test both) | KT/ME GLES3 first, a third reference Vulkan first |
 | Physics | `autoSyncTransforms` 0, `reuseCollisionCallbacks` 1, solver 6/1 (Unity default) | all refs |
-| Time | `timeScale` 1, `maximumDeltaTime` 0.1, fixed step 0.02 (1/30 on Low via policy) | BSE had timeScale 20 and 0.333: QA leftovers |
+| Time | `timeScale` 1, `maximumDeltaTime` 0.1, fixed step 0.02 (1/30 on Low via policy) | one reference had timeScale 20 and 0.333: QA leftovers |
 | Frame rate | vSync 0, cap 60 in code | `device-tier-policy` |
 | URP | SRP Batcher on, MSAA off/2x, shadowmap 512-1024, 1 cascade, short distance, no soft shadows, HDR off unless required | reference Mobile asset is looser (HDR on, soft shadows, distance 50): audit WARNs |
 | Textures | check `globalTextureMipmapLimit` is deliberate (KT sets 1 = half-res everywhere, undocumented) | |

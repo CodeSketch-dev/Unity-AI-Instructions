@@ -5,7 +5,7 @@ description: Modular avatar with slot parts (hair, hat, face, bag, tail) bound t
 
 # Modular avatar parts
 
-From steal-an-egg `CharacterSkin`, `AvatarPart`, `BoneMapper` (report 19 sec 1.4, VERIFIED; budgets INFERRED). Use when the Roblox game has hats/hair/clothes; whole-prefab skins (`character-skin-system`) suit "buy a character". Both can share one rig contract (`character-rig-and-animation-contract`).
+From a reference `CharacterSkin`, `AvatarPart`, `BoneMapper` (VERIFIED; budgets INFERRED). Use when the Roblox game has hats/hair/clothes; whole-prefab skins (`character-skin-system`) suit "buy a character". Both can share one rig contract (`character-rig-and-animation-contract`).
 
 - Slots: category x subcategory enums (reference: Avatar, Clothes, Accessories, Body x Items, Tail, Bag, Hair, SkinColor, Jewelery, Face, Hat). `Character_Part_Asset` per part: slot, prefab with a SkinnedMeshRenderer, baked bone-name list, price. A set item is a bundle of parts.
 - Binding by NAME: the part prefab stores its root bone name, bone name list and saved bounds (`BoneMapper`); `TryLoad()` re-resolves bones under the character's skeleton and resets the renderer's local transform. Bake the mapping at import (`character-skin-importer`), resolve at runtime without `Find` (rig slots).

@@ -1,0 +1,256 @@
+// FoundationInstaller.cs.txt - copy to Assets/_Game/Scripts/Editor/Foundation/FoundationInstaller.cs
+// Idempotent Editor installer for the studio foundation (spec: persistent-root-prefab/references/installer-spec.md).
+//  Tools/Foundation/Install Persistent Root : GameSingleton.cs + GameMasterInit.cs (if missing), GameSingleton.prefab
+//        (EventSystem, Manager, HUD / popup / transition canvases, loading + internet + native-slot shells),
+//        instance placed in the open scene, stray scene EventSystems removed.
+//  Tools/Foundation/Install Test Asmdefs    : Game.Runtime / Game.Editor / EditMode / PlayMode asmdefs whose reference
+//        list is built from the assemblies that are actually installed (run on a compiling project).
+// Framework components are attached by type name only when the type exists; everything skipped is reported.
+// Check the installed SketchEngine API (type names) before relying on this file. Not compiled in the skills repo.
+#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using UnityEditor;
+using UnityEditor.Compilation;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+namespace Game.EditorTools
+{
+    public static class FoundationInstaller
+    {
+        const string PrefabPath = "Assets/_Game/Prefabs/GameSingleton.prefab";
+        const string LogicDir = "Assets/_Game/Scripts/Logic/Game";
+        const int SORT_HUD = 2506, SORT_POPUP = 12506, SORT_TRANSITION = 20000;
+        static readonly StringBuilder Log = new();
+
+        const string SingletonSrc =
+            "using SketchEngine.Mono;\nnamespace Game\n{\n    public class GameSingleton : MonoSingleton<GameSingleton>\n    {\n        protected override bool PersistAcrossScenes => true;\n    }\n}\n";
+        const string InitSrc =
+            "using UnityEngine;\nnamespace Game\n{\n    public static class GameMasterInit\n    {\n        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]\n        static void RuntimeInit()\n        {\n            if (Application.isMobilePlatform)\n            {\n                Application.targetFrameRate = Mathf.Min(Screen.currentResolution.refreshRate, 60);\n                QualitySettings.vSyncCount = 0;\n            }\n            // DevicePolicy.ApplyRenderPolicy(); // see device-tier-policy\n        }\n    }\n}\n";
+
+        [MenuItem("Tools/Foundation/Install Persistent Root")]
+        public static void InstallRoot()
+        {
+            Log.Clear();
+            bool wrote = WriteIfMissing(LogicDir + "/GameSingleton.cs", SingletonSrc);
+            wrote |= WriteIfMissing(LogicDir + "/GameMasterInit.cs", InitSrc);
+            if (wrote || FindType("Game.GameSingleton") == null)
+            {
+                AssetDatabase.Refresh();
+                Debug.Log("[Foundation] Scripts written. Wait for compile, then run Install Persistent Root again.");
+                return;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(PrefabPath));
+            bool exists = File.Exists(PrefabPath);
+            GameObject root = exists ? PrefabUtility.LoadPrefabContents(PrefabPath) : new GameObject("GameSingleton");
+            try
+            {
+                Build(root);
+                PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
+            }
+            finally
+            {
+                if (exists) PrefabUtility.UnloadPrefabContents(root); else UnityEngine.Object.DestroyImmediate(root);
+            }
+
+            PlaceInScene();
+            AssetDatabase.SaveAssets();
+            ReadBack();
+            Debug.Log("[Foundation]\n" + Log);
+        }
+
+        static void Build(GameObject root)
+        {
+            AddByType(root, "Game.GameSingleton");
+
+            var es = Child(root.transform, "EventSystem", false);
+            if (!es.GetComponent<EventSystem>()) es.AddComponent<EventSystem>();
+            if (!es.GetComponent<BaseInputModule>())
+            {
+                var t = FindType("InputSystemUIInputModule") ?? typeof(StandaloneInputModule);
+                var m = es.AddComponent(t);
+                t.GetMethod("AssignDefaultActions")?.Invoke(m, null);
+            }
+
+            var mgr = Child(root.transform, "Manager", false);
+            AddByType(mgr, "FpsUnlock");
+            Child(mgr.transform, "Pool", false);
+            Child(mgr.transform, "IAP", false);
+
+            // HUD canvas
+            var hud = MakeCanvas(root.transform, "Canvas", SORT_HUD);
+            var hudRoot = Child(hud.transform, "Root", true);
+            var tint = Child(hudRoot.transform, "OverlayColor", true);
+            Img(tint, new Color(1, 1, 1, 0), false);
+            var cut = Child(hudRoot.transform, "CutSceneFocus", true);
+            Bar(cut.transform, "Top", true); Bar(cut.transform, "Bottom", false);
+            AddByType(Child(hudRoot.transform, "SafeArea", true), "UISafeArea");
+            var warn = Child(hudRoot.transform, "Notification_Warning", true);
+            Child(warn.transform, "Root", true).SetActive(false);
+
+            // Popup canvas
+            var pop = MakeCanvas(root.transform, "Canvas_Popup", SORT_POPUP);
+            var popRoot = Child(pop.transform, "Root", true);
+            var views = Child(popRoot.transform, "ViewContainer", true);
+            AddByType(views, "ViewContainer"); AddByType(views, "UISafeArea");
+            AddByType(Child(popRoot.transform, "PopupRoot", true), "PopupRootSetter");
+            Child(pop.transform, "OverlayContainer", true);
+            var load = Child(pop.transform, "LoadingScene", true);
+            var loadRoot = Child(load.transform, "Root", true);
+            if (!loadRoot.GetComponent<CanvasGroup>()) loadRoot.AddComponent<CanvasGroup>();
+            loadRoot.SetActive(false);
+            Child(Child(pop.transform, "UI_Internet_Popup", true).transform, "Root", true).SetActive(false);
+            var slot = Child(pop.transform, "Ads_NativeSlot", true).GetComponent<RectTransform>();
+            slot.anchorMin = new Vector2(1, 0); slot.anchorMax = new Vector2(1, 1);
+            slot.pivot = new Vector2(1, 0.5f); slot.sizeDelta = new Vector2(1080, 0); slot.anchoredPosition = Vector2.zero;
+
+            // Transition canvas (project adds the transition asset / loader script here)
+            var tr = MakeCanvas(root.transform, "Transition", SORT_TRANSITION);
+            var screen = Child(tr.transform, "Screen", true);
+            if (!screen.GetComponent<RawImage>()) { var r = screen.AddComponent<RawImage>(); r.raycastTarget = false; r.color = new Color(0, 0, 0, 0); }
+        }
+
+        // ---- scene placement -------------------------------------------------
+        static void PlaceInScene()
+        {
+            var scene = SceneManager.GetActiveScene();
+            if (!scene.IsValid() || !scene.isLoaded) { Log.AppendLine("No open scene: prefab saved only."); return; }
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+            GameObject inst = scene.GetRootGameObjects().FirstOrDefault(g => PrefabUtility.GetCorrespondingObjectFromSource(g) == prefab);
+            if (inst == null)
+            {
+                inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
+                Undo.RegisterCreatedObjectUndo(inst, "Install persistent root");
+                Log.AppendLine("Placed instance in scene " + scene.name);
+            }
+            foreach (var g in scene.GetRootGameObjects().Where(x => x != inst && x.GetComponent<EventSystem>() != null && x.transform.childCount == 0).ToArray())
+            {
+                Log.AppendLine("Removed scene EventSystem '" + g.name + "'");
+                Undo.DestroyObjectImmediate(g);
+            }
+            EditorSceneManager.MarkSceneDirty(scene);
+        }
+
+        static void ReadBack()
+        {
+            var c = PrefabUtility.LoadPrefabContents(PrefabPath);
+            foreach (var cv in c.GetComponentsInChildren<Canvas>(true))
+                Log.AppendLine($"canvas {cv.name}: sort {cv.sortingOrder}, mode {cv.renderMode}");
+            Log.AppendLine($"cameras {c.GetComponentsInChildren<Camera>(true).Length}, listeners {c.GetComponentsInChildren<AudioListener>(true).Length}");
+            PrefabUtility.UnloadPrefabContents(c);
+        }
+
+        // ---- test asmdefs ------------------------------------------------------
+        [MenuItem("Tools/Foundation/Install Test Asmdefs")]
+        public static void InstallTestAsmdefs()
+        {
+            var installed = new HashSet<string>(CompilationPipeline.GetAssemblies(AssembliesType.Player).Select(a => a.name));
+            string[] candidates = { "SketchEngine", "SketchEngine.Data", "SketchEngine.Patterns", "SketchEngine.Popup", "SketchEngine.View",
+                "SketchEngine.Utilities", "SketchEngine.Audio", "UniTask", "Unity.TextMeshPro", "PrimeTween.Runtime",
+                "Unity.Addressables", "Unity.ResourceManager", "Unity.Localization", "Unity.InputSystem", "Unity.Cinemachine" };
+            var refs = candidates.Where(installed.Contains).ToArray();
+            WriteJson("Assets/_Game/Scripts/Game.Runtime.asmdef", Asmdef("Game.Runtime", refs, null, false));
+            WriteJson("Assets/_Game/Scripts/Editor/Game.Editor.asmdef", Asmdef("Game.Editor", new[] { "Game.Runtime" }.Concat(refs).ToArray(), new[] { "Editor" }, false));
+            string[] testRefs = new[] { "Game.Runtime", "UnityEngine.TestRunner", "UnityEditor.TestRunner" }.Concat(refs).ToArray();
+            WriteJson("Assets/_Game/Tests/EditMode/Game.Tests.EditMode.asmdef", Asmdef("Game.Tests.EditMode", testRefs, new[] { "Editor" }, true));
+            WriteJson("Assets/_Game/Tests/PlayMode/Game.Tests.PlayMode.asmdef", Asmdef("Game.Tests.PlayMode", testRefs, null, true));
+            AssetDatabase.Refresh();
+            Debug.Log("[Foundation] Asmdefs written with references: " + string.Join(", ", refs) +
+                      ". Vendor SDK scripts in Assembly-CSharp cannot be referenced from an asmdef: move them or keep their callers outside.");
+        }
+
+        static string Asmdef(string name, string[] refs, string[] platforms, bool tests)
+        {
+            string r = string.Join(",", refs.Select(x => "\"" + x + "\""));
+            string p = platforms == null ? "[]" : "[" + string.Join(",", platforms.Select(x => "\"" + x + "\"")) + "]";
+            string t = tests ? ",\"overrideReferences\":true,\"precompiledReferences\":[\"nunit.framework.dll\"],\"defineConstraints\":[\"UNITY_INCLUDE_TESTS\"]"
+                             : ",\"overrideReferences\":false,\"precompiledReferences\":[],\"defineConstraints\":[]";
+            return "{\"name\":\"" + name + "\",\"rootNamespace\":\"Game\",\"references\":[" + r + "],\"includePlatforms\":" + p +
+                   ",\"excludePlatforms\":[],\"allowUnsafeCode\":false,\"autoReferenced\":" + (tests ? "false" : "true") + t + ",\"versionDefines\":[],\"noEngineReferences\":false}";
+        }
+
+        // ---- helpers -------------------------------------------------------------
+        static GameObject Child(Transform parent, string name, bool rect)
+        {
+            var t = parent.Find(name);
+            if (t != null) return t.gameObject;
+            var go = rect ? new GameObject(name, typeof(RectTransform)) : new GameObject(name);
+            go.transform.SetParent(parent, false);
+            if (rect) Stretch(go.GetComponent<RectTransform>());
+            return go;
+        }
+
+        static GameObject MakeCanvas(Transform parent, string name, int sort)
+        {
+            var go = Child(parent, name, true);
+            var c = go.GetComponent<Canvas>() ?? go.AddComponent<Canvas>();
+            c.renderMode = RenderMode.ScreenSpaceOverlay; c.sortingOrder = sort;
+            var s = go.GetComponent<CanvasScaler>() ?? go.AddComponent<CanvasScaler>();
+            s.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; s.referenceResolution = new Vector2(1920, 1080);
+            s.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand; s.matchWidthOrHeight = 0f;
+            if (!go.GetComponent<GraphicRaycaster>()) go.AddComponent<GraphicRaycaster>();
+            var rt = go.GetComponent<RectTransform>(); Stretch(rt);
+            return go;
+        }
+
+        static void Bar(Transform parent, string name, bool top)
+        {
+            var go = Child(parent, name, true); var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, top ? 1 : 0); rt.anchorMax = new Vector2(1, top ? 1 : 0);
+            rt.pivot = new Vector2(0.5f, top ? 0 : 1); rt.sizeDelta = new Vector2(0, 125); rt.anchoredPosition = Vector2.zero;
+            Img(go, Color.black, true);
+        }
+
+        static void Img(GameObject go, Color c, bool raycast)
+        {
+            var i = go.GetComponent<Image>() ?? go.AddComponent<Image>(); i.color = c; i.raycastTarget = raycast;
+        }
+
+        static void Stretch(RectTransform rt)
+        {
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = Vector2.zero; rt.offsetMax = Vector2.zero;
+        }
+
+        static void AddByType(GameObject go, string typeName)
+        {
+            var t = FindType(typeName);
+            if (t == null) { Log.AppendLine("SKIPPED (type not found): " + typeName); return; }
+            if (go.GetComponent(t) == null) go.AddComponent(t);
+        }
+
+        static Type FindType(string name)
+        {
+            bool full = name.Contains(".");
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type[] types;
+                try { types = a.GetTypes(); } catch (System.Reflection.ReflectionTypeLoadException e) { types = e.Types.Where(x => x != null).ToArray(); }
+                var hit = types.FirstOrDefault(t => full ? t.FullName == name : t.Name == name);
+                if (hit != null) return hit;
+            }
+            return null;
+        }
+
+        static bool WriteIfMissing(string path, string text)
+        {
+            if (File.Exists(path)) return false;
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            File.WriteAllText(path, text); Log.AppendLine("Wrote " + path); return true;
+        }
+
+        static void WriteJson(string path, string json)
+        {
+            if (File.Exists(path)) { Debug.LogWarning("[Foundation] exists, kept: " + path); return; }
+            Directory.CreateDirectory(Path.GetDirectoryName(path)); File.WriteAllText(path, json);
+        }
+    }
+}
+#endif

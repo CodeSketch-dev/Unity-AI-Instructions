@@ -1,6 +1,6 @@
 # Pattern: jackpot-slot
 
-Source: report 07 sec 4 row 4 (`Jackpot_Spin`, items, paytable; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Related: `recipe-spin-wheel` (wheel variant), `economy-progression-design`.
+Source: the studio evidence notes (`Jackpot_Spin`, items, paytable; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Related: `recipe-spin-wheel` (wheel variant), `economy-progression-design`.
 
 ## Regions
 Machine art 1413x814 (y+76), reel window 821x413 (y+146), one spin button 275x110 (`Spin_Free` and `ButtonIAP` share the slot, state swap), paytable button 91x103 opening a left panel 286x480, lever 133x260 on the right, close 135x135. Result overlay (`Result_Cup / Result_Speed / Result_Outfit`) plus a shower FX on the window.
@@ -14,7 +14,7 @@ Machine art 1413x814 (y+76), reel window 821x413 (y+146), one spin button 275x11
 | paytable | side panel with prize rows and odds label |
 
 ## Behavior and hooks
-Outcome is decided first (weights + pity, `economy-auto-balance` tunes them) and applied once; animation only displays it. Free spin cooldown from the data block; paid spin via IAP/ad (`unity-iap-port`, `ads-popup-flow`). Honest paytable labels the real odds the designer chose.
+Outcome is decided first (weights + pity, `economy-autobalance-simulator` tunes them) and applied once; animation only displays it. Free spin cooldown from the data block; paid spin via IAP/ad (`unity-iap-port`, `ads-popup-flow`). Honest paytable labels the real odds the designer chose.
 
 ## Binding
 `Jackpot_Asset` (slots, weights, prizes), `Data_Jackpot` (free spins, last free time, pity), audio configs, reward flow.

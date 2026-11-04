@@ -5,7 +5,7 @@ description: "Rule: item and tool behavior lives in the data class, not in switc
 
 # Item data-driven behavior
 
-Anti-patterns found in the reference code (report 15 sec 1, VERIFIED in knife-tower) and the rule that replaces each:
+Anti-patterns found in the reference code (VERIFIED in knife-tower) and the rule that replaces each:
 
 | Smell | Rule |
 |---|---|

@@ -5,7 +5,7 @@ description: Build a runtime mode with the framework StateMachine and IStateMach
 
 # State machine template
 
-Owner pattern (knife-tower `AI.cs`, report 01, VERIFIED):
+Owner pattern (verified on a production owner class):
 ```csharp
 StateMachine<AI_State> _sm;
 void InitStateMachine()

@@ -1,0 +1,63 @@
+// Scripts/Editor/Checks/Check_MissingReferences.cs
+// Batch entry: Unity -batchmode -nographics -projectPath <p> -executeMethod Game.Editor.Check_MissingReferences.RunBatch -logFile -
+// Menu entry for humans. Exit code 1 when any missing script or missing object reference is found.
+// Do NOT pass -quit: the method exits itself.
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+namespace Game.Editor
+{
+    public static class Check_MissingReferences
+    {
+        [MenuItem("Tools/Checks/Missing scripts and references")]
+        public static void RunMenu() => Debug.Log("[Check] problems: " + Run(null));
+
+        public static void RunBatch() => EditorApplication.Exit(Run(null) == 0 ? 0 : 1);
+
+        // roots: asset folders to scan, null = Assets/_Game. Returns the number of problems.
+        public static int Run(string[] roots)
+        {
+            roots ??= new[] { "Assets/_Game" };
+            int problems = 0;
+            foreach (var guid in AssetDatabase.FindAssets("t:Prefab", roots))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var root = PrefabUtility.LoadPrefabContents(path);
+                try { problems += Scan(root, path); }
+                finally { PrefabUtility.UnloadPrefabContents(root); }
+            }
+            foreach (var guid in AssetDatabase.FindAssets("t:Scene", roots))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+                try { foreach (var r in scene.GetRootGameObjects()) problems += Scan(r, path); }
+                finally { EditorSceneManager.CloseScene(scene, true); }
+            }
+            Debug.Log($"[Check] done, {problems} problem(s)");
+            return problems;
+        }
+
+        static int Scan(GameObject root, string assetPath)
+        {
+            int n = 0;
+            foreach (var t in root.GetComponentsInChildren<Transform>(true))
+            {
+                int missing = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject);
+                if (missing > 0) { n += missing; Debug.LogError($"[Check] {missing} missing script(s): {assetPath} :: {t.name}"); }
+                foreach (var c in t.GetComponents<Component>())
+                {
+                    if (c == null) continue;
+                    var so = new SerializedObject(c);
+                    for (var p = so.GetIterator(); p.NextVisible(true);)
+                        if (p.propertyType == SerializedPropertyType.ObjectReference && p.objectReferenceValue == null
+                            && p.objectReferenceInstanceIDValue != 0)
+                        { n++; Debug.LogError($"[Check] missing reference {c.GetType().Name}.{p.propertyPath}: {assetPath} :: {t.name}"); }
+                }
+            }
+            return n;
+        }
+    }
+}

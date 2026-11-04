@@ -5,7 +5,7 @@ description: Timing recipes for toasts, announcement banners, warning messages, 
 
 # UI feedback recipes
 
-Values read from knife-tower code (report 07, VERIFIED); soft defaults, keep the feel consistent across a game.
+Values read from knife-tower code (VERIFIED); soft defaults, keep the feel consistent across a game.
 
 | Item | Recipe |
 |---|---|

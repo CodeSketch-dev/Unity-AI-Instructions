@@ -1,0 +1,3 @@
+# Provenance
+
+Mined from the git history of the studio's "Knife Tower style" reference project: 2243 commits over 7.5 months, about 6 authors, 351 merge commits (16%), 0 tags, no CI, informal one-line messages except the last two releases, an unused-asset sweep every 2-3 weeks, one scene edited 85 times in 1500 commits, native-ads integration patched 25+ times (device-only bugs hidden by the Editor mock). Numbers are from `git log` counts on the date of analysis; reasons are inferred unless quoted from message bodies. The scripts (`commit-msg`, `churn_report.py`, `release_notes.py`) were run in a temporary repository. Not verified: hook behaviour on macOS, CI wiring.

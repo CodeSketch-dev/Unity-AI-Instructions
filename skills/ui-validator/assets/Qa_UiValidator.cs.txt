@@ -1,4 +1,4 @@
-// UNCOMPILED TEMPLATE (design: report 17 sec 5.2 B). Copy to Assets/_Game/Scripts/Editor/Qa_UiValidator.cs, adapt the text
+// UNCOMPILED TEMPLATE (design: the studio evidence notes). Copy to Assets/_Game/Scripts/Editor/Qa_UiValidator.cs, adapt the text
 // measurement to the project's text component (TextMeshPro here; UniText is being trialled and would need its own adapter),
 // compile via Unity MCP, then compare its JSON with ui_validator.py on the same prefab before trusting it.
 // Authoritative for what the static pass cannot know: layout groups, content size fitters, preferred text sizes.

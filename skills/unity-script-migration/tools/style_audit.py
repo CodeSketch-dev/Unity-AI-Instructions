@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Knife Tower style parity audit: per feature folder, counts of patterns that differ from the house style.
+"""House-style parity audit: per feature folder, counts of patterns that differ from the house style.
 
 usage: python style_audit.py <scripts root>      (e.g. Assets/_Game/Scripts/Logic/<Prefix>)
 Columns: files | C# event/static Action (-> StaticBus + Event_ classes) | coroutines (-> UniTask) | Update() (-> tick/event)

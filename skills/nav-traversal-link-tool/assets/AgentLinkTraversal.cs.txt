@@ -1,4 +1,4 @@
-// UNCOMPILED TEMPLATE (design: Character_AgentLinkTraversal, report 04 sec 5.4). The agent backend API differs by package
+// UNCOMPILED TEMPLATE (design: Character_AgentLinkTraversal). The agent backend API differs by package
 // (NavMeshAgent offMeshLink data, ProjectDawn Agents Navigation LinkTraversal=Custom): adapt Begin/Complete to the installed one.
 // Rules: duration = distance / speed; no arc up to 5 m; else apex = v^2/(2g) + 0.01 * distance; ease in-out; clear AI input meanwhile.
 using System.Threading;

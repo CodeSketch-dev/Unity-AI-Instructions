@@ -1,5 +1,5 @@
 {
-  "_note": "Soft defaults from report 18 section 11. NOT measured on a device; anchors: thunder-break-egg 93 batches and ~52k verts in the Editor. Override per project with a stated reason.",
+  "_note": "Soft defaults from the studio evidence notes NOT measured on a device; anchors: a reference project at 93 batches and ~52k verts in the Editor. Override per project with a stated reason.",
   "tiers": {
     "Low":  {"batches": 60,  "verts": 80000,  "tris": 120000, "active_chunks": 20, "materials": 1, "shadow_casters": 5,  "particles": 200,  "bots": 8},
     "Mid":  {"batches": 100, "verts": 150000, "tris": 250000, "active_chunks": 40, "materials": 1, "shadow_casters": 12, "particles": 500,  "bots": 16},

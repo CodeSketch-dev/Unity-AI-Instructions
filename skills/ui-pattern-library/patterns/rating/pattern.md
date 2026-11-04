@@ -1,6 +1,6 @@
 # Pattern: rating
 
-Source: report 07 sec 4 row 5 (`RatingPopup`; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Timing logic: `recipe-retention-timers`.
+Source: the studio evidence notes (`RatingPopup`; sizes VERIFIED). Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Timing logic: `recipe-retention-timers`.
 
 ## Behavior
 - `RatingHelper.CanShow()` decides (after a win/level-up moment, not on first session, cool-down between asks, never twice after a "Good"). The `Block` image is a full-stretch input blocker with a dim.

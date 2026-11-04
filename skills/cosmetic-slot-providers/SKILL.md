@@ -5,7 +5,7 @@ description: Equippable cosmetic slots (aura, trail, wing, pet) with asset SO, d
 
 # Cosmetic slot providers
 
-From knife-tower and monkey-escape (report 04 sec 9, VERIFIED). Skins/items entries: `recipe-add-skin-or-item`; pets as a system: `pet-system` (not yet written).
+From knife-tower and monkey-escape (VERIFIED). Skins/items entries: `recipe-add-skin-or-item`; pets as a system: `pet-system` (not yet written).
 
 ## Pattern
 - `Aura_Asset` / `Trail_Asset` / `Wing_Asset` ScriptableObjects: optional stat modifier layers, unlock channel, prefab, thumbnail. Modifier values and prices come from evidence or the balance pass; never use this skill's example as a default.

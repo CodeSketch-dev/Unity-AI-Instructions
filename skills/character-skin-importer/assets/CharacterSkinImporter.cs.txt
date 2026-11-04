@@ -1,4 +1,4 @@
-// UNCOMPILED TEMPLATE (design: report 19 sec 3.4). Copy to Assets/_Game/Scripts/Editor/Character_Skin_Importer.cs, adapt the
+// UNCOMPILED TEMPLATE (design: the studio evidence notes). Copy to Assets/_Game/Scripts/Editor/Character_Skin_Importer.cs, adapt the
 // project types (Character_Skin, Character_Skin_Asset, Character_Rig_Asset, Factory_Character), compile via Unity MCP, run on ONE skin first.
 // Deterministic and idempotent; returns a JSON report and a non-pass blocks registration. Batch: -executeMethod Game.Editor.Character_Skin_Importer.RunBatch
 #if UNITY_EDITOR

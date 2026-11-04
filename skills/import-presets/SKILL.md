@@ -5,7 +5,7 @@ description: Target import settings for textures, FBX models and audio on low-en
 
 # Import presets
 
-The reference project sets these by hand and is inconsistent (report 02, counts from a shell sample, VERIFIED as counts, intent INFERRED). No importer enforcement exists; add presets or an `AssetPostprocessor`.
+The reference project sets these by hand and is inconsistent (counts from a shell sample, VERIFIED as counts, intent INFERRED). No importer enforcement exists; add presets or an `AssetPostprocessor`.
 
 ## Textures (Android override)
 - ASTC: 6x6 default, 4x4 for UI/hero art, 8x8 for backgrounds. Max size by use (256-1024 typical, 2048 only when justified). Crunch off.

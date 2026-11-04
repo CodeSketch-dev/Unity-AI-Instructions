@@ -5,7 +5,7 @@ description: Pool anything spawned repeatedly (fx, floating text, projectiles, p
 
 # Pool everything spawned repeatedly
 
-Use the framework pool: `PoolPrefabGlobal.Get/Release` with a `PoolPrefabConfig` asset (report 03, VERIFIED). Do NOT add another pool (`PoolPrefabShared`, `PrefabPooler`, ad-hoc `Stack<T>`, LeanPool) even though they exist in the reference code: they are legacy or counter-examples. SketchEngine ships the same API under `SketchEngine.Patterns.Pool`; read the installed `PoolPrefabGlobal.cs` before writing.
+Use the framework pool: `PoolPrefabGlobal.Get/Release` with a `PoolPrefabConfig` asset. Do NOT add another pool (`PoolPrefabShared`, `PrefabPooler`, ad-hoc `Stack<T>`, LeanPool) even if a reference project contains one: they are legacy or counter-examples. SketchEngine ships the same API under `SketchEngine.Patterns.Pool`; read the installed `PoolPrefabGlobal.cs` before writing.
 
 ## Add a pooled fx / text / projectile
 1. Prefab root carries `PoolPrefabItem` (missing = `LogError` at `Pool_Manager.Awake`, not at authoring time).
@@ -20,4 +20,4 @@ Use the framework pool: `PoolPrefabGlobal.Get/Release` with a `PoolPrefabConfig`
 UI list items built once per screen, gacha/jackpot UI, skin swaps. Everything repeated in gameplay is pooled.
 
 ## Verify
-Prefab has `PoolPrefabItem`; config in the auto-collected folder; no `Instantiate/Destroy` left in the loop; run `config-registry-audit` (see `config-and-factory-authoring`) for prewarm > max.
+Prefab has `PoolPrefabItem`; config in the auto-collected folder; no `Instantiate/Destroy` left in the loop; run the duplicate-ID and registry check (`config-and-factory-authoring`) for prewarm > max.

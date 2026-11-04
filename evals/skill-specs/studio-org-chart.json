@@ -1,0 +1,1 @@
+{"must_contain": ["Verdict: APPROVE", "Report file:", "conflicts go up"], "must_not_contain": ["C:/Users", "thunder"], "triggers_any": ["director", "org chart"]}

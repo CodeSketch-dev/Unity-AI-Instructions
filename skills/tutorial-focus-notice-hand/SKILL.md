@@ -1,7 +1,7 @@
 ---
 name: tutorial-focus-notice-hand
 description: "Use when a tutorial spotlight, pointing hand, notice or quest-focus overlay needs visual parity or the highlighted button misses its first tap. Covers focus-hole geometry, real click delivery and measured Play checks."
-triggers: tutorial, ftue, spotlight, focus pointer, quest focus, quest_focus_message, quest_focus_pointer, pointing hand, notice tap, onboarding, huong dan, ban tay, bam giua, khong onclick, khong bam duoc
+triggers: kt style, knife tower, tutorial hand, dim hole, tutorial, ftue, spotlight, focus pointer, quest focus, quest_focus_message, quest_focus_pointer, pointing hand, notice tap, onboarding, huong dan, ban tay, bam giua, khong onclick, khong bam duoc
 ---
 
 # Tutorial focus, hand and notice
@@ -15,12 +15,14 @@ Apply automatically to onboarding spotlights, focus messages, pointing hands and
 4. Treat [historical evidence](references/README.md) as snapshots. Do not copy their project contracts, class names, save dependencies or old raw-input behavior into a new project.
 
 ## 2. Author the complete view
-1. Bake the focus box, four dim panels, hand and notice into source prefabs; keep their references and tuning serialized. Place reusable system roots in the scene under the installed architecture. Never build this hierarchy at runtime.
+1. Ruling: the focus overlay is a **scene-authored prefab** placed (inactive by default) under the persistent popup canvas's overlay container inside the persistent root prefab (`persistent-root-prefab`); runtime only shows it, fills data (target rect, message, hand offset) and hides it. Bake the focus box, four dim panels, hand and notice into that source prefab; keep references and tuning serialized. Never build the hierarchy at runtime. The reference game spawns the pointer/message prefabs lazily from a prefab factory and destroys them on dismiss (one allocation per step); that is its single deliberate exception for a persistent overlay singleton, not the recommended form. Spawning a prefab reference is acceptable only if a scene-placed copy is impossible.
 2. Size the box from the target control's own rect, excluding decorative icon overhang. Convert corners through the actual target/overlay cameras; world corners are screen pixels only for overlay canvases.
 3. Animate the hole's offsets toward zero using unscaled time. Follow a moving target without restarting the appear tween every frame. Keep the hand orientation fixed; yoyo only its scale around the fingertip pivot.
-4. Put the dim first and hand last in the overlay. Sort above the intended popups and below global fades. Keep notice content clear of the hand, target text, safe area, banners and native ads.
+4. Put the dim first and hand last in the overlay, as the last sibling of the overlay container each time it is shown. Sort above the intended popups and below global fades (the reference uses the popup canvas's overlay container, i.e. the same canvas as popups but last sibling; transition canvas above). Keep notice content clear of the hand, target text, safe area, banners and native ads.
 5. Build notice icon + localized text as one centered HorizontalLayoutGroup with automatic fitting and outlined Capline text. For a clickable notice reuse the project's Button press feedback and sfx.
 6. Save and re-read the source prefab's actual serialized values and a scene instance. Changing a C# default does not migrate existing prefab tuning; update through an Editor migration/builder, preserving field names and unrelated overrides.
+
+Technique numbers (hole tween, panel sizes, alpha, hand, two-layer blockers): [dim-hole-numbers](references/dim-hole-numbers.md) and [two-layer dim](references/two-layer-dim.md). Step driver and world arrow: [step-driver](references/step-driver.md), [quest-arrow](references/quest-arrow.md).
 
 ## 3. Deliver the first tap to the real action
 1. In pass-through mode disable `Graphic.raycastTarget` on every decorative image/text and any transparent center blocker. A disabled Button can still block raycasts; `interactable = false` does not make its Image transparent to input.

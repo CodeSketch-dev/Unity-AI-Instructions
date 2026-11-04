@@ -1,0 +1,4 @@
+# Provenance
+
+The rubric (138 items, 13 groups) was derived from an exhaustive analysis of the studio's "Knife Tower style" reference project (structure, scene authoring, code patterns, cameras, tutorial focus, persistent root, services, editor tooling, git history) and from an audit of a heavy production project against it. Where the reference itself is untidy (duplicate folders, test scenes in the repo, two tween libraries, no tests, 2000-line files) the rubric asks for the leaner version on purpose. The first baseline of the audited project was 1% pessimistic with 9 failing blockers (duplicate code trees, runtime-built worlds and UI, dead generated assets, tracked derived folders).
+Not verified here: the rubric has not yet been run end to end by an independent agent; thresholds (400 lines, 800 MB, 20 MB, 5 MB scenes, 2 MB prefabs) are working defaults to tune per project.

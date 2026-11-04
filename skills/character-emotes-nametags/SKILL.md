@@ -5,7 +5,7 @@ description: Emotes (animator trigger layer, emote wheel) and nametags (single w
 
 # Emotes and nametags
 
-No precedent exists in the mined projects (`Character_UI` is only an effect icon + countdown); everything here is a design (INFERRED, report 19 sec 3.2). Keep it small and cheap.
+No precedent exists in the mined projects (`Character_UI` is only an effect icon + countdown); everything here is a design (INFERRED). Keep it small and cheap.
 
 ## Emotes
 - `EmoteId` (int) + `TriggerEmote` parameters on an emote layer of the rig controller; the emote list per rig is part of the rig asset and `character-catalog.json` (`emotes`); clips are authored per rig and whitelisted in the required parameters.

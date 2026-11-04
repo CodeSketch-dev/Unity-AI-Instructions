@@ -11,3 +11,6 @@ _unity-pilots/roblox-shader-kit-pilot/
 
 # OMC runtime state is local session data
 .omc/
+
+# skill-test-loop baselines
+.skill-loop/

@@ -1,0 +1,4 @@
+# Provenance
+
+Measured on the studio's "Knife Tower style" reference project (Unity 6000.0, CodeSketch v1 framework, 723 first-party C# files): flat `namespace Game` in 92% of files, 7 script buckets, feature-first `Logic/<Feature>/`, minigames with 3-letter prefixes under `Logic/Minigame/<Name>/`, zero first-party asmdefs, zero tests, single Quality level with a runtime device policy. New work uses SketchEngine (the upgraded framework); the folder grammar is framework independent. The audit script was run against a second project to confirm it detects the known deviations (extra top folders, prefabs in Resources, multi-type files, prefix drift, long files).
+Verified: script runs, counts match an independent audit within detection differences. Not verified: macOS paths, projects with Windows-1252 sources.

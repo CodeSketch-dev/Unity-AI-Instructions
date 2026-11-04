@@ -5,7 +5,7 @@ description: "Build the Roblox-feel character with the KinematicCharacterControl
 
 # KCC character controller
 
-Pattern from knife-tower and monkey-escape (report 04, VERIFIED unless marked). Look first at the project's existing controller (`reference-index`); reuse the KinematicCharacterController asset if it is installed. Numbers are in `references/feel-table.md` as soft defaults.
+Pattern from knife-tower and monkey-escape (VERIFIED unless marked). Look first at the project's existing controller (`reference-index`); reuse the KinematicCharacterController asset if it is installed. Numbers are in `references/feel-table.md` as soft defaults.
 
 ## Shape
 - `Character : OptCollisionSensorFast<ICharacterCollidable>` is the actor root and the single physics-callback owner (`collision-registry`). Sibling components (renderer, animator, checkpoint, dead, fx, sfx, fall detector, skin) derive from the cached-mono hub base and read the root through `Hub`.

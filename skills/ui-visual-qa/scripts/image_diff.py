@@ -4,7 +4,7 @@ Usage: py -I image_diff.py <reference.png> <actual.png> [--mode mockup|golden] [
 masks.json: list of [x0, y0, x1, y1] rectangles to ignore (timers, random rewards).
 A pixel differs when any RGB channel differs by more than 12/255. Prints the differing %,
 the verdict and the top regions (32 px blocks merged) so a fix can target exact areas.
-Verdict thresholds (initial, report 17; tune on real screens): mockup PASS <= 1.5%, WARN <= 4%;
+Verdict thresholds (initial; tune on real screens): mockup PASS <= 1.5%, WARN <= 4%;
 golden PASS <= 0.2%, FAIL > 1%. In mockup mode block-SSIM (8x8 grayscale) must also be >= 0.97 PASS, >= 0.93 WARN.
 Edge maps (Sobel, 1 px tolerance, downscaled to ~480 px): mismatch <= 15% PASS, <= 30% WARN, else FAIL (initial).
 Exit 1 on FAIL.

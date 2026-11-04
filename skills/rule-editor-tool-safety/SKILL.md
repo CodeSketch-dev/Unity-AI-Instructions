@@ -5,7 +5,7 @@ description: Hard safety rules for Editor generators, bakers and MCP-driven scri
 
 # Editor tool safety
 
-Each rule traces to a real incident (report 11, VERIFIED in notes). Pairs with `editor-tool-authoring` (how to build tools) - this is the short blocklist.
+Each rule traces to a real incident (VERIFIED in notes). Pairs with `editor-tool-authoring` (how to build tools) - this is the short blocklist.
 
 1. **Never `PrefabUtility.InstantiatePrefab` on a nested-prefab child** (30 GB hang, unsaved session lost).
 2. **Cap every loop** with an iteration limit and a time/size guard (a runaway used about 31 GB).

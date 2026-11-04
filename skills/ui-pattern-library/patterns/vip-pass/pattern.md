@@ -1,6 +1,6 @@
 # Pattern: vip-pass (subscription / hero offer)
 
-Source: report 07 sec 4 row 11 (`IAP_Subscription_VIP_Pass`; Board 1432x743, art 603x346, title 450x224, benefits VLG 667x382, button 525x135, close 100x100; VERIFIED). The spec compresses benefits (230 high, scrolls if longer) and title (190) so leaf rects never overlap: those two heights are INFERRED. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Purchase: `unity-iap-port`.
+Source: the studio evidence notes (`IAP_Subscription_VIP_Pass`; Board 1432x743, art 603x346, title 450x224, benefits VLG 667x382, button 525x135, close 100x100; VERIFIED). The spec compresses benefits (230 high, scrolls if longer) and title (190) so leaf rects never overlap: those two heights are INFERRED. Contract: `spec.yaml`; wireframe `mockups/wireframe.png`. Purchase: `unity-iap-port`.
 
 ## Behavior and hooks
 - Benefits are rows from data (`IAP_VIP_Pass_BenefitText` style), each with icon + localized text.

@@ -5,7 +5,7 @@ description: "Loot and rarity tables: weighted roll, rarity asset, luck and muta
 
 # Loot and rarity tables
 
-Facts from knife-tower (`Gacha_Box_Asset.RollItem`, `Rarity_Randomizer`), thunder-break-egg (luck/mutation tables), monkey-escape (boost shop restock), climb-tower (chests) (report 15 sec 4, VERIFIED). Odds are the designer's decision (user decision 2026-10-15); the pipeline tunes numbers automatically and enforces one rule: what is displayed equals what is rolled.
+Facts from knife-tower (`Gacha_Box_Asset.RollItem`, `Rarity_Randomizer`), an egg-breaking reference (luck/mutation tables), monkey-escape (boost shop restock), a digging reference (chests) (VERIFIED). Odds are the designer's decision (user decision 2026-10-15); the pipeline tunes numbers automatically and enforces one rule: what is displayed equals what is rolled.
 
 ## Rule
 What is displayed must equal what is rolled: roll by sum of weights, `random * total`, cumulative scan; expose `GetPercent(item)` to the UI and keep an EditMode test asserting displayed == computed; pity counters persist before the result is shown.
@@ -17,6 +17,6 @@ What is displayed must equal what is rolled: roll by sum of weights, `random * t
 - Money-band rarity (KT): odds shift with the player's wealth through bands `{moneyFrom, moneyTo} -> Rate[]`.
 - Boost shop (ME): per-rank restock weights (base vs VIP), stock ranges per rank, max stock 10, fuse 3 -> 1 higher.
 - Chest (CT): rewards with `UnlockChance` and an open timer; ads or currency price.
-- Kill rewards: none in KT; TBE rewards the egg's pet plus deposit money; CT currency per dig/bomb.
+- Kill rewards: none in the melee reference; the egg-breaking reference rewards the egg's pet plus deposit money; the digging reference gives currency per dig/bomb.
 
-Persist pity counters before showing a result; choose the result before the animation (`gacha-box`, `jackpot-slot` patterns). Probabilities are tuned by `economy-auto-balance`.
+Persist pity counters before showing a result; choose the result before the animation (`gacha-box`, `jackpot-slot` patterns). Probabilities are tuned by `economy-autobalance-simulator`.

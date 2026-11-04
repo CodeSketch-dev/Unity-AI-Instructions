@@ -1,4 +1,4 @@
-# Phases, gates and budgets (report 21 sec 3.2 and 3.6)
+# Phases, gates and budgets
 
 Gate = an artifact plus an automated check. Hours are wall-clock guesses for a 16 h day with 4 file-lane workers and 1 Editor lane; token cap about 8 M including subagents. Recalibrate after the pilot (plan Task 27).
 

@@ -1,0 +1,62 @@
+using System.Collections.Generic;
+using SketchEngine.Core.Async;
+using SketchEngine.Core.UI;
+using SketchEngine.Patterns.Observer;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Game
+{
+    // Page script on the prefab ROOT (next to Popup + CanvasGroup).
+    public class Daily_Popup : MonoBehaviour
+    {
+        [SerializeField] ScrollRect _scrollRect;
+        [SerializeField] Daily_Item _itemPrefab;               // typed reference
+        readonly List<Daily_Item> _items = new List<Daily_Item>(32);
+        CancelToken _cancel;
+
+        void OnEnable()
+        {
+            StaticBus<Event_Daily_Claimed>.Subscribe(StaticBus_Event_Daily_Claimed);
+            Refresh();
+        }
+
+        void OnDisable()
+        {
+            StaticBus<Event_Daily_Claimed>.Unsubscribe(StaticBus_Event_Daily_Claimed);
+            _cancel?.Cancel();
+            _cancel = null;
+        }
+
+        void Refresh()
+        {
+            var configs = Factory_Daily.Configs;
+            var existing = _scrollRect.content.GetComponentsInChildren<Daily_Item>(true); // authored children
+            _items.Clear();
+            for (int i = 0; i < configs.Length; i++)
+            {
+                var item = i < existing.Length ? existing[i] : Instantiate(_itemPrefab, _scrollRect.content);
+                item.Initialize(this, configs[i], i);
+                _items.Add(item);
+            }
+        }
+
+        void StaticBus_Event_Daily_Claimed(Event_Daily_Claimed e) => Refresh();
+    }
+
+    // Item root: Image + Button + UIPressPrimeTween + AudioButtonSfx + this script.
+    public class Daily_Item : UIButtonBase
+    {
+        [SerializeField] GameObject _goClaimed;
+        Daily_Popup _page;
+        Daily_Asset _config;
+
+        public void Initialize(Daily_Popup page, Daily_Asset config, int index)
+        {
+            _page = page;
+            _config = config;
+            _goClaimed.SetActive(Data_Daily.IsClaimed(index));
+        }
+        // click handler comes from the base class override (check the installed UIButtonBase API)
+    }
+}

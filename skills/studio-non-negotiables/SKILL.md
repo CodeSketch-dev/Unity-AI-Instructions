@@ -28,6 +28,7 @@ Owner principle: be fast, beautiful and correct from the FIRST pass. Rework and 
 | 10 | Superpowers skills and coding discipline on every task (assumptions as Rulings, simplest code, surgical diffs, success criteria first) | AGENTS + router reminder | plan/ledger with Ruling lines |
 | 11 | Performance target low-end Android: no per-frame allocations, pooled spawns, batched draw calls; claims need profiler evidence or "not measured" | `mobile-perf-audit` | numbers or explicit not-measured |
 | 12 | Project rules: landscape only, money text without `$`, claim blocking popups before Play tests, Play only with the Editor lock | project AGENTS.md | screenshot/test notes |
+| 13 | Visual evidence: anything player-visible (UI, VFX, camera, art, animation) is not done until the game was launched, the change observed, and a screenshot saved; the report lists the saved path and what it shows. Compile or unit tests alone never close a visual item | `qa-playmode-smoke`, `creative-director` review, report check | screenshot path(s) + one line of what was observed; "not launched" = item stays open |
 
 ## Adding or changing a gate
 A gate is critical only if it has an ENFORCEMENT (hook, tool, audit rule, or a required line of evidence in reports). Prose alone is not a gate. When a mistake costs rework, add the gate here, link its skill, add the audit/hook if possible, publish.

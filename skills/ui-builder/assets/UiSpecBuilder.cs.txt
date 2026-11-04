@@ -1,4 +1,4 @@
-// UNCOMPILED TEMPLATE (design from report 21 + 07). Copy to Assets/_Game/Scripts/Editor/UiSpecBuilder.cs, fix
+// UNCOMPILED TEMPLATE (design from the studio evidence notes). Copy to Assets/_Game/Scripts/Editor/UiSpecBuilder.cs, fix
 // namespaces for the installed framework, compile via Unity MCP and run the idempotence check before trusting it.
 // Reads the JSON produced by `ui_spec_tool.py build`. Keyed by element name: running twice changes nothing.
 #if UNITY_EDITOR

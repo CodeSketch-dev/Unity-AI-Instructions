@@ -111,6 +111,7 @@ The owner must never have to repeat or micro-direct. Skills `minigame-consistenc
 - **One design system for all minigames**: shop (`Shop_All`), popups/frames, currency bars, icons, pet size and labels, HUD plates, toasts, camera/fog conventions, material/shader are shared; only content, own cash balance and original-game specifics differ. Fill the consistency matrix against SAB/SAE/KT/Home before building or fixing a minigame.
 - **Defect-class sweep**: a defect reported once is audited everywhere (every screen, every minigame), fixed everywhere, and written into a skill. The owner should see each class of mistake at most once.
 - **Run to completion**: keep agents busy in parallel (Codex via hub for code, Claude for Editor/Play), review each result as it lands, redo failures, and only stop for real blockers.
+- **Studio org chart (skill `studio-org-chart`)**: three tiers (producer, creative-director, technical-director above leads and specialists); every brief ends with `Report file: <path>` (hook warns if missing), directors review by evidence and return APPROVE/REWORK, visual work needs a saved screenshot (gate 13 of `studio-non-negotiables`); edit skills with `skill-test-loop`.
 
 ### Build / clone a game autonomously (always on, every agent)
 Standing owner permission, never ask: when the owner names a game to make or clone (a name, a link, "like the original"), the agent runs the whole research-and-build loop itself, following skill `clone-research-autonomy` (with `gameplay-video-analysis`, `game-clone-recon`, `clone-pipeline`, `clone-ip-safety`).
@@ -373,7 +374,7 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 
 - Load skill `scene-authored-prefabs` before adding any manager, system, world piece, player/camera/GUI stack, skybox, UI page, event or script folder; load `unity-script-migration` before renaming, splitting or moving scripts. The owner vibe-codes and must be able to find and hand-tune everything in the Hierarchy or Prefab Mode.
 - Managers and world pieces are prefabs in `Assets/_Game/Prefabs/<Feature>/` placed in the scene; never create them at runtime (`new GameObject`, `AddComponent`, `Instantiate`, `Resources.Load` spawn). UI pages are prefabs that spawn item prefabs into a ScrollRect.
-- Layout: `Assets/_Game/Scripts/{Core,Data,Editor,Event,Factory,Logic}`, `Logic/<Game>/<Feature>/<Prefix>_<Feature>_<Part>.cs`, one type per file with file name == class name, editor-only code in `Scripts/Editor/<Game>/<Feature>/` with its own asmdef, source art in `_Art/{2D,3D,Fx,Shader,Skyboxes}`, vendor packs in `Packages Fx` / `Packages Required`. Suffixes: `_Asset` ScriptableObject entry, `Factory_`, `Data_`, `_Component : MonoCached`, `_Static`, `_Type`, `Event_<Feature>_<Noun>_<Verb>`.
+- Verified Knife Tower layout (skills `project-structure-layout`, `persistent-root-prefab`, `map-chunk-prefabs`, `house-code-patterns`, `ui-page-item-prefab`, `scene-authored-prefabs`): flat `Assets/_Game/Scripts/{Core,Data,Editor,Event,Factory,Logic,Utilities}`, `Logic/<Feature>/` and `Logic/Minigame/<Name>/<XXX>_<Part>.cs`, one type per file (file name == class name), NO first-party asmdefs except the required test asmdefs (first-party code compiles in the default assemblies; editor code lives in `Editor` folders), a GameSingleton-class persistent root prefab placed in every scene, maps/levels as prefab chunks placed in the scene, UI authored in prefabs. Source art in `_Art/{2D,3D,Fx,Shader,Skyboxes}`, vendor packs in `Packages Fx` / `Packages Required`. Suffixes: `_Asset` ScriptableObject entry, `Factory_`, `Data_`, `_Component : MonoCached`, `_Static`, `_Type`, `Event_<Feature>_<Noun>_<Verb>`.
 - Prefer SketchEngine (the owner's own framework) before custom code: StaticBus + IEvent, MonoCached/MonoCachedFast/MonoCachedHub, DataBlock/DataValue, ScriptableObjectSingleton, pools, Opt* collision, audio, popup, CancelToken/UniTask helpers. Read `Packages/com.sketchengine/Runtime` for the concept first.
 - Every refactor batch ends green: compile, full EditMode (compare PASS and SKIP counts), reopen the scene and count missing scripts on scenes and prefabs, Play 5 s with an empty Console, then commit. Check `git check-ignore -v` for new folders.
 - When a skill, rule or guide is written or changed: plan it (spec-then-plan), review it against evidence (what is verified, what is not), then run `publish.bat`.
@@ -436,6 +437,17 @@ The owner only prompts. Match the request to a cue below (plus the router hint a
 | Cleaning, deleting old code | `tech-debt` | unused-proof (GUID/path scan), separate commit |
 | Long session, many scene or mode switches | `soak-test` | repeated flow, no leaks |
 | Writing or editing a skill | `skill-quality-rubric`, `spec-then-plan` | lint 0 errors, publish run |
+| New project, folders, namespaces, asmdefs, file naming | `project-structure-layout`, `house-code-patterns` | tree matches the layout, no first-party asmdef |
+| Manager, singleton, persistent systems, scene bootstrap | `persistent-root-prefab`, `app-services-bootstrap` | root prefab in every scene, boot order verified in Play |
+| Map, level, stage, chunk, world piece | `map-chunk-prefabs`, `scene-authored-prefabs` | chunks placed in scene, nothing spawned from data |
+| UI page, scroll list, list item, popup content | `ui-page-item-prefab` (+ UI row) | page and item prefabs, items spawned into a ScrollRect |
+| No internet, offline gate | `internet-gate-popup` | popup shown with network off, closes when back |
+| Rate us, review prompt | `rating-prompt-flow` | prompt fires once at the right moment, state saved |
+| Refactor, rename, move scripts or assets | `staged-refactor-playbook`, `lean-asset-audit`, `unity-script-migration` | green batch (compile, EditMode PASS/SKIP, missing scripts 0, Play 5 s clean) |
+| Editor tool, menu, bake button | `house-editor-tools` | idempotent run, counts reported |
+| Commit, .gitignore, LFS, branches | `git-hygiene-conventions` | `git check-ignore -v` on new folders |
+| Study or clone a reference project | `reference-project-dissection` (+ `clone-ip-safety`) | evidence-tagged findings, nothing copied verbatim |
+| Any non-trivial task start and finish | `studio-non-negotiables` | gates touched, evidence, unverified list |
 
 - `rigor:` line. Default `rigor: minimal` (solo/live games, see `rigor-switch`): no ceremony for small, clear tasks. Live games and any UI, save or IAP change never drop below the safety rules in this file (no data loss, tests run, Play verification, parental gate in front of money).
 - Research first, skills stay out of context until needed: inspect the project and read the one or two matching skills at the moment a cue fires (names and descriptions are the only preloaded text). Drop a skill when its step ends and re-route when the work pivots. If no skill matches, say "no matching skill; closest: X" and proceed with the general rules; never invent a skill name.

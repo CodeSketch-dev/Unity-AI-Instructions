@@ -1,10 +1,10 @@
 # Default shrink-hole profile
 
-Provenance: read-only source prefab/hierarchy archive from Knife Tower, inspected again on 2026-11-03. These values describe that reference's focus style; runtime input delivery is a separate contract. An exact-match request still requires current MCP inspection and screenshots of both projects.
+Provenance: read-only source prefab/hierarchy archive of the studio reference game (see PROVENANCE.md), inspected again on 2026-11-03. These values describe that reference's focus style; runtime input delivery is a separate contract. An exact-match request still requires current MCP inspection and screenshots of both projects.
 
 | Part | Reference value |
 |---|---|
-| Overlay order | 310, above popups at 300 and below fades; adapt actual project orders |
+| Overlay order | Reference game: child of the popup canvas overlay container (popup canvas sort 12506), re-sent to last sibling on each focus; transition canvas (20000) above. A project value of 310 above popups at 300 was used in an earlier port. Adapt to the actual project orders |
 | Root rect | Centered on target's own rect plus explicit extension |
 | Hole appear | offsets +/-1000 -> 0, 0.35 s OutSine |
 | Dim | black alpha 0.9607843 |

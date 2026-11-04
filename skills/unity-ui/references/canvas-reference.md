@@ -1,19 +1,11 @@
-# Canvas reference (what the reference projects actually do)
+# Canvas reference (moved)
 
-Evidence: reports 06 and 07 (knife-tower and monkey-escape `GameSingleton.prefab`, VERIFIED). Use as defaults; `unity-ui` rules win when they differ.
+The canvas table (HUD 2506, popup 12506, transition 20000, scalers, safe area, raycast rules) now lives in `persistent-root-prefab/references/canvas-table.md`; the full tree is in `persistent-root-prefab/references/hierarchy-tree.md`.
 
-| Canvas | Mode / sort | Contains | Per-frame work |
-|---|---|---|---|
-| HUD `Canvas` | Overlay / 2506 | `Root` > warning toast, screen-flash overlay, `SafeArea` (UISafeArea), cut-scene letterbox bars (125 high) | none |
-| `Canvas_Popup` + `UIGlobalCanvas` | Overlay / 12506 | `Root/PopupRoot` (`PopupRootSetter`), `OverlayContainer` (fly FX), internet popup, loading scene; `ViewContainer` under this Root (INFERRED) | none |
-| Per-mode `Player_GUI` | own Overlay canvas, sort 0 | `SafeArea` with joystick, action buttons, bars, drag-look pad | event-based |
-| Third party | Transition 20000, Graphy 30000, ad prefabs 500/999 | | |
-| World space | only name tags / a quiz prefab | | |
-
-- Whole game = 2 persistent overlay canvases (inside a persistent `GameSingleton`) plus per-mode HUD canvases. Almost no world-space UI. Every CanvasScaler is ScaleWithScreenSize 1920x1080 Expand.
-- Popup prefabs have NO Canvas of their own; they inherit the popup canvas. Order HUD < popup < transition < debug.
-- Fly-to FX items spawn into the overlay container; loading screen sits under the popup canvas.
-- `UISafeArea`: `Screen.safeArea` -> anchors, conform X/Y, refresh on enable and on screen-size/orientation change (not every frame); handles Samsung NaN anchors. Search for the installed one before writing another.
-- Banner clearance has no code in the references (banner prefabs are ad-plugin canvases, sort 500): the 200 px bottom clearance is a layout convention.
-- Joystick: an existing joystick pack behind the player GUI; the right half is a drag-look pad anchored (0.5,0)-(1,1).
-- Framework identity: one framework in three eras (CFramework folder, `com.codesketch`, `com.sketchengine`); same type names, different namespaces. Resolve from the installed package (`framework-version-map`).
+Kept here (UI-specific facts):
+- Per-mode HUD canvases (inside a player/GUI prefab): own Overlay canvas, sort 0, `SafeArea` holding joystick, action buttons, bars and a drag-look pad (right half anchored (0.5,0)-(1,1)); event-based, no per-frame work.
+- Popup prefabs have NO Canvas of their own; they inherit the popup canvas. Fly-to FX items spawn into `OverlayContainer`; the loading screen sits under the popup canvas.
+- `UISafeArea`: `Screen.safeArea` -> anchors, conform X/Y, re-checked each frame when refresh-on-update is on and applied only when the value changed; handles NaN anchors on some Samsung devices. Search the installed package for it before writing another.
+- Banner clearance has no code in the reference (banner prefabs are ad-plugin canvases): the 200 px bottom clearance is a layout convention.
+- World-space UI only for name tags and similar.
+- Framework identity: one framework in several eras (older folder copy, `com.codesketch`, `com.sketchengine`); same type names, different namespaces. Resolve from the installed package (`framework-version-map`).

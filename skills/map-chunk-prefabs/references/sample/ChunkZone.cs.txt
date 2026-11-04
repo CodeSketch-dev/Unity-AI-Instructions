@@ -1,0 +1,32 @@
+// Far-clip zone on a chunk root (SketchEngine form; adapt the register base to the installed package).
+// The player sensor forwards trigger events to owners that implement ICharacterCollidable.
+using SketchEngine.Optimize;
+using UnityEngine;
+
+namespace Game
+{
+    public class ChunkZone : OptCollisionRegister, ICharacterCollidable
+    {
+        [SerializeField] float _farClip = 80f;
+        [SerializeField] Collider _zone;
+
+        static readonly System.Collections.Generic.List<ChunkZone> Inside = new();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() => Inside.Clear();
+
+        public void OnTriggerEnterFunc(Character c) { Inside.Add(this); Apply(); }
+        public void OnTriggerExitFunc(Character c)  { Inside.Remove(this); Apply(); }
+        public void OnCollisionEnterFunc(Character c) { }
+        public void OnCollisionExitFunc(Character c) { }
+
+        // Overlapping zones: the zone the player is deepest inside (last entered) wins.
+        static void Apply()
+        {
+            var cam = Camera.main;
+            if (cam != null && Inside.Count > 0) cam.farClipPlane = Inside[Inside.Count - 1]._farClip;
+        }
+    }
+}
+// Notes: with Cinemachine write the far clip into the virtual camera lens, not Camera.farClipPlane (the brain overwrites it).
+// Check the installed OptCollisionRegister registration API (colliders registered in OnEnable) before use.

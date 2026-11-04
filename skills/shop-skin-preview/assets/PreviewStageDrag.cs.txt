@@ -1,4 +1,4 @@
-// UNCOMPILED TEMPLATE (design: report 19 sec 3.5). Put on the RawImage that shows the preview RenderTexture.
+// UNCOMPILED TEMPLATE (design: the studio evidence notes). Put on the RawImage that shows the preview RenderTexture.
 // Rotates the stage pivot with touch drag, with inertia and a snap-back. Does not block the item list: it only handles drags that start on this rect.
 using UnityEngine;
 using UnityEngine.EventSystems;

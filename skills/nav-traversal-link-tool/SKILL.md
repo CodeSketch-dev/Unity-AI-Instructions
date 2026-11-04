@@ -5,7 +5,7 @@ description: "Editor tool and runtime rules for NavMesh traversal links: two-cli
 
 # Nav traversal links
 
-From knife-tower and monkey-escape (report 04 sec 5.4, VERIFIED): `NavTraversalLinkEditor`, `Nav_TraversalLink` (NavMeshLink), `Ladder_NavmeshLink`, `Character_AgentLinkTraversal`.
+From knife-tower and monkey-escape (VERIFIED): `NavTraversalLinkEditor`, `Nav_TraversalLink` (NavMeshLink), `Ladder_NavmeshLink`, `Character_AgentLinkTraversal`.
 
 ## Editor window (template: `assets/NavTraversalLinkEditor.cs.txt`, UNCOMPILED)
 Two scene clicks create a NavMeshLink between the points: snap each to the ground with a configurable mask (default layers: world and ground layers of the project, not a magic integer), bidirectional toggle, width, container parent object named by purpose, undo support, idempotent by name (re-running does not duplicate), saves the scene dirty flag. Never writes into a project without approval (`rule-editor-tool-safety`).

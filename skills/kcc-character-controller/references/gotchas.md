@@ -1,6 +1,6 @@
 # KCC gotchas (DATA)
 
-From report 04 (VERIFIED in code/assets):
+From the studio evidence notes (VERIFIED in code/assets):
 1. `_orientationSharpness` (10) only gates > 0; the real turn uses a hard-coded `1 - exp(-100 dt)`. Copy the 100 and delete the dead field.
 2. Coyote and jump buffer are 0.5 s each (default KCC practice is ~0.1). It feels forgiving; make it a profile value.
 3. `Ladder` keeps a static `Dictionary<Collider, Ladder>`; it is not reset on domain reload. Add a `RuntimeInitializeOnLoadMethod(SubsystemRegistration)` reset.

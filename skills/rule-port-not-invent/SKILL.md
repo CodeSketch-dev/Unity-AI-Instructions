@@ -5,7 +5,7 @@ description: "Standing rule: port a reference game's visuals, prefabs, audio and
 
 # Port, do not invent
 
-The most repeated correction in thunder-break-egg (report 11, user feedback): "close enough" art and improvised icons were rejected and reworked. Why it matters here: the user's goal is a faithful clone, built fast and right the first time.
+The most repeated correction in an earlier clone project (user feedback): "close enough" art and improvised icons were rejected and reworked. Why it matters here: the user's goal is a faithful clone, built fast and right the first time.
 
 1. **Check the reference first**: the reference game's prefab/atlas/audio, then the sister projects (`reference-index`). Generate new art only after proving none exists and say so.
 2. **Transfer the full closure** (prefab + materials + shader + textures + animator) with GUIDs, through `asset-transfer-closure`, with a SketchEngine adapter instead of copying a CodeSketch class. Log provenance in `docs/asset-provenance.md`.

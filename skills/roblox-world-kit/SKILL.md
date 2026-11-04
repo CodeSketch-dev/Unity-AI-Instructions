@@ -5,7 +5,7 @@ description: "Roblox-look world kit: stud scale, palette, surface registry, modu
 
 # Roblox world kit
 
-Design from report 18 (mining + proposal). Everything marked INFERRED is unproven in the Editor and on a device; `STUD_M = 0.28` is UNVERIFIED (check against a door/avatar ratio from the reference).
+Design from the studio evidence notes (mining + proposal). Everything marked INFERRED is unproven in the Editor and on a device; `STUD_M = 0.28` is UNVERIFIED (check against a door/avatar ratio from the reference).
 
 ## Units and assembly
 - One constants class (`RobloxUnits`): `STUD_M` default 0.28, `WORLD_SCALE` from the GDD. Studs stay square regardless of metres. No studs in gameplay code (see Roblox defaults in `roblox-to-unity-map` when it exists).

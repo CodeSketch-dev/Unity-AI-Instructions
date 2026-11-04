@@ -5,7 +5,7 @@ description: Naming and folder conventions for UI prefabs and objects (Btn_, Tex
 
 # UI naming conventions
 
-Builders and validators key objects by name path (idempotent tools, `ui-popup-from-demo`), so names are an interface. From report 07 counts over KT/ME popups (VERIFIED):
+Builders and validators key objects by name path (idempotent tools, `ui-popup-from-demo`), so names are an interface. From the studio evidence notes counts over KT/ME popups (VERIFIED):
 
 - Popup root = feature name + `_Popup` (`Daily_Login_Popup`) with the Popup component; child `Root`, optional `Scale`, `Board`.
 - Prefixes: `Btn_` (buttons; legacy `Button*` exists, do not add new), `Text_` or `Text`, `Icon`, `Frame` (state/selected outline), `Content`, `Layout` (HLG of bottom buttons), `Fill`, `State_*` (exclusive panels), `Notify`, `Cooldown` (radial fill), `Tab_<Type>`, `Item`.

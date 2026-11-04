@@ -5,7 +5,7 @@ description: "Ladder climbing for the KCC character: ladder collider and cache, 
 
 # Ladder climb
 
-From knife-tower `Ladder.cs` and `CharacterKC` (report 04 sec 8.1, VERIFIED).
+From knife-tower `Ladder.cs` and `CharacterKC` (VERIFIED).
 
 - `Ladder : MonoCached` with a BoxCollider, `_height`, optional tiled model (`_modelHeight`). A static `Dictionary<Collider, Ladder>` cache and a `Collider.IsLadder(out Ladder)` extension avoid `GetComponent`; reset the static cache at `SubsystemRegistration` (the reference does not).
 - Detection in the controller, only with move input: BoxCast 0.2 cube, 0.35 up, reach `radius + 0.1`, every 0.05 s.

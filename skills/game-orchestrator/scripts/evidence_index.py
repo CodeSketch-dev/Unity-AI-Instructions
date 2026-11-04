@@ -18,7 +18,7 @@ def build(root):
         files.append(relative)
         if path.suffix.lower() in IMAGE_EXTENSIONS:
             images.append(relative)
-    return {"schema": 1, "root": str(root), "files": files, "images": images,
+    return {"schema": 1, "root": ".", "files": files, "images": images,
             "image_count": len(images),
             "unknowns": [] if images else ["no reference images found; visual fidelity is unverified"]}
 

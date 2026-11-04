@@ -1,0 +1,3 @@
+# Provenance
+
+Derived from a read-only study of the studio's Knife Tower style reference game (services inventory, boot order, ad gate order, remote-config priority, lifecycle table) and its git history (service introduction timeline: ads/native patched 25+ times; device-only bugs; the internet-gate exemption for paid users was added the day after the popup). The study read source and prefab YAML only; nothing was run, so runtime behaviour is "verified by code". Vendor SDK names are replaced by roles. SketchEngine module facts (Internet, Notification, AppStore, Settings) were checked against the installed package source.

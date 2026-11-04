@@ -5,7 +5,7 @@ description: Route trigger and collision contacts through the framework OptColli
 
 # Collision registry
 
-Why: one physics callback owner (the moving actor) plus one dictionary read keyed by collider instance id replaces N callbacks and N `GetComponent` calls (report 02; cost model INFERRED, no profiler numbers exist, so never quote speedups).
+Why: one physics callback owner (the moving actor) plus one dictionary read keyed by collider instance id replaces N callbacks and N `GetComponent` calls (cost model INFERRED, no profiler numbers exist, so never quote speedups).
 
 ## Shape
 - Actor (e.g. `Character`) derives from `OptCollisionSensorFast<T>` and forwards: `OnTriggerEnterFunc(T t) => t.OnTriggerEnterFunc(this)` (same for collision enter/exit, trigger exit).
@@ -13,7 +13,7 @@ Why: one physics callback owner (the moving actor) plus one dictionary read keye
 - Registration happens in `OnEnable`, unregistration in `OnDisable`; colliders are gathered in `Awake`/`OnValidate`. Multi-collider objects register all of them.
 
 ## Pick the version first (`framework-version-map`)
-| | v1 CodeSketch | v2 SketchEngine |
+| | older package form | SketchEngine (use this) |
 |---|---|---|
 | Base | `OptCollisionRegister<ICharacterCollidable>`; `Register2/3` for several interfaces | non-generic `OptCollisionRegister`; implement any interfaces |
 | Match | typed map by T | sensor filters `owner is T` |
@@ -28,6 +28,6 @@ Both: use these helpers on overlap/raycast results instead of `GetComponent`.
 5. Sensor `T` must match the interface the world object registers under (v1 strict, v2 any implemented).
 
 ## Accepted exceptions (raw OnTrigger/OnCollision)
-Pooled projectiles, actor-vs-actor contacts and one-off minigame trackers: the reference project keeps ~15 raw files. Default from report 02; override when a profiler shows the registry is not the bottleneck.
+Pooled projectiles, actor-vs-actor contacts and one-off minigame trackers: a production project keeps a small set of raw callback files. Default; override when a profiler shows the registry is not the bottleneck.
 
-Examples to read: knife-tower `PlatformKill.cs` (tiny register), `CameraFarDistanceZone.cs` (overlapping zones + static reset), `FNAF_Tower_Floor_Detector.cs` (two interfaces).
+Examples to read: a tiny register (kill plane), an overlapping-zones register with a static reset, and a detector implementing two collidable interfaces; see `house-code-patterns` references.

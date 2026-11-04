@@ -1,6 +1,6 @@
 ---
 name: coding-discipline-karpathy
-description: "Four coding-discipline rules for every code task: surface assumptions, simplest code that works, surgical changes (every changed line traces to the request), goal-driven execution with verifiable success criteria. Inspired by Andrej Karpathy's observations on LLM coding pitfalls; adapted to the studio's autonomy rules."
+description: "Use when writing or changing code: four rules - surface assumptions, simplest code that works, surgical changes (every changed line traces to the request), goal-driven execution with verifiable success criteria. Adapted from Karpathy on LLM coding pitfalls."
 triggers: assumption, overengineering, simplify, surgical, minimal diff, drive-by refactor, success criteria, test first, don dian, toi gian, sua dung cho, khong refactor ngoai pham vi
 ---
 

@@ -1,0 +1,49 @@
+// Pattern: an auto-fixing Editor tool that gives up after 2 attempts per target (kept in Library, not in the repo).
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+
+namespace Game.Editor
+{
+    public static class Bounded_Fix_Attempts
+    {
+        const int MAX_ATTEMPTS = 2;
+        static string FilePath => Path.Combine("Library", "FixAttempts.txt");
+
+        public static bool TryBegin(string key)
+        {
+            var map = Load();
+            map.TryGetValue(key, out int done);
+            if (done >= MAX_ATTEMPTS) { Debug.LogWarning("[Fix] gave up after " + MAX_ATTEMPTS + " attempts, needs a human: " + key); return false; }
+            map[key] = done + 1;
+            Save(map);
+            return true;
+        }
+
+        // usage inside the fixer:
+        //   if (!Bounded_Fix_Attempts.TryBegin(prefabPath + "|" + childPath)) { skipped++; continue; }
+        //   var root = PrefabUtility.LoadPrefabContents(prefabPath);
+        //   try { Apply(root); PrefabUtility.SaveAsPrefabAsset(root, prefabPath); }
+        //   finally { PrefabUtility.UnloadPrefabContents(root); }
+
+        static Dictionary<string, int> Load()
+        {
+            var d = new Dictionary<string, int>();
+            if (!File.Exists(FilePath)) return d;
+            foreach (var line in File.ReadAllLines(FilePath))
+            {
+                int i = line.LastIndexOf('\t');
+                if (i > 0 && int.TryParse(line.Substring(i + 1), out int n)) d[line.Substring(0, i)] = n;
+            }
+            return d;
+        }
+
+        static void Save(Dictionary<string, int> d)
+        {
+            var lines = new List<string>();
+            foreach (var kv in d) lines.Add(kv.Key + "\t" + kv.Value);
+            File.WriteAllLines(FilePath, lines);
+        }
+    }
+}

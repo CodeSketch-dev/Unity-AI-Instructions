@@ -1,0 +1,20 @@
+# Primary reference profile (framework v1) with the SketchEngine form
+
+Facts read (read-only) from the studio's primary house-style reference project: Unity 6, URP, Android low-end target, `namespace Game`, framework v1 (`com.codesketch`, namespaces `CodeSketch.*`). Each row states the v1 fact and the form to write in new work. New work uses SketchEngine (the upgraded framework): check the installed package API before writing code; never mass-replace namespaces and never invent an API that the installed package does not have.
+
+| Concern | Reference fact (v1) | Write this (SketchEngine) |
+|---|---|---|
+| Persistent root | `GameSingleton : MonoSingleton<GameSingleton>` with `PersistAcrossScenes => true`, one prefab placed in the boot scene and every scene meant to be played alone; a duplicate destroys itself | `SketchEngine.Mono.MonoSingleton<T>` (abstract `PersistAcrossScenes`, `Instance`, `SafeInstance`); same prefab placement. Details: `persistent-root-prefab` |
+| Global UI | `UIGlobalCanvas : MonoSingleton` exposes the authored canvas/container; three overlay canvases (HUD 2506, popups 12506, transition 20000), ScaleWithScreenSize 1920x1080, EventSystem inside the root | game-layer class (not in the package); sort order HUD < popup < transition < debug. Details: `persistent-root-prefab` canvas table |
+| Boot | `GameMasterInit.RuntimeInit` at `AfterSceneLoad` after the first scene (Splash) loads, before Home is requested: frame rate, device policy, settings binding, services | same hook; data preload is `DataBlockWarmup` (generated registration in builds, reflection fallback in the Editor), not a hand-written preloader |
+| Audio | `Factory_Audio : ScriptableObjectSingleton`, `AudioConfig` assets, `AudioManager`, `Audio_Volume` bound to settings and unsubscribed in `OnDestroy`; BGM centralised in one helper with cancellable UniTask crossfade | installed `SketchEngine.Audio`; no ad-hoc BGM managers (`game-audio-system`) |
+| Scenes | `SceneLoaderPlus` (light, fade, busy gate) and `LoadingScreen` (heavy, progress smoothing, registered load tasks, activation, mute/restore) are persistent components in the root | game-layer; contract in `scene-flow-loading` |
+| Settings / localization | `DataSettings` values + Unity Localization; locale subscriptions paired in `Awake`/`OnDestroy`; text/font via a localization factory | `localization-pipeline`, `settings-pause-offline` |
+| Camera | `CameraManager` owns the camera, talks through `StaticBus`, cancels owned async work, applies the low-end camera policy; no scattered `Camera.main` | `freelook-third-person-camera` (follows the installed Cinemachine major version) |
+| Pooling | `Pool_Manager` initialises `Factory_Pool.Configs` once and calls `PoolPrefabGlobal.Init`; pooled prefabs need the pool component and validated prewarm | `SketchEngine.Patterns.Pool.PoolPrefabGlobal` + `PoolPrefabConfig` (`pool-everything`) |
+| Feature UI | popup-owned components, event-driven bindings; unsubscribe in the popup lifecycle | `ui-page-item-prefab`, `ui-popup-anatomy` |
+| Data / factory / events / state | `Factory_* : ScriptableObjectSingleton<>` (serialized variant for dictionaries), `DataBlock<T>/DataValue<T>`, `StaticBus<TEvent>`, state machine | `SketchEngine.SO`, `SketchEngine.Data`, `SketchEngine.Patterns.Observer`, `SketchEngine.Patterns.StateSystem`; singleton assets live where the installed loader reads them (`Resources/<framework folder>/ScriptableObjectSingletons`, verify in the package) |
+| Collision | generic `OptCollisionRegister<T>` and multi-interface variants; sensor on the moving actor | SketchEngine `OptCollisionRegister` is NOT generic: an owner implements any number of interface families, the sensor `OptCollisionSensorFast<T>` filters owners with `owner is T` (`collision-registry`) |
+| Style | feature-first folders under `Assets/_Game/Scripts`, `namespace Game`, cached references / `MonoCachedHub<T>`, PrimeTween preferred, low-end budgets | `project-structure-layout`, `house-code-patterns` |
+
+Unknowns stay explicit until package/API or Unity inspection confirms them.
