@@ -1,6 +1,6 @@
 ---
 name: minigame-consistency-contract
-description: "One design system across all minigames: before building or fixing a minigame, fill a consistency matrix against the studio's reference games (shop, popups, bars, icons, pets, labels, camera, fog, audio, perf) and sweep every defect class everywhere. Use for any new minigame, port, clone, or when the owner reports a defect."
+description: "One design system across all minigames: fill a consistency matrix against the reference games (shop, popups, bars, icons, pets, labels, camera, fog, audio, perf) before building or fixing, and sweep each defect class everywhere. Use for new minigames, ports, clones, owner defect reports."
 triggers: consistency, dong bo, minigame, game khac nhau, cung style, shop, popup, pets, label, currency bar, design system, sweep, kiem tra toan bo, khong nhat quan
 ---
 

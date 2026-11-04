@@ -218,7 +218,7 @@
 - mesh-scene-combiner - Combine static meshes by material with an Editor bake and a budgeted runtime combine, excluding anything dynamic. Use when a scene has thousands of static MeshRenderers and draw calls are high.
 
 ## minigame
-- minigame-consistency-contract - One design system across all minigames: before building or fixing a minigame, fill a consistency matrix against the studio's reference games (shop, popups, bars, icons, pets, labels, camera, fog, audio, perf) and sweep every defect class everywhere. Use for any new minigame, port, clone, or when the owner reports a defect.
+- minigame-consistency-contract - One design system across all minigames: fill a consistency matrix against the reference games (shop, popups, bars, icons, pets, labels, camera, fog, audio, perf) before building or fixing, and sweep each defect class everywhere. Use for new minigames, ports, clones, owner defect reports.
 - minigame-registration - Minigame registration contract: enum entry, config, scene or prefab, flow hooks, result routing. Use with recipe-add-minigame when a game has several modes.
 
 ## mobile
