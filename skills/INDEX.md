@@ -324,6 +324,7 @@
 ## reference
 - reference-index - One-time searchable index of the reference projects in docs/clone-plan.md; find a prefab/script/scene/tool in one query. Use on "like the reference", before reference-port/asset transfer, or when searching big projects is slow.
 - reference-port - Port or match a feature from a reference project/screenshot faithfully: inspect first, compare side by side, adapt not blind-copy. Use on \"like the reference\", \"match 100%\", or \"ours looks different\".
+- reference-project-dissection - Use when the owner points to a reference project/game as the standard: dissect it exhaustively on your own (structure, scenes, prefabs, singleton, services, cameras, UI, code patterns), build a pass/fail rubric, then write skills and a bootstrap so later agents reproduce it. The owner's examples are only examples.
 
 ## regression
 - regression-suite - Choose and run the right regression checks after each change class (code, prefab/UI, balance, assets, settings) with EditMode, PlayMode and screenshot evidence, kept fast. Use after any change or when picking what to test.
