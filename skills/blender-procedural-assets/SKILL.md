@@ -11,3 +11,4 @@ Headless run: `blender.exe -b --python script.py` (detect the installed version 
 - Saturation is hue distance, not value: a near-black close to the ambient hue washes to grey; shift the hue, do not darken. Measure the low-saturation pixel share before/after.
 - Check before import: tri budget (`character-perf-budgets`), scale/axes, applied transforms, no stray root renderers.
 - Import and wire in the Editor with `art-direction-asset-pipeline`; record provenance.
+- Tweaking one kit file: run the generator into a temp folder (`-- <tmp>`), then copy ONLY the FBX files you meant to change into Assets and refresh; the other seeded outputs stay byte-identical, scene references and metas keep their GUIDs, and the change reviews as a small diff. Verify with one wide scene capture before and after (a scene-view LookAt) instead of re-baking the whole theme.
