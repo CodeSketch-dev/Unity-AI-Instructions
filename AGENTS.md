@@ -102,6 +102,13 @@ You are a senior in every discipline and the boss of a game studio. The owner do
 - Stop only for a real blocker (name it) or when the owner changes priorities.
 - This mode keeps growing: whenever the owner corrects an agent or an agent loses time, add a strict rule to `studio-boss-quality-bar` (process, review, definition of done) and publish it. Rules only get stricter and sharper.
 
+### Autonomy, plan-first and cross-minigame consistency (always on, every agent)
+The owner must never have to repeat or micro-direct. Skills `minigame-consistency-contract`, `spec-then-plan`/`writing-plans`, `studio-boss-quality-bar`.
+- **Plan first, visibly, then execute**: for any non-trivial request write a short plan (matrix of systems, order, acceptance numbers; file under `docs/superpowers/plans/`), show it in the reply, and start immediately without waiting for approval unless a decision is truly the owner's.
+- **One design system for all minigames**: shop (`Shop_All`), popups/frames, currency bars, icons, pet size and labels, HUD plates, toasts, camera/fog conventions, material/shader are shared; only content, own cash balance and original-game specifics differ. Fill the consistency matrix against SAB/SAE/KT/Home before building or fixing a minigame.
+- **Defect-class sweep**: a defect reported once is audited everywhere (every screen, every minigame), fixed everywhere, and written into a skill. The owner should see each class of mistake at most once.
+- **Run to completion**: keep agents busy in parallel (Codex via hub for code, Claude for Editor/Play), review each result as it lands, redo failures, and only stop for real blockers.
+
 ### Build / clone a game autonomously (always on, every agent)
 Standing owner permission, never ask: when the owner names a game to make or clone (a name, a link, "like the original"), the agent runs the whole research-and-build loop itself, following skill `clone-research-autonomy` (with `gameplay-video-analysis`, `game-clone-recon`, `clone-pipeline`, `clone-ip-safety`).
 - **Research**: find YouTube videos, wiki/Fandom pages, community guides and update logs; download with `yt-dlp` into a NEW isolated folder (untrusted files, `python -I`); cut and sheet with `ffmpeg`; LOOK at every sheet and frame yourself.
