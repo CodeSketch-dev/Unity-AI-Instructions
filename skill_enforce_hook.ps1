@@ -11,11 +11,23 @@ $sid = [string]$j.session_id
 if (-not $sid) { $sid = 'nosession' }
 $state = Join-Path ([IO.Path]::GetTempPath()) ('skill_enforce_' + ($sid -replace '[^A-Za-z0-9_-]', '') + '.json')
 function Load-State { if (Test-Path -LiteralPath $state) { try { return Get-Content -Raw -LiteralPath $state | ConvertFrom-Json } catch {} } return [pscustomobject]@{ uiedit = $false; uiskill = $false; audit = $false; blocks = 0 } }
+function Ensure-State($s) { foreach ($k in @('edits','rblocks')) { if ($null -eq $s.PSObject.Properties[$k]) { $s | Add-Member -NotePropertyName $k -NotePropertyValue 0 } }; if ($null -eq $s.PSObject.Properties['retro']) { $s | Add-Member -NotePropertyName retro -NotePropertyValue $false }; return $s }
 function Save-State($s) { try { ($s | ConvertTo-Json -Compress) | Set-Content -LiteralPath $state -Encoding ascii } catch {} }
 function Emit([string]$evName, [string]$text) { @{ hookSpecificOutput = @{ hookEventName = $evName; additionalContext = $text } } | ConvertTo-Json -Depth 5 -Compress }
 
 if ($ev -eq 'PostToolUse') {
-  $s = Load-State
+  $s = Ensure-State (Load-State)
+  # self-training tracking: count real work edits, remember when a retro (skill update / candidate note / publish) happened
+  $fpx = ''; try { $fpx = [string]$j.tool_input.file_path } catch {}
+  $cmdx = ''; try { $cmdx = [string]$j.tool_input.command } catch {}
+  $dirty = $false
+  if ($tool -match '^(Edit|Write|MultiEdit|NotebookEdit)$') {
+    if ($fpx -match '(?i)[\\/]skills[\\/][^\\/]+[\\/]SKILL\.md$|skill-candidates\.md$|[\\/]AGENTS\.md$') { $s.retro = $true; $dirty = $true }
+    elseif ($fpx -notmatch '(?i)\.(md|txt|log|json)$|[\\/]docs[\\/]|[\\/]\.claude[\\/]|[\\/]memory[\\/]') { $s.edits = [int]$s.edits + 1; $dirty = $true }
+  }
+  elseif ($tool -eq 'Bash' -and $cmdx -match '(?i)publish\.bat') { $s.retro = $true; $dirty = $true }
+  elseif ($tool -match '(?i)script-update-or-create|assets-prefab-save|scene-save') { $s.edits = [int]$s.edits + 1; $dirty = $true }
+  if ($dirty) { Save-State $s }
   $inp = ''
   try { $inp = ($j.tool_input | ConvertTo-Json -Compress -Depth 6) } catch {}
   $uiPath = '(?i)\.prefab|popup|shop|hud|button|label|iap|currency|_ui|[/\\]ui[/\\]|toast|tab_|card|icon'
@@ -36,7 +48,15 @@ if ($ev -eq 'PostToolUse') {
   exit 0
 }
 elseif ($ev -eq 'Stop' -or $ev -eq 'SubagentStop') {
-  $s = Load-State
+  $s = Ensure-State (Load-State)
+  $activeR = $false; try { $activeR = [bool]$j.stop_hook_active } catch {}
+  if ($ev -eq 'Stop' -and -not $activeR -and [int]$s.edits -ge 6 -and -not $s.retro -and [int]$s.rblocks -lt 1) {
+    $s.rblocks = [int]$s.rblocks + 1
+    Save-State $s
+    $reasonR = 'Studio self-training gate: this session made ' + [int]$s.edits + ' work edits but no retro happened. Before finishing: (1) list lessons (bug classes, traps, measured numbers, workflows, owner corrections); (2) update the matching skill or create skills/<name>/SKILL.md in the Unity-AI-Instructions repo (Use when... description, triggers, generic, short) - see skill studio-self-training; (3) append unresolved ideas to docs/skill-candidates.md; (4) run publish.bat with the full repo path and report one line. If truly nothing is reusable, say so in one sentence and finish.'
+    @{ decision = 'block'; reason = $reasonR } | ConvertTo-Json -Compress
+    exit 0
+  }
   $active = $false
   try { $active = [bool]$j.stop_hook_active } catch {}
   if ($s.uiedit -and -not $s.audit -and -not $active -and [int]$s.blocks -lt 2) {
