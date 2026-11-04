@@ -172,6 +172,17 @@ foreach ($p in $projects) {
       if (-not (Test-Path -LiteralPath $target) -or ([IO.File]::ReadAllText($target) -ne $new)) { [IO.File]::WriteAllText($target, $new, $utf8); Write-Host ("  AiQa installed: " + $target) }
     }
   }
+  # Ensure .gitignore ignores the auto-managed .claude files so they never pollute the project repo
+  $giPath = Join-Path $p '.gitignore'
+  $giMarker = '# AI-Instructions auto-managed'
+  if (Test-Path -LiteralPath $giPath) {
+    $giContent = [IO.File]::ReadAllText($giPath)
+    if ($giContent -notmatch [regex]::Escape($giMarker)) {
+      $giBlock = "`n$giMarker (synced by Unity-AI-Instructions/sync.bat, not project-owned)`n/.claude/skills/`n/.claude/ai-instructions.md`n"
+      [IO.File]::WriteAllText($giPath, $giContent.TrimEnd() + $giBlock, $utf8)
+      Write-Host ("  .gitignore updated: added .claude/skills + ai-instructions.md ignore")
+    }
+  }
   Write-Host ("project synced: " + $p)
 }
 if (-not $projects) { Write-Host 'no Unity projects found next to the repo (add roots to projects.txt)' }
