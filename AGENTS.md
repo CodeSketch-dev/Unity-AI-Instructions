@@ -431,6 +431,7 @@ The owner only prompts. Match the request to a cue below (plus the router hint a
 | Atlas, sprites, draw calls | `sprite-atlas-v2` | draw-call count before/after |
 | New feature or system | `spec-then-plan`, `config-and-factory-authoring`, `done-means-wired` | spec/plan, wired in scene, used in game |
 | Level or map layout | `level-whitebox-checklist` | walk test, composition screenshot |
+| Tutorial, onboarding, first-time user flow, guide hand, pointer, quest arrow, focus highlight | `tutorial-phase-system`, `tutorial-focus-notice-hand` (focus message, pointer, dim-hole, hand), `ui-always` for the UI parts | tutorial steps persisted and resumable, focus prefab final in Edit Mode, Play walkthrough screenshots per step |
 | New idea, mechanic, risky experiment | `prototype-keep-kill` | keep/kill verdict |
 | Every finish | `test-evidence-review`, `regression-suite` | tests actually run, PASS/SKIP counts, empty Console |
 | Phase ends ("ready for next phase") | `gate-check` | PASS/CONCERNS/FAIL with evidence list |
