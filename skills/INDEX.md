@@ -5,6 +5,7 @@
 - ads-popup-flow - Implement an ad/monetization sheet (interstitial/rewarded popups, boosters, show-conditions, placements) on top of the project ads SDK wrapper. Use when given an ad placement sheet or asked for inter/reward popups or boosters.
 
 ## agent
+- agent-hub-codex-workflow - Delegate code work to Codex agents through the owner's agent hub (hubctl.py or ai-agent-hub MCP): brief files, owns paths, non-blocking submit, check progress from disk, never read huge status output. Use when dispatching or reviewing Codex/hub tasks.
 - agent-team-protocol - Coordinator rules for running many subagents on one Unity project: model tiering, brief template, FIFO Editor lock with heartbeat, keep-compiling, denial handling, report format. Use when dispatching or acting as a subagent on a shared Editor.
 
 ## ai
@@ -357,6 +358,7 @@
 
 ## scene
 - scene-authored-prefabs - Use when adding any manager, system, world piece, player/camera/GUI stack, skybox or UI page to a Unity project, or when naming scripts/folders/events: prefab in Assets/_Game/Prefabs/<Feature>/ placed in the scene (never runtime-spawned), Knife Tower folder and naming layout, StaticBus events.
+- scene-bloat-play-crash - Unity crashes entering Play or scene file is huge: ExecuteAlways material components write thousands of null m_Materials overrides into nested prefab instances. Use when a scene grows to many MB, Play entry crashes in SaveScene, or after bulk authoring with material-swapping components.
 - scene-flow-loading - Build gated Unity splash and loading flows. Use when startup needs a studio logo, game artwork, progress, async tasks, app-open/native ads, or delayed scene activation.
 - scene-naming-conventions - Scene, prefab and asset naming conventions and folders for a clone project, checked by the naming lint. Use when creating scenes, prefabs or assets.
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints) callable from the menu and from Unity MCP. Use when a scene needs several bake steps run in the right order.
@@ -440,6 +442,9 @@
 ## tutorial
 - tutorial-focus-notice-hand - Use when a tutorial spotlight, pointing hand, notice or quest-focus overlay needs visual parity or the highlighted button misses its first tap. Covers focus-hole geometry, real click delivery and measured Play checks.
 - tutorial-phase-system - Tutorial phase system: persisted phase int, per-phase HUD visibility and locks, spotlight guidance, rewards once, resume safety. Use when building the first-time tutorial.
+
+## uber
+- uber-world-shader-design - Design a light shared world shader for mobile: one material per biome renders lego/checker/neon/lava/ice via per-vertex type and params, bloom via HDR emission, transparent mesh pre-sorted. Use when planning world shader, map combine, or special-surface materials.
 
 ## ui
 - ui-9slice-buttons - Cut sprite 9-slice borders (spriteBorder) for buttons, tabs and plates so Sliced images stretch with no notch, seam or broken outline. Use when importing or restyling a button sprite, or one shows artifacts at some size. Part of the ui-always set.
