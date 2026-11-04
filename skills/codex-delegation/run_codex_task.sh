@@ -8,7 +8,7 @@
 #   Tools/codex/run_codex_task.sh <brief.md> [model] [agent]   (agent: codex (default) | any CLI reading the brief on stdin, set AGENT_CMD)
 set -uo pipefail
 BRIEF="${1:?brief file}"
-MODEL="${2:-gpt-5.6-terra}"
+MODEL="${2:-gpt-5.6-luna}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 NAME="$(basename "$BRIEF" .md)"
 D="$ROOT/Temp/codex"; mkdir -p "$D"
@@ -25,5 +25,6 @@ else
 fi
 AFTER="$(cd "$ROOT" && git status --porcelain 2>/dev/null | wc -l)"
 [ -s "$OUT" ] && HASOUT=yes || HASOUT=NO_FINAL_MESSAGE
+[ "$HASOUT" = "NO_FINAL_MESSAGE" ] && grep -q "usage limit" "$LOG" 2>/dev/null && HASOUT="USAGE_LIMIT($(grep -o "try again at [0-9:]* [AP]M" "$LOG" | tail -1))"
 echo "DONE exit=$RC end=$(date +%FT%T) final=$HASOUT dirty_delta=$((AFTER-BEFORE))" > "$ST"
 echo "done: $ST"

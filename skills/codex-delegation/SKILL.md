@@ -21,7 +21,7 @@ REVIEW THE TESTS, not just the code: Codex wrote a "simulation" whose key metric
 - Truth source is a status file, not the notification: the wrapper writes `<name>.status` = `RUNNING pid start`, then `DONE exit=N final=yes|NO_FINAL_MESSAGE dirty_delta=K`. Read it (`Tools/codex/codex_status.sh`). `final=NO_FINAL_MESSAGE` = worker died or stopped early: re-run once, then do it yourself.
 - A run can stop after reading files with no output: always check created files + status before trusting a report.
 - Other CLIs (kimi etc.): same wrapper with `AGENT_CMD='<cli reading stdin, printing final message>'`; the contract (brief on stdin, status file, out/log files, manager reviews diff, compiles, tests, commits) stays identical.
-- Model: terra (smarter) for logic/tests touching real APIs; luna for mechanical edits. Briefs name files to read, owned paths, exact signatures; the worker never touches git/Unity.
+- Model: DEFAULT luna (cheap, owner request 2026-11-04 to save tokens); use terra only for a hard task luna failed twice, via the 2nd wrapper argument. Briefs name files to read, owned paths, exact signatures; the worker never touches git/Unity.
 - Commit only owned paths (`git add <paths>`): the Editor regenerates baked assets that a broad add sweeps in.
 
 ## Reviewing worker output (lessons from a 10-task session)
