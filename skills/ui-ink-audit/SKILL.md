@@ -34,3 +34,6 @@ Install: `sync.bat` copies `Qa_InkDump` and `Qa_InkFix` (`templates/unity-editor
 - The dump must include legacy `UnityEngine.UI.Text` labels, not only TMP; otherwise those buttons look label-less and offsets are reported falsely.
 - Never guess the button face by flat colour on gradient sprites: grow the face region along the smooth gradient (neighbour delta below a small threshold) instead.
 - Currency pills whose icon deliberately overhangs the frame edge must be skipped (see `ui-currency-bar-contract`), not flagged as off-centre.
+
+## Hidden elements give false positives (lesson 2026-11-04)
+The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 / mode off), so it can report a large dx (e.g. -58 px) for a button whose geometry is centred. Before "fixing" a big dx on a conditional button, dump the runtime rects (icon/label world centres vs the button centre). If the geometry is centred, record a false positive; re-run the pixel audit only while the button is visible.
