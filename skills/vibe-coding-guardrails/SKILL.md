@@ -38,3 +38,4 @@ Each rule comes from a real mistake. Follow the habit, it is cheaper than the re
 - Report in the user's language, short: what changed, how verified, what is left. Offer the next step as one question with a recommended default.
 - Stage only the files you changed (`git add <paths>`), never a whole folder in a Unity project: the Editor regenerates baked meshes, materials and font assets in the background and they ride along into your commit as noise.
 - A measurement tool that returns 0 elements is a broken tool, not a clean screen: check how it finds its root (canvas name, scene object) before trusting "no findings", and say so in the report.
+- Before writing or accepting a "port X from the reference project" task, grep the project for the reference's class names and for "Port of"/"ported" comments: twice a runbook item (IAP manager, tutorial arrow/message) described work that was already done. Report the gap list (ported / not ported / why) instead of re-doing it.
