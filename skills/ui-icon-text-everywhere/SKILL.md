@@ -1,6 +1,6 @@
 ---
 name: ui-icon-text-everywhere
-description: "Every toast, notification, cash/currency value, reward or status text is ICON on the LEFT + TextMeshPro on the RIGHT (UI = TextMeshProUGUI in a HorizontalLayoutGroup; 3D/world text = TextMeshPro with a TMP sprite tag). Use when adding or touching any toast, popup number, floating value, label with a currency, notice lane or overhead text."
+description: "Every toast, currency value, reward or status text is an ICON on the left plus TextMeshPro on the right (UI in a HorizontalLayoutGroup, world text with a TMP sprite tag). Use when adding or touching any toast, popup number, floating value, currency label, notice lane or overhead text."
 triggers: toast, notification, notice, cash, currency, reward text, floating text, popup number, overhead label, tmp sprite, sprite asset, icon left, thong bao, tien, so tien, bieu tuong
 ---
 

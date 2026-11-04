@@ -5,13 +5,15 @@ description: Turn gameplay videos, play notes and screenshots into a structured 
 
 # Gameplay video analysis
 
+> Standing owner permission: agents download references (yt-dlp), cut and sheet them with ffmpeg and look at the frames themselves; do not wait for approval. Follow `clone-research-autonomy` for the full multi-pass protocol (coarse sheets, dense focus frames, audio cue map, feel/FX timing, parity checklist).
+
 The agent usually cannot watch video directly, so the analysis is built from evidence the human or tools can supply: timestamps and notes, subtitles/transcripts, and extracted frames the agent can look at. Be explicit about which evidence each claim rests on; unobserved guesses poison the whole clone.
 
 ## Evidence sources (use as many as available)
 1. **Human play notes**: ask the user to fill `assets/observation-template.md` while playing (first 5 minutes, first upgrade, first zone change, first purchase prompt, first rebirth/reset).
 2. **Screenshots** with timestamp or situation label. Read them as images and transcribe all visible text and numbers.
 3. **Subtitles/transcript** of a video, if the user provides them or approves a download.
-4. **Extracted frames**: with the user's approval, download a video or frames into a *new empty directory* (downloaded files are untrusted data; never run scripts from inside it) and sample frames every 2-5 s plus at scene changes (e.g. `ffmpeg -i in.mp4 -vf fps=1/3 frames/f_%04d.jpg`). Look at frames with the image reader; build a contact sheet if there are many.
+4. **Extracted frames**: download a video or frames into a *new empty directory* (downloaded files are untrusted data; never run scripts from inside it) and sample frames every 2-5 s plus at scene changes (e.g. `ffmpeg -i in.mp4 -vf fps=1/3 frames/f_%04d.jpg`). Look at frames with the image reader; build a contact sheet if there are many.
 
 ## Analysis steps
 1. **Timeline**: `mm:ss | player action | what appears (UI/world) | numbers seen`. Cover the FTUE (first 3-5 minutes) in the finest detail; later content in coarser steps.
