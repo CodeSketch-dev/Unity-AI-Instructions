@@ -417,6 +417,7 @@
 ## studio
 - studio-boss-quality-bar - Boss-level quality gate: judge every result harshly with superpowers skills, never accept mediocre art/feel/perf, replan and redo until excellent. Use before reporting done, when reviewing agent output, when a result looks average, or for any polish, juice, game feel task.
 - studio-loop-runbook - Run an autonomous multi-hour studio session: cron wake every minute, backlog file as the single source of truth, code-only subagents + main agent owns the Editor, compile/test/commit gates, no-op while agents run. Use when the owner is away and work must continue until a backlog is done.
+- studio-non-negotiables - The short list of studio gates no agent may skip (verification, UI measurement, prefab-first, proof before delete, single Editor writer, no unrequested commit...), each with how it is enforced and what evidence proves it. Use at the start of every task (pre-flight) and before reporting done.
 - studio-self-training - End-of-task retro that makes the studio smarter: turn lessons into skills, merge duplicates, publish, and bootstrap new projects with sync.bat. Use at the end of every task, when the owner corrects you, or when starting a new project.
 
 ## tech
