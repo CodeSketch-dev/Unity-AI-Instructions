@@ -14,6 +14,14 @@ Operating manual; see `editor-lane-single-writer` (what is serial) and `multi-ag
 - **Collect** report files, not transcripts. Append to shared docs only (re-read the tail first).
 - **Denials**: a classifier-denied call stops the agent; it reports the exact call. Never retry, reroute or launder it; ask the user. Pre-authorise routine Editor calls in settings rules; for refresh, the allowed alternative is running `AssetDatabase.Refresh()` via the script-execute tool.
 
+## Delegation hygiene (learned from stalled UI rounds)
+- **Slice by turn budget**: a subagent gets ~60 tool calls. Give one slice (2-3 popups / one system). Never combine fixing content, fixing the checker and porting to builders in one brief.
+- **Report paths absolute**: the brief names the full report path inside the PROJECT folder; the agent writes it by turn 5 and updates it after each stage. The coordinator checks both the project folder and the repo root when a report seems missing.
+- **Verify progress by files**: judge an agent by artifact mtimes (notes, changed assets), not by its `running` status. 10 min without a change = stop and re-scope.
+- **Looking is part of done**: for visual work the brief requires saved screenshots that the agent looks at and the coordinator opens too; audit numbers alone never close a visual item (`ui-visual-qa`).
+- **Do not repeat measurements**: one audit per case unless a fix happened in between (`qa-fix-retest-loop`).
+- After an agent ends or is killed, restore the Editor (exit Play, scene not dirty, save restored) before dispatching the next.
+
 ## Editor lock (Play, compile, scenes, prefabs, assets, screenshots)
 - `scripts/editor_lock.sh acquire <agent>` queues FIFO (no ticket = starvation); `touch` every ~2 min; `release` always, also on failure. Set `LOCK`/`Q` env to relocate; default is under `Temp/`.
 - No heartbeat for 5 min = stale, next ticket takes over (note it in the report). A waiter silent for 2 min leaves the queue.
