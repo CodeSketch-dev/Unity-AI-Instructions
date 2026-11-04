@@ -396,6 +396,7 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 
 - Before ANY UI, popup, HUD, button, world-canvas or text work, read the `ui-text-autofit-system` skill and make sure the project has the `UI_TextAutoFit` system installed (install it if missing). Text fitting is automatic: auto size, padding from frames/buttons/shadows, no overflow, centred icon+label groups, never a `$` prefix on money. HARD RULE: text (its rect AND its rendered bounds) must never extend outside its parent/frame or overlap a sibling icon, never use ellipsis (shrink to min 10 instead), and overlays (banners/native half/tutorial hints) must never cover popup content; verify with a scripted rect/textBounds measurement over every popup state, not by eye.
 - Do not wait to be asked to align or fit text. Every new or changed UI is built correctly, normalised by the system, then verified by measurement (`textBounds` vs rect) and a screenshot in Play Mode before reporting done.
+- UI is authored in Edit Mode (skill `ui-edit-mode-authoring`, owner order): new art/texture/size/text goes straight into the source prefab; runtime code only shows/hides and fills data (item icons, names, counts are fine). Never ship old or placeholder static art that runtime code overwrites with the new texture/size, and delete the old UI it replaces (proved unused first).
 
 ## Shops, popups and HUD polish (automatic, every project, mandatory)
 
@@ -413,7 +414,7 @@ The owner only prompts. Match the request to a cue below (plus the router hint a
 
 | Cue in the task or in what you see | Mandatory skills | Completion evidence |
 |---|---|---|
-| Any UI, HUD, popup, layout, text, button, icon, tab, shop, toast (even one value) | `ui-always`, `ui-center-alignment`, `ui-layout-audit`, `ui-scaling-safe-area-checklist`, `ui-text-tmp`, `tmp-font-optimization` | measured dx/dy <= 1 px, audit totals, Play screenshot looked at |
+| Any UI, HUD, popup, layout, text, button, icon, tab, shop, toast (even one value) | `ui-always`, `ui-center-alignment`, `ui-layout-audit`, `ui-scaling-safe-area-checklist`, `ui-text-tmp`, `tmp-font-optimization`, `ui-edit-mode-authoring` | measured dx/dy <= 1 px, audit totals, Play screenshot looked at, prefab final in Edit Mode (no runtime restyle, no placeholder) |
 | Art, icon, skybox, 3D, Blender generation | `art-direction-asset-pipeline` (+ `clone-ip-safety`) | style card, in-engine screenshot, provenance line |
 | Slow, FPS, hitch, heat, memory | `perf-triage-ladder`, `mobile-perf-audit`, `profiling-evidence` | profiler numbers, or "not measured on device" |
 | Economy, prices, offline, rebirth, rewards | `simulator-pacing-checks`, `economy-progression-design`, `consistency-check` | sim run before/after, pacing within tolerance |
