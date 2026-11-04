@@ -64,14 +64,14 @@ def ink_bbox(parts, face, box):
     """White text fill (min channel > 235) + the VISIBLE pixels of each icon (colour differs from the face; transparent sprite margins ignored)."""
     boxes = []
     bx0, by0, bx1, by1 = box   # ink is only counted INSIDE the face: icon rects and text rects reach over the outline / highlight / lip, whose bright pixels are not ink
-    for p in (p for p in parts if p["type"] == "icon"):
+    for p in (p for p in parts if not ignored_part(p) and p["type"] == "icon"):
         x0, y0, x1, y1 = p["rect"]
         xs, ys = [], []
         for yy in range(cy_(max(y0, by0)), cy_(min(y1, by1) + 1)):
             for xx in range(cx_(max(x0, bx0)), cx_(min(x1, bx1) + 1)):
                 if dist(q(px[xx, yy]), face) > 80 and sum(px[xx, yy]) > 120: xs.append(xx); ys.append(yy)
         if xs: boxes.append([min(xs), min(ys), max(xs), max(ys)])
-    for p in (p for p in parts if p["type"] == "text"):
+    for p in (p for p in parts if not ignored_part(p) and p["type"] == "text"):
         x0, y0, x1, y1 = p["rect"]
         xs, ys = [], []
         for yy in range(cy_(max(y0 - 2, by0)), cy_(min(y1 + 2, by1) + 1)):
@@ -82,6 +82,14 @@ def ink_bbox(parts, face, box):
     return [min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes)]
 
 
+OVERLAY_TOKENS = ("x2burst", "dot", "badge", "tag", "notify", "count")
+
+
+def ignored_part(part):
+    """Ignore explicit dump markers and overlay naming patterns for older dumps."""
+    return bool(part.get("ignore", False)) or any(token in part.get("name", "").lower() for token in OVERLAY_TOKENS)
+
+
 SKIP_NAMES = ("Panel", "Currency", "Attack", "Joystick", "Dot", "Badge", "Pill")   # currency bars (Pill: icon overhangs the left cap, value right aligned) / touch controls / badges have their own contracts
 fails, oks, fixes = [], [], []
 fixes_path = None
@@ -89,7 +97,7 @@ if "--fixes" in args:
     i = args.index("--fixes"); fixes_path = args[i + 1]; del args[i:i + 2]
 buttons = [i for i in data["items"] if i["kind"] in ("button", "frame")]
 for it in buttons:
-    parts = it["parts"]
+    parts = [p for p in it["parts"] if not ignored_part(p)]
     has_icon = any(p["type"] == "icon" for p in parts); has_text = any(p["type"] == "text" for p in parts)
     if not (has_text or has_icon): continue
     sc = it["scale"] or 1.0
