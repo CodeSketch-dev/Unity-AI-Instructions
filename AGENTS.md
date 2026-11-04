@@ -102,7 +102,7 @@ Goal: the studio gets faster, cheaper (fewer tokens) and better with every task;
 - **Publish**: run `publish.bat "<short message>"` in the repo (rules above). Unpublished lessons do not exist for the other machine or the other agents. Tell the owner in one line what was added.
 - **New project**: put the Unity project next to this repo (the parent folder is scanned) or add its folder to `projects.txt`, then run `sync.bat /nopause`. It installs the shared rules (`CLAUDE.md` block, `.claude/ai-instructions.md`), all skills, agents, hooks and the router into that project, so a fresh project behaves like the trained ones. Start every new project session with `sync.bat /nopause` to pull what the other machine learned.
 - **Delegate to learn cheaply**: code-only work goes to Codex through the hub (`agent-hub-codex-workflow`); Claude keeps Editor, verification and review. Record in a skill which kind of task each agent did well or badly.
-- **Enforced**: the Stop hook (`skill_enforce_hook.ps1`) blocks the main session once if it made 6+ work edits without a retro (skill update, `skill-candidates.md` note or `publish.bat` run). Do not try to bypass it; do the retro.
+- **Always in the brain, never blocking**: this rule lives in the shared instructions AND is re-injected on every prompt by the router hook (`ui_gate_reminder.ps1`), so old and new sessions, Claude and Codex, all carry it. Nothing blocks the agent; it just keeps teaching the studio.
 - **Quality gates stay**: never skip verification (compiled, Play-tested, measured) to save tokens; save tokens by reusing skills, narrow searches, compact outputs and batched calls.
 
 ### Graphify and skill auto-load (always on)

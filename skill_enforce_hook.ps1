@@ -49,14 +49,6 @@ if ($ev -eq 'PostToolUse') {
 }
 elseif ($ev -eq 'Stop' -or $ev -eq 'SubagentStop') {
   $s = Ensure-State (Load-State)
-  $activeR = $false; try { $activeR = [bool]$j.stop_hook_active } catch {}
-  if ($ev -eq 'Stop' -and -not $activeR -and [int]$s.edits -ge 6 -and -not $s.retro -and [int]$s.rblocks -lt 1) {
-    $s.rblocks = [int]$s.rblocks + 1
-    Save-State $s
-    $reasonR = 'Studio self-training gate: this session made ' + [int]$s.edits + ' work edits but no retro happened. Before finishing: (1) list lessons (bug classes, traps, measured numbers, workflows, owner corrections); (2) update the matching skill or create skills/<name>/SKILL.md in the Unity-AI-Instructions repo (Use when... description, triggers, generic, short) - see skill studio-self-training; (3) append unresolved ideas to docs/skill-candidates.md; (4) run publish.bat with the full repo path and report one line. If truly nothing is reusable, say so in one sentence and finish.'
-    @{ decision = 'block'; reason = $reasonR } | ConvertTo-Json -Compress
-    exit 0
-  }
   $active = $false
   try { $active = [bool]$j.stop_hook_active } catch {}
   if ($s.uiedit -and -not $s.audit -and -not $active -and [int]$s.blocks -lt 2) {

@@ -18,5 +18,5 @@ triggers: retro, self training, train agents, update skill, new skill, publish, 
 ## Token habits
 Index first, 1-3 skills, narrow greps, compact tool output (cap `max_chars`), batch tool calls, delegate code to the hub, never re-read what you just wrote.
 
-## Enforcement
-`skill_enforce_hook.ps1` (Stop) blocks the main session once when it made 6+ work edits (code/scene/prefab/script files, not docs) without a retro: a skill/AGENTS/skill-candidates edit or a `publish.bat` run. Do the retro (or state in one sentence that nothing is reusable) and finish; subagents are not gated.
+## Reminder (not a gate)
+The prompt-router hook adds a one-line self-training reminder to every prompt (also in sessions started before this rule). Nothing blocks you: when a task taught something reusable, update or create the skill and run `publish.bat`; if not, just finish.

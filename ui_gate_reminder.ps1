@@ -73,7 +73,7 @@ $isUi = $prompt -match $ui
 $m = 'Skill router: before acting, load (Skill tool, or Read .claude/skills/<name>/SKILL.md) the skills that match this task. Skills are never optional and the user will not ask for them. Always keep skill vibe-coding-guardrails in mind (inspect before assuming, narrow searches, verify before claiming).'
 if ($isUi) { $m += ' UI TASK: FIRST load ui-always (it names the required UI skills), then measure centring (<=1px), text autofit and black outline by script + screenshot before saying done.' }
 if ($set.Count -gt 0) { $m += ' Matched skills (load the ones the current step needs, drop them when the step ends): ' + (($set | Select-Object -First 18) -join ', ') + '.' }
-$m += ' New feature or behavior change: superpowers brainstorming first. Bug: systematic-debugging first. Always finish with done-means-wired + verification-before-completion.'
+$m += ' New feature or behavior change: superpowers brainstorming first. Bug: systematic-debugging first. Always finish with done-means-wired + verification-before-completion. Self-training (standing rule, never ask): whenever this task teaches something reusable (bug class, trap, measured number, workflow, owner correction), update or create a short generic skill in the Unity-AI-Instructions repo and run publish.bat so every agent gets smarter.'
 $o = @{ hookSpecificOutput = @{ hookEventName = 'UserPromptSubmit'; additionalContext = $m } }
 $o | ConvertTo-Json -Depth 5 -Compress
 exit 0
