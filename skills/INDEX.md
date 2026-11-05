@@ -288,6 +288,9 @@
 ## one
 - one-material-world-shader - Render the whole world with one opaque material (plus one alpha) by moving per-part variation into vertex data, with the Game/RobloxWorld shader contract. Use when setting up world art, writing the world shader, or fixing material counts and draw calls.
 
+## owner
+- owner-request-ledger - Use when the owner sends ANY request, complaint, preference or new task (even mid-task, even a one-liner or screenshot). Log it to docs/owner-requests.md BEFORE acting, never drop it, close only with evidence. Prevents swallowed tasks.
+
 ## parallel
 - parallel-qa-fanout - How to QA and fix many screens, modes or minigames with subagents on a single-writer Unity Editor without running out of turns or losing the Editor lock. Use when asked to QA or fix several modes, shops or screens in parallel.
 - parallel-subagents-unity-lock - Editor lock rules for parallel agents sharing one Unity Editor: FIFO lock with heartbeat, one writer, keep compiling, stop on denied calls. Use when several agents might use the Editor or MCP at once.

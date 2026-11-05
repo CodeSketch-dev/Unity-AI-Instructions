@@ -169,6 +169,10 @@ Goal: the studio gets faster, cheaper (fewer tokens) and better with every task;
 - Append concise dated bullet entries grouped by topic; update an existing entry instead of duplicating it. Record the why when the user gave one.
 - Update the notes as feedback arrives, not only at the end, so the information survives context compaction. Read the file at the start of a session before continuing work.
 
+### Owner request ledger (mandatory, never swallow a task)
+- Every owner message with a request, complaint, preference or idea is logged FIRST (before acting) as a row in `docs/owner-requests.md` (skill `owner-request-ledger`): `OR-###`, date, owner words, area, status, evidence. Rows are append-only; never delete, merge away or silently drop one. Status moves OPEN -> IN PROGRESS -> DONE (needs commit + verification evidence) / BLOCKED (reason) / DROPPED (only if the owner said so).
+- Read the OPEN rows at every session start, cron tick and after context compaction; give each subagent the OR ids it owns; never stop a loop or cron while OPEN rows remain without an explicit reason per row. Replies end with the count of OPEN rows when any exist.
+
 ## Communication
 
 - Communicate tersely. For long tasks, give short progress updates when useful.
