@@ -16,3 +16,7 @@ The most repeated correction in an earlier clone project (user feedback): "close
 7. When unsure which source wins: reference priority is the original game footage, then knife-tower/monkey-escape conventions, then tuned "fun".
 
 Workflow: `reference-port` (compare side by side), `game-clone-recon`, `clone-ip-safety` for what must not be copied. Ledger of the underlying corrections: `user-corrections-ledger`.
+
+## Feature-scope check before building a system (owner correction)
+- When cloning, list the reference game's actual stats/systems first (e.g. pets = rarity + income + event boost, no levels). Do NOT add progression layers (levels, XP, feed/fuse/evolve, extra currencies, extra tabs) the reference does not have: the owner wants minimal, instantly readable Roblox-style games.
+- If such a layer already exists and the owner rejects it: hide it behind one const, record the directive in AGENTS.md, queue its removal (unused-proof, delete code/tests/strings, save migration that folds the old bonus into plain income with zero loss).
