@@ -51,3 +51,8 @@ Read this for every UI task. A UI is not done until it is measured as centred, n
 - Several items in one row/column (reward chips, currency + XP, stat rows, tab strips) are distributed with EQUAL gaps and the whole group is centred in the free space between its outer neighbours (left icon .. right button); items have the same height and y centre; text sizes match across items.
 - The visual weight is balanced: no cluster glued to one side, no tiny text beside a big button, no item whose size differs from its siblings without a reason. Prefer one layout group (spacing + padding + child alignment) over hand positions.
 - Check by script: gaps between consecutive items (max - min <= 2 px), group centre vs free-gap centre (<= 1 px), heights equal, then LOOK at the screenshot for harmony.
+
+## Detail / preview panels: one balanced column (owner correction)
+- A detail panel (info + art + action button) is ONE vertical stack with equal top and bottom margins (within ~12 px) and consistent gaps; never leave a big empty band under the CTA or pile everything at the top. Compute the stack height first, then place from the panel height.
+- Horizontal clusters (art + side button/lock/badge) are centred as a GROUP (group width = parts + gaps, left edge = (panel - group)/2); the primary CTA and text lines are centred on the panel axis. When a feature is removed, re-flow the remaining elements; do not leave the old coordinates.
+- Put the stack numbers in named consts next to the builder so a later change edits one place, then verify with a Play screenshot (margins top/bottom, group centre vs panel centre).
