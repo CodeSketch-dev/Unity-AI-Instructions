@@ -40,3 +40,8 @@ Source: third-party example (Unity-Technologies/AutoLOD, idea-only), our wording
 - Before culling far geometry, consider hierarchical LOD: one merged proxy per chunk, swapped by distance with hysteresis, built as an idempotent undo-safe Editor bake like the chunk bake above.
 - LODGroups only on a few large meshes seen near and far; never on tiny props or meshes already combined.
 - Runtime QualitySettings.lodBias per device tier is the cheapest quality lever.
+
+## Measure before you merge (2026-11-05)
+- Merging static props is not automatically a win: merging a whole theme (one mesh per material) gave +5% draw calls and +14% triangles because the combined mesh was never frustum-culled. Always take a before/after on the same view (UnityStats drawCalls/batches/setPass/triangles plus visible renderers grouped by root) and revert if worse.
+- Chunk by world-space XZ cells (about 30 m) so culling still helps; find the real driver first (group visible renderers by top-level root and by why they are not merge-eligible: unreadable mesh, collider, animator).
+- Typical blockers: FBX Read/Write off (enable it for small decor kits), content added after the baker ran (outside the roots it merges), colliders on the same object. Make the tool idempotent with a marker component on every renderer it disables so un-merge is exact, and save combined meshes as assets.

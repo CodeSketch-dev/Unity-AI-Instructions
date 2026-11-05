@@ -28,3 +28,7 @@ Use before saying "verified". A claim needs proof that would FAIL if the claim w
 
 ## Output
 Claim | evidence | strength (strong / weak / none) | action taken. The final report wording must match the strongest proof obtained and name what was not verified.
+
+## Date-dependent tests (2026-11-05)
+- A test that calls an API reading the real clock (event weeks, daily rotations, seasonal pools) starts failing on the day an event begins and looks like a regression. Pin the time through the API's explicit-time overload and a known calm day; classify a new failure first by asking whether anything time-based is involved.
+- Do not trust animating UI audit readings (tabs sliding in, pulsing buttons, press scale): re-measure at rest and compare identical values across captures; stable identical numbers are real, drifting ones are animation.

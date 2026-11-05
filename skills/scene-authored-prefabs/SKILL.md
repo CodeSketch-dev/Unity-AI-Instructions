@@ -36,3 +36,4 @@ Prefab exists once (no duplicate baked copy), the scene instance is a prefab ins
 - Editor builders must write prefabs (idempotent), not scene-only objects (`editor-bake-safety`).
 - `.gitignore` can swallow folders named like Unity templates (`Tutorial`, `Examples`): `git check-ignore -v` every new folder.
 - Provenance of the style: [references/PROVENANCE.md](references/PROVENANCE.md).
+- Runtime binders (`transform.Find("Row" + x)`) must use FIXED object names, never localized text: baked children keep the language they were baked in, so a lookup built from `Localize.Get(...)` returns null in any other language, aborts the HUD initialise halfway and every later system then hits nulls. A chaos/random-tap PlayMode test run in a second language catches this class; fixed in two places in one project.
