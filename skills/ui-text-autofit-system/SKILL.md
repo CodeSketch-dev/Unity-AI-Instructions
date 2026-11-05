@@ -48,3 +48,11 @@ let the system normalise, then measure textBounds vs rect in Play. Read the ui-t
 
 ## Opt-out instead of per-frame hacks
 - If an auto-fit/normalising system re-centres or resizes a text you placed deliberately (e.g. a right-aligned corner amount under a button-like card), use the system's explicit opt-out marker on that text; never fight it with `Update`/`LateUpdate` code. Re-check alignment on the live screen after the first frame, because normalisers run after your builder.
+
+## Text must never touch its frame: padding budget (owner correction, recurring)
+- Every label inside a plate/card/button needs EQUAL padding top and bottom (>= 8-10 px at 1080 ref) measured from the sprite FACE (outline + bottom lip are border, not free space). A label that "fits" the rect but touches the lip is a defect.
+- Budget first: free height = face height - 2 x padding. Multi-line labels (name + level, label + price) must fit that budget at the font the auto-size reaches; if the floor font x lines x ~1.2 exceeds it, make the card/button TALLER or shrink the art block above it. Never squeeze the label.
+- Auto-size cannot go below its min font: legacy Text and TMP then overflow vertically, silently. Check line count x line height against the budget at build time.
+- Text line boxes are not symmetric around glyph ink: one-line and two-line labels in the same button need different vertical insets. Set the inset again whenever the label text changes line count (helper called from the refresh path, not only the builder). Measure ink with the ink audit, interpolate, re-measure (the relation is not linear when auto-size reacts).
+- Dynamic text (names, prices, levels, counts, localized strings) is tested with its LONGEST realistic value, not the demo one.
+- Defect-class sweep: after fixing one card/button, grep every builder that places a label inside a plate with the same pattern (pet cards, shop cards, tabs, price plates) and fix them in the same change.
