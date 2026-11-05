@@ -30,3 +30,8 @@ Render the sprite sliced at small (120x60), medium (220x70), wide (400x80) and t
 - Keep `pixelsPerUnitMultiplier` as the prefab already has it (usually 1). Raising it shrinks the fixed corners, lowering it enlarges them; change it only when the corner looks too thick or thin at the target size, and then change it identically for all buttons of that style.
 - Do not change prefabs just to fix borders: fix the sprite import, and all users improve at once.
 - Report old -> new border per sprite.
+
+## Adding sprites to a registry-backed kit (trap)
+- Add new art under NEW keys first (never overwrite a live key until a pilot popup is reviewed). Names with a sliced-family prefix (board_, card_, ribbon_, btn_...) need a non-zero border; ribbons with folded tails must not be sliced, so give them a non-sliced prefix (title_, badge_, fx_).
+- A sprite-factory/registry rebuild menu only shows new keys after `AssetDatabase.SaveAssets()` plus a script reload; until then kit audits report "failed to load". Check the factory with a one-line probe before running tests.
+- Source art authored at 1x must be upscaled to the kit's pixels-per-unit convention before measuring borders; scan only the header band reliably, derive other borders from corner radius and verify in the sprite preview.
