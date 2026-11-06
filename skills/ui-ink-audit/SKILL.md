@@ -42,3 +42,11 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 ## Fix at the baked prefab, not only the builder (measured trap)
 - Modals/pages that are BAKED prefabs keep their serialized layout values (HLG padding, offsets). Editing the code builder changes only newly built UI: the Play audit shows identical numbers and the fix looks like it "did nothing". Confirm with the audit that the failing object comes from a prefab, then batch-fix the sources with an Editor pass (`PrefabUtility.LoadPrefabContents` -> edit -> `SaveAsPrefabAsset`) AND update the builder so new UI matches. Dry-run first (count objects per sprite/padding), then apply, then re-run the audit.
 - Audit numbers that change between captures are animation or test state; only values identical across 2-3 settled captures are real defects. A class of identical offsets (e.g. all tabs -3 px) is one shared fix, not per-screen nudges.
+
+## Glyph side bearings and probe bias (lesson 2026-11-06)
+- TMP centres the ADVANCE box of the string, not the drawn glyphs. Side bearings of the first/last glyph (e.g. "S...1", "x3", "28M") push the ink 1-7 px off the rect centre on text-only and icon+price buttons. Fix once at the shared text component: for single-line, centred labels shift the TMP child by the measured glyph-quad ink centre (`textInfo.characterInfo` bottomLeft.x / topRight.x of visible chars, clamp ~12 px), run only when text or layout changes (never per frame).
+- Measure ink INCLUDING the dark outline (thicker below): white fill only biases every pair 1-1.5 px up/left.
+- Tab-like buttons: take dx on the plate rect and dy on the vertical face run; falling back to the whole rect includes a transparent lip margin and reads a fake dy of about -4.
+- Ignore notify dots/badges in the scan; wait for the modal pop-in/slide to settle (30-40 frames) before capturing, otherwise the offset is animation state.
+- Prefab text rects baked for one width (landscape chip) spill past the face when the host is narrower (portrait): stretch the label to the live host width with an inset instead of a fixed width.
+- Confirm a suspected artifact with a 5x crop and your own silhouette scan before touching layout; keep the audit as a regression gate, not the truth.
