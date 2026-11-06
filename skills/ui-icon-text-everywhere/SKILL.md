@@ -27,3 +27,10 @@ Verification (do it, do not ask the user)
 3. Add/extend an EditMode test for the pure parts (lifetime clamp, string builders that prepend the sprite tag).
 
 Related: `ui-icon-label-layout` (buttons), `ui-text-tmp`, `ui-text-autofit-system`, `world-label-recipes`, `ui-feedback-toasts`, `ui-always`.
+
+## Icon must match the meaning; missing icon = generate it, never reuse a wrong one (owner rule)
+- A stat / currency / counter shows the icon of WHAT it is (throw power = muscle arm, speed = shoe, cash = cash, luck = clover). Reusing another stat's icon (speed shoe for throw power) is a defect.
+- No fitting icon in the project or sibling games: generate it with `generate_game_image` (codex-game-art) in the style of the game's existing icons (chunky outline, same palette), save under `Assets/_Art/2D/GUI/<Game>/`, import as Sprite, put it in the prefab AND its builder (idempotent). The MCP call may report a timeout while the file still arrives: check the file with a bounded wait, then use it; if it never appears, draw it yourself, never ship the wrong icon.
+- Text-only counters are defects: every number that has a meaning gets icon + text in one centred HorizontalLayoutGroup.
+- Native half ad / popups: only the POPUP scales or shifts; HUD bars and buttons never move (NativeHalf_HudAvoid is a no-op by owner rule).
+- World labels above pets (name, income, rarity) are never hidden, also while carried or revealed.
