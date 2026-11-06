@@ -12,3 +12,4 @@ description: "World-space canvas boards and slot layouts: strip imported layout 
 - Related: `ui-validator`, `text-spread`.
 - Text centring: Capline alignment plus the sprite face offset, never a per-label nudge (`ui-text-tmp` Optical centring).
 - World buttons need press feedback too: `UIPressPrimeTween` on the button, pointer down/up forwarded by the pass-through (`ui-button-anatomy` World buttons).
+- Reference world boards (Steal-style SM_InfoBoard + world uGUI canvas) are authored for a ~3.2x scaled world: placed 1:1 in a normal-scale world the board is ~9 m tall and its text sits far above the camera. Scale the board root (0.2-0.25 worked) and enlarge the trigger collider by 1/scale. A uGUI canvas keeps its text readable from any camera angle (3D TextMeshPro is single-sided and vanishes when the camera rotates).
