@@ -57,6 +57,9 @@ elseif ($ev -eq 'Stop' -or $ev -eq 'SubagentStop') {
     $reason = 'UI was edited in this session but no layout audit ran afterwards. Before finishing: load ui-always (+ ui-center-alignment, ui-layout-audit), run the layout audit (Qa_UiAudit.Run on the changed screens: text centred in the free gap between neighbouring icons/buttons, no overlap, >= 6 px padding on all sides, ScrollRect margin >= 12 px, outline on every text, readable font size), fix every violation at its shared source, re-capture and look at the screenshot. If the edit had no visible UI effect, say so explicitly in your final message.'
     @{ decision = 'block'; reason = $reason } | ConvertTo-Json -Compress
   }
+  # automation gates (clone must use the frame tool, swallowed delegation, completion claim vs open ledger rows): clone_gate.ps1
+  $cg = Join-Path $PSScriptRoot 'clone_gate.ps1'
+  if (-not $active -and (Test-Path -LiteralPath $cg)) { try { $gout = $raw | & powershell -NoProfile -File $cg; if ($gout) { $gout; exit 0 } } catch {} }
   exit 0
 }
 elseif ($ev -eq 'SubagentStart') {

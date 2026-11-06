@@ -20,3 +20,10 @@ Owner rule (standing, every project): when a UI gets new art/texture/frame, the 
 2. Grep the feature's scripts for `.sprite =`, `sizeDelta =`, `Resources.Load`, `ApplyStyle`, builders called from runtime: none touches static art.
 3. Audit rules: PLACEHOLDER-TEXT and RUNTIME-RESTYLE (default texts/sprites in prefabs; runtime art swaps) report 0 over `Assets/_Game`.
 4. First frame in Play equals the final look (no flash of old art).
+
+## Edit mode must equal Play (owner standing rule, binding for every agent, automatic)
+- Every UI frame, board, popup, HUD, shop and billboard is a real prefab (or scene object) authored in Edit mode and looks EXACTLY as in Play. Runtime only fills data (pet names, icons, numbers, prices). Never build UI frames at runtime, never leave test/builder output in a scene.
+- Junk UI is a defect: it bloats the build and cannot be hand-edited. After ANY UI or builder work run this sweep in Edit mode and delete (after proving unused: the real prefab is referenced elsewhere, e.g. in the feature's Factory asset) everything it reports, then save the scene:
+  `foreach Transform t in FindObjectsByType<Transform>(Include): if t.name.EndsWith("(Clone)") && t.gameObject.scene.IsValid() -> report/DestroyImmediate` (plus any `PrefabUtility.IsAddedGameObjectOverride` object under a UI prefab instance that no code references).
+- The Game view in Edit mode must show the same screen as Play at the same moment (HUD, popups closed). If a board, placeholder text (Trail, Rarity, Lorem, New Text) or foreign-game art (Knife Tower clones) is visible in Edit mode, it is a bug: fix the prefab, not the runtime.
+- When a layout or UI is redesigned, update the prefab and its builder so Edit mode and the builder output both equal the final Play look; a builder that is run again must reproduce it (idempotent).
