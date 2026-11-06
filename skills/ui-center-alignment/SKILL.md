@@ -56,3 +56,8 @@ Read this for every UI task. A UI is not done until it is measured as centred, n
 - A detail panel (info + art + action button) is ONE vertical stack with equal top and bottom margins (within ~12 px) and consistent gaps; never leave a big empty band under the CTA or pile everything at the top. Compute the stack height first, then place from the panel height.
 - Horizontal clusters (art + side button/lock/badge) are centred as a GROUP (group width = parts + gaps, left edge = (panel - group)/2); the primary CTA and text lines are centred on the panel axis. When a feature is removed, re-flow the remaining elements; do not leave the old coordinates.
 - Put the stack numbers in named consts next to the builder so a later change edits one place, then verify with a Play screenshot (margins top/bottom, group centre vs panel centre).
+
+## Traps found in banner/pill work
+- Stretch anchors (anchorMin.x 0, anchorMax.x 1): `sizeDelta.x` is a margin, not a width, and `anchoredPosition.x` offsets from the parent centre. Centre text in a free gap by computing the rect centre from the parent edge; verify with the ink in a Play screenshot.
+- An overhanging badge/icon must be at least as tall as the frame it overlaps (else it looks detached), centred on the frame edge.
+- Stacking semi-transparent sliced sprites never gives an opaque fill; for a translucent plate use one built-in rounded sprite (UI/Skin/UISprite) tinted black with alpha 0.5-0.7.
