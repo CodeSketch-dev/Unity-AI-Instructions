@@ -40,3 +40,6 @@ Trigger: the task says clone / like the original / same as X / fix a flow, FX, c
 - Split by system with disjoint file ownership. Codex (via the hub, `agent-hub-codex-workflow`) gets SPEC + frame paths and does code/shader/doc work; Claude subagents or the main agent do Editor wiring, Play, screenshots. Prefer prefab-first scene authoring (`scene-authored-prefabs`).
 - Verify against the reference: Play screenshot at the same moment next to the reference frame (contact sheet + `docs/tools/pixel_diff.py` when layouts match), FX timing by frame counts, audio cue map checked in Play. Fix and repeat until COVERAGE.md is all verified or explicitly deferred.
 - Retro at the end (`studio-self-training`): new tricks go into skills, then `publish.bat`.
+
+## Numbers first, then config (measured trap)
+Before tuning any economy of a clone, extract the original's numbers from frames: start stat, XP bar "Level n a/b" samples (fit a curve), item price table, income per early animal, cash growth over the first minutes. A config copied from a plausible guess was 8x too low on income, 33x too cheap on shop items and 3x too slow on early levelling. Camera angles likewise: compare time-aligned frames of the original (dense extract around the action) before choosing heights/pitches; never invent a camera.

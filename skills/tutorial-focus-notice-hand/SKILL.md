@@ -44,3 +44,6 @@ Technique numbers (hole tween, panel sizes, alpha, hand, two-layer blockers): [d
 - "A notice should trigger the focused buy button": reuse its guarded action and test disabled/canceled taps without duplicating spend logic.
 - "The hand moves onto the label": measure target rect and fingertip/profile before changing anchors.
 - "Change the app icon horse silhouette": do not route here; use art/image skills.
+
+## Off-screen targets (measured trap)
+A spotlight on a world point that is outside the screen leaves the four dim panels covering only part of the screen (L-shaped hole). Clamp the focus centre inside the canvas, widen the Top/Bottom panels (12000), re-clamp the message inside the canvas every frame, and for a target outside the viewport show a text hint instead of a spotlight.
