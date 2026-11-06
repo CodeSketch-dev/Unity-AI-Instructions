@@ -1,0 +1,2 @@
+"""Authorized Meshy automation adapters."""
+
