@@ -7,6 +7,14 @@ triggers: clone game, lam game, game moi, giong game goc, youtube, wiki, communi
 # Clone research autonomy (owner standing permission: do all of this without asking)
 Goal: from only a game name/link, reproduce the original faithfully (core logic AND look, FX, sound, feel). Never invent what the original shows; never claim 100% without a checked parity list.
 
+## 0. AUTO-RUN (binding for every agent, session and project; never ask the owner first)
+Trigger: the task says clone / like the original / same as X / fix a flow, FX, camera, UI or number of a game that has a reference video or wiki, or a new game name. Then, before touching code, run this loop yourself:
+1. Sources: wiki + 2-3 YouTube videos (section 1), download (section 2). Check `docs/research/<game>/` first: reuse existing frames and SPECs, extend them instead of redoing.
+2. Frames with the tool, not by hand: `python -I <skills>/clone-research-autonomy/scripts/clone_frames.py coarse <video> <outdir>` (whole video, timestamped sheets), LOOK at every sheet, then list key moments in `moments.txt` (`name start end fps [crop]`) and run `... moments <video> <outdir> moments.txt`. Use fps 10-15 for flows and UI, 30-60 for FX/camera easing, `crop` + higher width for UI text, numbers, menus, popups.
+3. Write TIMELINE/SPEC (seen / inferred / unknown, with timestamps) and COVERAGE.md. Codex may help with code or docs, but frame extraction is never delegated (it silently produced nothing once): the tool above is the baseline and takes seconds.
+4. Build with the owner's art (UI and models synced to the owner's other games, e.g. Knife Tower / SAB / SAE) but the original's flow, logic, numbers, timing, FX.
+5. Verify: record the same flow in Play (automated recorder, frames every 0.1 s), put your sheets next to the reference sheets, list every delta, fix all, re-record. Done = COVERAGE all verified or explicitly deferred.
+
 ## 1. Find sources (parallel, 15 min cap)
 - YouTube: `yt-dlp "ytsearch8:<game> gameplay"` (pick long walkthroughs, newest version, different players), plus patch-note / "all items / all biomes" videos. Wiki/Fandom/Roblox page, Reddit/Discord/community guides, update logs. Record title, URL, date, game version for each.
 - Look for lists (all items/zones/rarities/numbers) on the wiki first: they replace hours of frame reading.
