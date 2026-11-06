@@ -7,8 +7,8 @@ try { $j = $raw | ConvertFrom-Json } catch { exit 0 }
 if ($j.stop_hook_active) { exit 0 }
 $sid = [string]$j.session_id; if (-not $sid) { $sid = 'nosession' }
 $stateFile = Join-Path ([IO.Path]::GetTempPath()) ('clone_gate_' + ($sid -replace '[^A-Za-z0-9_-]', '') + '.json')
-$st = @{ g1 = 0; g2 = 0; g3 = 0 }
-if (Test-Path -LiteralPath $stateFile) { try { $o = Get-Content -Raw -LiteralPath $stateFile | ConvertFrom-Json; $st.g1 = [int]$o.g1; $st.g2 = [int]$o.g2; $st.g3 = [int]$o.g3 } catch {} }
+$st = @{ g1 = 0; g2 = 0; g3 = 0; g4 = 0 }
+if (Test-Path -LiteralPath $stateFile) { try { $o = Get-Content -Raw -LiteralPath $stateFile | ConvertFrom-Json; $st.g1 = [int]$o.g1; $st.g2 = [int]$o.g2; $st.g3 = [int]$o.g3; $st.g4 = [int]$o.g4 } catch {} }
 function Block([string]$key, [string]$reason) { $st[$key] = $st[$key] + 1; try { ($st | ConvertTo-Json -Compress) | Set-Content -LiteralPath $stateFile -Encoding ascii } catch {}; (@{ decision = 'block'; reason = $reason } | ConvertTo-Json -Compress); exit 0 }
 $tp = [string]$j.transcript_path
 $userText = ''; $asstRaw = ''; $lastAsst = ''
@@ -28,5 +28,12 @@ for ($i = 0; $i -lt 4 -and $dir; $i++) { $cand = Join-Path $dir 'docs\owner-requ
 if ($led -and $claims -and $st.g3 -lt 1) {
   $open = @(Select-String -LiteralPath $led -Pattern '\|\s*(OPEN|IN PROGRESS)' -ErrorAction SilentlyContinue)
   if ($open.Count -gt 0) { Block 'g3' ('docs/owner-requests.md still has ' + $open.Count + ' OPEN / IN PROGRESS row(s) but your final message claims completion. Either finish them now (continue working, no questions) or state plainly in the final message which rows are NOT done and why. Close a row only with evidence (paths, numbers, screenshots).') }
+}
+
+# Gate 4: the final message PROMISES future work while open ledger rows remain: the turn would end and nothing would happen. Do the work now.
+$promise = $lastAsst -match '(?i)toi se |tiep theo toi|\bI will\b|\bI.ll\b|\bnext step\b|t\u00f4i s\u1ebd|ti\u1ebfp theo t\u00f4i|s\u1ebd quay|s\u1ebd ki\u1ec3m|s\u1ebd s\u1eeda'
+if ($led -and $promise -and $st.g4 -lt 3) {
+  $open4 = @(Select-String -LiteralPath $led -Pattern '\|\s*(OPEN|IN PROGRESS)' -ErrorAction SilentlyContinue)
+  if ($open4.Count -gt 0) { Block 'g4' 'Your final message promises future work (will / next) while docs/owner-requests.md has OPEN rows. A turn that ends with a promise does nothing: the owner sees you stop. Do the work NOW in this turn (record, verify, fix, re-record) and end only when each open row is closed with evidence or reported as blocked with the exact blocker. Never write what you will do instead of doing it.' }
 }
 exit 0
