@@ -47,3 +47,9 @@ Technique numbers (hole tween, panel sizes, alpha, hand, two-layer blockers): [d
 
 ## Off-screen targets (measured trap)
 A spotlight on a world point that is outside the screen leaves the four dim panels covering only part of the screen (L-shaped hole). Clamp the focus centre inside the canvas, widen the Top/Bottom panels (12000), re-clamp the message inside the canvas every frame, and for a target outside the viewport show a text hint instead of a spotlight.
+
+## Scene-authored overlay traps (verified in Play)
+- If the focus prefab is placed in the scene under its own overlay canvas, the code that reparents the instance (`SetParent(_canvasRect)`) must resolve `_canvasRect` from THAT canvas before any HasInstance early-out; a null canvas silently detaches the instance to the scene root and it stops rendering while `IsFocusing` still returns true.
+- Check by script, not by the flag: `instance.transform.parent` must be the overlay canvas and a Play screenshot must show the dim + hole + hand.
+- Clamp the message with the RENDERED text bounds (`textBounds`), every frame while the target is a UI element at a screen edge; the text rect is often narrower than a no-wrap line.
+- Never freeze with `Time.timeScale = 0` to screenshot a tween-driven overlay: scaled-time tweens never start and the overlay stays invisible.
