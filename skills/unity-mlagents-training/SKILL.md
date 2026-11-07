@@ -24,3 +24,11 @@ triggers: ml-agents, mlagents, train npc, training bot, onnx, ppo, gail, behavio
 - A trainer talks to ONE Unity process. Agents with the same BehaviorName in that process share one policy and every agent's experience updates it. So both partners must be agents in the SAME process.
 - A static global input channel (touch input) blocks two agents per process: give each player an input source object, and let the server drive NPC players (server-owned, no client connection). The same design later spawns NPC partners in production when no human is online.
 - Never train or accept with a solo player when the game is 2-player co-op.
+
+## Lessons from a long unattended NPC run (evidence-backed)
+- Owner intent decides the method: if the owner wants the NPC to LEARN, never put a scripted teacher, baked route or hand rules in the policy path (they called that "imposing rules"). Start pure PPO (+ RND curiosity) with reward only; add help (curriculum start distance, route observations, demos) only after measuring that pure RL stalls, and say so. A shipped NPC is just the exported ONNX policy run by plain C#, never an LLM.
+- Editor training is slow (~50-65 steps/s even at time-scale 20). For real throughput build a standalone player and run `--env <exe> --num-envs N --no-graphics` with a per-instance port (derive from `--mlagents-port`). Judge progress only from `Mean Reward` lines in the trainer log (`grep "Mean Reward"`), not from the Editor.
+- Anything that sets `Time.timeScale` (slow-mo on events like glass breaks) silently kills the trainer's time-scale: restore the previous value, not 1.
+- Ownerless server-driven NPCs need server-side setup that an owner would do by RPC (e.g. skin index SyncVar defaulting to -1 gave invisible characters). Check a screenshot, not a component count.
+- Editing C# during Play/training forces a domain reload and drops the run: kill the trainer first, restart it after compile, then press Play.
+- Put reward/penalty for repeated failure (falls, breaking the shared object at the same spot) in the design; log best checkpoint reached so the morning report is honest.

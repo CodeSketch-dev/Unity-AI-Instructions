@@ -25,3 +25,10 @@ This skill automates normal Unity builds on the developer's machine. No remote b
 Deterministic local steps (build and test) are scripts. A `claude -p` step may fix compile or test failures caused by files changed in the branch: allow-list tools (Read, Edit, Grep, Glob, read-only git), 8 to 15 turns per call, at most 3 compile-fix and 2 test-fix iterations, never touch ProjectSettings, scenes, prefabs or keystores, never commit, never skip permissions. After the cap, stop and keep the logs locally for review. Details: `references/headless-fix-loop.md`.
 
 Release checklist and store forms: `mobile-build-release`.
+
+## Editor-triggered player builds (traps seen)
+- Never infer "build is running" from an empty output folder. Success/failure is only the Editor.log line `Build Finished, Result: ...` plus your own result log. Read it after each attempt (`grep -a "Build Finished, Result\|error CS" Editor.log`, newest line wins; `tac` shows newest first).
+- `EditorApplication.ExecuteMenuItem` from an MCP script may silently do nothing. Call the static build method through reflection inside `EditorApplication.delayCall`, and log exceptions there. A build blocks the main thread for minutes, so schedule it and watch the log with a Monitor.
+- Deleting assets inside an IPreprocessBuild callback triggers a recompile and aborts the build (`BuildResult.Unknown`). Fix compile problems with source files, not with build-time deletes.
+- SketchEngine from PackageCache: its build step writes `Assets/SketchEngine/.../DataBlockRegistry.g.cs`, a partial-method implementation of `DataBlockWarmup` that cannot bind across assemblies (CS0759, player build fails). Add a declaration-only partial `SketchEngine.Data.DataBlockWarmup { static bool s_generatedRan; static partial void WarmupGenerated(); }` in the game assembly; the package falls back to reflection warmup.
+- Do not start Play Mode or edit C# while a build runs; do not build while a trainer is attached to Play.
