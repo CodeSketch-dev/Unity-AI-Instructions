@@ -28,3 +28,7 @@ triggers: unreal, ue4ss, live dump, blueprint scale, wrong scale, ported map, cl
 - Blender decimate with a geometric deviation gate is NOT proof of same look. 15 of 27 decimations failed the Unity depth-compare gate; the skyline looked shattered in a screenshot while the Blender gate said p95 0.2 %. Always run a Unity visual compare against the original and look at a screenshot; keep a backup of the original FBX outside Assets.
 - Far decor (skyline, mountains): ship the low-poly proxy as the only mesh (2.8 k instead of 71.8 k); near meshes keep the strict gate.
 - Typical budgets: character 6 k, building 4 k, prop 1.5 k, bush/rock 600, grass clump 80, far decor 3 k. View target 300-500 k, hard max 1 M.
+- Far skyline must keep its look (glass window grid) at a few thousand triangles: proxy boxes + a world-space grid shader (unlit, SRP Batcher, fog, `fwidth` anti-aliasing) instead of geometry; one shared material. A plain box proxy loses the look and is rejected by the owner.
+- Remove art-only statues and teaser props from the mobile map by an explicit rule in the rebuild step (log it), never by deleting source data.
+- One capture key only; the mod takes sample B itself 1 s after A and runs the slow full serialize last.
+
