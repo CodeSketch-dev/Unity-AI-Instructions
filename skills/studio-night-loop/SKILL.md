@@ -20,6 +20,8 @@ triggers: cron, night loop, unattended, treo may, di ngu, tu stop cron, codex, d
 - `codex exec -s workspace-write "$(cat brief.md)"` in the background; the brief ends with `Report file: <path>`.
 - Give each run DISJOINT file ownership and write it into `docs/agent-handoff.md` ("do not touch X until report Y exists"). Codex never enters Play, never edits prefab/scene YAML by hand, never commits.
 - Treat research-agent claims as hypotheses: ask Codex to mark each CONFIRMED/REFUTED with file:line before fixing.
+- If Codex is out of tokens, hits its 5-hour limit, errors or returns nothing: do the work yourself with Claude as normal (no waiting, no asking) and note it in the handoff.
+- Name the real stack in every loop prompt (here FishNet Pro, not Netcode for GameObjects) so a loop never drifts to another framework.
 - Claude keeps Editor work, Play tests, screenshots and the review of every diff.
 
 ## Verify harshly
