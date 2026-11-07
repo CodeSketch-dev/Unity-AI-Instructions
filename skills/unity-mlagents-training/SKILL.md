@@ -10,9 +10,10 @@ triggers: ml-agents, mlagents, train npc, training bot, onnx, ppo, gail, behavio
 1. `pip install "setuptools<81" wheel`
 2. `pip install torch --index-url https://download.pytorch.org/whl/cu128` (RTX 5070/Blackwell needs CUDA 12.8+; check `torch.cuda.is_available()`).
 3. `pip install mlagents==1.1.0` (pairs with Unity package com.unity.ml-agents 4.2.0: handshake logs `communication version 1.5.0`).
-4. ONNX export with torch 2.11 needs `onnxscript` AND `onnx`, but a plain `pip install onnxscript onnx` upgrades protobuf to 7.x and BREAKS mlagents ("Descriptors cannot be created directly"). Fix: `pip install "protobuf==3.20.3" "onnx==1.17.0" "numpy<2"`. pip then prints conflicts with mlagents' numpy/onnx pins; they are harmless, verify with a real export.
-5. Set `PYTHONUTF8=1` (and `PYTHONIOENCODING=utf-8`): the torch exporter prints emoji and crashes on the cp1252 console. Verify with a tiny `torch.onnx.export(...opset_version=15)`.
-- Without step 4-5 training runs fine and then dies at the first checkpoint save (no ONNX, no deployable model). Test the export BEFORE a long run.
+4. Do NOT `pip install onnxscript`: it drags protobuf 7 (breaks mlagents: "Descriptors cannot be created directly") and numpy>=1.26 / ml_dtypes>=0.6 (mlagents needs `numpy<1.24`, `np.float` is gone in newer numpy). Working pins: `pip install "protobuf==3.20.3" "numpy==1.23.5"`.
+5. torch>=2.9 `torch.onnx.export` defaults to the dynamo exporter (needs onnxscript). Use the legacy exporter instead: patch `site-packages/mlagents/trainers/torch_entities/model_serialization.py` and add `dynamo=False` to the `torch.onnx.export(...)` call (keep a `.orig` copy). Verify with a tiny `torch.onnx.export(..., opset_version=15, dynamo=False)`. Set `PYTHONUTF8=1` anyway (the exporter prints emoji and crashes on a cp1252 console).
+6. Validate configs through the real path, not `RunOptions.from_dict`: `from mlagents.trainers.learn import parse_command_line; parse_command_line([cfg, "--run-id", "x", "--force"])` (trainer types register there).
+- Without step 4-6 training runs fine and then dies at the first checkpoint save (no ONNX, no deployable model). Test the export BEFORE a long run.
 
 ## Run
 - `mlagents-learn config.yaml --run-id X --force --time-scale 5 --results-dir <git-ignored> --timeout-wait 300`, then press Play in the Editor (the Editor is the environment). Changing C# scripts during Play triggers a domain reload and kills the run.
