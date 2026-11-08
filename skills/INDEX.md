@@ -119,6 +119,9 @@
 ## debug
 - debug-cheats-menu - Dev-only cheat/debug menu (set money/zone, spawn, timeScale, reset save) with a ready IMGUI component. Use at project start or whenever testing needs fast state setup or skipping grind.
 
+## dedicated
+- dedicated-server-no-client-state - Use when a feature works in Editor host/host-client tests but does nothing against a dedicated (headless) server. Server code must not read client-only registries or lists filled in OnStartClient.
+
 ## device
 - device-tier-policy - Use when a low-end Android crashes or runs hot, or when setting up quality tiers: detect Low/Medium/High at runtime and apply render, physics and per-object policies by editing the active URP asset in place, never swapping it.
 
@@ -451,6 +454,9 @@
 
 ## sprite
 - sprite-atlas-v2 - Sprite Atlas V2 setup: Sprite Packer mode, packables from Assets only, padding, prebuild generation, late-binding via Addressables. Use when UI or 2D sprites cause many draw calls, atlases are missing in builds or sprites show gaps.
+
+## srp
+- srp-batcher-multipass-check - Use when URP SetPass calls or batches stay high although objects share materials or were combined. Check the Frame Debugger batch cause for "Node use multi-pass shader" and disable the extra (outline) pass on materials that do not use it.
 
 ## staged
 - staged-refactor-playbook - Use when refactoring a live Unity project toward a reference architecture in verified stages: baseline snapshot, stage order, per-stage gates (compile, EditMode counts, missing scripts, Play), rubric scoring, lean before/after numbers, rollback rules, batch reports.
