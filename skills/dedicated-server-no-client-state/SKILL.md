@@ -9,3 +9,8 @@ A static list filled in `OnStartClient` (e.g. `CLIENT_PANES`) is EMPTY on a dedi
 - Give server code its own registry (add in `OnStartServer`, remove in `OnStopServer`) or look up through server-owned state.
 - Always run the feature once against a built headless server with scripted clients (e.g. `-testrotate` style flag logging the synced value) before calling it done; a host/Editor pass is not evidence.
 - Grep for `CLIENT_` statics used inside `IsServerStarted` branches.
+
+## Headless server CPU (measured)
+- `-batchmode` ignores `Application.targetFrameRate`: the dedicated server runs uncapped. Cap it by hand (coroutine + `Thread.Sleep` to a target ms): 60 fps with players, ~10 fps with none. Empty match went 16% -> 4% of one core.
+- A server never draws: disable display-only behaviours, Animators/RigBuilders, Canvas, Camera, particles, renderers once after start and after scene load (not per frame); keep colliders, rigidbodies and authoritative scripts. Check no authoritative code reads `Renderer.bounds` (collider bounds are fine). Gain alone was ~30% of the idle floor.
+- Measure server CPU as process TotalProcessorTime over 30 s after a 20 s warm-up; clients on the same PC add noise, so claim only idle-floor gains.
