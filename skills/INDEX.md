@@ -141,6 +141,9 @@
 ## feedback
 - feedback-notes-sync - Keep docs/feedback-notes.md as durable log and task queue of user corrections and queued requests. Use at session start, on every correction/preference, and when a request arrives mid-task.
 
+## fishnet
+- fishnet-external-move-reconcile - Use when a FishNet predicted player is moved by the server outside Replicate (carry, teleport, knockback) and the owner client stays at a stale position, jitters, or snaps late. Fixes idle-owner reconcile starvation.
+
 ## framework
 - framework-version-map - Identify whether a Unity project uses CodeSketch (v1) or SketchEngine (v2) and map APIs between them. Use before writing any code against the in-house framework, or when porting code between projects.
 
