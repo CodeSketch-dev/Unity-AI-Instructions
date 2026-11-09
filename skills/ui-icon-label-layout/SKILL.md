@@ -39,3 +39,6 @@ Create `Button/Content/IconLabelGroup` rather than placing the icon and TMP dire
 - Ink audits count ANY child graphic or text as button ink: notification dots, badge counts and glow images must be named so the audit skips them (names containing Dot or Badge), otherwise they shift the measured pair centre. Fix the name, not the layout.
 - A runtime icon swap with a raw sprite that has transparent margins shifts the pair: use the tight (alpha-trimmed) sprite and re-fit the HorizontalLayoutGroup after every swap.
 - Stacked tile (name / icon / count): the count goes in its OWN row below the icon (>= 6 px gap), the block centred on the tile face using the sprite lip; never put the count over the art.
+
+## Icon never smaller than the text (owner rule 2026-11-09)
+In every icon + label / icon + number row the icon height is >= the label font size (visible line height): prefer 1.05-1.25 x the font size, capped to ~70% of the button's short side. A smaller icon sinks next to the text and the label dominates. If space is tight, shrink the TEXT through autofit first. Audit: icon rect height >= text font size for every row (script), then look at the screenshot.

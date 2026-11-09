@@ -42,3 +42,6 @@ Always pair this skill with `ui-text-autofit-system`: the project must have `UI_
 ## Outline is mandatory on EVERY text
 - No text may ship without the black outline material (white/coloured face + dark outline), on every screen, popup, tab, button, price, small helper line and world label; without it text is unreadable on bright art. When creating, cloning or restyling any TMP, assign the outlined preset immediately.
 - Verify by script on the live screen: every active TMP's material has outline width > 0 (or an underlay); list offenders by hierarchy path and fix at the shared source (prefab/builder/text factory), not per instance. A screenshot showing plain-white text on a light surface is a defect to fix at once (auto-fix loop in `ui-always`).
+
+## Outline scales down with text size (owner rule 2026-11-09)
+Thick black outlines on big text look heavy and clumsy. Use size classes: small (< 52 px) ~0.35, large (>= 52 px) <= 0.30, huge titles / amounts (>= 72 px) ~0.22-0.26 in TMP SDF outline units, always soft navy-black (not pure black) with a light underlay. The white fill must keep a clear margin from the outline. When a screen feels heavy, thin the outline before changing size or colour; verify on a Play screenshot at 1920x1080.

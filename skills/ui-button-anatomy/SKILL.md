@@ -31,3 +31,8 @@ Build a button inside a parent-owned padded content area. Its label uses TMP Aut
 - A world button is a World Canvas Image/TMP with Button + press script (+ collider registered for the pass-through). Non-UI sprites/meshes: write one PrimeTween press script implementing `IPointerDownHandler/UpHandler/ExitHandler`, same 0.9 / 0.1 s OutQuad / unscaled spec.
 - Do not put press on an object another script already scales (pop/pulse): put it on a child wrapper `_target`.
 - Audit with `Qa_PressAnim` (asset in this folder): dry run lists Button/Toggle without press, apply adds it to prefabs and scenes (skip third-party sets and prefabs with missing scripts). Confirm in Play Mode by sending pointer down/up and reading localScale.
+
+## Owner feel rules added 2026-11-09 (apply to every button, every project)
+- **Pivot (0.5, 0.5) on every pressable.** The press tween scales around the pivot: a corner pivot makes the button lean when pressed. When you change a pivot, compensate `anchoredPosition += (newPivot - oldPivot) * size * scale` so the button does not move. Audit all pressables for pivot != (.5,.5) after building (prefabs, runtime-built, layout code that re-sets pivots).
+- **Lit-face centring.** Glossy buttons = outline + highlight + body (light) + darker bottom shade band. Content centre = middle of [top of the button .. start of the dark band]. Measure it from a screenshot column scan (colour steps), not from the rect. Raise content by about half the dark band height versus rect centring.
+- **Icon >= text height** in icon + label rows (see ui-icon-label-layout).
