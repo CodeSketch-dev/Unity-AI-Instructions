@@ -1,0 +1,44 @@
+// Generic Editor sweep + audit: every pressable carries SketchEngine's UIPressPrimeTween (rename the namespace to the project's own).
+// Install into an Editor folder, run via menu, then call Run(false) in every UI QA pass: it must report missing = 0.
+// Pressable = any Selectable except Slider / Scrollbar / InputField / Dropdown, plus the project's own tap / hold handlers (add them to IsPressable).
+using System.Text;
+using SketchEngine.Utilities.UI;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+
+public static class Ui_PressSweep
+{
+    [MenuItem("Tools/UI/Press: add UIPressPrimeTween to every pressable")] static void Fix() => Debug.Log(Run(true));
+    [MenuItem("Tools/UI/Press: audit only")] static void Audit() => Debug.Log(Run(false));
+
+    static bool IsPressable(Component c) =>
+        c is Selectable && !(c is Slider || c is Scrollbar || c is InputField || c is TMPro.TMP_InputField || c is Dropdown || c is TMPro.TMP_Dropdown);
+        // || c is MyHoldButton || c is MyTapButton ...
+
+    public static string Run(bool fix)
+    {
+        int total = 0, missing = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets" }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (path.StartsWith("Assets/Packages") || path.Contains("/Plugins/")) continue;   // vendor content is not ours
+            var root = PrefabUtility.LoadPrefabContents(path);
+            int n = 0;
+            foreach (var c in root.GetComponentsInChildren<Component>(true))
+            {
+                if (c == null || !IsPressable(c)) continue;
+                total++;
+                if (c.TryGetComponent<UIPressPrimeTween>(out _)) continue;
+                n++; if (fix) c.gameObject.AddComponent<UIPressPrimeTween>();
+            }
+            if (n > 0 && fix) PrefabUtility.SaveAsPrefabAsset(root, path);
+            missing += n;
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+        return "pressables=" + total + (fix ? " added=" : " missing=") + missing;
+    }
+}
+// Runtime-built buttons: never AddComponent<Button>() directly. Use one project helper (AddButton) that also adds UIPressPrimeTween, and make the shared Button subclass add it in Awake.
+// Scale animators on the same transform (pulse / breathe / punch) must be RELATIVE and re-base when the scale was changed by someone else (the press tween writes absolute scales).

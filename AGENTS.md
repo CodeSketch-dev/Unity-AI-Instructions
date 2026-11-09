@@ -365,6 +365,17 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - After file changes, refresh/compile through Unity when available, inspect Console errors, verify created assets and serialized references, and run relevant EditMode/PlayMode tests. A successful external C# build alone is not proof that Unity serialization, scenes, or prefabs are correct.
 - When Unity MCP is unavailable or connected to a different project, make only safe file-based changes, state exactly what was not Editor-verified, and never claim scene/prefab/Console validation occurred.
 
+## UI REFLEXES - long-term memory (apply without being told, every UI/world-UI change, every project)
+Treat this list as habit, not as a document to look up. The owner is a feel-first developer; each item below was a repeated correction.
+1. **Every pressable gets the press tween**: Button, Toggle, close X, CLAIM, "No, thanks", tabs, cards, HUD icons, tap/hold areas -> SketchEngine `UIPressPrimeTween` (skill `ui-button-anatomy`, `PressSweep.cs.txt`; sweep reports missing = 0). Runtime buttons via one `AddButton` helper. Reward / watch-ad / free buttons also pulse (`UI_RewardPulse`). Pulse/breathe/punch must coexist with the press tween (relative scale + re-base).
+2. **Content never touches its parent**: every label / icon / card has padding on all four sides measured from the sprite FACE (outline + lip are border), >= 8-12 px at 1080 ref. A label that merely "fits" the rect is a defect.
+3. **Align by layout groups, verify by measurement**: icon + text/price = one centred HorizontalLayoutGroup; centres within 1-2 px by script; screenshot looked at. Never hand-nudge.
+4. **Text is never lost or cut**: autofit shrinks, never ellipsis; text is sized only after layout settled (re-fit next frame + on rect change); run the invisible-text audit (M/D/X) and play the real flow (see LOST-TEXT SWEEP).
+5. **Button colour roles and families** (blue = default tap, green = confirm/claim/buy, gold = reward/premium, red = close/destructive), icons never grayscale, one focal CTA per screen, tiles overhang style where the reference does.
+6. **Feel on every interaction**: press anim + sfx + haptic + juice (count-up, fly, punch); a dead tap is a defect.
+7. **Authored in Edit Mode, wired in scene**: prefabs hold the final look; runtime only fills data; no `(Clone)` leftovers; nothing the owner cannot find in the Hierarchy.
+8. **The agent audits itself**: after UI work it enters Play, plays the flow, runs the audits (layout, ink, text M/D/X, press sweep), fixes at the shared source, re-runs to 0 and reports the numbers. The owner must never discover these defects.
+
 ## UI centre alignment (mandatory)
 
 - Before building or editing ANY Unity UI (popups, bars, buttons, tabs, icon + text, currency bars), read `skills/ui-center-alignment/SKILL.md` and follow it.
