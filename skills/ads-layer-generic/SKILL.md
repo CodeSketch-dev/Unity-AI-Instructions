@@ -37,3 +37,7 @@ The Editor fake provider cannot prove native ads, consent, app-open or close beh
 
 ## Done means
 The gate-matrix test is green and the real-device checklist ran. Every placement in the GDD has a call site, a fallback when no ad, and a logged event (`analytics-events-taxonomy`).
+
+
+## Call chain (owner law)
+Game decision layer (e.g. `Dig_Ads`: WHEN) -> game adapter `AdsHelper` (the only file that references the SDK) -> shared SDK facade (`SketchSdk`: mechanism, providers, pure policy / fit helpers, Editor fake provider). The SDK never knows popups, shops or currencies; the decision layer never calls the SDK directly.

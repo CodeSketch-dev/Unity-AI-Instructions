@@ -52,3 +52,7 @@ See `references/anti-patterns.md`: abstract event class, empty `catch`, raw `Get
 - Samples in `references/` are compile-plausible, not copy-paste: verify names against the installed package.
 
 References: `references/samples-data-factory-event.md`, `references/samples-owner-state-pool-collision.md`, `references/samples-async-tween-audio-loc.md`, `references/v1-to-sketchengine.md`, `references/anti-patterns.md`, `references/counts.md`, `references/PROVENANCE.md`.
+
+
+## Layering and SOLID (owner law, see AGENTS.md ARCHITECTURE LAW)
+SDK (mechanism) <- game adapter (only SDK caller) <- decision layer <- UI/gameplay. Pure policy/fit classes + state classes + providers + facade are separate types in separate files. Before writing a class name its single reason to change; if you need "and" to describe it, split it. Review every diff for skipped layers.
