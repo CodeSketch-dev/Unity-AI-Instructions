@@ -11,6 +11,7 @@ UI REFLEXES (every UI / world-UI change, every project):
 7. Feel on every interaction: press anim + sfx + haptic + juice; focal CTA pulses; icons never grayscale.
 8. UI is authored in prefabs (Edit Mode == Play); never rebuild hand-tuned prefabs blindly; scene-authored managers; nothing spawned from code that the owner cannot find in the Hierarchy.
 9. After ANY UI change the agent itself enters Play, plays the flow (move, dig, open every popup/tab), runs the audits, fixes at the shared source and reports numbers.
+COPY-EXACTLY (AGENTS.md): "copy / like X" = take the reference COMPLETE and verbatim from its code; owner numbers are examples; a ruling never narrows, caps or simplifies; risky = copy + measure + report, not cut; briefs quote reference file:line and every row; diff against the reference at the end.
 ARCHITECTURE LAW (AGENTS.md): layered + single responsibility (SOLID): shared SDK (mechanism, game-agnostic) <- one thin game-side adapter (only caller of the SDK) <- decision layer (WHEN) <- UI/gameplay; no layer skips a layer; one type = one reason to change, one type per file, pure rules + injected clock, interfaces + config instead of edits. Every Codex brief states it.
 PERF: low-end Android first; ONE shared UI text material; pooled FX; no per-frame allocations.
 SKILLS TO LOAD FOR UI: ui-always, ui-button-anatomy, ui-icon-label-layout, ui-text-tmp, ui-text-autofit-system, ui-lit-face-centring, ui-reward-popup-recipe; for delegation codex-ui-director-loop.

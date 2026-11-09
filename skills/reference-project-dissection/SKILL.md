@@ -29,3 +29,5 @@ Whenever the owner names a project, pack, SDK or minigame to learn from (Break a
 3. **Distil (writing-plans):** a plan in `docs/superpowers/plans/` with rulings for every open question (the owner pre-approves gates), keep / throw-away lists, interfaces, tests, owned files per task, acceptance numbers, risks. The essence goes into OUR layer (SketchSdk, UI kit, skills), not a vendor copy.
 4. **Port:** Codex for file-only code with owned-file briefs (`codex-ui-director-loop`), director for assets, bake, Play, audits. Original art is regenerated in our style; FX / animations may be reused with dependency closure (`asset-transfer-closure`); our own models only.
 5. **Prove and generalise:** compile, EditMode, Play captures, measured numbers; then extract what generalises into generic skills + digest and publish (`studio-hook-factory` if it should become automatic).
+
+6. **Copy-exactly:** when the owner says copy / like X, the port reproduces the reference's tables and rules verbatim (see skill `rule-port-not-invent`, Copy-exactly); rulings fill unknowns only, never narrow or cap.
