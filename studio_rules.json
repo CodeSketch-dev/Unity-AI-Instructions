@@ -1,0 +1,26 @@
+{
+  "_doc": "Data-driven rules for studio_rules_hook.ps1. Add a rule = add one object, then run sync.bat (no hook code). Fields: id; event (UserPromptSubmit | PreToolUse | PostToolUse | Stop); match (regex on the diacritics-stripped lowercase prompt, or on tool name + file path for tool events); inject (text added to the agent context); flag (state flag to set); once (inject only once per session). Special rule ids: correction (detects owner corrections and arms the retro gate), retro_gate (Stop: blocks finishing until skills/AGENTS/digest changed and published).",
+  "rules": [
+    {
+      "id": "correction",
+      "event": "UserPromptSubmit",
+      "match": "toi da bao|toi bao|toi noi roi|lan sau|luon luon|khong duoc|khong nen|phai luon|sao lai|van bi|lai bi|van chua|chua dung|chua ngon|khong on|sai roi|i told you|you keep|always |never |stop doing|again and again",
+      "flag": "correction",
+      "inject": "OWNER CORRECTION / STANDING RULE DETECTED. Do all of this in THIS session without being asked: (1) log it in docs/owner-requests.md; (2) fix the work; (3) turn the rule into the strongest enforceable form: update the matching skill in Unity-AI-Instructions/skills, add a line to STUDIO-BRAIN-DIGEST.md and AGENTS.md if it is a standing rule, and if it is checkable add or extend an audit tool / a rule in studio_rules.json (a hook beats prose); (4) run publish.bat; (5) tell the owner in one line what was upgraded. The Stop gate will block finishing until the skills repo changed."
+    },
+    {
+      "id": "extract_essence",
+      "event": "UserPromptSubmit",
+      "match": "chiet xuat|tinh tuy|extract the essence|extract skill|cap nhat skill|update skill|upgrade skill|viet skill",
+      "flag": "correction",
+      "inject": "SKILL EXTRACTION ORDER: write GENERIC skills (no game, popup or class names of one project), short, with `Use when ...` description under 300 chars and `triggers:` incl. Vietnamese without accents; merge near-duplicates; put measured numbers and script templates in the skill folder; run publish.bat and report one line."
+    },
+    {
+      "id": "new_repeat_reminder",
+      "event": "UserPromptSubmit",
+      "match": "moi lan|phai nhac|toan phai yeu cau|khong tu dong|thu cong|tu dong hoa|tu dong goi",
+      "flag": "correction",
+      "inject": "AUTOMATION GAP DETECTED: the owner is doing manually something the studio must do by itself. Do not answer with prose. Build the automation now: a rule in studio_rules.json, a hook, an audit script, a scheduled loop or a skill trigger; prove it with a dry run (pipe a sample event into the hook) and publish."
+    }
+  ]
+}

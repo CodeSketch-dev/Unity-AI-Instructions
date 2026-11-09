@@ -14,4 +14,5 @@ UI REFLEXES (every UI / world-UI change, every project):
 PERF: low-end Android first; ONE shared UI text material; pooled FX; no per-frame allocations.
 SKILLS TO LOAD FOR UI: ui-always, ui-button-anatomy, ui-icon-label-layout, ui-text-tmp, ui-text-autofit-system, ui-lit-face-centring, ui-reward-popup-recipe; for delegation codex-ui-director-loop.
 CODEX BRIEFS: name owned files, forbid deleting shared helpers (grep usages before removing any symbol), include measured defects + acceptance numbers, ask for a report file.
+AUTOMATION: a reminder the owner types twice becomes a mechanism (skill studio-hook-factory): rule in studio_rules.json, hook or failing audit, proven by a dry run. The Stop retro gate blocks finishing after an owner correction until the skills repo is updated and published.
 MEMORY: this digest + AGENTS.md + feedback notes are your memory; when the owner corrects you, write it into the matching skill, AGENTS.md and the project docs in the same session.

@@ -65,6 +65,22 @@ if (-not $haveBrain) {
   $entry = [pscustomobject]@{ matcher = 'startup|resume|clear|compact'; hooks = @([pscustomobject]@{ type = 'command'; command = $brainCmd; timeout = 10 }) }
   $s.hooks.SessionStart = @($s.hooks.SessionStart) + $entry
 }
+# Data-driven studio rules hook (studio_rules.json): detects owner corrections / automation gaps on UserPromptSubmit and enforces the retro gate on Stop
+# (finishing is blocked until the lesson is written into the skills repo). studio_repo.txt tells the hook where the skills repo clone lives on this machine.
+$rulesScript = Join-Path $ClaudeHome 'pipeline-hooks\hooks\studio_rules_hook.ps1'
+try { [IO.File]::WriteAllText((Join-Path $ClaudeHome 'pipeline-hooks\hooks\studio_repo.txt'), $Repo, (New-Object Text.UTF8Encoding($false))) } catch {}
+function Register-RulesHook($settings, [string]$event) {
+  $cmdLine = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $rulesScript + '" -Event ' + $event
+  if (-not ($settings.hooks.PSObject.Properties.Name -contains $event)) { $settings.hooks | Add-Member -NotePropertyName $event -NotePropertyValue @() }
+  $found = $false
+  foreach ($e in @($settings.hooks.$event)) { foreach ($h in @($e.hooks)) { if ($h.command -like '*studio_rules_hook*') { $found = $true; if ($h.command -ne $cmdLine) { $h.command = $cmdLine } } } }
+  if (-not $found) {
+    $entry = [pscustomobject]@{ hooks = @([pscustomobject]@{ type = 'command'; command = $cmdLine; timeout = 15 }) }
+    $settings.hooks.$event = @($settings.hooks.$event) + $entry
+  }
+}
+Register-RulesHook $s 'UserPromptSubmit'
+Register-RulesHook $s 'Stop'
 Register-ObserveHook $s 'PreToolUse' '.*update_plan.*'
 Register-ObserveHook $s 'PostToolUse' 'mcp__ai-game-developer__(screenshot|tests-run|console-get-logs).*|mcp__Claude_Browser__computer'
 # Enforcement hooks (skill_enforce_hook.ps1): PostToolUse tracking, Stop/SubagentStop gate, SubagentStart UI contract.
@@ -101,7 +117,7 @@ Register-InkHook $s 'PostToolUse' 'mcp__ai-game-developer__.*|Bash|Read|Edit|Wri
 Register-InkHook $s 'UserPromptSubmit' ''
 Register-InkHook $s 'Stop' ''
 # Fail loudly if an installed hook script does not parse (a silent parse error once disabled the whole skill router).
-foreach ($hs in @($hookScript, $brainScript, $editScript, $obsScript, $inkScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'), $enfScript)) {
+foreach ($hs in @($hookScript, $brainScript, $rulesScript, $editScript, $obsScript, $inkScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'), $enfScript)) {
   if (Test-Path -LiteralPath $hs) {
     $errs = $null; $tok = $null
     [void][Management.Automation.Language.Parser]::ParseFile($hs, [ref]$tok, [ref]$errs)
