@@ -45,3 +45,10 @@ Compile clean, EditMode PASS/SKIP equal to baseline, missing-script/reference ch
 - Editor-only mocks hide device bugs (ads close/hide calls): test ads and native on a device early.
 - History rewrite to shrink a big pack is an owner decision; propose, never run.
 - Merge noise: prefer rebase for short branches; do not merge main into a variant daily without the sync list.
+
+
+## Size gate before any push (owner order 2026-11-10: a 4.5 GiB repo nearly hit the host limit)
+1. Never `git add -A`, `git add .`, `git add docs` or a whole Assets folder; add explicit paths. A runaway agent staging tree (e.g. `tmp_tmp_tmp_...` names, Windows path-too-long errors) means STOP and clean, do not force it.
+2. Before pushing: `git count-objects -vH` (size-pack), `git status --short | grep -c '^??'` (untracked count: hundreds means a missing ignore), and the blob sizes of the range: `git rev-list --objects <base>..HEAD | git cat-file --batch-check='%(objecttype) %(objectsize:disk) %(rest)'` summed; stop above a few tens of MiB or any single blob > 5 MiB.
+3. Keep big, derived or purchased content out of git with .gitignore (vendor art packs, art staging, screenshots, research video, agent working folders), like the Break and Steal .gitignore: research / reports / screenshots / staging / qa folders, `.agents/`, generated graph indexes, FBX sources > 100 MB.
+4. If the owner says "do not push", commit locally only and keep telling him what is waiting. History rewrite / gc / filter-repo needs his explicit go.
