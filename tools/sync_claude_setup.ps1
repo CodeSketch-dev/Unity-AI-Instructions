@@ -55,6 +55,16 @@ function Register-ObserveHook($settings, [string]$event, [string]$matcher) {
     $settings.hooks.$event = @($settings.hooks.$event) + $entry
   }
 }
+# SessionStart: re-inject the studio brain digest (owner rules) at startup / resume / clear / compact, so a restart or a fresh pull of the AI instructions always loads them.
+$brainScript = Join-Path $ClaudeHome 'pipeline-hooks\hooks\studio_brain_digest.ps1'
+$brainCmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File "' + $brainScript + '"'
+if (-not ($s.hooks.PSObject.Properties.Name -contains 'SessionStart')) { $s.hooks | Add-Member -NotePropertyName SessionStart -NotePropertyValue @() }
+$haveBrain = $false
+foreach ($e in @($s.hooks.SessionStart)) { foreach ($h in @($e.hooks)) { if ($h.command -like '*studio_brain_digest*') { $haveBrain = $true; if ($h.command -ne $brainCmd) { $h.command = $brainCmd } } } }
+if (-not $haveBrain) {
+  $entry = [pscustomobject]@{ matcher = 'startup|resume|clear|compact'; hooks = @([pscustomobject]@{ type = 'command'; command = $brainCmd; timeout = 10 }) }
+  $s.hooks.SessionStart = @($s.hooks.SessionStart) + $entry
+}
 Register-ObserveHook $s 'PreToolUse' '.*update_plan.*'
 Register-ObserveHook $s 'PostToolUse' 'mcp__ai-game-developer__(screenshot|tests-run|console-get-logs).*|mcp__Claude_Browser__computer'
 # Enforcement hooks (skill_enforce_hook.ps1): PostToolUse tracking, Stop/SubagentStop gate, SubagentStart UI contract.
@@ -91,7 +101,7 @@ Register-InkHook $s 'PostToolUse' 'mcp__ai-game-developer__.*|Bash|Read|Edit|Wri
 Register-InkHook $s 'UserPromptSubmit' ''
 Register-InkHook $s 'Stop' ''
 # Fail loudly if an installed hook script does not parse (a silent parse error once disabled the whole skill router).
-foreach ($hs in @($hookScript, $editScript, $obsScript, $inkScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'), $enfScript)) {
+foreach ($hs in @($hookScript, $brainScript, $editScript, $obsScript, $inkScript, (Join-Path $ClaudeHome 'pipeline-hooks\hooks\skill_router_lib.ps1'), $enfScript)) {
   if (Test-Path -LiteralPath $hs) {
     $errs = $null; $tok = $null
     [void][Management.Automation.Language.Parser]::ParseFile($hs, [ref]$tok, [ref]$errs)
