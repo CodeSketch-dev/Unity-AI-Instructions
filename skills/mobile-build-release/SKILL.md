@@ -39,3 +39,9 @@ Local headless builds and size gates: `unity-batch-build`. Full store checklist 
 
 ## Report
 Build output path, size, version numbers, settings changed, what was verified vs not, and the exact manual steps left for the human.
+
+## Changed C# default does not reach the build (serialized value wins)
+- A `[SerializeField] string _address = "x"` default only applies to NEW components. If a prefab/scene already imported with the old default, the player takes the value cached in the Library import artifact, not your new initializer. A "domain/IP" APK built by editing only the C# default kept the old LAN IP and could never connect over 4G.
+- Verify before shipping: unzip the APK and `grep -a` the new value in `assets/bin/Data/*` (the serialized level data), not only in `global-metadata.dat` (that only holds the C# literal).
+- Fix: write the field into the prefab/scene (or set it through SerializedObject in the build script), rebuild, re-grep; restore the temporary edit afterwards.
+- Put the connect address on the phone debug overlay (addr / transport state / attempts) so one screenshot shows what the build really uses.
