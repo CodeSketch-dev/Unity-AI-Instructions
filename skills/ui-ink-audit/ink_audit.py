@@ -57,7 +57,10 @@ def face_box(r):
     row = cy_(ys[0] + 5)
     xs = [x for x in range(cx_(x0 - 6), cx_(x1 + 6)) if isface(px[x, row])]
     if not xs: return None
-    return xs[0], ys[0], xs[-1], ys[-1], face
+    # LIT face (owner convention, skill ui-lit-face-centring): extend the top edge up through the highlight to the dark outline; the dark bottom shade band stays excluded.
+    top = ys[0]
+    while top - 1 >= cy_(y0 - 6) and sum(px[col, top - 1][:3]) > 240: top -= 1
+    return xs[0], top, xs[-1], ys[-1], face
 
 
 def ink_bbox(parts, face, box):

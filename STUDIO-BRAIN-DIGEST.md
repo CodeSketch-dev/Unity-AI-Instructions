@@ -12,5 +12,6 @@ UI REFLEXES (every UI / world-UI change, every project):
 8. UI is authored in prefabs (Edit Mode == Play); never rebuild hand-tuned prefabs blindly; scene-authored managers; nothing spawned from code that the owner cannot find in the Hierarchy.
 9. After ANY UI change the agent itself enters Play, plays the flow (move, dig, open every popup/tab), runs the audits, fixes at the shared source and reports numbers.
 PERF: low-end Android first; ONE shared UI text material; pooled FX; no per-frame allocations.
+SKILLS TO LOAD FOR UI: ui-always, ui-button-anatomy, ui-icon-label-layout, ui-text-tmp, ui-text-autofit-system, ui-lit-face-centring, ui-reward-popup-recipe; for delegation codex-ui-director-loop.
 CODEX BRIEFS: name owned files, forbid deleting shared helpers (grep usages before removing any symbol), include measured defects + acceptance numbers, ask for a report file.
 MEMORY: this digest + AGENTS.md + feedback notes are your memory; when the owner corrects you, write it into the matching skill, AGENTS.md and the project docs in the same session.

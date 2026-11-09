@@ -65,3 +65,10 @@ Source: official (Unity-Technologies/skills/unity-pipeline, unity-cli, project-a
 - Never teleport a test player to a guessed coordinate: it can land inside a prop or in a pet cage and the screenshot is useless. Read a real spawn / path position from the scene (or use a scene-view camera for environment reviews: set `SceneView.lastActiveSceneView.pivot/rotation/size` and call `screenshot-scene-view`).
 - Hot-looking audit failures that come from a hidden object (CanvasGroup alpha 0) are false positives: fix the audit tool, not the layout.
 - Image-generation MCP calls (Codex art) often return "Request timed out" while the file is still written: check the requested output path before retrying; do not give up or loop. `editor-application-set-state` returns the OLD state: re-read the state. After a script teleport of the player the Game View may keep showing the old frame: prefer a scene-view camera or screenshot-camera for location checks.
+
+
+## When the MCP tools failed to connect or the Editor is busy (learned 2026-11)
+- If a session starts with the Unity MCP server "failed to connect" (tools missing) but the plugin window says Connected, the HTTP endpoint still works: POST JSON-RPC to the URL in `.mcp.json` (`initialize`, then `notifications/initialized`, then `tools/call`, with the `Mcp-Session-Id` header and Accept `application/json, text/event-stream`). Keep a tiny python helper in the scratchpad that reads C# from stdin and calls `script-execute` (argument name `csharpCode`).
+- A call that takes longer than ~10 s returns "Failed to invoke RunCallTool after 10 retries" while Unity KEEPS RUNNING it: do not resend; poll the result on disk (a Temp/ file) or by state.
+- Wait for compile with a monitor loop on `EditorApplication.isCompiling`, never a long sleep; grep `Editor.log` for `error CS` before blaming runtime. Entering Play while compiling silently fails (isPlaying stays False).
+- Scene path / name can change under you (the owner renames scenes): read the open scene name instead of hard-coding it.

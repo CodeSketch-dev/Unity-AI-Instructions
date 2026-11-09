@@ -82,6 +82,7 @@
 
 ## codex
 - codex-delegation - Delegate well-specified CODE-ONLY tasks to the Codex CLI (cheap model) as a managed worker to save Claude tokens: write a brief, run codex exec in the background, then compile/test/review yourself. Use for pure logic, tests, data tables, boilerplate; keep design and Editor work on Claude.
+- codex-ui-director-loop - Director workflow for UI work done by Codex CLI: plan doc + brief with owned files and measured defects, round files, review by Play capture and pixel measurement, protect shared helpers. Use when you delegate any UI/layout task to Codex or another coding agent.
 
 ## coding
 - coding-discipline-karpathy - Use when writing or changing code: four rules - surface assumptions, simplest code that works, surgical changes (every changed line traces to the request), goal-driven execution with verifiable success criteria. Adapted from Karpathy on LLM coding pitfalls.
@@ -533,6 +534,7 @@
 - ui-icon-text-everywhere - Every toast, currency value, reward or status text is an ICON on the left plus TextMeshPro on the right (UI in a HorizontalLayoutGroup, world text with a TMP sprite tag). Use when adding or touching any toast, popup number, floating value, currency label, notice lane or overhead text.
 - ui-ink-audit - Use on any UI edit, Play test or screenshot in every Unity project: audit UI by pixels (icon+text centred on the button face, titles on their band, no overlaps) and fix the [InkAudit] FAIL lines it reports.
 - ui-layout-audit - Automatic layout audit of live UI in Play Mode (text centred in the free gap, overlap, padding, ScrollRect margins, missing outline, tiny fonts); fix every violation at its shared source. Use after ANY UI change and before reporting UI done.
+- ui-lit-face-centring - Centre text and icons on the LIT face of glossy buttons (top of the button to the start of the dark bottom shade band), measured by a pixel column scan of a Play screenshot. Use whenever a button, pill, plate or price row is aligned or looks low / high.
 - ui-localization - Localization setup for UI text: Unity Localization tables, TMP localize components, per-locale fonts, RTL, glyph coverage. Use when adding languages, new UI text, or fixing missing or unreadable glyphs.
 - ui-naming-conventions - Naming and folder conventions for UI prefabs and objects (Btn_, Text_, Root, Board, State_*). Use when creating UI hierarchies so builders, validators and scripts can find objects by name.
 - ui-notification-dots - Default red notification dots on HUD buttons, tabs and cards when the player can afford an upgrade or claim something. Use at game start and when building any shop, upgrade, collection or reward screen. Part of the ui-always set.
@@ -540,6 +542,7 @@
 - ui-pattern-library - Game-independent UI patterns (shop, settings, daily login, gacha, jackpot, rating, revive, inventory, rebirth, wheel, quests) with layout contract, states and variants. Use before building any shop, list, popup or page. Part of the ui-always set.
 - ui-popup-anatomy - Popup prefab tree, animation modules and timings, dim, Escape stack and page-vs-popup distinction. Use when building or fixing any popup, confirm dialog or full page. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-popup-from-demo - Build popups/HUD buttons that match demo screenshots 1:1 via an idempotent editor builder and screenshot compare loop, generating only missing icons. Use when given demo images or "match the demo exactly".
+- ui-reward-popup-recipe - Layout recipe for small reward / claim / welcome / free-cash popups: stacked plates, cash icon + amount in one HLG, equal-height button pair, x2 sticker near the corner, padding numbers, acceptance checks. Use when building or fixing any popup with an amount and CLAIM buttons.
 - ui-scaling-safe-area-checklist - Checklist for UI that survives phone, tablet and notch aspect ratios: CanvasScaler, anchors and pivots, safe area, event-driven HUD, screen stack, text growth. Use when UI breaks on other resolutions or before sign-off of any screen.
 - ui-scroll-board - Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after any popup, shop, HUD button or card. Part of the ui-always set.

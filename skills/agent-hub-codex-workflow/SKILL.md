@@ -13,3 +13,5 @@ triggers: codex, hub, hubctl, ai-agent-hub, sketch-agent-hub, delegate, giao cod
 - After a report: read its conclusion, `assets-refresh`, check Console, verify in Play with screenshots; a Codex "done" is a claim until compiled and seen.
 - A stuck "running" row after an MCP/client restart is an orphan (new hub marks it failed); resubmit.
 - When the hub misbehaves, fix the hub (owner granted authority) and add a test.
+
+- UI delegation: follow `codex-ui-director-loop` (plan + brief + owned files + capture-based review). Always add "grep usages before removing any symbol".
