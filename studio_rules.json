@@ -21,6 +21,12 @@
       "match": "moi lan|phai nhac|toan phai yeu cau|khong tu dong|thu cong|tu dong hoa|tu dong goi",
       "flag": "correction",
       "inject": "AUTOMATION GAP DETECTED: the owner is doing manually something the studio must do by itself. Do not answer with prose. Build the automation now: a rule in studio_rules.json, a hook, an audit script, a scheduled loop or a skill trigger; prove it with a dry run (pipe a sample event into the hook) and publish."
+    },
+    {
+      "id": "learn_from_reference",
+      "event": "UserPromptSubmit",
+      "match": "tham khao|hoc hoi|tinh hoa|reference project|break and steal|break an egg|knife tower|monkey.escape|bouncesdk|sketch sdk|asset store|pack nay|lay nguyen|copy y|clone",
+      "inject": "REFERENCE LEARNING ORDER: use superpowers. Spawn read-only study subagents (one per topic, docs/reference-<project>/*-STUDY.md with file:line evidence), evaluate harshly with a scorecard (licence first for packs), write a plan with rulings (docs/superpowers/plans), port the ESSENCE into our own layer (SketchSdk, UI kit, skills) via Codex briefs + director verification, regenerate art in our style, then extract generic skills and publish. Skill: reference-project-dissection (Learning loop)."
     }
   ]
 }

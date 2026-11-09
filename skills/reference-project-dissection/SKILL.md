@@ -20,3 +20,12 @@ Owner rule: when a reference project is named, the examples the owner gives are 
 
 ## Never
 Reference only what the owner pointed at; do not write into the reference project; do not copy proprietary art/audio into shipped content; do not stop at the examples the owner listed.
+
+
+## Learning loop (owner standing order 2026-11-10: always learn the essence from references, with superpowers)
+Whenever the owner names a project, pack, SDK or minigame to learn from (Break and Steal, Knife Tower, monkey-escape, BounceSdk, an Asset Store pack ...), run this WITHOUT being asked:
+1. **Study (parallel, read-only subagents, each told to use superpowers):** one agent per topic writes `docs/reference-<project>/<TOPIC>-STUDY.md` with file:line evidence, numbers, prefab hierarchies, an ASCII diagram, "unverified" list. Reference projects are never modified; their Unity MCP may be down: read YAML / code on disk.
+2. **Evaluate harshly:** scorecard 0-10 per axis (architecture, features, code quality, Unity 6 / package fit, privacy / kids fit, licence, value for us). Asset Store packs: licence first; port IDEAS, never copy code or art without a licence.
+3. **Distil (writing-plans):** a plan in `docs/superpowers/plans/` with rulings for every open question (the owner pre-approves gates), keep / throw-away lists, interfaces, tests, owned files per task, acceptance numbers, risks. The essence goes into OUR layer (SketchSdk, UI kit, skills), not a vendor copy.
+4. **Port:** Codex for file-only code with owned-file briefs (`codex-ui-director-loop`), director for assets, bake, Play, audits. Original art is regenerated in our style; FX / animations may be reused with dependency closure (`asset-transfer-closure`); our own models only.
+5. **Prove and generalise:** compile, EditMode, Play captures, measured numbers; then extract what generalises into generic skills + digest and publish (`studio-hook-factory` if it should become automatic).
