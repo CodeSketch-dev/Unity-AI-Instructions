@@ -4,7 +4,7 @@
     {
       "id": "correction",
       "event": "UserPromptSubmit",
-      "match": "toi da bao|toi bao|toi noi roi|lan sau|luon luon|khong duoc|khong nen|phai luon|sao lai|van bi|lai bi|van chua|chua dung|chua ngon|khong on|sai roi|i told you|you keep|always |never |stop doing|again and again",
+      "match": "toi da bao|toi bao|toi noi roi|lan sau|luon luon phai|sao lai|van bi|lai bi|van chua|chua dung|chua ngon|sai roi|i told you|you keep|stop doing|again and again",
       "flag": "correction",
       "inject": "OWNER CORRECTION / STANDING RULE DETECTED. Do all of this in THIS session without being asked: (1) log it in docs/owner-requests.md; (2) fix the work; (3) turn the rule into the strongest enforceable form: update the matching skill in Unity-AI-Instructions/skills, add a line to STUDIO-BRAIN-DIGEST.md and AGENTS.md if it is a standing rule, and if it is checkable add or extend an audit tool / a rule in studio_rules.json (a hook beats prose); (4) run publish.bat; (5) tell the owner in one line what was upgraded. The Stop gate will block finishing until the skills repo changed."
     },
