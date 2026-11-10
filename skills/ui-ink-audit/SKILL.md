@@ -50,3 +50,5 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 - Ignore notify dots/badges in the scan; wait for the modal pop-in/slide to settle (30-40 frames) before capturing, otherwise the offset is animation state.
 - Prefab text rects baked for one width (landscape chip) spill past the face when the host is narrower (portrait): stretch the label to the live host width with an inset instead of a fixed width.
 - Confirm a suspected artifact with a 5x crop and your own silhouette scan before touching layout; keep the audit as a regression gate, not the truth.
+
+- The dump must skip widgets under a CanvasGroup with alpha <= 0.01 (parked/faded buttons) and badge/sticker children (notify dot, x2 sticker): otherwise hidden widgets and overhanging badges show up as fake dx/dy and overlap failures. Name badge children consistently so the dump can skip them.
