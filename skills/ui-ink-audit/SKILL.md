@@ -57,3 +57,5 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 - A fix in a SHARED builder (tab, button, plate) changes every screen that uses it: after tuning it on one screen, re-measure every other family member (other popups with the same tab/button) in the same pass, or the fix becomes a regression elsewhere.
 
 - Trap: a reward/offline popup opened on top makes the audit measure the screen hidden UNDER it (false fails). Claim/close blocking popups first, then re-open the target screen and capture.
+
+- Trap: ink numbers identical to the pixel after a builder edit = the screen is a BAKED prefab; re-run its bake before re-measuring. Rect-centred content on a plate whose lit face is shorter than the rect still reads low: centre on the face (ui-lit-face-centring), not the rect.
