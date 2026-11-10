@@ -1,6 +1,6 @@
 @echo off
 rem One command for a fresh clone: find Python 3.11+, install dependencies, test, build the one-file exe and copy it to the
-rem project root (next to data\, profiles\, Export\). The exe already contains the default Purelymail key and shared mailbox
+rem package folder (next to publish.bat). The exe already contains the default Purelymail key and shared mailbox
 rem password (app\mail\default_key.py); nothing has to be typed in afterwards.
 setlocal
 cd /d "%~dp0.."
@@ -14,5 +14,5 @@ echo Using: %PY%
 %PY% -m pip install -q -r requirements.txt pyinstaller || (echo pip install failed & exit /b 1)
 %PY% -m pytest -q || (echo TESTS FAILED - exe not built & exit /b 1)
 %PY% -m PyInstaller --noconfirm --distpath dist --workpath build MeshyAIStudio.spec || exit /b 1
-copy /Y "dist\MeshyAIStudio.exe" "MeshyAIStudio.exe" || (echo Close the running MeshyAIStudio.exe and run again & exit /b 1)
-echo Built: %CD%\MeshyAIStudio.exe
+copy /Y "dist\MeshyAIStudio.exe" "..\MeshyAIStudio.exe" || (echo Close the running MeshyAIStudio.exe and run again & exit /b 1)
+echo Built: %CD%\..\MeshyAIStudio.exe

@@ -34,6 +34,13 @@
       "match": "gen.*(texture|icon|button|sprite|art|anh)|codex.*(art|ui|gen)|image gen|9 ?slice|outline|bo goc|nut ui|texture ui|art ui|icon|outline|vien|shadow|bong do|9 ?slice",
       "flag": "ui_art",
       "inject": "UI ART RULE: load skills ui-art-quality-gate, codex-ui-sprite-brief and ui-sprite-audit. Every art brief to Codex carries the rules block (image_generation only, exact rounded rect, constant thick outline, corner-cap 9-slice, <=512 px, no clipping). Run ui-sprite-audit/sprite_audit.py on every output before import; any FAIL = rework with the numbers. Importer manifest (ppu/border) overrides .meta. Look at an 8x corner crop and an in-game screenshot at real size. Never import an unverified batch. Icons: ui-icon-outline-bake (thick uniform outline baked, ledger). Replace whole families at once; read AGENTS.md section UI ART PIPELINE."
+    },
+    {
+      "id": "tmp_text_careful",
+      "event": "UserPromptSubmit",
+      "match": "textmesh|text mesh|tmp|textmeshpro|font sdf|alpha clip|chu bi|vet den|outline chu|shader chu",
+      "flag": "tmp",
+      "inject": "TEXTMESHPRO RULE: load skill tmp-shader-alpha-clip-fix (and tmp-font-optimization). Ensure the TMP_SDF shaders carry the clamped alpha clip (max(alphaClip..., 0.01)); keep the guard test green; change one text suspect at a time and zoom-check in Play."
     }
   ]
 }

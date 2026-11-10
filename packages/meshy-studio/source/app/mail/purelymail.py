@@ -175,7 +175,10 @@ class ImapMailbox:
             messages = []
             for uid in reversed(uids):
                 _, fetched = connection.fetch(uid, "(RFC822)")
-                parsed = email_lib.message_from_bytes(fetched[0][1])
+                part = next((item for item in fetched or [] if isinstance(item, tuple) and len(item) > 1), None)
+                if part is None:  # a message that just arrived or was expunged can return no body: skip it, never crash
+                    continue
+                parsed = email_lib.message_from_bytes(part[1])
                 try:
                     received = parsedate_to_datetime(parsed["Date"]) if parsed["Date"] else None
                 except (TypeError, ValueError):

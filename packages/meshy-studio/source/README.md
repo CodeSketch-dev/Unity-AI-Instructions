@@ -10,7 +10,7 @@ See `IMPLEMENTATION_STATUS.md` (what works, what is mock/untested/blocked), `TES
 ## Run / build
 - `run.bat` - start from source (`pip install -r requirements.txt` first, Python 3.12+, Chrome installed).
 - `test.bat` - static check + all automated tests. `python tools\gui_exe_test.py` - drives the built exe (UI Automation only: no mouse/keyboard/focus).
-- `publish.bat` - tests + one-file Windows x64 exe, copied to `MeshyAIStudio.exe` in this folder.
+- `..\publish.bat` (one level up, next to the exe) - installs deps, tests, builds the one-file exe to `..\MeshyAIStudio.exe`. Models default to `..\Export`; data and profiles stay in this `source` folder.
 - `python tools\live_e2e.py --image X --spend-credits` - ONE real job against Meshy (spends ~30 credits; refuses without the flag).
 - `tools\make_team_package.bat` - small shareable folder (exe + accounts.txt + README).
 

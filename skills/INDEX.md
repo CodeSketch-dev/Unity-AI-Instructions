@@ -513,6 +513,7 @@
 
 ## tmp
 - tmp-font-optimization - TextMeshPro font and text performance: static main font plus dynamic fallbacks, padding ratio, atlas size, autosize cost, world text, CJK. Use when TMP atlases bloat memory, glyph weight differs, text spikes CPU or a multilingual build is large.
+- tmp-shader-alpha-clip-fix - Use for ANY TextMeshPro work (new project, package update, text looks smeared/dark behind glyphs, outline artefacts): patch the TMP SDF shaders' alpha clip line, guard it with a test, and follow the careful-TMP checklist.
 - tmp-sprite-icons - One shared TextMeshPro Sprite Asset for inline icons (cash, gem, power, egg, star) used by world TextMeshPro text via sprite tags, built by an Editor baker, with a pure string helper. Use when text must carry a currency/stat icon in 3D or world-space labels.
 
 ## token

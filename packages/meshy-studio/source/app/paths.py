@@ -12,8 +12,16 @@ def app_root() -> Path:
     """
     if getattr(sys, "frozen", False):
         exe_dir = Path(sys.executable).resolve().parent
+        if (exe_dir / "source" / "app" / "main.py").is_file():  # published layout: exe beside publish.bat and source
+            return exe_dir / "source"
         for folder in (exe_dir, *exe_dir.parents):
             if (folder / "app" / "main.py").is_file():
                 return folder
         return exe_dir
     return Path(__file__).resolve().parents[1]
+
+
+def default_export_dir(root: Path) -> Path:
+    """Models go to an Export folder next to publish.bat / MeshyAIStudio.exe so the team finds them at once."""
+    root = Path(root)
+    return root.parent / "Export" if root.name == "source" and (root / "app" / "main.py").is_file() else root / "Export"

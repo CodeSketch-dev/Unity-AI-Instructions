@@ -120,7 +120,8 @@ class MeshyWebWorker:
                     if outcome == EmailLoginOutcome.OTP_UNAVAILABLE:
                         return WorkerResult(WorkerState.WAITING_FOR_LOGIN, account_id, "Meshy email OTP was not received")
                     if outcome != EmailLoginOutcome.AUTHENTICATED:
-                        return WorkerResult(WorkerState.INVALID_CREDENTIALS, account_id, "Meshy email OTP login failed")
+                        # not "invalid credentials": the page flow failed (selector, timeout); the account itself is fine
+                        return WorkerResult(WorkerState.FAILED, account_id, "Meshy email OTP login could not be completed")
                 else:
                     return WorkerResult(WorkerState.INVALID_CREDENTIALS, account_id, "Google login is disabled")
                 login_state = self.adapter.wait_for_authenticated(page, timeout_ms=wait_for_login_ms)

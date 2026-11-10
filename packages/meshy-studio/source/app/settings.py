@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from app.mail.purelymail import OFFICIAL_API_CONFIG
+from app.paths import default_export_dir
 
 DEFAULTS: dict[str, Any] = {
     "concurrency": 1,           # parallel jobs (each on its own account, own browser)
@@ -50,7 +51,7 @@ class Settings:
     @property
     def export_dir(self) -> Path:
         value = self._load().get("export_dir")
-        return Path(value) if value else self.root / "Export"
+        return Path(value) if value else default_export_dir(self.root)
 
     @export_dir.setter
     def export_dir(self, value: str | Path) -> None:

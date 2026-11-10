@@ -5,7 +5,7 @@ triggers: meshy, gen model, generate model, image to 3d, glb, fbx, 3d model from
 ---
 
 # Meshy model generation (MCP)
-- Tool lives in `packages/meshy-studio`. Run `setup.ps1`, register its MCP, then import authorized existing accounts. An email-only line (`user@example.com`) selects email OTP; legacy password rows are retained for migration but Google login is disabled.
+- Tool lives in `packages/meshy-studio` (double-click `publish.bat` there to build `MeshyAIStudio.exe`; code is in its `source` folder, models go to `Export` beside the exe). Or run `source/setup.ps1`, register its MCP, then import authorized existing accounts. An email-only line (`user@example.com`) selects email OTP; legacy password rows are retained for migration but Google login is disabled.
 - Per-job modes (always model Meshy 7): Topology (default) = Smart Topology tab + polygon count (100-30000, default 3000) -> Texture -> download, NO remesh (remesh caps at 10K tris); Automatic = Meshy's dense mesh -> Texture -> Remesh 10K -> download. Optional rig last (humanoid / four-legged / automatic). Rig selectors are from screenshots only (unverified live); a rig failure exports the unrigged model with a warning.
 - Canonical paid flow is Generate -> Texture 2K -> Remesh 10K -> download GLB -> convert FBX and extract PNG textures. Never click Generate twice when the first click may have reached the server; reconcile the remote asset/task first.
 - `generate_model(image_path)` (PNG/JPG/WEBP, <=20 MB) returns `job_id`. Poll `job_status` about every 60 s. `Completed` requires a non-empty GLB with triangles plus the export folder's FBX and PNG textures.

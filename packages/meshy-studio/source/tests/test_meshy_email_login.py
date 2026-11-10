@@ -29,7 +29,7 @@ class Page:
         return {"Đăng nhập": self.login, "Nhận mã": self.send, "Tiếp tục": self.verify}.get(name, Locator(False))
 
     def locator(self, selector):
-        return self.email if 'type="email"' in selector else self.code
+        return self.email if selector.startswith('input[type="email"]') else self.code
 
     def wait_for_timeout(self, ms): pass
     def bring_to_front(self): self.brought_to_front = True
@@ -68,4 +68,17 @@ def test_captcha_marker_does_not_block_code_entry_when_the_mail_arrived():
     page.locator = lambda selector: body if selector == "body" else original(selector)
     codes = iter((None, "481675"))
     result = MeshyEmailLogin(lambda *args, **kwargs: next(codes), max_polls=3).attempt(page, "box@purelymail.com")
+    assert result == EmailLoginOutcome.AUTHENTICATED and page.code.value == "481675"
+
+
+def test_provider_exception_does_not_abort_login():
+    page = Page()
+    calls = iter((None, RuntimeError("imap hiccup"), "481675"))
+
+    def provider(*args, **kwargs):
+        value = next(calls)
+        if isinstance(value, Exception):
+            raise value
+        return value
+    result = MeshyEmailLogin(provider, max_polls=4).attempt(page, "box@purelymail.com")
     assert result == EmailLoginOutcome.AUTHENTICATED and page.code.value == "481675"
