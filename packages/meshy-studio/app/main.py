@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import sys
 import threading
@@ -8,8 +9,8 @@ from pathlib import Path
 
 from PySide6.QtCore import QSize, Qt, QTimer, Signal, Slot
 from PySide6.QtGui import QColor, QIcon, QPixmap
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QLineEdit,
-                               QListView, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QPlainTextEdit, QPushButton,
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QLineEdit,
+                               QListView, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QPlainTextEdit, QPushButton, QSpinBox,
                                QStackedWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from app import bootstrap
@@ -17,6 +18,7 @@ from app.automation.browser_manager import BrowserManager
 from app.automation.meshy_worker import REQUIRED_CREDITS
 from app.core.account_manager import AccountManager
 from app.core.database import Database
+from app.core.job_options import DEFAULT_POLYCOUNT, MAX_POLYCOUNT, MIN_POLYCOUNT, GenMode, JobOptions, RigType
 from app.core.pipeline import acquire_runner_lock
 from app.logs import setup_logging
 from app.paths import app_root
@@ -247,11 +249,69 @@ class MeshyMainWindow(QMainWindow):
         hint.setObjectName("muted")
         inner.addWidget(hint)
         page_layout.addWidget(card)
+        page_layout.addWidget(self._build_options_card())
         self.prompt_input = QLineEdit()
         self.prompt_input.setPlaceholderText("Optional note saved with the next jobs")
         page_layout.addWidget(self.prompt_input)
         page_layout.addStretch(1)
         self._refresh_export_label()
+
+    def _build_options_card(self) -> QFrame:
+        """Per-job generation options, copied into every job queued after a change (Meshy 7 is always used)."""
+        card, inner = self._card()
+        title = QLabel("Generation (applies to images queued next, model is always Meshy 7)")
+        title.setObjectName("muted")
+        inner.addWidget(title)
+        row = QHBoxLayout()
+        self.mode_combo = QComboBox()
+        self.mode_combo.addItem("Topology (Smart Topology, no remesh)", GenMode.TOPOLOGY.value)
+        self.mode_combo.addItem("Automatic (Meshy decides, then remesh 10K)", GenMode.AUTOMATIC.value)
+        self.mode_combo.setToolTip("Topology: Meshy 7 + Smart Topology with your polygon count -> texture -> download.\n"
+                                   "Automatic: Meshy's own dense mesh -> texture -> remesh (max 10K triangles) -> download.")
+        row.addWidget(self.mode_combo, 1)
+        row.addWidget(QLabel("Polygons"))
+        self.poly_spin = QSpinBox()
+        self.poly_spin.setRange(MIN_POLYCOUNT, MAX_POLYCOUNT)
+        self.poly_spin.setSingleStep(500)
+        self.poly_spin.setValue(DEFAULT_POLYCOUNT)
+        self.poly_spin.setToolTip("Target triangle count for Smart Topology (Meshy allows 100 - 30000, default 3000)")
+        row.addWidget(self.poly_spin)
+        inner.addLayout(row)
+        rig_row = QHBoxLayout()
+        self.rig_check = QCheckBox("Rig a skeleton after everything else")
+        self.rig_check.setToolTip("Runs Meshy's auto-rigging last, so the exported model has a skeleton. Costs extra credits.")
+        rig_row.addWidget(self.rig_check)
+        self.rig_combo = QComboBox()
+        self.rig_combo.addItem("Humanoid (people)", RigType.HUMANOID.value)
+        self.rig_combo.addItem("Four-legged (dog, cat...)", RigType.QUADRUPED.value)
+        self.rig_combo.addItem("Automatic (Meshy picks)", RigType.AUTO.value)
+        self.rig_combo.setCurrentIndex(2)
+        rig_row.addWidget(self.rig_combo, 1)
+        inner.addLayout(rig_row)
+        stored = self.settings.get("job_options")
+        saved = JobOptions.from_json(json.dumps(stored)) if stored else JobOptions()
+        self.mode_combo.setCurrentIndex(max(0, self.mode_combo.findData(saved.mode.value)))
+        self.poly_spin.setValue(saved.polycount)
+        self.rig_check.setChecked(saved.rig)
+        self.rig_combo.setCurrentIndex(max(0, self.rig_combo.findData(saved.rig_type.value)))
+        self.mode_combo.currentIndexChanged.connect(self._options_changed)
+        self.poly_spin.valueChanged.connect(self._options_changed)
+        self.rig_check.toggled.connect(self._options_changed)
+        self.rig_combo.currentIndexChanged.connect(self._options_changed)
+        self._sync_option_enabled()
+        return card
+
+    def current_options(self) -> JobOptions:
+        return JobOptions(GenMode(self.mode_combo.currentData()), self.poly_spin.value(), self.rig_check.isChecked(),
+                          RigType(self.rig_combo.currentData())).normalized()
+
+    def _sync_option_enabled(self) -> None:
+        self.poly_spin.setEnabled(self.mode_combo.currentData() == GenMode.TOPOLOGY.value)
+        self.rig_combo.setEnabled(self.rig_check.isChecked())
+
+    def _options_changed(self, *_args) -> None:
+        self._sync_option_enabled()
+        self.settings.set("job_options", json.loads(self.current_options().to_json()))
 
     def _refresh_export_label(self) -> None:
         self.export_label.setText(str(self.settings.export_dir))
@@ -301,7 +361,7 @@ class MeshyMainWindow(QMainWindow):
 
     def _enqueue(self, path: str) -> tuple[bool, str]:
         try:
-            job_id = self.pipeline.enqueue(path, self.prompt_input.text())
+            job_id = self.pipeline.enqueue(path, self.prompt_input.text(), self.current_options())
         except ValueError as error:
             self.status.setText(f"Rejected: {error}")
             return False, str(error)

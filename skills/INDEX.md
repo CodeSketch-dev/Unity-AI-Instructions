@@ -86,6 +86,7 @@
 ## codex
 - codex-delegation - Delegate well-specified CODE-ONLY tasks to the Codex CLI (cheap model) as a managed worker to save Claude tokens: write a brief, run codex exec in the background, then compile/test/review yourself. Use for pure logic, tests, data tables, boilerplate; keep design and Editor work on Claude.
 - codex-ui-director-loop - Director workflow for UI work done by Codex CLI: plan doc + brief with owned files and measured defects, round files, review by Play capture and pixel measurement, protect shared helpers. Use when you delegate any UI/layout task to Codex or another coding agent.
+- codex-ui-sprite-brief - Use when asking Codex (or any image model) to generate UI sprites: the ready brief template with the binding quality rules (image_generation only, constant outline, rounded rect, corner-cap 9-slice, size cap, no clipping, name-colour match) and the acceptance loop with sprite_audit.py.
 
 ## coding
 - coding-discipline-karpathy - Use when writing or changing code: four rules - surface assumptions, simplest code that works, surgical changes (every changed line traces to the request), goal-driven execution with verifiable success criteria. Adapted from Karpathy on LLM coding pitfalls.
@@ -558,6 +559,7 @@
 - ui-reward-popup-recipe - Layout recipe for small reward / claim / welcome / free-cash popups: stacked plates, cash icon + amount in one HLG, equal-height button pair, x2 sticker near the corner, padding numbers, acceptance checks. Use when building or fixing any popup with an amount and CLAIM buttons.
 - ui-scaling-safe-area-checklist - Checklist for UI that survives phone, tablet and notch aspect ratios: CanvasScaler, anchors and pivots, safe area, event-driven HUD, screen stack, text growth. Use when UI breaks on other resolutions or before sign-off of any screen.
 - ui-scroll-board - Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-sprite-audit - Use before importing ANY generated or edited UI sprite: run sprite_audit.py (outline uniformity/thickness, exact rounded rectangle, corner cap, size cap, clipping, magenta fringe) and reject on FAIL; a hook-style gate so bad Codex art never reaches the game.
 - ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after any popup, shop, HUD button or card. Part of the ui-always set.
 - ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-text-autofit-system - MANDATORY for any UI, popup, HUD, button, world-canvas or code-built text: install/use the automatic TMP fitting system (auto size, padding, no overflow). Part of the ui-always set; read ui-always first.

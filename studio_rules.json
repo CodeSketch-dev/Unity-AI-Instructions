@@ -27,6 +27,13 @@
       "event": "UserPromptSubmit",
       "match": "tham khao|hoc hoi|tinh hoa|reference project|break and steal|break an egg|knife tower|monkey.escape|bouncesdk|sketch sdk|asset store|pack nay|lay nguyen|copy y|clone",
       "inject": "REFERENCE LEARNING ORDER: use superpowers. Spawn read-only study subagents (one per topic, docs/reference-<project>/*-STUDY.md with file:line evidence), evaluate harshly with a scorecard (licence first for packs), write a plan with rulings (docs/superpowers/plans), port the ESSENCE into our own layer (SketchSdk, UI kit, skills) via Codex briefs + director verification, regenerate art in our style, then extract generic skills and publish. Skill: reference-project-dissection (Learning loop)."
+    },
+    {
+      "id": "ui_art_generation",
+      "event": "UserPromptSubmit",
+      "match": "gen.*(texture|icon|button|sprite|art|anh)|codex.*(art|ui|gen)|image gen|9 ?slice|outline|bo goc|nut ui|texture ui|art ui",
+      "flag": "ui_art",
+      "inject": "UI ART RULE: load skills ui-art-quality-gate, codex-ui-sprite-brief and ui-sprite-audit. Every art brief to Codex carries the rules block (image_generation only, exact rounded rect, constant thick outline, corner-cap 9-slice, <=512 px, no clipping). Run ui-sprite-audit/sprite_audit.py on every output before import; any FAIL = rework with the numbers. Importer manifest (ppu/border) overrides .meta. Look at an 8x corner crop and an in-game screenshot at real size. Never import an unverified batch."
     }
   ]
 }

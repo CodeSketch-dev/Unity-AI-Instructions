@@ -31,7 +31,7 @@ class FakeWorker:
     def release_all(self):
         self.released_all = True
 
-    def run_one(self, account_id, image_path, *, account_key=None, wait_for_login_ms=0):
+    def run_one(self, account_id, image_path, *, account_key=None, wait_for_login_ms=0, options=None):
         with self.lock:
             self.calls.append((account_id, account_key, Path(image_path).name))
         action = self.script.get(account_id, WorkerState.COMPLETED)

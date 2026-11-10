@@ -13,6 +13,7 @@ from app.paths import app_root
 from app.automation.meshy_adapter import MeshyLoginState, MeshyWebAdapter, _advance_onboarding, dismiss_onboarding
 from app.automation.google_login import GoogleLoginOutcome, GoogleOAuthLogin
 from app.automation.meshy_email_login import EmailLoginOutcome, MeshyEmailLogin
+from app.core.job_options import GenMode, JobOptions
 from app.security.redaction import redact
 
 
@@ -70,8 +71,9 @@ class MeshyWebWorker:
             self._contexts[account_id] = self.adapter.open_profile(account_id, headless=False)
         return self._contexts[account_id]
 
-    def run_one(self, account_id: int, image_path: str | Path, *, account_key: str | None = None, wait_for_login_ms: int = 120_000) -> WorkerResult:
-        result = self._run_one(account_id, image_path, account_key=account_key, wait_for_login_ms=wait_for_login_ms)
+    def run_one(self, account_id: int, image_path: str | Path, *, account_key: str | None = None, wait_for_login_ms: int = 120_000,
+                options: JobOptions | None = None) -> WorkerResult:
+        result = self._run_one(account_id, image_path, account_key=account_key, wait_for_login_ms=wait_for_login_ms, options=options)
         if result.state == WorkerState.FAILED:
             self._snapshot(account_id)
         return result
@@ -88,7 +90,9 @@ class MeshyWebWorker:
         except Exception:
             pass
 
-    def _run_one(self, account_id: int, image_path: str | Path, *, account_key: str | None = None, wait_for_login_ms: int = 120_000) -> WorkerResult:
+    def _run_one(self, account_id: int, image_path: str | Path, *, account_key: str | None = None, wait_for_login_ms: int = 120_000,
+                 options: JobOptions | None = None) -> WorkerResult:
+        options = (options or JobOptions(mode=GenMode.AUTOMATIC)).normalized()  # no options = the previous behaviour
         if self._active_account is not None:
             raise RuntimeError("A Meshy job is already running; queue is sequential")
         self._active_account = account_id
@@ -136,12 +140,21 @@ class MeshyWebWorker:
             if balance is not None:
                 if callable(self.on_credits):
                     self.on_credits(account_id, balance)
-                if balance < self.required_credits:
+                needed = self.required_credits + (options.required_credits - 30)
+                if balance < needed:
                     return WorkerResult(WorkerState.QUOTA_LIMITED, account_id,
-                                        f"Only {balance} credits left (a model needs {self.required_credits})")
+                                        f"Only {balance} credits left (a model needs {needed})")
             self.adapter.open_model_tab(page)
             dismiss_onboarding(page)
             self.adapter.upload_image(page, image_path)
+            if options.mode == GenMode.TOPOLOGY:
+                configure = getattr(self.adapter, "configure_topology", None)
+                if configure is not None:
+                    configure(page, options.polycount)  # Meshy 7 + Smart Topology + polygon count; raises before any spend
+            else:
+                select_mode = getattr(self.adapter, "select_generation_mode", None)
+                if select_mode is not None:
+                    select_mode(page, False)
             if not _has_uploaded_preview(page):
                 return WorkerResult(WorkerState.FAILED, account_id, "Upload preview was not visible")
             self._progress(10)
@@ -204,7 +217,7 @@ class MeshyWebWorker:
             if (stop := self._canceled(account_id)):
                 return stop
             optimize = getattr(self.adapter, "optimize_remesh_10k", None)
-            if optimize is not None:
+            if optimize is not None and options.remesh:
                 before = _asset_marker(self.adapter, page, count_cards)
                 if not optimize(page) or (wait_new is not None and not wait_new(page, before, 60_000)):
                     return WorkerResult(WorkerState.FAILED, account_id, "Remesh 10K could not start")
@@ -213,6 +226,15 @@ class MeshyWebWorker:
             self._progress(85)
             if (stop := self._canceled(account_id)):
                 return stop
+            rig_warning = ""
+            rig = getattr(self.adapter, "apply_rig", None)
+            if options.rig and rig is not None:
+                before = _asset_marker(self.adapter, page, count_cards)
+                if rig(page, options.rig_type.value) and (wait_new is None or wait_new(page, before, 60_000)):
+                    if idle is not None:
+                        idle(page)
+                else:  # the textured model is already paid for: export it unrigged instead of losing it
+                    rig_warning = "rigging could not start; exported without a skeleton"
             if self.export_dir is not None and optimize is not None:
                 base = self.export_dir() if callable(self.export_dir) else self.export_dir
                 folder = job_folder(base, image_path)
@@ -226,8 +248,8 @@ class MeshyWebWorker:
                 self._refresh_credits(page, account_id)
                 message = (f"Exported {info['triangles']} triangles, {len(extra['textures'])} PNG textures, "
                            f"FBX {'yes' if extra['fbx'] else 'no'} -> {folder}")
-                if extra["warnings"]:
-                    message += " | " + "; ".join(extra["warnings"])
+                if extra["warnings"] or rig_warning:
+                    message += " | " + "; ".join([*extra["warnings"], *([rig_warning] if rig_warning else [])])
                 return WorkerResult(WorkerState.COMPLETED, account_id, message, str(info["path"]))
             return WorkerResult(WorkerState.FAILED, account_id, "No output was produced (export folder or remesh step missing)")
         except Exception as error:

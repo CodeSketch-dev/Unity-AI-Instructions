@@ -53,4 +53,5 @@ class Job:
     submitted: int = 0
     started_at: str | None = None
     finished_at: str | None = None
+    options: str | None = None  # JobOptions JSON; None = legacy row
 

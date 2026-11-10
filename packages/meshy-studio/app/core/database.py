@@ -32,7 +32,11 @@ def _m4_library_metadata(connection: sqlite3.Connection) -> None:
     _add_columns(connection, "models", {"folder": "TEXT", "formats": "TEXT", "triangles": "INTEGER", "size_bytes": "INTEGER"})
 
 
-MIGRATIONS = [_m1_account_columns, _m2_job_columns, _m3_idempotency_and_timing, _m4_library_metadata]
+def _m5_job_options(connection: sqlite3.Connection) -> None:
+    _add_columns(connection, "jobs", {"options": "TEXT"})
+
+
+MIGRATIONS = [_m1_account_columns, _m2_job_columns, _m3_idempotency_and_timing, _m4_library_metadata, _m5_job_options]
 
 
 class Database:
@@ -212,11 +216,11 @@ class Database:
         with self._lock, self._connection:
             self._connection.execute("DELETE FROM accounts WHERE id=?", (account_id,))
 
-    def create_job(self, image_path: str, note: str = "", account_id: int | None = None) -> int:
+    def create_job(self, image_path: str, note: str = "", account_id: int | None = None, options: str | None = None) -> int:
         with self._lock, self._connection:
             cursor = self._connection.execute(
-                "INSERT INTO jobs(image_path,note,status,account_id) VALUES(?,?,?,?)",
-                (image_path, note, JobStatus.PENDING.value, account_id),
+                "INSERT INTO jobs(image_path,note,status,account_id,options) VALUES(?,?,?,?,?)",
+                (image_path, note, JobStatus.PENDING.value, account_id, options),
             )
             return int(cursor.lastrowid)
 
@@ -370,5 +374,5 @@ class Database:
     def _job(row: sqlite3.Row) -> Job:
         return Job(*(row[key] for key in ("id", "image_path", "note", "status", "account_id", "meshy_task_id",
                                            "progress", "retries", "error", "result_path", "meshy_url",
-                                           "created_at", "updated_at", "submitted", "started_at", "finished_at")))
+                                           "created_at", "updated_at", "submitted", "started_at", "finished_at", "options")))
 

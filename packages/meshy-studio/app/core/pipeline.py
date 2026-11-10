@@ -9,6 +9,7 @@ from typing import Any, Callable
 
 from app.automation.meshy_export import MeshyExportError, inspect_glb
 from app.automation.meshy_worker import WorkerResult, WorkerState
+from app.core.job_options import JobOptions
 from app.core.models import JobStatus
 from app.core.scheduler import Scheduler, SchedulePolicy
 
@@ -130,9 +131,9 @@ class PipelineService:
             return self._workers[slot]
 
     # ---- queue ------------------------------------------------------------------------------------------------------
-    def enqueue(self, image_path: str, note: str = "") -> int:
+    def enqueue(self, image_path: str, note: str = "", options: JobOptions | None = None) -> int:
         path = validate_image(image_path)
-        job_id = self.database.create_job(str(path.resolve()), note)
+        job_id = self.database.create_job(str(path.resolve()), note, options=(options or JobOptions()).to_json())
         LOG.info("job %s queued: %s", job_id, path.name)
         return job_id
 
@@ -254,7 +255,8 @@ class PipelineService:
         worker.on_progress = lambda percent: db.update_job(job.id, progress=int(percent))
         LOG.info("job %s started on account #%s (%s)", job.id, account.id, Path(job.image_path).name)
         try:
-            result = worker.run_one(account.id, job.image_path, account_key=account.email)
+            result = worker.run_one(account.id, job.image_path, account_key=account.email,
+                                    options=JobOptions.from_json(job.options))
         except Exception as error:  # a crash inside the worker must not kill the queue
             LOG.exception("job %s crashed", job.id)
             result = WorkerResult(WorkerState.FAILED, account.id, f"{type(error).__name__}")

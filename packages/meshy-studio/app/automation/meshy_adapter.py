@@ -171,6 +171,92 @@ class MeshyWebAdapter:
         chooser_info.value.set_files(str(path))
 
     @staticmethod
+    def select_generation_mode(page: Any, topology: bool) -> None:
+        """Form tabs: High detail (Meshy's own dense mesh, default) or Smart Topology. Best effort for High detail."""
+        label = "Smart Topology" if topology else "Chi tiết cao"
+        tab = page.get_by_text(label, exact=True)
+        try:
+            if tab.count() and tab.first.is_visible():
+                tab.first.click(force=True, timeout=3000)
+                page.wait_for_timeout(500)
+                return
+        except Exception:
+            pass
+        if topology:
+            raise MeshyWebError("Smart Topology tab was not found")
+
+    @staticmethod
+    def configure_topology(page: Any, polycount: int) -> None:
+        """Smart Topology form: model Meshy 7 (always), polygon count, texture toggle off (texture is its own step)."""
+        MeshyWebAdapter.select_generation_mode(page, True)
+        model = page.get_by_text("Meshy 7", exact=True)
+        if not (model.count() and model.first.is_visible()):
+            raise MeshyWebError("Meshy 7 model option was not found")
+        model.first.click(force=True, timeout=3000)
+        label = page.get_by_text("Số lượng đa giác", exact=True).first
+        field = label.locator("xpath=ancestor::div[.//input][1]").locator("input[type='text'], input[type='number'], input:not([type])").last
+        field.click(timeout=3000)
+        field.fill(str(int(polycount)))
+        field.press("Enter")
+        field.press("Tab")
+        page.wait_for_timeout(300)
+        value = re.sub(r"\D", "", field.input_value() or "")
+        if value != str(int(polycount)):
+            raise MeshyWebError(f"Polygon count could not be set (wanted {polycount}, form shows {value or 'nothing'})")
+        MeshyWebAdapter._set_texture_toggle(page, False)
+
+    @staticmethod
+    def _set_texture_toggle(page: Any, on: bool) -> None:
+        """The 'Kết cấu' switch in the form: generating the mesh and the texture are separate steps here."""
+        try:
+            label = page.get_by_text("Kết cấu", exact=True).first
+            switch = label.locator("xpath=ancestor::div[.//*[@role='switch']][1]").locator("[role='switch']").first
+            state = switch.get_attribute("aria-checked")
+            if state is not None and (state == "true") != on:
+                switch.click(force=True, timeout=2000)
+        except Exception:
+            LOG.warning("texture toggle not adjusted", exc_info=True)
+
+    RIG_CARDS = {"humanoid": "Nhân hình", "quadruped": "Chó bốn chân", "auto": "Giàn khoan thông minh"}
+
+    @staticmethod
+    def apply_rig(page: Any, rig_type: str) -> bool:
+        """Viewer toolbar -> Rig -> pick a character type -> confirm. Selectors come from screenshots, not live runs."""
+        try:
+            dismiss_onboarding(page, 6)
+            if _busy_cards(page) or not MeshyWebAdapter.open_latest_asset(page):
+                return False
+            button = None
+            for test_id in ("viewer-rig-btn", "viewer-rigging-btn", "viewer-auto-rig-btn", "viewer-animate-btn"):
+                candidate = page.get_by_test_id(test_id)
+                if candidate.count() and candidate.first.is_visible():
+                    button = candidate.first
+                    break
+            if button is None:
+                for name in ("Rig", "Áp rig", "Rigging", "Hoạt ảnh"):
+                    candidate = page.get_by_role("button", name=re.compile(name, re.I))
+                    if candidate.count() and candidate.first.is_visible():
+                        button = candidate.first
+                        break
+            if button is None:
+                return False
+            button.click(force=True, timeout=3000)
+            title = page.get_by_text("Áp rig cho mô hình", exact=False)
+            title.first.wait_for(state="visible", timeout=8000)
+            card = page.get_by_text(MeshyWebAdapter.RIG_CARDS.get(rig_type, "Giàn khoan thông minh"), exact=False)
+            card.first.click(force=True, timeout=3000)
+            page.wait_for_timeout(500)
+            for name in ("Áp rig", "Xác nhận", "Bắt đầu", "Tạo ra", "Áp dụng"):
+                confirm = _widest(page.get_by_role("button", name=name, exact=True))
+                if confirm is not None and confirm.is_visible() and confirm.is_enabled():
+                    confirm.click(force=True, timeout=3000)
+                    return True
+            return True  # picking a card may start rigging by itself; the caller verifies a new asset appeared
+        except Exception:
+            LOG.warning("rig step failed", exc_info=True)
+            return False
+
+    @staticmethod
     def optimize_remesh_10k(page: Any) -> bool:
         """Viewer toolbar -> Remesh -> fixed 10K, triangle topology -> confirm (keeps texture)."""
         try:
