@@ -13,3 +13,4 @@ triggers: clone framework, standalone, doc lap, remove package, sketchengine, me
 5. Keep ScriptableObject singleton resource paths/names unchanged so existing assets still load.
 6. Only then remove the package from `manifest.json` AND `packages-lock.json`, refresh with Play stopped, expect the MCP to drop for a minute.
 7. Settings/Data features used once may be replaced by PlayerPrefs; tell the owner saved values are lost.
+8. VERIFY, never trust a report: after the refresh, count Missing scripts in every prefab/scene (`GameObjectUtility.GetMonoBehavioursWithMissingScriptCount`) and read each cloned `.meta` guid against the GUID the prefabs reference. A subagent claimed GUIDs were preserved while Unity had regenerated them (4 touch detectors + 4 press tweens missing, serialized refs null, NullReference at start). Fix: put the original guid back in the clone `.meta`, refresh, re-save prefabs whose refs were lost, re-instance scene copies.
