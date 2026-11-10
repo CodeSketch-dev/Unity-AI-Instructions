@@ -14,3 +14,6 @@ _unity-pilots/roblox-shader-kit-pilot/
 
 # skill-test-loop baselines
 .skill-loop/
+
+# skill-architect backups and adaptive runtime data are local only
+.skill-backups/

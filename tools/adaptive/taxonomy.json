@@ -1,0 +1,18 @@
+{
+  "_doc": "Priors only. candidates are ordered by the default tool hierarchy (API/SDK > deterministic CLI/log > targeted UI automation > screenshot+vision > hybrid). Measured data overrides this order per (category, env). First matching category wins; extend by adding an object.",
+  "categories": [
+    {"id": "unity.compile_errors", "match": "compile error|compiler|\\bcs\\d{4}\\b|build error|loi bien dich", "candidates": ["log_parse", "editor_api"], "deterministic": true},
+    {"id": "unity.build", "match": "batchmode|make a build|build (an? )?(apk|aab|player|android|windows)|\\bbuild (the )?(game|project)\\b", "candidates": ["batchmode_cli", "editor_api"], "deterministic": true},
+    {"id": "unity.run_tests", "match": "edit ?mode test|play ?mode test|unit test|test framework|run (the )?tests|chay test", "candidates": ["test_framework", "editor_api"], "deterministic": true},
+    {"id": "unity.gameplay_physics", "match": "physics|collision|rigidbody|gameplay behaviou?r|kcc|prediction", "candidates": ["test_framework", "runtime_telemetry", "telemetry_plus_vision"], "deterministic": true},
+    {"id": "unity.gameview_visual", "match": "game view|screenshot|looks (wrong|off)|visual|alignment|misaligned|hinh anh", "candidates": ["telemetry_plus_vision", "screenshot_vision"], "needs": ["vision"]},
+    {"id": "unity.scene_edit", "match": "scene|prefab|hierarchy|inspector|component|gameobject", "candidates": ["editor_api", "mcp_tool"], "deterministic": true},
+    {"id": "windows.form_ui", "match": "click|button|dialog|form|menu|textbox|notepad|desktop app|window title|uia|accessibility", "candidates": ["ui_automation_scoped", "ui_automation_skeleton", "screenshot_vision", "hybrid"], "needs": ["ui_automation"]},
+    {"id": "windows.script", "match": "powershell|batch file|scheduled task|registry|windows service|bat script", "candidates": ["powershell_cli", "python_script"], "deterministic": true},
+    {"id": "code.search", "match": "where is|find (the )?(usages|callers|definition)|grep|search for|tim kiem", "candidates": ["grep_scoped", "codegraph_query"], "deterministic": true},
+    {"id": "code.edit", "match": "refactor|implement|rename|add (a )?(function|method|class)|write code|fix (the )?bug|sua code", "candidates": ["direct_edit"], "deterministic": false}
+  ],
+  "critical": "delete|drop |publish|deploy|force.?push|production|credential|payment|purchase|wipe|reset --hard|xoa (het|toan)",
+  "scope_words": "all|every|entire|whole|repository|toan bo|tat ca",
+  "step_words": "then|after that|and then|next|sau do|roi|finally"
+}

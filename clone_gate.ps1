@@ -19,6 +19,10 @@ if ($tp -and (Test-Path -LiteralPath $tp)) {
   }
 }
 $isRef = $userText -match '(?i)clone|giong game goc|game goc|ban goc|original|reference|video|ffmpeg|youtube|so frame|tach frame|giong 100|y het'
+# Skill / instruction authoring is not a clone task: pasted docs often contain "reference"/"original"/"clone". Only real media or clone-game cues keep the gate on.
+$isSkillWork = $userText -match '(?i)\bskills?\b|SKILL\.md|agentskills|AI Instructions|adaptive task'
+$isMedia = $userText -match '(?i)youtube|ffmpeg|yt-dlp|game goc|ban goc|clone game|clone_frames|so frame|tach frame|giong 100|y het|gameplay video'
+if ($isSkillWork -and -not $isMedia) { $isRef = $false }
 $ran = $asstRaw -match '(?i)clone_frames\.py|ffmpeg'
 $claims = $lastAsst -match '(?i)da xong|hoan tat|da sua|da kiem|verified|done\b|completed|\u0111\u00e3 xong|ho\u00e0n t\u1ea5t|\u0111\u00e3 s\u1eeda|\u0111\u00e3 ki\u1ec3m'
 if ($isRef -and -not $ran -and $st.g1 -lt 2) { Block 'g1' 'Reference/clone task but no frame extraction ran in this session. Follow skill clone-research-autonomy section 0 NOW, without asking: python -I clone_frames.py coarse|dense|moments (whole-video sheets, then dense/zoomed key moments), LOOK at the sheets, write SPEC/COVERAGE, compare with your Play recording. If you compared another way, say exactly how and show evidence paths. Never claim parity without it.' }

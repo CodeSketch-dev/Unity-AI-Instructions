@@ -124,6 +124,11 @@ Standing owner permission, never ask: when the owner names a game to make or clo
 - **Team**: split by system with disjoint file ownership; Codex through the hub for code/shader/doc work, Claude subagents or the main agent for Editor wiring, Play and screenshots; all agents auto-load skills (rules above) and finish with the retro.
 - **Never**: invent UI/FX/behaviour the original does not show, copy copyrighted audio/art assets verbatim into shipped content, or report done without the verification above.
 
+### Adaptive task intelligence (always on, additive; never overrides safety rules)
+- Task with several viable methods (API, CLI, UI automation, vision): load `adaptive-task-intelligence`. Simple tasks take the fast path (`tools/adaptive/cli.py classify`); no analysis that costs more than the task.
+- Default prior: Editor API/SDK/test framework > deterministic CLI/logs > scoped UI Automation > screenshot + vision > hybrid. Measured per (category, environment) data may reorder it; verified success beats speed or tokens; tokens are UNKNOWN unless the runtime reported them.
+- Never retry a non-idempotent action blindly, never continue without a way to verify, keep timeouts/retry caps/STOP switch. Learned preferences are advisory: skill edits need the owner's explicit permission, backup, tests before/after and `skill-architect` dependency checks.
+
 ### Studio self-training loop (always on, every agent, every project)
 Goal: the studio gets faster, cheaper (fewer tokens) and better with every task; the owner only prompts, agents do the rest and teach the next agents.
 - **Start**: read `skills/INDEX.md` (names + descriptions only) or the router hint, load only the 1-3 skills the task needs (`token-efficient-workflow`), skim the project's `docs/feedback-notes.md` and `docs/agent-handoff.md`. Do not re-research what a skill already answers.

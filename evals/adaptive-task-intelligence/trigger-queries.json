@@ -1,0 +1,10 @@
+[
+  {"q": "should I use UI automation or screenshot vision to click this Windows dialog button", "should": ["adaptive-task-intelligence"]},
+  {"q": "chon phuong an nhanh nhat va tiet kiem token cho tac vu windows automation", "should": ["adaptive-task-intelligence"]},
+  {"q": "benchmark which method is faster for this task and learn from the results", "should": ["adaptive-task-intelligence"]},
+  {"q": "set up agent-desktop accessibility tree snapshots for our desktop tests", "should": ["adaptive-task-intelligence"]},
+  {"q": "do tu hoc hieu suat cua agent theo tung loai task", "should": ["adaptive-task-intelligence"]},
+  {"q": "create a new skill for FishNet client prediction debugging", "not": ["adaptive-task-intelligence"]},
+  {"q": "align the price label inside the shop button", "not": ["adaptive-task-intelligence"]},
+  {"q": "balance the egg hatch economy for day-one retention", "not": ["adaptive-task-intelligence"]}
+]

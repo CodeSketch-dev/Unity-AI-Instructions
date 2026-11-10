@@ -1,0 +1,1 @@
+{"must_contain": ["fast path", "VERIFIED", "non-idempotent", "explicit permission", "UNKNOWN", "never in git"], "must_not_contain": ["C:/Users", "thunder"], "triggers_any": ["adaptive", "tool selection", "benchmark method"]}
