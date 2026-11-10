@@ -23,3 +23,8 @@ Bots use the player's character prefab (type Npc). `AI : MonoCachedFast` writes 
 
 ## Check
 Verify in Play Mode via Unity MCP: bots complete the course unaided, recover when stuck, respawn near the player when far behind, and do not allocate per frame.
+
+## Partner-bot play-test lessons (tethered pair, e.g. carried pane/leash)
+- Before reading a Play result, check the flow gate (`CanSimulate`/state): after a failure the flow waits for retry and every actor looks "frozen" - that is the gate, not a bot bug.
+- Harness actors that walk straight lines cause wall hits of their own: classify each break (harness human vs bot) before fixing the bot.
+- A leading bot must WAIT while its partner is idle or blocked; otherwise it drags the partner into walls. Test with an idle-partner scenario and report leash-band samples outside range.
