@@ -38,3 +38,28 @@ Desktop app: `python -m app.main` (drop an image to queue it) or `tools\build_ex
 - Fresh Google accounts may demand phone/CAPTCHA; those accounts are marked "Needs verification" and skipped (never bypassed).
 - Meshy's UI changes: selectors use `data-testid` where possible; on failure a screenshot is saved to `output/diagnostics/`.
 - Free accounts need >= 30 credits per model (generate 20 + texture 10; remesh is free).
+
+## App modules
+## Modules
+- **Generation queue** (page *Generation Queue*): drop/choose several images; previews, queue position, cancel one or
+  many (the rest move up), retry. Running job stops at its next step. Retry with exponential backoff (30 s, 60 s, ... 10 min),
+  max 2 retries; interrupted jobs are restored on restart.
+- **Meshy accounts** (page *Accounts*): import `email|password[|recovery|totp]`, credit read from the Meshy sidebar
+  (a model needs 30), automatic rotation, rest period after quota, "Use selected account" to pin one yourself,
+  low-credit warning. No credit = the job is *Paused* (not failed); it resumes when an account is back or you pick one.
+  The app never creates Meshy accounts.
+- **Export** (main page): choose the export folder; each model gets `<name>_<time>/` with GLB, FBX (Blender, headless) and
+  `textures/*.png`.
+- **Purelymail** (page *Purelymail*): save the API token, track existing mailboxes (status, expiry warning), check IMAP
+  login, read mail and show the verification code of messages you are waiting for.
+  IMAP `imap.purelymail.com:993` (SSL) is from Purelymail's Technical Setup page. **The management API is not documented
+  on the public site, so base URL (`https://purelymail.com/api/v0`), header (`Purelymail-Api-Token`) and endpoint names are
+  unverified defaults** - check them against the documentation in your Purelymail account before relying on *Sync from API*.
+- **Emergency stop** (top right): stops the running job at its next step, pauses the queue, closes all browsers.
+  *Resume queue* continues.
+- **Logs** (page *Logs*): `data/logs/app.log` (rotating, passwords/tokens redacted).
+
+## MCP (Claude Code / Codex)
+See `docs/mcp-setup.md`. Tools: `generate_model`, `job_status`, `list_jobs`, `cancel_jobs`, `list_accounts`,
+`import_accounts`, `list_exports`.
+

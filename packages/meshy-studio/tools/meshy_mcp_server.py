@@ -36,6 +36,8 @@ TOOLS = [
      "inputSchema": _schema(["image_path"], image_path={"type": "string"}, note={"type": "string"})},
     {"name": "job_status", "description": "Status, progress, error and account of one job.",
      "inputSchema": _schema(["job_id"], job_id={"type": "integer"})},
+    {"name": "cancel_jobs", "description": "Cancel queued jobs (others move up); a running job stops at its next step.",
+     "inputSchema": _schema(["job_ids"], job_ids={"type": "array", "items": {"type": "integer"}})},
     {"name": "list_jobs", "description": "Most recent jobs.", "inputSchema": _schema(limit={"type": "integer"})},
     {"name": "list_accounts", "description": "Accounts with health status and quota cooldown (no secrets).", "inputSchema": _schema()},
     {"name": "import_accounts", "description": "Import a .txt file of lines email|password or email|password|recovery_email|totp_secret.",
@@ -82,11 +84,18 @@ def call_tool(name: str, args: dict):
         return {"job_id": job.id, "status": job.status, "progress": job.progress, "error": job.error,
                 "account_id": job.account_id, "retries": job.retries, "result_path": job.result_path,
                 "result_folder": str(Path(job.result_path).parent) if job.result_path else None, "files": files}
+    if name == "cancel_jobs":
+        db = _db()
+        outcome = db.cancel_jobs([int(i) for i in args.get("job_ids", [])])
+        db.close()
+        return outcome
     if name == "list_jobs":
         db = _db()
         jobs = db.list_jobs()[: int(args.get("limit", 20))]
+        positions = {j.id: db.queue_position(j.id) for j in jobs}
         db.close()
-        return [{"job_id": j.id, "image": Path(j.image_path).name, "status": j.status, "error": j.error} for j in jobs]
+        return [{"job_id": j.id, "image": Path(j.image_path).name, "status": j.status, "queue_position": positions[j.id],
+                 "error": j.error} for j in jobs]
     if name == "list_accounts":
         db = _db()
         accounts = db.list_accounts()

@@ -222,6 +222,19 @@ class MeshyWebAdapter:
         return False
 
     @staticmethod
+    def read_credits(page: Any) -> int | None:
+        """The credit balance shown above the upgrade button in the sidebar."""
+        try:
+            text = page.evaluate("""() => {
+                const button = document.querySelector("[data-testid='sidebar-upgrade-btn']");
+                return button && button.parentElement ? button.parentElement.innerText : '';
+            }""")
+            match = re.search(r"\d[\d.,]*", text or "")
+            return int(re.sub(r"[.,]", "", match.group(0))) if match else None
+        except Exception:
+            return None
+
+    @staticmethod
     def count_cards(page: Any) -> int:
         try:
             return page.locator("[data-testid='assets-card']").count()

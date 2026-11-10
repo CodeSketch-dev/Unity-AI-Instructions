@@ -16,6 +16,7 @@ class JobStatus(StrEnum):
     PAUSED = "Paused"
     CANCELED = "Canceled"
     QUOTA_LIMITED = "Quota Limited"
+    CANCEL_REQUESTED = "Cancel Requested"
 
 
 @dataclass(slots=True)
@@ -30,6 +31,8 @@ class Account:
     authorized: bool
     active_jobs: int = 0
     cooldown_until: str | None = None
+    credit_balance: int | None = None
+    credit_checked_at: str | None = None
 
 
 @dataclass(slots=True)

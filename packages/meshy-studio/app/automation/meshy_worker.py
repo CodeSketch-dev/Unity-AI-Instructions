@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -14,6 +15,9 @@ from app.core.scheduler import SchedulePolicy
 from app.security.redaction import redact
 
 
+REQUIRED_CREDITS = 30  # Generate 20 + Texture 10 (remesh is free)
+
+
 class WorkerState(StrEnum):
     IDLE = "idle"
     WAITING_FOR_LOGIN = "waiting_for_login"
@@ -24,6 +28,7 @@ class WorkerState(StrEnum):
     QUOTA_LIMITED = "quota_limited"
     MANUAL_VERIFICATION = "manual_verification"
     INVALID_CREDENTIALS = "invalid_credentials"
+    CANCELED = "canceled"
 
 
 @dataclass(slots=True)
@@ -48,6 +53,9 @@ class MeshyWebWorker:
         self.exporter = exporter or MeshyExporter()
         self._contexts: dict[int, tuple[Any, Any]] = {}
         self._active_account: int | None = None
+        self.cancel_event = threading.Event()
+        self.on_credits: Any = None  # callback(account_id, balance)
+        self.required_credits = REQUIRED_CREDITS
 
     def context_for(self, account_id: int) -> tuple[Any, Any]:
         if account_id not in self._contexts:
@@ -108,8 +116,18 @@ class MeshyWebWorker:
             if login_state != MeshyLoginState.AUTHENTICATED:
                 return WorkerResult(WorkerState.FAILED, account_id, "Meshy authentication state is unknown")
 
+            if (stop := self._canceled(account_id)):
+                return stop
             self.close_stray_tabs(context, page)
             dismiss_onboarding(page)
+            read_credits = getattr(self.adapter, "read_credits", None)
+            balance = read_credits(page) if read_credits is not None else None
+            if balance is not None:
+                if callable(self.on_credits):
+                    self.on_credits(account_id, balance)
+                if balance < self.required_credits:
+                    return WorkerResult(WorkerState.QUOTA_LIMITED, account_id,
+                                        f"Only {balance} credits left (a model needs {self.required_credits})")
             self.adapter.open_model_tab(page)
             dismiss_onboarding(page)
             self.adapter.upload_image(page, image_path)
@@ -150,6 +168,8 @@ class MeshyWebWorker:
             wait_ready = getattr(self.adapter, "wait_for_cards_idle", None) or getattr(self.adapter, "wait_for_model_ready", None)
             if wait_ready is not None and not wait_ready(page):
                 return WorkerResult(WorkerState.FAILED, account_id, "Model did not reach a ready viewer state")
+            if (stop := self._canceled(account_id)):
+                return stop
             idle = getattr(self.adapter, "wait_for_cards_idle", None)
             texture = getattr(self.adapter, "apply_texture", None)
             if texture is not None:
@@ -160,6 +180,8 @@ class MeshyWebWorker:
                     idle(page)
                 elif wait_ready is not None:
                     wait_ready(page)
+            if (stop := self._canceled(account_id)):
+                return stop
             optimize = getattr(self.adapter, "optimize_remesh_10k", None)
             if optimize is not None:
                 before = count_cards(page) if count_cards is not None else 0
@@ -167,6 +189,8 @@ class MeshyWebWorker:
                     return WorkerResult(WorkerState.FAILED, account_id, "Remesh 10K could not start")
                 if idle is not None:
                     idle(page)
+            if (stop := self._canceled(account_id)):
+                return stop
             if self.export_dir is not None and optimize is not None:
                 base = self.export_dir() if callable(self.export_dir) else self.export_dir
                 folder = job_folder(base, image_path)
@@ -185,6 +209,23 @@ class MeshyWebWorker:
             return WorkerResult(WorkerState.FAILED, account_id, f"{type(error).__name__}: {redact(error)[:300]}")
         finally:
             self._active_account = None
+
+    def release_all(self) -> None:
+        for account_id in list(self._contexts):
+            try:
+                self.release_account(account_id)
+            except Exception:
+                pass
+
+    def request_cancel(self) -> None:
+        """Stop the running job at the next step boundary (a step already clicked cannot be undone)."""
+        self.cancel_event.set()
+
+    def _canceled(self, account_id: int) -> WorkerResult | None:
+        probe = getattr(self, "cancel_probe", None)
+        if self.cancel_event.is_set() or (probe is not None and probe()):
+            return WorkerResult(WorkerState.CANCELED, account_id, "Canceled by user")
+        return None
 
     def release_account(self, account_id: int) -> None:
         """Close this account's whole browser window (used when rotating away from it)."""

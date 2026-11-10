@@ -159,3 +159,24 @@ def test_close_stray_tabs_keeps_only_workspace_page():
     keep, oauth, blank = Tab(), Tab(), Tab()
     MeshyWebWorker.close_stray_tabs(SimpleNamespace(pages=[keep, oauth, blank]), keep)
     assert (keep.closed, oauth.closed, blank.closed) == (False, True, True)
+
+
+def test_low_credit_stops_before_generate_and_reports_balance(tmp_path: Path):
+    seen = []
+
+    class CreditAdapter(Adapter):
+        def read_credits(self, page): return 15
+
+    page = Page(MeshyLoginState.AUTHENTICATED)
+    worker = MeshyWebWorker(object(), CreditAdapter(page))
+    worker.on_credits = lambda account_id, balance: seen.append((account_id, balance))
+    result = worker.run_one(7, tmp_path / "a.png")
+    assert result.state == WorkerState.QUOTA_LIMITED and "15" in result.message
+    assert seen == [(7, 15)] and not page.generate.clicked  # no credit was spent
+
+
+def test_enough_credit_continues(tmp_path: Path):
+    class CreditAdapter(Adapter):
+        def read_credits(self, page): return 100
+    page = Page(MeshyLoginState.AUTHENTICATED)
+    assert MeshyWebWorker(object(), CreditAdapter(page)).run_one(1, tmp_path / "a.png").state == WorkerState.GENERATING
