@@ -30,6 +30,8 @@ from app.ui.library_page import LibraryPage
 from app.ui.logs_page import LogsPage
 from app.ui.settings_page import SettingsPage
 from app.ui.stall_watch import StallWatch
+from app.ui.tripo_page import TripoPage
+from app.tripo.service import TripoService
 from app.ui.theme import STYLE, status_color
 
 THUMB = 64
@@ -187,7 +189,41 @@ class MeshyMainWindow(QMainWindow):
         layouts[6].addWidget(self.logs_page)
         self.navigation.currentRowChanged.connect(self._on_page_changed)
         self.navigation.itemSelectionChanged.connect(self._on_nav_selected)  # also reacts to accessibility / UI Automation selection
-        self.setCentralWidget(root_widget)
+        self.credentials = KeyringCredentialStore()
+        self.tripo_service = TripoService(self.root, lambda: self.settings.export_dir, self.credentials)
+        self.tripo_page = TripoPage(self.tripo_service)
+        self.tripo_page.message.connect(lambda text: self.status.setText(text))
+        self.provider_stack = QStackedWidget()
+        self.provider_stack.addWidget(root_widget)
+        self.provider_stack.addWidget(self.tripo_page)
+        shell = QWidget()
+        shell_layout = QVBoxLayout(shell)
+        shell_layout.setContentsMargins(0, 0, 0, 0)
+        shell_layout.setSpacing(0)
+        switch = QHBoxLayout()
+        switch.setContentsMargins(0, 0, 0, 0)
+        switch.setSpacing(0)
+        self.meshy_tab = QPushButton("MESHY")
+        self.tripo_tab = QPushButton("TRIPO")
+        for index, button in enumerate((self.meshy_tab, self.tripo_tab)):
+            button.setCheckable(True)
+            button.setMinimumHeight(54)
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+            button.setStyleSheet("QPushButton{font-size:20px;font-weight:700;border:0;border-bottom:4px solid transparent;background:#1b1f2a;color:#9aa4b8}"
+                                 "QPushButton:checked{background:#262c3b;color:#ffffff;border-bottom:4px solid #7c5cff}"
+                                 "QPushButton:hover{color:#ffffff}")
+            button.clicked.connect(lambda _=False, i=index: self._select_provider(i))
+            switch.addWidget(button, 1)
+        self.meshy_tab.setChecked(True)
+        shell_layout.addLayout(switch)
+        shell_layout.addWidget(self.provider_stack, 1)
+        self.setCentralWidget(shell)
+
+    def _select_provider(self, index: int) -> None:
+        self.provider_stack.setCurrentIndex(index)
+        self.meshy_tab.setChecked(index == 0)
+        self.tripo_tab.setChecked(index == 1)
+        self.status.setText("Meshy (web automation, own accounts)" if index == 0 else "Tripo (official API, API key)")
 
     def _card(self) -> tuple[QFrame, QVBoxLayout]:
         frame = QFrame()

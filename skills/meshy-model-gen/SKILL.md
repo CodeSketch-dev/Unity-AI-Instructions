@@ -28,3 +28,4 @@ triggers: meshy, gen model, generate model, image to 3d, glb, fbx, 3d model from
 - A white render means no material texture bound (FBX has none); bind atlas.png to `_BaseMap` yourself.
 - Meshy meshes are bevel-heavy and fragmented (~380 shells, 2.4k xatlas charts, same count at every xatlas setting): re-unwrapping (smart_project, xatlas) never beats Meshy's own UVs. `blender_atlas` now defaults to `unwrap:"keep"`; use atlas only to share one texture/material across models.
 - Close MeshyAIStudio.exe before rebuilding (build_exe.bat copies over it); check job_status first so no running job is lost.
+- Tripo: the app has a Tripo tab (official REST API, key from platform.tripo3d.ai, NOT the web credits); MCP tools tripo_generate / tripo_status / tripo_balance. Tripo free web accounts cannot export models and the API needs its own paid credits; do not use console scripts that bypass the export lock. Download is off by default (generate-only).

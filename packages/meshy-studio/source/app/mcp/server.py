@@ -5,7 +5,7 @@ import json
 import sys
 from typing import Any
 
-from app.mcp import blender, guide, jobs, models  # noqa: F401  (importing registers the tools)
+from app.mcp import blender, guide, jobs, models, tripo  # noqa: F401  (importing registers the tools)
 from app.mcp.registry import TOOLS
 
 SERVER = {"name": "meshy-ai-studio", "version": "3.0"}
