@@ -32,3 +32,5 @@ Reference facts, mostly VERIFIED from package source. Confirm against the instal
 - Always overwrite on the first migration: warmup may already have created default values.
 - Delete the migration marker on save reset so the next run migrates again.
 - Verify by restoring a real legacy save in Play and checking the new blocks.
+
+- When content moves to a new roster (e.g. purchased packs replacing a legacy list), grep every record/discovery/claim path for early returns on the legacy id: they silently skip all new entries.
