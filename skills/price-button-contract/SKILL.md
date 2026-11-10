@@ -16,3 +16,5 @@ Every control that spends a currency satisfies ALL of these:
 6. Components: soft-currency buttons must not carry the store/IAP purchase component; real-money buttons use the project's IAP component only.
 7. Data: the item list, prices and rewards equal the design sheet row by row; remove template leftovers from the reference game (placeholder text, hidden prices, items the sheet does not list).
 Verify in Play per screen: one script dump of counts/texts/colours/interactable/scale (twice, 0.3 s apart), a screenshot you look at, buy the cheapest item (balance drops by exactly the price), try an unaffordable one.
+
+- Secondary route chips (watch-ad / free) on item cards never float over the card art: share the existing price row (split halves, centred pivots) and give the full row back when the chip hides.
