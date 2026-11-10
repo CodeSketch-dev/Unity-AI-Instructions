@@ -41,3 +41,4 @@ Each rule comes from a real mistake. Follow the habit, it is cheaper than the re
 - Before writing or accepting a "port X from the reference project" task, grep the project for the reference's class names and for "Port of"/"ported" comments: twice a runbook item (IAP manager, tutorial arrow/message) described work that was already done. Report the gap list (ported / not ported / why) instead of re-doing it.
 
 - Changing a code default (`Tuning.Default()`, field initialiser) does nothing when the value is serialized on a prefab/scene/SO: grep the .prefab/.asset for the field and measure the result in Play before claiming it changed.
+- Prefab vs code-built drift: code that does `go.GetComponent<Button>()` on an instantiated prefab finds nothing when the baked prefab keeps the Button on a child -> listener never attached = dead tap. Use GetComponentInChildren(true) and TAP it in Play (invoke onClick and check the popup opened) before closing the task.
