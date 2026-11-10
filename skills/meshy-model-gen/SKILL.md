@@ -21,3 +21,8 @@ triggers: meshy, gen model, generate model, image to 3d, glb, fbx, 3d model from
 - Failure diagnosis: screenshots of failed pages are in the tool's `output/diagnostics/`; look at the newest one before changing anything. Meshy changes its UI, tours and popups often; fix selectors in `app/automation/meshy_adapter.py` and add a test.
 - Verify before reporting: tests pass, EXE builds, job is Completed, GLB triangles are near/below 10K, FBX exists and texture PNG count is non-zero. State clearly when live Meshy, IMAP, drag/drop or EXE GUI was not exercised.
 - Rebuilding the exe: `tools\build_exe.bat` (tests, one-file build, copies `MeshyAIStudio.exe` to the project root).
+
+## Texture crispness traps (measured on a 12.9k-tri Meshy pagoda)
+- Do NOT use the FBX from `unity_import` directly: its UVs came out damaged (wrong colours, soft). Convert the GLB with `blender_atlas` `unwrap:"keep"` (one model, 2048) and bind the atlas to a URP/Lit material: correct, crisp.
+- `unwrap:"smart"` shreds bevel-heavy Meshy meshes into thousands of tiny islands (texture gets worse even at 4K, even after weld). Use `keep` for such models; Meshy's own UVs are the better packing.
+- A white render means no material texture bound (FBX has none); bind atlas.png to `_BaseMap` yourself.

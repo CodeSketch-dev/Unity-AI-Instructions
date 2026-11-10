@@ -67,6 +67,7 @@ for o in allm:
         bpy.context.view_layer.objects.active = o
         bpy.ops.object.mode_set(mode="EDIT")
         bpy.ops.mesh.select_all(action="SELECT")
+        bpy.ops.mesh.remove_doubles(threshold=0.00005)  # weld split vertices so islands follow real surfaces, not triangles
         bpy.ops.uv.smart_project(angle_limit=math.radians(ANGLE), island_margin=0.0, correct_aspect=True, scale_to_bounds=False)
         bpy.ops.object.mode_set(mode="OBJECT")
 
