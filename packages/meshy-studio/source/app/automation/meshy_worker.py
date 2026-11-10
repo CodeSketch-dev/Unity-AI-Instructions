@@ -210,7 +210,10 @@ class MeshyWebWorker:
             if wait_new is not None and not wait_new(page, cards_before):
                 if self._poll_visible_status(page) == WorkerState.QUOTA_LIMITED:
                     return WorkerResult(WorkerState.QUOTA_LIMITED, account_id, "Account has no credits left")
-                return WorkerResult(WorkerState.FAILED, account_id, "No new model appeared after Generate")
+                # The DOM card can lag behind a slow Meshy queue. When the task list from before Generate is known, the
+                # export step waits (up to 15 min) for the NEW task through the API, so do not fail the paid job here.
+                if not (ids_before is not None and options.mode == GenMode.TOPOLOGY):
+                    return WorkerResult(WorkerState.FAILED, account_id, "No new model appeared after Generate")
             wait_ready = getattr(self.adapter, "wait_for_cards_idle", None) or getattr(self.adapter, "wait_for_model_ready", None)
             if wait_ready is not None and not wait_ready(page):
                 return WorkerResult(WorkerState.FAILED, account_id, "Model did not reach a ready viewer state")

@@ -52,3 +52,4 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 - Confirm a suspected artifact with a 5x crop and your own silhouette scan before touching layout; keep the audit as a regression gate, not the truth.
 
 - The dump must skip widgets under a CanvasGroup with alpha <= 0.01 (parked/faded buttons) and badge/sticker children (notify dot, x2 sticker): otherwise hidden widgets and overhanging badges show up as fake dx/dy and overlap failures. Name badge children consistently so the dump can skip them.
+- Before chasing unstable audit numbers, check whether they repeat: sample the widget several times; a value that changes between runs is a measurement artefact (stale bake, translucent plate over moving 3D), a value that repeats is a real offset. Convert px to layout units from a measured step (e.g. 11 px per 17 units) instead of guessing the sign.
