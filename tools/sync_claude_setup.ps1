@@ -168,19 +168,99 @@ Skill routing (always on): at the start of every task match it against `.claude/
 Graphify: if `graphify-out/` exists and is fresh, prefer `graphify query/path/explain` over Read/Grep; fall back silently when missing or stale. Never install, never start the watcher yourself.
 <!-- ai-instructions:end -->
 '@
+$giBegin = '# >>> ai-instructions managed ignore (Unity-AI-Instructions/sync.bat; rewritten on every sync, do not edit) >>>'
+$giEnd = '# <<< ai-instructions managed ignore <<<'
+function Get-ManagedIgnoreLines([string]$R) {
+  # $R = Unity project path relative to the git root ('sub/' with trailing slash), or '' when the root is the Unity folder.
+  $l = New-Object 'System.Collections.Generic.List[string]'
+  $l.Add('# AI-synced files (skills, instruction copy): never push')
+  $l.Add('/' + $R + '.claude/'); $l.Add('/' + $R + 'CLAUDE.local.md')
+  $l.Add('/' + $R + 'Assets/_AiQa/'); $l.Add('/' + $R + 'Assets/_AiQa.meta')
+  $l.Add('# Tool output and scratch folders: generated, never push')
+  foreach ($d in 'Temp*/', 'output/', 'outputs/', 'work/', 'backup*/', '.agents/', '.publish-backup/') { $l.Add('/' + $d); if ($R) { $l.Add('/' + $R + $d) } }
+  foreach ($d in 'graphify-out/', '.omc/', '__pycache__/', '.pytest_cache/') { $l.Add($d) }
+  $l.Add('*.bak'); $l.Add('*.orig'); $l.Add('*.rej')
+  $l.Add('# Generated docs (research dumps, staging copies, reports, QA screenshots/media); hand-written .md docs stay trackable')
+  $docRoots = @('docs/'); if ($R) { $docRoots += ($R + 'docs/') }
+  foreach ($b in $docRoots) {
+    foreach ($d in 'research/', 'staging/', 'screenshots/', 'reports/', 'qa/', 'shots/', 'captures/') { $l.Add('/' + $b + $d) }
+    foreach ($e in 'png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'webm', 'zip') { $l.Add('/' + $b + '**/*.' + $e) }
+  }
+  return $l.ToArray()
+}
+function Write-ManagedBlock([string]$path, [string[]]$lines) {
+  $existing = ''
+  if (Test-Path -LiteralPath $path) { $existing = [IO.File]::ReadAllText($path) }
+  $nl = "`n"; if ($existing -match "`r`n") { $nl = "`r`n" }
+  $block = ($giBegin + "`n" + ($lines -join "`n") + "`n" + $giEnd) -replace "`r?`n", $nl
+  $re = '(?s)' + [regex]::Escape($giBegin) + '.*?' + [regex]::Escape($giEnd)
+  if ($existing -match $re) { $new = [regex]::Replace($existing, $re, { param($m) $block }) }
+  elseif ($existing.Length -eq 0) { $new = $block + $nl }
+  else { $new = $existing.TrimEnd() + $nl + $nl + $block + $nl }
+  if ($new -ne $existing) {
+    $dir = Split-Path -Parent $path
+    if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
+    [IO.File]::WriteAllText($path, $new, $utf8); return $true
+  }
+  return $false
+}
+function Ensure-ProjectIgnore([string]$proj) {
+  # The Unity project's own .gitignore: append ONLY the missing private-file lines (never rewrite or reorder what the owner wrote). Present lines are left alone.
+  $gi = Join-Path $proj '.gitignore'
+  if (-not (Test-Path -LiteralPath $gi)) { return }
+  $raw = [IO.File]::ReadAllText($gi)
+  $have = @($raw -split "`r?`n" | ForEach-Object { $_.Trim() })
+  $want = '/.claude/', '/CLAUDE.local.md', '/Assets/_AiQa/', '/Assets/_AiQa.meta'
+  $missing = @($want | Where-Object { ($have -notcontains $_) -and ($have -notcontains $_.TrimStart('/')) })
+  if ($missing.Count -eq 0) { return }
+  $nl = "`n"; if ($raw -match "`r`n") { $nl = "`r`n" }
+  $add = $nl + '# AI-Instructions private files (synced by Unity-AI-Instructions/sync.bat, never push)' + $nl + ($missing -join $nl) + $nl
+  [IO.File]::WriteAllText($gi, $raw.TrimEnd() + $nl + $add, $utf8)
+  Write-Host ('  project .gitignore: added ' + ($missing -join ' '))
+}
+function Update-ManagedIgnore([string]$proj) {
+  $root = $proj.TrimEnd('\')
+  while ($root -and -not (Test-Path -LiteralPath (Join-Path $root '.git'))) {
+    $parent = Split-Path -Parent $root
+    if (-not $parent -or $parent -eq $root) { $root = $null; break }
+    $root = $parent
+  }
+  if (-not $root) { Write-Host '  ignore: no git repository above this project, skipped'; return }
+  if (-not (Test-Path -LiteralPath (Join-Path $root '.git') -PathType Container)) { Write-Host '  ignore: .git is not a folder (worktree), skipped'; return }
+  $rel = ''
+  if ($proj.TrimEnd('\') -ne $root) { $rel = ($proj.TrimEnd('\').Substring($root.Length).TrimStart('\') -replace '\\', '/') + '/' }
+  $lines = Get-ManagedIgnoreLines $rel
+  # root differs from the Unity folder: managed block in the root .gitignore; same folder: local-only .git/info/exclude (the project's own .gitignore is never edited)
+  if ($rel) { $target = Join-Path $root '.gitignore' } else { $target = Join-Path $root '.git\info\exclude' }
+  if (Write-ManagedBlock $target $lines) { Write-Host ("  ignore block updated: " + $target) }
+}
 foreach ($p in $projects) {
   $cl = Join-Path $p '.claude'
   New-Item -ItemType Directory -Force -Path $cl | Out-Null
   Copy-Item -LiteralPath $agents -Destination (Join-Path $cl 'ai-instructions.md') -Force
-  $cm = Join-Path $p 'CLAUDE.md'
+  # Private by design: the managed block lives in CLAUDE.local.md (personal, git-ignored), never in the shared CLAUDE.md,
+  # so teammates get a clean repo and only machines that cloned + ran sync.bat load the studio skills.
+  $cm = Join-Path $p 'CLAUDE.local.md'
   $block = $gate
   if (Test-Path -LiteralPath (Join-Path $p 'AGENTS.md')) { $block = $gate -replace '@\.claude/ai-instructions\.md', "@AGENTS.md`n@.claude/ai-instructions.md" }
+  $txt = ''
   if (Test-Path -LiteralPath $cm) {
     $txt = [IO.File]::ReadAllText($cm)
     if ($txt -match '(?s)<!-- ai-instructions:begin.*?<!-- ai-instructions:end -->') { $new = [regex]::Replace($txt, '(?s)<!-- ai-instructions:begin.*?<!-- ai-instructions:end -->', { param($m) $block }) }
     else { $new = $block + "`n`n" + $txt }
   } else { $new = $block + "`n" }
   if ($new -ne $txt) { [IO.File]::WriteAllText($cm, $new, $utf8) }
+  # migrate: strip the old managed block from the shared CLAUDE.md so it is no longer a modified tracked file
+  $shared = Join-Path $p 'CLAUDE.md'
+  if (Test-Path -LiteralPath $shared) {
+    $sraw = [IO.File]::ReadAllText($shared)
+    $sre = '(?s)<!-- ai-instructions:begin.*?<!-- ai-instructions:end -->(\r?\n){0,2}'
+    if ($sraw -match $sre) {
+      $snew = [regex]::Replace($sraw, $sre, '')
+      if ($snew.Trim().Length -eq 0) { Remove-Item -LiteralPath $shared -Force; Write-Host ('  removed empty shared CLAUDE.md (block moved to CLAUDE.local.md): ' + $p) }
+      else { [IO.File]::WriteAllText($shared, $snew, $utf8); Write-Host ('  moved managed block from CLAUDE.md to CLAUDE.local.md: ' + $p) }
+    }
+  }
   & robocopy $skills (Join-Path $cl 'skills') /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP | Out-Null
   # Automatic UI audit tooling (skill ui-ink-audit): Editor-only scripts go to Assets/_AiQa/Editor of every Unity project that has uGUI/TMP; nobody copies files by hand.
   $qaSrc = Join-Path $Repo 'templates\unity-editor\AiQa'
@@ -198,17 +278,9 @@ foreach ($p in $projects) {
       if (-not (Test-Path -LiteralPath $target) -or ([IO.File]::ReadAllText($target) -ne $new)) { [IO.File]::WriteAllText($target, $new, $utf8); Write-Host ("  AiQa installed: " + $target) }
     }
   }
-  # Ensure .gitignore ignores the auto-managed .claude files so they never pollute the project repo
-  $giPath = Join-Path $p '.gitignore'
-  $giMarker = '# AI-Instructions auto-managed'
-  if (Test-Path -LiteralPath $giPath) {
-    $giContent = [IO.File]::ReadAllText($giPath)
-    if ($giContent -notmatch [regex]::Escape($giMarker)) {
-      $giBlock = "`n$giMarker (synced by Unity-AI-Instructions/sync.bat, not project-owned)`n/.claude/skills/`n/.claude/ai-instructions.md`n"
-      [IO.File]::WriteAllText($giPath, $giContent.TrimEnd() + $giBlock, $utf8)
-      Write-Host ("  .gitignore updated: added .claude/skills + ai-instructions.md ignore")
-    }
-  }
+  # Keep AI-managed files and tool junk out of git. Never touches the Unity project's own .gitignore.
+  Ensure-ProjectIgnore $p
+  Update-ManagedIgnore $p
   Write-Host ("project synced: " + $p)
 }
 if (-not $projects) { Write-Host 'no Unity projects found next to the repo (add roots to projects.txt)' }

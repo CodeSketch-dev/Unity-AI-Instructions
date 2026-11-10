@@ -41,6 +41,8 @@ Before/after table from the same commands, proof CSVs saved with the report, eve
 
 ## Pitfalls
 - A 0-reference GUID can still load by string: `Resources.Load`, `Addressables` keys, folder loads, `AssetDatabase.LoadAssetAtPath` in Editor tools. The proof checks literals; a dynamically built path ("Biome_" + n) is caught only as a prefix literal.
+- Baked-mesh and generated-art folders are loaded by BUILT paths (`dir + name + "_" + hash`), invisible to GUID and file-stem scans. Real case: 3717 baked meshes had 0 GUID refs and no stem in code, yet deleting them nulled 8532 MeshFilters in one scene. Rule: a folder whose path literal appears in an Editor/runtime script (baker `MESH_DIR`, generator output dir) is NEVER deleted on GUID proof alone.
+- Delete-then-measure gate (mandatory for those folders): count null `MeshFilter.sharedMesh`, null sprites/materials and missing scripts over ALL scenes before and after (script-execute over every scene), delete ONE group per refresh, compare, restore at once (`git checkout -- <paths>`) if any count rises. Play of the Home scene alone proves nothing: a minigame scene can break.
 - Binary-serialized scenes hide references from text scans: the script byte-scans them but you must validate the byte layout on one known GUID; convert such scenes to Force Text anyway.
 - "Same name, same size" is a hint, the sha1 is the proof; keep one canonical copy and repoint nothing by hand (delete the copy with 0 references).
 - Vendor folders: unreferenced does not mean ours to delete; trim a vendor pack to its used closure (`asset-transfer-closure` resolver) or leave it.
