@@ -1,0 +1,1 @@
+{"must_contain": ["READ-ONLY", "backup_deps.py", "trigger_eval.py", "inventory.py", "Never clone"], "must_not_contain": ["C:/Users", "thunder"], "triggers_any": ["skill architect", "tao skill", "audit skills"]}

@@ -444,6 +444,7 @@
 - simulator-pacing-checks - Pacing and economy checks for simulator, idle and pet games: cost curves, buy-max, rebirth ratio, offline cap, big-number rollover, odds disclosure, save repair. Use when tuning or reviewing prices, rebirth, offline income or progress stalls.
 
 ## skill
+- skill-architect - Create, audit, fix and optimise Agent Skills (SKILL.md): inventory, spec check, backup and dependency scan, trigger tests, publish. Use when asked to create, review, merge, rename, delete or tune any skill, or when a skill never fires or misfires.
 - skill-quality-rubric - Score, lint, test and improve a SKILL.md: structural checklist, behavioural eval spec, test-fix-retest loop with keep/revert on score. Use when writing, reviewing or tuning a skill or adding an evals/ spec.
 - skill-test-loop - Test-fix-retest loop for editing a skill: static lint, optional spec check, snapshot, edit, re-score, keep or revert on score change. Use when creating or changing any SKILL.md, before publish, or when a skill misleads agents.
 

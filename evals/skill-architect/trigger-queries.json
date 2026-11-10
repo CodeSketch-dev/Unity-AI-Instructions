@@ -1,0 +1,14 @@
+[
+  {"q": "Create a new skill for FishNet client prediction debugging", "should": ["skill-architect"]},
+  {"q": "tao skill moi cho Windows automation bang PowerShell", "should": ["skill-architect"]},
+  {"q": "audit all my skills and tell me which ones have broken frontmatter", "should": ["skill-architect"]},
+  {"q": "kiem ke skill va sua cac skill bi loi", "should": ["skill-architect"]},
+  {"q": "my skill never fires, how do I fix the description so it triggers", "should": ["skill-architect"]},
+  {"q": "toi uu skill de kich hoat dung tinh huong", "should": ["skill-architect"]},
+  {"q": "merge two duplicate skills and rename one without breaking hooks", "should": ["skill-architect"]},
+  {"q": "review the agentskills.io spec and check my SKILL.md files", "should": ["skill-architect"]},
+  {"q": "Align the price label inside the shop button and add press animation", "not": ["skill-architect"]},
+  {"q": "bots stutter on waypoint corners at high speed", "not": ["skill-architect"]},
+  {"q": "set up FishNet NetworkObject spawning for pickups", "not": ["skill-architect"]},
+  {"q": "balance the egg hatch economy for day-one retention", "not": ["skill-architect"]}
+]
