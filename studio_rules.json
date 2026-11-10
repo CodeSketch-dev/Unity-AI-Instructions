@@ -41,6 +41,12 @@
       "match": "textmesh|text mesh|tmp|textmeshpro|font sdf|alpha clip|chu bi|vet den|outline chu|shader chu",
       "flag": "tmp",
       "inject": "TEXTMESHPRO RULE: load skill tmp-shader-alpha-clip-fix (and tmp-font-optimization). Ensure the TMP_SDF shaders carry the clamped alpha clip (max(alphaClip..., 0.01)); keep the guard test green; change one text suspect at a time and zoom-check in Play."
+    },
+    {
+      "id": "disabled_flag_needs_ledger",
+      "event": "PostToolUse",
+      "match": "(edit|write).*\\.cs",
+      "inject": "SWALLOW GUARD: if this edit sets a feature/UI flag to false (const bool X_ENABLED = false, ENABLED = false, hidden 'until reworked'), add an OPEN row to docs/owner-requests.md in the SAME change naming the flag and the rework, or the owner's task is silently swallowed. Also never close a task on 'code exists': prove it is live in Play (bound, tappable, visible)."
     }
   ]
 }
