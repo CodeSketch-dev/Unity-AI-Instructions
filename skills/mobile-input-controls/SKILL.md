@@ -30,3 +30,7 @@ On a phone the player has two thumbs and no mouse. Everything depends on assigni
 Test with two simultaneous touches (joystick + camera drag + button) on a device or the Device Simulator; confirm no stuck movement after a popup opens, after an interruption, and after scene reload. Layout checks belong to `mobile-hud-layout`.
 
 How knife-tower/monkey-escape wire joystick, look drag, edge-triggered jump and pinch: `references/touch-input-reference.md`. Camera values: `freelook-third-person-camera`.
+
+## Second stick for body facing (carry/aim games)
+- A small fixed right-hand stick sets the body FACING relative to the camera (up = camera forward, left = 90 deg left, down = back); target yaw = cameraYaw + atan2(x, y); turn toward it at a capped rate and keep the yaw when the stick is released. Keep a keyboard fallback (Q/E rate turn) and gamepad right stick. Movement stays camera-relative and independent of facing, so the player can walk sideways with a long carried object.
+- A carried long object held in front of the body must sit close (reach ~ thickness + margin, e.g. 0.4 m); a far reach makes sideways passage through narrow gaps impossible. Verify with a scripted pilot that drives the REAL input statics (TOUCH_MOVE / turn stick / roll / lift), not teleports.
