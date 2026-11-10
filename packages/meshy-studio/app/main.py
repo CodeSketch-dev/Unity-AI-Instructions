@@ -644,7 +644,7 @@ class MeshyMainWindow(QMainWindow):
         token_row = QHBoxLayout()
         self.mail_token = QLineEdit()
         self.mail_token.setEchoMode(QLineEdit.EchoMode.Password)
-        self.mail_token.setPlaceholderText("Purelymail API token (stored in the Windows credential store, never shown again)")
+        self.mail_token.setPlaceholderText("Optional own Purelymail API key (built-in default is used when empty; yours is stored in the Windows credential store)")
         token_row.addWidget(self.mail_token, 1)
         token_row.addWidget(self._button("Save token", self._save_mail_token))
         page_layout.addLayout(token_row)

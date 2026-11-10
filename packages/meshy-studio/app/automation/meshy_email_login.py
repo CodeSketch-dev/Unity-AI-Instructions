@@ -35,15 +35,14 @@ class MeshyEmailLogin:
             saw_captcha = False
             for _ in range(self._max_polls):
                 page.wait_for_timeout(1000)
-                if _captcha_visible(page):
-                    if not saw_captcha:
-                        page.bring_to_front()
-                        saw_captcha = True
-                    continue
+                # Always poll the mailbox first: a CAPTCHA marker (often a hidden iframe) must never stop code entry.
                 code = self._otp_provider(address, sender="meshy", subject="verification", within_minutes=5)
                 if code and code != baseline:
                     break
                 code = None
+                if _captcha_visible(page) and not saw_captcha:
+                    page.bring_to_front()
+                    saw_captcha = True
             if not code:
                 return EmailLoginOutcome.MANUAL_VERIFICATION if saw_captcha else EmailLoginOutcome.OTP_UNAVAILABLE
             field = page.locator('input[maxlength="6"], input[inputmode="numeric"], input[name*="code" i]').first
@@ -76,6 +75,8 @@ def _captcha_visible(page: Any) -> bool:
             except Exception:
                 pass
         for iframe in page.locator("iframe").all():
+            if not iframe.is_visible():
+                continue  # hidden bot-protection frames are always present and are not a challenge
             value = " ".join(filter(None, (iframe.get_attribute("src"), iframe.get_attribute("title")))).lower()
             if any(marker in value for marker in markers):
                 return True

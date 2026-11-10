@@ -12,7 +12,7 @@ def bake(path, ratio):
     im = Image.open(path).convert('RGBA'); w, h = im.size; m = max(w, h)
     a0 = np.asarray(im)[..., 3] / 255.0
     if a0.mean() > 0.92 or m > 640: return None
-    T = max(3, round(ratio * m)); s = (m - 2 * T) / m
+    T = max(2, round(ratio * m)); s = (m - 2 * T) / m
     nw, nh = max(1, round(w * s)), max(1, round(h * s))
     ic = im.resize((nw, nh), Image.LANCZOS)
     canvas = Image.new('RGBA', (w, h), (0, 0, 0, 0)); canvas.alpha_composite(ic, ((w - nw) // 2, (h - nh) // 2))

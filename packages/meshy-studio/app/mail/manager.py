@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 
 from app.mail.purelymail import API_DISABLED_REASON, ImapMailbox, PurelymailApi, PurelymailError, api_config_valid
+from app.mail.default_key import default_token
 from app.security.credentials import CredentialStore
 
 PROVIDER = "purelymail"
@@ -43,7 +44,7 @@ class MailboxManager:
     def api(self) -> PurelymailApi:
         if not self.api_enabled():
             raise PurelymailError(API_DISABLED_REASON)
-        return self._api_factory(self.credentials.get(*TOKEN_KEY) or "", self._api_config())
+        return self._api_factory(self.credentials.get(*TOKEN_KEY) or default_token(), self._api_config())
 
     def add_mailbox(self, address: str, password: str, *, expires_in_days: int | None = None) -> int:
         expires = (datetime.now(timezone.utc) + timedelta(days=expires_in_days)).strftime("%Y-%m-%d %H:%M:%S") \

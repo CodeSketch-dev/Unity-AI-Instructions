@@ -37,3 +37,6 @@ Ask which symptom: atlas memory, glyph weight/blur, CPU spike on text change, bu
 
 ## Pitfalls
 One giant dynamic atlas for all languages; forgetting Clear Dynamic Data; world text on UGUI; autosize on timers.
+
+## SDF padding vs outline (trap, 2026-11-10)
+Symptom: glyph fragments of a neighbouring letter appear inside text ("alphabet bleeding"). Cause: outline + face dilate of the shared outline material (0.5 + 0.5) uses the whole SDF gradient range of a font whose atlas padding is only ~14% of the point size (pad 9 at pt 64). Do NOT just raise `atlasPadding` on an existing dynamic font and call ClearFontAssetData: the material gradient scale no longer matches and every outlined text gets a dark rectangle behind it (reverted with git). Safe routes: (a) lower outline+dilate so their sum stays well under the range (reference 0.30 / 0.28), or (b) create a NEW font asset with `TMP_FontAsset.CreateFontAsset(font, pt, padding >= 25% of pt, ...)`, regenerate its materials and compare screenshots before swapping. Static localisation atlases with pad 4-5 need the same treatment per language.

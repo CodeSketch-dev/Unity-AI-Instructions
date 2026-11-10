@@ -58,3 +58,14 @@ def test_email_login_stops_for_captcha_instead_of_polling_or_bypassing():
     result = MeshyEmailLogin(lambda *args, **kwargs: None, max_polls=2).attempt(page, "box@purelymail.com")
     assert result == EmailLoginOutcome.MANUAL_VERIFICATION
     assert page.brought_to_front
+
+
+def test_captcha_marker_does_not_block_code_entry_when_the_mail_arrived():
+    page = Page()
+    body = Locator()
+    body.inner_text = lambda **kwargs: "hcaptcha iframe present"
+    original = page.locator
+    page.locator = lambda selector: body if selector == "body" else original(selector)
+    codes = iter((None, "481675"))
+    result = MeshyEmailLogin(lambda *args, **kwargs: next(codes), max_polls=3).attempt(page, "box@purelymail.com")
+    assert result == EmailLoginOutcome.AUTHENTICATED and page.code.value == "481675"
