@@ -28,3 +28,9 @@ Verify in Play Mode via Unity MCP: bots complete the course unaided, recover whe
 - Before reading a Play result, check the flow gate (`CanSimulate`/state): after a failure the flow waits for retry and every actor looks "frozen" - that is the gate, not a bot bug.
 - Harness actors that walk straight lines cause wall hits of their own: classify each break (harness human vs bot) before fixing the bot.
 - A leading bot must WAIT while its partner is idle or blocked; otherwise it drags the partner into walls. Test with an idle-partner scenario and report leash-band samples outside range.
+
+## Runtime pair planning (owner rule: no baked avoidance, the partner is a live player)
+- Baked routes give only the goal/heading; avoidance, jumps and gap handling come from runtime perception (overlap/cast/cone) because the human's behaviour cannot be pre-set.
+- Plan the whole carried volume (human + bot + pane): sweep the pane box ahead for each candidate (lateral offset x roll), pick the cheapest clear one, steer sideways with a strong gain (0.8 was too weak; the route pulls back), roll the pane early (roll takes ~0.75 s, so look ahead >= 3 m) and WAIT while the pane is still turning.
+- Run the planner every frame, never at the bot's think/reaction rate, and read perception colliders from the same mask the damage system uses (some props block the pane but not characters).
+- Debug loop that worked: subscribe to the break event in a one-off script and log pane pose/roll/hits plus planner state, then fix the one cause it shows; one fix per run.
