@@ -42,8 +42,9 @@ def audit(path, a):
     # corner radius from the top-left corner: first solid column on the top row
     row0 = solid[ys.min()]; c0 = np.argmax(row0) - xs.min()
     rad = c0 / H * 100
-    if a.kind == 'button':
-        add('corner radius 20-36% of height', 20 <= rad <= 36, f'{rad:.0f}%')
+    if a.kind in ('button', 'tile'):
+        lo = 15 if a.kind == 'tile' else 20
+        add(f'corner radius {lo}-36% of height', lo <= rad <= 36, f'{rad:.0f}%')
     cap = max(c0, 0) + med
     add('corner cap <= 36% of short side', cap <= .36 * min(W, H) + 1, f'cap ~{cap:.0f}px of {min(W, H)}')
     m = inner & (al > .9)

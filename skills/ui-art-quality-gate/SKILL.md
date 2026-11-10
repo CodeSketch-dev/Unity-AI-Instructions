@@ -25,3 +25,11 @@ Any visible flaw = redo, no "good enough". Review every batch like a senior: loo
 - A kit importer (AssetPostprocessor + manifest json) overwrites .meta PPU/border: edit the manifest (per-sprite `ppu`), force reimport, re-read the .meta and dump the live Sprite in Play.
 - Corner size in canvas units = border_px / (ppu/100). Pick ppu so the cap is ~22 units; a cap larger than half the shortest button squeezes into pointed ends.
 - Never ship a smoothing experiment that blurs rims (revert to the original); never import a partial/unverified batch over working art.
+
+## Round 2 conclusions (owner 2026-11-10, same day)
+- One family: EVERY plate sprite the game uses (rail/tile plates, toggles, tags, buttons) must come from the same pipeline; a leftover old sprite (here a rail plate with an opaque drop shadow and a different outline) next to new buttons reads as broken ("ngao"). After replacing a family, grep the code for the remaining plate names (RAIL_PLATE etc.) and rebuild those too (ideal_rounded_tile.py = near-square tile with soft shadow).
+- Shadow like Knife Tower: small offset (~6% of height), tight blur (sigma ~1.3 px at 4x supersample), alpha ~0.3, dark navy (not tan/grey, not wide soft). Fill colours must not be over-blurred (sigma <= 1): over-soft blends read cheap; KT has crisp light band, crisp lip.
+- Icons: outline = same navy as the plate outline, opaque, thick (pad ~6% of the icon size per side), baked or follow-scaled; a translucent 4 px outline reads thin.
+- Icon + amount rows (reward cards, currency, price) are a HorizontalLayoutGroup (icon LayoutElement preferred size, text flexible 0, childAlignment MiddleCenter, outline child ignoreLayout); never hand-placed offsets.
+- When a project test hard-codes ppu 200 / compares to a staging manifest, update the TEST to honour the per-sprite `ppu` override instead of reverting art; keep tests green.
+- The studio must use these skills by itself: art request -> ui-art-quality-gate + codex-ui-sprite-brief + ui-sprite-audit; UI change -> ui-always. The owner should never have to say "use the skills".
