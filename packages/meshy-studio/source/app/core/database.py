@@ -356,6 +356,14 @@ class Database:
         with self._lock:
             return [dict(row) for row in self._connection.execute("SELECT * FROM models ORDER BY id DESC")]
 
+    def update_model_formats(self, model_id: int, formats: str) -> None:
+        with self._lock, self._connection:
+            self._connection.execute("UPDATE models SET formats=? WHERE id=?", (formats, model_id))
+
+    def update_model_file(self, model_id: int, file_path: str, formats: str) -> None:
+        with self._lock, self._connection:
+            self._connection.execute("UPDATE models SET file_path=?, formats=? WHERE id=?", (file_path, formats, model_id))
+
     def delete_model_record(self, model_id: int) -> None:
         """Removes the Library record only; files on disk are never touched."""
         with self._lock, self._connection:

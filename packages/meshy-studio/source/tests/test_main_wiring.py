@@ -32,8 +32,13 @@ def test_windows_explorer_url_drop_queues_all_valid_images(tmp_path):
                        Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
     window.dropEvent(event)
     assert event.isAccepted()
-    assert {Path(job.image_path).name for job in window.database.list_jobs()} == {"one.png", "two.webp"}
+    assert window.database.list_jobs() == []  # dropping only stages: nothing runs before Generate
+    assert window.generate_button.isEnabled() and "2 image" in window.generate_button.text()
     assert "notes.txt" in window.reject_label.text()
+    window._generate_staged()
+    assert {Path(job.image_path).name for job in window.database.list_jobs()} == {"one.png", "two.webp"}
+    window._generate_staged()  # nothing staged: still clickable and it says why
+    assert "Add images first" in window.status.text()
 
 
 def test_queue_shows_previews_and_cancels_selected_jobs(tmp_path):
@@ -178,28 +183,53 @@ def test_library_lists_filters_and_removes_only_the_record(tmp_path):
     folder = tmp_path / "Export" / "gate_1"
     folder.mkdir(parents=True)
     glb = folder / "gate.glb"; glb.write_bytes(b"glb")
+    (folder / "gate.fbx").write_bytes(b"fbx")
     window.database.create_job("a.png")
     window.database.add_model(1, "gate", "a.png", None, str(glb), str(folder), "FBX,GLB", 9449, 1_600_000, None)
     window.database.add_model(2 if window.database.create_job("b.png") else 2, "vase", "b.png", None, str(tmp_path / "gone.glb"), str(tmp_path / "Export" / "vase_1"), "GLB", 100, 10, None)
     library = window.library_page
     library.refresh()
-    assert library.table.rowCount() == 2
+    assert library.table.rowCount() == 1  # the vase record was dropped: its files are not on disk
+    assert len(window.database.list_models()) == 1
+    window.database.add_model(2, "vase", "b.png", None, str(tmp_path / "gone.glb"), str(tmp_path / "Export" / "vase_1"), "GLB", 100, 10, None)
     library.search.setText("gat")
     assert library.table.rowCount() == 1 and "gate" in library.table.item(0, 1).text()
     library.search.setText(""); library.format_filter.setCurrentText("FBX"); assert library.table.rowCount() == 1
     library.format_filter.setCurrentIndex(0)
-    row = next(r for r in range(2) if "vase" in library.table.item(r, 1).text())
-    assert "(file missing)" in library.table.item(row, 1).text()  # a record whose file vanished is flagged, not hidden
     opened = []
     library._opener = opened.append
-    row = next(r for r in range(2) if "gate" in library.table.item(r, 1).text())
+    library.refresh()
+    row = next(r for r in range(library.table.rowCount()) if "gate" in library.table.item(r, 1).text())
     library.table.selectionModel().select(library.table.model().index(row, 0), QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows)
     assert library.open_model() and opened == [str(glb)] and library.open_folder() and opened[-1] == str(folder)
     library._confirm = lambda text: False
-    assert library.remove_record() is False and len(window.database.list_models()) == 2
+    assert library.remove_record() is False and len(window.database.list_models()) == 1
     library._confirm = lambda text: "NOT deleted" in text
     assert library.remove_record() is True
-    assert len(window.database.list_models()) == 1 and glb.exists()  # the record went, the file stayed
+    assert len(window.database.list_models()) == 0 and glb.exists()  # the record went, the file stayed
+
+
+def test_library_follows_files_deleted_in_explorer(tmp_path):
+    window = make_window(tmp_path)
+    folder = tmp_path / "Export" / "m_1"; folder.mkdir(parents=True)
+    glb, fbx = folder / "m.glb", folder / "m.fbx"
+    glb.write_bytes(b"g"); fbx.write_bytes(b"f")
+    window.database.create_job("a.png")
+    window.database.add_model(1, "m", "a.png", None, str(glb), str(folder), "FBX,GLB", 10, 5, None)
+    library = window.library_page
+    library.refresh()
+    assert library.table.rowCount() == 1 and library.selected_id() is not None  # a row is selected at once
+    glb.unlink()  # deleted in Explorer: only the FBX remains
+    library.refresh()
+    model = window.database.list_models()[0]
+    assert model["formats"] == "FBX" and model["file_path"] == str(fbx)
+    fbx.unlink()
+    library.refresh()  # nothing left: the record is removed
+    assert window.database.list_models() == [] and library.table.rowCount() == 0
+    seen = []
+    library.message.connect(seen.append)
+    assert library.open_model() is False and library.open_folder() is False and library.remove_record() is False
+    assert seen and all(text for text in seen)  # every button answers, never silently does nothing
 
 
 def test_logs_filter_and_export_hide_secrets(tmp_path):

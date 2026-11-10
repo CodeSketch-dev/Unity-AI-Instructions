@@ -33,3 +33,10 @@ Any visible flaw = redo, no "good enough". Review every batch like a senior: loo
 - Icon + amount rows (reward cards, currency, price) are a HorizontalLayoutGroup (icon LayoutElement preferred size, text flexible 0, childAlignment MiddleCenter, outline child ignoreLayout); never hand-placed offsets.
 - When a project test hard-codes ppu 200 / compares to a staging manifest, update the TEST to honour the per-sprite `ppu` override instead of reverting art; keep tests green.
 - The studio must use these skills by itself: art request -> ui-art-quality-gate + codex-ui-sprite-brief + ui-sprite-audit; UI change -> ui-always. The owner should never have to say "use the skills".
+
+## Round 3: process failures and the rules they became (owner 2026-11-10, angry, deserved)
+- ONE outline thickness in CANVAS units for the whole game (target 3.6 +- 0.8): `outline_px = units x ppu / 100`. After ANY plate change run `ui-sprite-audit/family_audit.py` (all sliced sprites, grouped); an outlier family is rebuilt in the same pass. Measured today: 45 of 105 sliced kit sprites were outside the band.
+- The runtime must wrap a texture with ONE ppu: check the sprite cache (`Dig_Ui_Kit.Get` rebuilt sprites with the default ppu and ignored the manifest value) and dump the live Sprite of every instance of the plate (ppu, border, rect).
+- Importer manifest borders are (L,B,R,T): a bottom shadow band goes into the 2nd value, not the 4th.
+- Never restructure a prefab (HLG row, moved children) without grepping the code for the old paths (Find("AmountCard/Amount")) and running the screen.
+- Start every UI/art task from the owner's screenshot: apply `ui-screenshot-defect-analysis` and show the defect table.

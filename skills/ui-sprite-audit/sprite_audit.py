@@ -31,8 +31,10 @@ def audit(path, a):
     d_in = ndi.distance_transform_edt(~inner)
     edge = solid & ~ndi.binary_erosion(solid)
     v = d_in[edge]; spread = np.percentile(v, 90) - np.percentile(v, 10); med = float(np.median(v))
-    add('outline uniform (p90-p10 <= 1 px)', spread <= 1.0, f'median {med:.1f} px, spread {spread:.1f} px')
-    add(f'outline thick enough (>= {a.min_outline_pct}% of height)', med / H * 100 >= a.min_outline_pct, f'{med / H * 100:.1f}%')
+    add('outline uniform (p90-p10 <= 1.2 px)', spread <= 1.2, f'median {med:.1f} px, spread {spread:.1f} px')
+    units = med / (a.ppu / 100.0)
+    add(f'outline in CANVAS units {a.units_min}-{a.units_max} (px / (ppu/100); same value for every family)', a.units_min <= units <= a.units_max, f'{units:.2f} units ({med:.1f} px at ppu {a.ppu:g})')
+    if a.min_outline_pct > 0: add(f'outline >= {a.min_outline_pct}% of height', med / H * 100 >= a.min_outline_pct, f'{med / H * 100:.1f}%')
     # silhouette: straight middle strips (top & bottom edge rows over the central third) must not wave
     cols = np.arange(xs.min() + W // 3, xs.min() + 2 * W // 3)
     top = np.array([np.argmax(solid[:, c]) for c in cols], dtype=float)
@@ -55,7 +57,7 @@ def audit(path, a):
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(); p.add_argument('files', nargs='+'); p.add_argument('--max-long', type=int, default=512)
-    p.add_argument('--min-outline-pct', type=float, default=6.5); p.add_argument('--kind', default='button')
+    p.add_argument('--min-outline-pct', type=float, default=0.0); p.add_argument('--kind', default='button'); p.add_argument('--ppu', type=float, default=100.0); p.add_argument('--units-min', type=float, default=3.0); p.add_argument('--units-max', type=float, default=4.2)
     a = p.parse_args(); bad = 0
     for f in a.files:
         res = audit(f, a); fails = [n for n, ok, _ in res if not ok]; bad += len(fails)

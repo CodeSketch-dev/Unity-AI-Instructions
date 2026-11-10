@@ -171,6 +171,7 @@ class MeshyMainWindow(QMainWindow):
         self._build_accounts_page(layouts[2])
         self._build_mail_page(layouts[3])
         self.library_page = LibraryPage(self.database)
+        self.library_page.message.connect(lambda text: self.status.setText(text))
         layouts[4].addWidget(self.library_page)
         self.settings_page = SettingsPage(self.root, self.settings, self.pipeline, self.mail, self.database,
                                           choose_export=self._choose_export_dir,
@@ -216,11 +217,11 @@ class MeshyMainWindow(QMainWindow):
 
     # ---- Generate ----------------------------------------------------------------------------------------------------
     def _build_generate_page(self, page_layout: QVBoxLayout) -> None:
-        self.image_label = QPushButton("Drop images here, or click to choose\nPNG / JPG / WEBP, up to 20 MB each")
+        self.image_label = QPushButton("Drop images here, or click to choose\nPNG / JPG / WEBP, up to 20 MB each\nThey are queued when you press Generate")
         self.image_label.setObjectName("dropzone")
         self.image_label.setCursor(Qt.CursorShape.PointingHandCursor)
         self.image_label.setMinimumHeight(150)
-        self.image_label.setToolTip("Every image you drop or choose is queued immediately")
+        self.image_label.setToolTip("Images you drop or choose wait here until you press Generate")
         self.image_label.clicked.connect(self._choose_image)
         page_layout.addWidget(self.image_label)
         self.reject_label = QLabel("")
@@ -235,7 +236,8 @@ class MeshyMainWindow(QMainWindow):
         self.recent.setIconSize(QSize(72, 72))
         self.recent.setGridSize(QSize(100, 104))
         self.recent.setFixedHeight(128)
-        self.recent.setToolTip("Images you queued recently (see the Queue page for progress)")
+        self.recent.setToolTip("Images waiting for Generate, then images you queued recently (see the Queue page for progress)")
+        self._staged: list[str] = []  # images chosen but not queued yet
         page_layout.addWidget(self.recent)
         card, inner = self._card()
         title = QLabel("Save models to")
@@ -255,6 +257,14 @@ class MeshyMainWindow(QMainWindow):
         inner.addWidget(hint)
         page_layout.addWidget(card)
         page_layout.addWidget(self._build_options_card())
+        gen_row = QHBoxLayout()
+        self.generate_button = self._button("Generate", self._generate_staged)
+        self.generate_button.setMinimumHeight(44)
+        self.generate_button.setToolTip("Queue the images above with the options chosen here")
+        gen_row.addWidget(self.generate_button, 1)
+        self.clear_staged_button = self._button("Clear", self._clear_staged, secondary=True)
+        gen_row.addWidget(self.clear_staged_button)
+        page_layout.addLayout(gen_row)
         self.prompt_input = QLineEdit()
         self.prompt_input.setPlaceholderText("Optional note saved with the next jobs")
         page_layout.addWidget(self.prompt_input)
@@ -339,7 +349,51 @@ class MeshyMainWindow(QMainWindow):
     @Slot()
     def _choose_image(self) -> None:
         paths, _ = QFileDialog.getOpenFileNames(self, "Choose input images", "", "Images (*.png *.jpg *.jpeg *.webp)")
-        self.enqueue_many(paths)
+        self.stage_many(paths)
+
+    def stage_many(self, paths: list[str]) -> tuple[int, list[str]]:
+        """Add valid images to the waiting list; nothing is queued or started until Generate is pressed."""
+        from app.core.pipeline import validate_image
+        added, rejected = 0, []
+        for path in paths:
+            try:
+                validate_image(path)
+            except ValueError as error:
+                rejected.append(str(error))
+                continue
+            if path not in self._staged:
+                self._staged.append(path)
+                item = QListWidgetItem(self._thumbnail(path, 72), Path(path).name[:14])
+                item.setToolTip(path)
+                self.recent.insertItem(0, item)
+                added += 1
+        self.reject_label.setText("Not added: " + "; ".join(rejected) if rejected else "")
+        self._sync_generate_button()
+        return added, rejected
+
+    def _sync_generate_button(self) -> None:
+        count = len(self._staged)
+        self.generate_button.setText(f"Generate ({count} image{'s' if count != 1 else ''})" if count else "Generate")
+        self.image_label.setText(f"{count} image(s) ready - set the options, then press Generate\nDrop or click to add more" if count
+                                 else "Drop images here, or click to choose\nPNG / JPG / WEBP, up to 20 MB each\nThey are queued when you press Generate")
+
+    @Slot()
+    def _generate_staged(self) -> None:
+        if not self._staged:
+            self.status.setText("Add images first: drop them on the box above or click it")
+            return
+        paths, self._staged = self._staged, []
+        self.recent.clear()
+        queued, rejected = self.enqueue_many(paths)
+        self._sync_generate_button()
+        self.status.setText(f"Generate: {queued} job(s) queued with the current options" + (f", {len(rejected)} rejected" if rejected else ""))
+
+    @Slot()
+    def _clear_staged(self) -> None:
+        self.status.setText("Cleared the waiting images" if self._staged else "Nothing to clear")
+        self._staged = []
+        self.recent.clear()
+        self._sync_generate_button()
 
     def dragEnterEvent(self, event) -> None:
         if event.mimeData().hasUrls():
@@ -348,7 +402,7 @@ class MeshyMainWindow(QMainWindow):
     def dropEvent(self, event) -> None:
         paths = [url.toLocalFile() for url in event.mimeData().urls() if url.isLocalFile()]
         if paths:
-            self.enqueue_many(paths)
+            self.stage_many(paths)
             event.acceptProposedAction()
 
     def enqueue_many(self, paths: list[str]) -> tuple[int, list[str]]:
