@@ -16,6 +16,11 @@ class RigType(StrEnum):
     AUTO = "auto"            # Meshy "Smart rigging" picks the skeleton
 
 
+class TextureModel(StrEnum):
+    MESHY_7 = "meshy7"  # default
+    N1 = "n1"           # Meshy N1: native 3D texturing (fewer projection seams); unverified on this app's jobs
+
+
 MIN_POLYCOUNT = 100
 MAX_POLYCOUNT = 30_000
 DEFAULT_POLYCOUNT = 3_000
@@ -28,10 +33,15 @@ class JobOptions:
     polycount: int = DEFAULT_POLYCOUNT
     rig: bool = False
     rig_type: RigType = RigType.AUTO
+    texture_model: TextureModel = TextureModel.MESHY_7
+
+    @property
+    def texture_label(self) -> str:
+        return "Meshy N1" if self.texture_model == TextureModel.N1 else MODEL_NAME
 
     def normalized(self) -> "JobOptions":
         return JobOptions(GenMode(self.mode), max(MIN_POLYCOUNT, min(MAX_POLYCOUNT, int(self.polycount))),
-                          bool(self.rig), RigType(self.rig_type))
+                          bool(self.rig), RigType(self.rig_type), TextureModel(self.texture_model))
 
     def to_json(self) -> str:
         return json.dumps(asdict(self.normalized()))
@@ -44,7 +54,8 @@ class JobOptions:
         try:
             data = json.loads(text)
             return JobOptions(GenMode(data.get("mode", "automatic")), int(data.get("polycount", DEFAULT_POLYCOUNT)),
-                              bool(data.get("rig", False)), RigType(data.get("rig_type", "auto"))).normalized()
+                              bool(data.get("rig", False)), RigType(data.get("rig_type", "auto")),
+                              TextureModel(data.get("texture_model", "meshy7"))).normalized()
         except (ValueError, TypeError):
             return JobOptions(mode=GenMode.AUTOMATIC)
 

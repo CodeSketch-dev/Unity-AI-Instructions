@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from app.automation.meshy_export import inspect_glb
-from app.core.job_options import DEFAULT_POLYCOUNT, MAX_POLYCOUNT, MIN_POLYCOUNT, GenMode, JobOptions, RigType
+from app.core.job_options import DEFAULT_POLYCOUNT, MAX_POLYCOUNT, MIN_POLYCOUNT, GenMode, JobOptions, RigType, TextureModel
 from app.core.pipeline import runner_lock_held, validate_image
 from app.mcp import context
 from app.mcp.registry import INT, STR, schema, tool
@@ -24,13 +24,17 @@ OPTIONS_PROPS = {
                                  "Choose per object: detailed hero pieces high, small or distant props low (see triangle_budget_guide)."},
     "rig": {"type": "boolean", "description": "Auto-rig a skeleton after everything else (extra credits)."},
     "rig_type": {"type": "string", "enum": ["humanoid", "quadruped", "auto"]},
+    "texture_model": {"type": "string", "enum": ["meshy7", "n1"],
+                      "description": "Texture model in topology mode: meshy7 (default) or n1 (Meshy N1 native 3D texturing, fewer seams; "
+                                     "A/B it on the same image before relying on it)."},
     "note": STR,
 }
 
 
 def _options(args: dict) -> JobOptions:
     return JobOptions(GenMode(args.get("mode", "topology")), int(args.get("polycount", DEFAULT_POLYCOUNT)),
-                      bool(args.get("rig", False)), RigType(args.get("rig_type", "auto"))).normalized()
+                      bool(args.get("rig", False)), RigType(args.get("rig_type", "auto")),
+                      TextureModel(args.get("texture_model", "meshy7"))).normalized()
 
 
 def app_running() -> bool:

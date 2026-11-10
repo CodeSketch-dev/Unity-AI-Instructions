@@ -33,7 +33,7 @@ def test_per_item_polycount_modes_and_rig_reach_the_job(tmp_path):
                                                         {"image_path": str(tmp_path / "nope.txt")}]}),
                          ("job_status", {"job_id": 1}))
     assert [q["options"]["polycount"] for q in result["queued"]][0] == 12000
-    assert result["queued"][1]["options"] == {"mode": "automatic", "polycount": 3000, "rig": True, "rig_type": "humanoid"}
+    assert result["queued"][1]["options"] == {"mode": "automatic", "polycount": 3000, "rig": True, "rig_type": "humanoid", "texture_model": "meshy7"}
     assert len(result["rejected"]) == 1 and "nope.txt" in result["rejected"][0]["image_path"]
     assert status["options"]["mode"] == "topology" and status["status"] == "Pending"
     assert result["queued"][0]["app_running"] is False and "warning" in result["queued"][0]

@@ -43,7 +43,7 @@ class StepAdapter(Adapter):
     def __init__(self, page):
         super().__init__(page)
         self.steps = []
-    def configure_topology(self, page, polycount): self.steps.append(("topology", polycount))
+    def configure_topology(self, page, polycount, texture_model="meshy7"): self.steps.append(("topology", polycount))
     def select_generation_mode(self, page, topology): self.steps.append(("mode", topology))
     def count_cards(self, page): return 0
     def wait_for_new_asset(self, page, before, timeout_ms=90_000): return True
@@ -78,7 +78,16 @@ def test_no_options_behaves_like_before(tmp_path):
 
 def test_topology_textured_in_form_skips_the_separate_texture_step(tmp_path):
     class InForm(StepAdapter):
-        def configure_topology(self, page, polycount): self.steps.append(("topology", polycount)); return True
+        def configure_topology(self, page, polycount, texture_model="meshy7"): self.steps.append(("topology", polycount, texture_model)); return True
     adapter = InForm(Page(MeshyLoginState.AUTHENTICATED))
     MeshyWebWorker(object(), adapter).run_one(1, tmp_path / "a.png", options=JobOptions(GenMode.TOPOLOGY, 1500))
-    assert adapter.steps == [("topology", 1500)]
+    assert adapter.steps == [("topology", 1500, "meshy7")]
+
+
+def test_texture_model_n1_travels_from_options_to_the_form(tmp_path):
+    class InForm(StepAdapter):
+        def configure_topology(self, page, polycount, texture_model="meshy7"): self.steps.append(texture_model); return True
+    adapter = InForm(Page(MeshyLoginState.AUTHENTICATED))
+    options = JobOptions.from_json(JobOptions(GenMode.TOPOLOGY, 2000, texture_model="n1").to_json())
+    MeshyWebWorker(object(), adapter).run_one(1, tmp_path / "a.png", options=options)
+    assert adapter.steps == ["n1"] and JobOptions.from_json(None).texture_model.value == "meshy7"

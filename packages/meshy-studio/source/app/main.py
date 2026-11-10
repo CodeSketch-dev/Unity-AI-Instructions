@@ -18,7 +18,7 @@ from app.automation.browser_manager import BrowserManager
 from app.automation.meshy_worker import REQUIRED_CREDITS
 from app.core.account_manager import AccountManager
 from app.core.database import Database
-from app.core.job_options import DEFAULT_POLYCOUNT, MAX_POLYCOUNT, MIN_POLYCOUNT, GenMode, JobOptions, RigType
+from app.core.job_options import DEFAULT_POLYCOUNT, MAX_POLYCOUNT, MIN_POLYCOUNT, GenMode, JobOptions, RigType, TextureModel
 from app.core.pipeline import acquire_runner_lock
 from app.mail.provisioner import AccountProvisioner, MailboxRule
 from app.logs import setup_logging
@@ -298,6 +298,14 @@ class MeshyMainWindow(QMainWindow):
         self.poly_spin.setToolTip("Target triangle count for Smart Topology (Meshy allows 100 - 30000, default 3000)")
         row.addWidget(self.poly_spin)
         inner.addLayout(row)
+        tex_row = QHBoxLayout()
+        tex_row.addWidget(QLabel("Texture model"))
+        self.texture_combo = QComboBox()
+        self.texture_combo.addItem("Meshy 7 (default)", TextureModel.MESHY_7.value)
+        self.texture_combo.addItem("Meshy N1 (native 3D texturing, fewer seams)", TextureModel.N1.value)
+        self.texture_combo.setToolTip("Used in Topology mode. Try N1 on the same image to compare the texture cleanliness.")
+        tex_row.addWidget(self.texture_combo, 1)
+        inner.addLayout(tex_row)
         rig_row = QHBoxLayout()
         self.rig_check = QCheckBox("Rig a skeleton after everything else")
         self.rig_check.setToolTip("Runs Meshy's auto-rigging last, so the exported model has a skeleton. Costs extra credits.")
@@ -313,21 +321,24 @@ class MeshyMainWindow(QMainWindow):
         saved = JobOptions.from_json(json.dumps(stored)) if stored else JobOptions()
         self.mode_combo.setCurrentIndex(max(0, self.mode_combo.findData(saved.mode.value)))
         self.poly_spin.setValue(saved.polycount)
+        self.texture_combo.setCurrentIndex(max(0, self.texture_combo.findData(saved.texture_model.value)))
         self.rig_check.setChecked(saved.rig)
         self.rig_combo.setCurrentIndex(max(0, self.rig_combo.findData(saved.rig_type.value)))
         self.mode_combo.currentIndexChanged.connect(self._options_changed)
         self.poly_spin.valueChanged.connect(self._options_changed)
         self.rig_check.toggled.connect(self._options_changed)
+        self.texture_combo.currentIndexChanged.connect(self._options_changed)
         self.rig_combo.currentIndexChanged.connect(self._options_changed)
         self._sync_option_enabled()
         return card
 
     def current_options(self) -> JobOptions:
         return JobOptions(GenMode(self.mode_combo.currentData()), self.poly_spin.value(), self.rig_check.isChecked(),
-                          RigType(self.rig_combo.currentData())).normalized()
+                          RigType(self.rig_combo.currentData()), TextureModel(self.texture_combo.currentData())).normalized()
 
     def _sync_option_enabled(self) -> None:
         self.poly_spin.setEnabled(self.mode_combo.currentData() == GenMode.TOPOLOGY.value)
+        self.texture_combo.setEnabled(self.mode_combo.currentData() == GenMode.TOPOLOGY.value)
         self.rig_combo.setEnabled(self.rig_check.isChecked())
 
     def _options_changed(self, *_args) -> None:

@@ -161,7 +161,7 @@ class MeshyWebWorker:
             if options.mode == GenMode.TOPOLOGY:
                 configure = getattr(self.adapter, "configure_topology", None)
                 if configure is not None:  # Meshy 7 + Smart Topology + texture + polygon count; raises before any spend
-                    textured_in_form = bool(configure(page, options.polycount))
+                    textured_in_form = bool(configure(page, options.polycount, options.texture_model.value))
             else:
                 select_mode = getattr(self.adapter, "select_generation_mode", None)
                 if select_mode is not None:

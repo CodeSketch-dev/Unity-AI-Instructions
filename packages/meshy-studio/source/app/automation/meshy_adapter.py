@@ -186,13 +186,13 @@ class MeshyWebAdapter:
             raise MeshyWebError("Smart Topology tab was not found")
 
     @staticmethod
-    def configure_topology(page: Any, polycount: int) -> bool:
+    def configure_topology(page: Any, polycount: int, texture_model: str = "meshy7") -> bool:
         """Smart Topology form (verified against the live page): Kết cấu (texture) ON reveals the Mô hình options, so
         pick Meshy 7 and 2K, then the polygon count. The mesh and its texture come out of ONE generation, so the
         separate texture step is not needed afterwards (returns True = already textured)."""
         MeshyWebAdapter.select_generation_mode(page, True)
         MeshyWebAdapter._set_texture_toggle(page, True)
-        MeshyWebAdapter._pick_model(page, "Meshy 7")
+        MeshyWebAdapter._pick_model(page, "Meshy N1" if texture_model == "n1" else "Meshy 7")
         MeshyWebAdapter._pick_model(page, "2K")
         field = MeshyWebAdapter._polygon_field(page)
         field.click(timeout=3000)
