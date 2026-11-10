@@ -55,3 +55,5 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 - Before chasing unstable audit numbers, check whether they repeat: sample the widget several times; a value that changes between runs is a measurement artefact (stale bake, translucent plate over moving 3D), a value that repeats is a real offset. Convert px to layout units from a measured step (e.g. 11 px per 17 units) instead of guessing the sign.
 - Readings that jump between captures on one widget usually mean an attention shake/pulse with a corner pivot (rotation swings the content). Centre the pivot (compensate position), then measure; never tune padding from noisy samples.
 - A fix in a SHARED builder (tab, button, plate) changes every screen that uses it: after tuning it on one screen, re-measure every other family member (other popups with the same tab/button) in the same pass, or the fix becomes a regression elsewhere.
+
+- Trap: a reward/offline popup opened on top makes the audit measure the screen hidden UNDER it (false fails). Claim/close blocking popups first, then re-open the target screen and capture.
