@@ -10,7 +10,7 @@ from pathlib import Path
 from PySide6.QtCore import QSize, Qt, QTimer, Signal, Slot
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QHBoxLayout, QInputDialog, QLabel, QLineEdit,
-                               QListView, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QPlainTextEdit, QPushButton, QSpinBox,
+                               QListView, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QPlainTextEdit, QPushButton, QScrollArea, QSpinBox,
                                QStackedWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from app import bootstrap
@@ -159,7 +159,12 @@ class MeshyMainWindow(QMainWindow):
             page_layout.setContentsMargins(0, 0, 0, 0)
             page_layout.setSpacing(12)
             layouts.append(page_layout)
-            self.pages.addWidget(page)
+            scroll = QScrollArea()  # a page taller than the window scrolls instead of squashing its buttons
+            scroll.setWidgetResizable(True)
+            scroll.setFrameShape(QFrame.Shape.NoFrame)
+            scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            scroll.setWidget(page)
+            self.pages.addWidget(scroll)
         column.addWidget(self.pages, 1)
         self.status = QLabel("Ready")
         self.status.setObjectName("footer")
@@ -200,6 +205,7 @@ class MeshyMainWindow(QMainWindow):
         if tip:
             button.setToolTip(tip)
         button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setMinimumHeight(36)
         button.clicked.connect(handler)
         return button
 
@@ -220,7 +226,7 @@ class MeshyMainWindow(QMainWindow):
         self.image_label = QPushButton("Drop images here, or click to choose\nPNG / JPG / WEBP, up to 20 MB each\nThey are queued when you press Generate")
         self.image_label.setObjectName("dropzone")
         self.image_label.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.image_label.setMinimumHeight(150)
+        self.image_label.setMinimumHeight(110)
         self.image_label.setToolTip("Images you drop or choose wait here until you press Generate")
         self.image_label.clicked.connect(self._choose_image)
         page_layout.addWidget(self.image_label)

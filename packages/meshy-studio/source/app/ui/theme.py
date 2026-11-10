@@ -27,6 +27,8 @@ QListWidget#nav {{ background: transparent; border: none; outline: none; }}
 QListWidget#nav::item {{ padding: 11px 14px; border-radius: 8px; margin: 2px 0; color: {MUTED}; }}
 QListWidget#nav::item:hover {{ background: {CARD_ALT}; color: {TEXT}; }}
 QListWidget#nav::item:selected {{ background: {ACCENT}; color: white; font-weight: 600; }}
+QScrollArea {{ background: transparent; border: none; }}
+QScrollArea > QWidget > QWidget {{ background: transparent; }}
 QPushButton {{ background: {ACCENT}; color: white; border: none; border-radius: 8px; padding: 8px 16px; font-weight: 600; }}
 QPushButton:hover {{ background: {ACCENT_HOVER}; }}
 QPushButton:pressed {{ background: #6a46b8; }}
