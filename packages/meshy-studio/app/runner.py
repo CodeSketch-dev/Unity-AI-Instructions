@@ -45,7 +45,7 @@ def main() -> int:
         while True:
             time.sleep(3600)
     except KeyboardInterrupt:
-        service.stop()
+        service.stop(cancel_running=True, wait_seconds=10)
     return 0
 
 

@@ -12,6 +12,7 @@ from app.automation.model_export import job_folder, package_model, safe_name
 from app.paths import app_root
 from app.automation.meshy_adapter import MeshyLoginState, MeshyWebAdapter, _advance_onboarding, dismiss_onboarding
 from app.automation.google_login import GoogleLoginOutcome, GoogleOAuthLogin
+from app.automation.meshy_email_login import EmailLoginOutcome, MeshyEmailLogin
 from app.security.redaction import redact
 
 
@@ -43,10 +44,13 @@ class MeshyWebWorker:
     """Sequential web worker. It intentionally never accepts credentials or closes contexts."""
 
     def __init__(self, browser_manager: Any, adapter: MeshyWebAdapter | None = None, google_login: GoogleOAuthLogin | None = None,
+                 email_login: MeshyEmailLogin | None = None, auth_mode: Any = None,
                  *, export_dir: Any = None, exporter: MeshyExporter | None = None, packager: Any = None):
         self.browser_manager = browser_manager
         self.adapter = adapter or MeshyWebAdapter(browser_manager)
         self.google_login = google_login
+        self.email_login = email_login
+        self.auth_mode = auth_mode or (lambda _key: "google")
         # a folder, or a callable returning the folder (read per job so the GUI can change it live)
         self.export_dir = export_dir if callable(export_dir) or export_dir is None else Path(export_dir)
         self.packager = packager or (lambda glb: package_model(glb, app_root()))
@@ -89,6 +93,9 @@ class MeshyWebWorker:
             raise RuntimeError("A Meshy job is already running; queue is sequential")
         self._active_account = account_id
         try:
+            if account_key and self.auth_mode(account_key) != "email_otp":
+                return WorkerResult(WorkerState.INVALID_CREDENTIALS, account_id,
+                                    "Legacy Google accounts are disabled; import an authorized email-only account")
             _, context = self.context_for(account_id)
             page = context.pages[0] if context.pages else context.new_page()
             login_state = self.adapter.classify_login_state(page)
@@ -101,22 +108,22 @@ class MeshyWebWorker:
             if login_state == MeshyLoginState.MANUAL_VERIFICATION:
                 return WorkerResult(WorkerState.MANUAL_VERIFICATION, account_id, "Manual verification required")
             if login_state == MeshyLoginState.LOGIN_REQUIRED:
-                self.adapter.start_manual_google_login(page)
-                if self.google_login and account_key:
-                    oauth_page = _new_oauth_page(context, page)
-                    if oauth_page is not None:
-                        outcome = self.google_login.attempt(oauth_page, account_key)
-                        if outcome == GoogleLoginOutcome.MANUAL_VERIFICATION:
-                            return WorkerResult(WorkerState.MANUAL_VERIFICATION, account_id, "Google MFA/CAPTCHA/device verification requires the user")
-                        if outcome == GoogleLoginOutcome.INVALID_CREDENTIALS:
-                            return WorkerResult(WorkerState.INVALID_CREDENTIALS, account_id, "Google credentials were rejected")
-                        if outcome == GoogleLoginOutcome.CREDENTIALS_UNAVAILABLE:
-                            return WorkerResult(WorkerState.WAITING_FOR_LOGIN, account_id, "Google credentials are unavailable in CredentialStore")
+                mode = self.auth_mode(account_key) if account_key else "google"
+                if mode == "email_otp" and self.email_login and account_key:
+                    outcome = self.email_login.attempt(page, account_key)
+                    if outcome == EmailLoginOutcome.MANUAL_VERIFICATION:
+                        return WorkerResult(WorkerState.MANUAL_VERIFICATION, account_id, "Meshy CAPTCHA requires manual verification")
+                    if outcome == EmailLoginOutcome.OTP_UNAVAILABLE:
+                        return WorkerResult(WorkerState.WAITING_FOR_LOGIN, account_id, "Meshy email OTP was not received")
+                    if outcome != EmailLoginOutcome.AUTHENTICATED:
+                        return WorkerResult(WorkerState.INVALID_CREDENTIALS, account_id, "Meshy email OTP login failed")
+                else:
+                    return WorkerResult(WorkerState.INVALID_CREDENTIALS, account_id, "Google login is disabled")
                 login_state = self.adapter.wait_for_authenticated(page, timeout_ms=wait_for_login_ms)
                 if login_state == MeshyLoginState.MANUAL_VERIFICATION:
-                    return WorkerResult(WorkerState.MANUAL_VERIFICATION, account_id, "Google MFA/CAPTCHA/device verification requires the user")
+                    return WorkerResult(WorkerState.MANUAL_VERIFICATION, account_id, "Meshy verification requires the user")
                 if login_state != MeshyLoginState.AUTHENTICATED:
-                    return WorkerResult(WorkerState.WAITING_FOR_LOGIN, account_id, "Google sign-in did not complete before timeout")
+                    return WorkerResult(WorkerState.WAITING_FOR_LOGIN, account_id, "Meshy email sign-in did not complete before timeout")
             if login_state != MeshyLoginState.AUTHENTICATED:
                 return WorkerResult(WorkerState.FAILED, account_id, "Meshy authentication state is unknown")
 
@@ -160,9 +167,8 @@ class MeshyWebWorker:
                 if self._poll_visible_status(page) == WorkerState.QUOTA_LIMITED:
                     _dismiss_modal(page)
                     return WorkerResult(WorkerState.QUOTA_LIMITED, account_id, "Account has no credits left")
-                generate = _generate_button(page)  # first click did not start a job; try once more
-                if generate.is_visible() and generate.is_enabled():
-                    generate.click(timeout=8000)
+                # The first click may already have created a paid remote task even when Meshy's card is delayed.
+                # Never click Generate twice; continue polling and let the submitted-job guard handle a timeout.
             # Meshy may show the daily check-in reward immediately after a job
             # starts; claim/dismiss it without interrupting the generation.
             _advance_onboarding(page)
@@ -184,7 +190,10 @@ class MeshyWebWorker:
             idle = getattr(self.adapter, "wait_for_cards_idle", None)
             texture = getattr(self.adapter, "apply_texture", None)
             if texture is not None:
-                before = count_cards(page) if count_cards is not None else 0
+                open_latest = getattr(self.adapter, "open_latest_asset", None)
+                if open_latest is not None:
+                    open_latest(page)
+                before = _asset_marker(self.adapter, page, count_cards)
                 if not texture(page) or (wait_new is not None and not wait_new(page, before, 60_000)):
                     return WorkerResult(WorkerState.FAILED, account_id, "Texture step could not start")
                 if idle is not None:
@@ -196,7 +205,7 @@ class MeshyWebWorker:
                 return stop
             optimize = getattr(self.adapter, "optimize_remesh_10k", None)
             if optimize is not None:
-                before = count_cards(page) if count_cards is not None else 0
+                before = _asset_marker(self.adapter, page, count_cards)
                 if not optimize(page) or (wait_new is not None and not wait_new(page, before, 60_000)):
                     return WorkerResult(WorkerState.FAILED, account_id, "Remesh 10K could not start")
                 if idle is not None:
@@ -232,6 +241,13 @@ class MeshyWebWorker:
                 self.release_account(account_id)
             except Exception:
                 pass
+
+    def shutdown(self) -> None:
+        """Release contexts and the thread-owned Playwright driver."""
+        self.release_all()
+        close_driver = getattr(self.browser_manager, "close_thread_driver", None)
+        if close_driver is not None:
+            close_driver()
 
     def request_cancel(self) -> None:
         """Stop the running job at the next step boundary (a step already clicked cannot be undone)."""
@@ -315,6 +331,12 @@ def _has_uploaded_preview(page: Any) -> bool:
         return page.locator("img").count() > 0
     except Exception:
         return False
+
+
+def _asset_marker(adapter: Any, page: Any, count_cards: Any) -> int | str:
+    latest = getattr(adapter, "latest_asset_id", None)
+    task_id = latest(page) if latest is not None else None
+    return task_id or (count_cards(page) if count_cards is not None else 0)
 
 
 def _new_oauth_page(context: Any, workspace_page: Any, timeout_ms: int = 15_000) -> Any | None:

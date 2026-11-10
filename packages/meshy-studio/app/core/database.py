@@ -271,13 +271,18 @@ class Database:
         return {"canceled": canceled, "stopping": flagged}
 
     def requeue_jobs(self, job_ids: list[int]) -> int:
-        """Put Failed/Canceled jobs back at the end of the queue."""
+        """Put unsubmitted Failed/Canceled jobs back at the end of the queue.
+
+        A submitted job may still exist remotely and must be reconciled first; silently resetting its submitted flag can
+        spend credits twice.
+        """
         count = 0
         with self._lock, self._connection:
             for job_id in job_ids:
                 cursor = self._connection.execute(
                     "UPDATE jobs SET status=?,error=NULL,retries=0,submitted=0,progress=0,started_at=NULL,finished_at=NULL,updated_at=CURRENT_TIMESTAMP,"
-                    "queue_seq=(SELECT COALESCE(MAX(COALESCE(queue_seq,id)),0)+1 FROM jobs) WHERE id=? AND status IN (?,?)",
+                    "queue_seq=(SELECT COALESCE(MAX(COALESCE(queue_seq,id)),0)+1 FROM jobs) "
+                    "WHERE id=? AND submitted=0 AND status IN (?,?)",
                     (JobStatus.PENDING.value, job_id, JobStatus.FAILED.value, JobStatus.CANCELED.value))
                 count += cursor.rowcount
         return count

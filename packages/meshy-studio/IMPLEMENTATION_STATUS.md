@@ -30,14 +30,14 @@ concurrency). The restructured engine has been verified with fakes and with the 
 | Meshy web flow | Upload, Generate, Texture 2K, Remesh 10K, GLB download via decoder, PNG, FBX (Blender) | WORKING (live earlier) / UNTESTED live after refactor | live earlier; Blender + PNG verified again with real Blender in tests |
 | Meshy web flow | Official Meshy API | NOT IMPLEMENTED / BLOCKED | needs a paid API key; no endpoint is guessed. Whether Meshy permits UI automation of its web app is **unverified** |
 | Accounts | Import, rotation (least recently used), pin one account, rest after quota (24 h), invalid/needs-verification flags | WORKING | unit tests |
-| Accounts | Auto-creating Meshy accounts / mailboxes to renew free credit | NOT IMPLEMENTED (by decision) | circumvents the one-free-account-per-person limit |
+| Accounts | Auto-creating Meshy accounts to renew free credit | NOT IMPLEMENTED (by decision) | not requested; the app never creates Meshy accounts |
 | Purelymail | Track existing mailboxes, expiry warning, IMAP login check, read mail, find OTP | MOCK | unit tests with a fake IMAP; **never run against a real mailbox** (no test mailbox credentials provided) |
-| Purelymail | Management API (list users, domains, credit) | BLOCKED / DISABLED | official documentation is not publicly reachable; disabled unless the user supplies the endpoint configuration; no default endpoints exist in code |
+| Purelymail | Management API (list/create users) | IMPLEMENTED, LIVE UNVERIFIED | disabled unless the user supplies official endpoint configuration; create requires an explicit payload template; no defaults are guessed |
 | Purelymail | Auto-clean of expired mailboxes | NOT IMPLEMENTED | would need the (unverified) management API |
 | UI | 7 pages: Generate, Queue, Accounts, Purelymail, Library, Settings, Logs | WORKING | real EXE: all 7 open (27/27 GUI checks) |
 | UI | Generate: multi-select file picker, instant queue, thumbnails, rejection list, export folder (persisted) | WORKING | real EXE picker + unit tests |
 | UI | Generate: drag & drop from Explorer | PARTIAL | in-process drop test only; the real OLE drag was not driven (needs the mouse) |
-| UI | Queue: thumbnail, name, status, progress, account, time, pause/resume/cancel/retry (confirm if already submitted) | WORKING | real EXE + unit tests |
+| UI | Queue: thumbnail, name, status, progress, account, time, pause/resume/cancel/retry (blocked if already submitted) | WORKING | real EXE + unit tests |
 | UI | Library: records, thumbnail, formats, size, search/filter, open file/folder, remove record without deleting files | WORKING (logic) / UNTESTED (real Explorer open) | unit tests with a fake opener |
 | UI | Settings: parallel jobs, time limit, retries, output folder, environment checks (Chrome/Blender/decoder), IMAP check | WORKING | unit tests; persisted across restart |
 | UI | Logs: level + text filter, export, redaction of passwords/tokens/cookies/OTP | WORKING | unit tests |

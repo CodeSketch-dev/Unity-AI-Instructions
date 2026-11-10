@@ -19,6 +19,16 @@ def test_active_jobs_are_recovered_after_restart(tmp_path: Path):
     assert job.meshy_task_id == "task-1"
 
 
+def test_submitted_job_cannot_be_requeued_before_server_reconciliation(tmp_path: Path):
+    db = Database(tmp_path / "jobs.sqlite3")
+    image = tmp_path / "source.png"; image.write_bytes(b"x")
+    job_id = db.create_job(str(image))
+    db.update_job(job_id, status=JobStatus.FAILED.value, submitted=1, meshy_task_id="remote-42")
+    assert db.requeue_jobs([job_id]) == 0
+    saved = db.get_job(job_id)
+    assert saved.status == JobStatus.FAILED.value and saved.submitted == 1 and saved.meshy_task_id == "remote-42"
+
+
 
 def test_account_cooldown_and_claim_next_job(tmp_path):
     from app.core.database import Database

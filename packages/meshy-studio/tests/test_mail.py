@@ -5,7 +5,7 @@ import pytest
 
 from app.core.database import Database
 from app.mail.manager import MailboxManager
-from app.mail.purelymail import API_DISABLED_REASON, ImapMailbox, PurelymailApi, PurelymailError, extract_otp
+from app.mail.purelymail import API_DISABLED_REASON, OFFICIAL_API_CONFIG, ImapMailbox, PurelymailApi, PurelymailError, extract_otp
 
 CONFIG = {"base_url": "https://api.example.test/v1", "token_header": "X-Test-Token", "endpoints": {"list_users": "users/list"}}
 from app.security.credentials import MemoryCredentialStore
@@ -75,6 +75,155 @@ def test_api_client_uses_header_and_never_leaks_token():
         PurelymailApi("", CONFIG)
 
 
+def test_api_creates_only_a_configured_purelymail_user_and_tracks_it(tmp_path):
+    requests = []
+    config = {
+        **CONFIG,
+        "endpoints": {**CONFIG["endpoints"], "create_user": "users/create"},
+        "payload_templates": {"create_user": {"userName": "{local}", "domainName": "{domain}", "password": "{password}"}},
+    }
+
+    created = False
+
+    def transport(url, headers, body):
+        nonlocal created
+        requests.append((url, json.loads(body)))
+        if url.endswith("users/list"):
+            users = ["artist@owned.example"] if created else []
+            return json.dumps({"result": {"users": users}}).encode()
+        created = True
+        return b'{"result":{"created":true}}'
+
+    db = Database(tmp_path / "t.sqlite3")
+    store = MemoryCredentialStore()
+    manager = MailboxManager(db, store, api_config=lambda: config,
+                             api_factory=lambda token, cfg: PurelymailApi(token, cfg, transport=transport))
+    manager.set_api_token("owner-token")
+    manager.create_mailbox("artist@owned.example", "safe-password", expires_in_days=30)
+    assert requests == [
+        ("https://api.example.test/v1/users/list", {}),
+        ("https://api.example.test/v1/users/create",
+         {"userName": "artist", "domainName": "owned.example", "password": "safe-password"}),
+        ("https://api.example.test/v1/users/list", {}),
+    ]
+    assert db.list_mailboxes()[0]["email"] == "artist@owned.example"
+    assert store.get("artist@owned.example", "mail_password") == "safe-password"
+
+
+def test_official_api_contract_matches_purelymail_openapi():
+    assert OFFICIAL_API_CONFIG == {
+        "base_url": "https://purelymail.com",
+        "token_header": "Purelymail-Api-Token",
+        "endpoints": {"list_users": "/api/v0/listUser", "create_user": "/api/v0/createUser",
+                      "modify_user": "/api/v0/modifyUser"},
+        "payload_templates": {"create_user": {
+            "userName": "{local}", "domainName": "{domain}", "password": "{password}",
+            "enableSearchIndexing": True,
+        }},
+    }
+
+
+def test_create_mailbox_is_idempotent_when_user_already_exists(tmp_path):
+    calls = []
+
+    class Api:
+        def list_users(self):
+            calls.append("list")
+            return ["Artist@owned.example"]
+
+        def create_user(self, address, password):
+            calls.append("create")
+
+    db = Database(tmp_path / "t.sqlite3")
+    store = MemoryCredentialStore()
+    manager = MailboxManager(db, store, api_config=lambda: OFFICIAL_API_CONFIG,
+                             api_factory=lambda token, config: Api(),
+                             imap_factory=lambda address, password: ImapMailbox(address, password, imap_factory=FakeImap))
+    manager.set_api_token("owner-token")
+    manager.create_mailbox("artist@owned.example", "good")
+    assert calls == ["list"]
+    assert db.list_mailboxes()[0]["email"] == "artist@owned.example"
+
+
+def test_default_password_and_modify_password_stay_in_credential_store(tmp_path):
+    changed = []
+
+    class Api:
+        def list_users(self):
+            return []
+
+        def create_user(self, address, password):
+            changed.append(("create", address, password))
+
+        def modify_user_password(self, address, password):
+            changed.append(("modify", address, password))
+
+    class Login:
+        def __init__(self, address, password):
+            self.password = password
+
+        def check_login(self):
+            return self.password == "good"
+
+    db = Database(tmp_path / "t.sqlite3")
+    store = MemoryCredentialStore()
+    manager = MailboxManager(db, store, api_config=lambda: OFFICIAL_API_CONFIG,
+                             api_factory=lambda token, config: Api(), imap_factory=Login)
+    manager.set_api_token("owner-token")
+    manager.set_default_password("good")
+    manager.change_password("artist@owned.example", "good")
+    assert changed == [("modify", "artist@owned.example", "good")]
+    assert store.get("_purelymail", "default_mail_password") == "good"
+    assert store.get("artist@owned.example", "mail_password") == "good"
+
+
+def test_create_mailbox_reconciles_timeout_after_server_commit(tmp_path):
+    calls = 0
+
+    class Api:
+        def list_users(self):
+            return ["artist@owned.example"] if calls else []
+
+        def create_user(self, address, password):
+            nonlocal calls
+            calls += 1
+            raise PurelymailError("create_user failed")
+
+    db = Database(tmp_path / "t.sqlite3")
+    store = MemoryCredentialStore()
+    manager = MailboxManager(db, store, api_config=lambda: OFFICIAL_API_CONFIG,
+                             api_factory=lambda token, config: Api())
+    manager.set_api_token("owner-token")
+    manager.create_mailbox("artist@owned.example", "safe-password")
+    assert calls == 1
+    assert store.get("artist@owned.example", "mail_password") == "safe-password"
+
+
+def test_create_mailbox_does_not_store_password_when_server_never_confirms(tmp_path):
+    class Api:
+        def list_users(self):
+            return []
+
+        def create_user(self, address, password):
+            return {}
+
+    db = Database(tmp_path / "t.sqlite3")
+    store = MemoryCredentialStore()
+    manager = MailboxManager(db, store, api_config=lambda: OFFICIAL_API_CONFIG,
+                             api_factory=lambda token, config: Api())
+    manager.set_api_token("owner-token")
+    with pytest.raises(PurelymailError, match="without the mailbox appearing"):
+        manager.create_mailbox("artist@owned.example", "safe-password")
+    assert db.list_mailboxes() == []
+    assert store.get("artist@owned.example", "mail_password") is None
+
+
+def test_api_never_guesses_create_user_payload_schema():
+    config = {**CONFIG, "endpoints": {**CONFIG["endpoints"], "create_user": "users/create"}}
+    with pytest.raises(PurelymailError, match="payload template"):
+        PurelymailApi("token", config, transport=lambda *args: b"{}").create_user("a@owned.example", "password")
+
+
 def test_api_error_payload_becomes_exception():
     api = PurelymailApi("t", {**CONFIG, "endpoints": {"list_users": "u", "list_domains": "d"}},
                         transport=lambda *a: json.dumps({"error": {"message": "nope"}}).encode())
@@ -90,7 +239,7 @@ def test_no_endpoint_is_ever_guessed(tmp_path):
     manager = MailboxManager(db, MemoryCredentialStore(), api_factory=lambda *a: called.append(a))  # default: no configuration
     manager.set_api_token("tok")
     assert manager.api_enabled() is False
-    with pytest.raises(PurelymailError, match="disabled"):
+    with pytest.raises(PurelymailError, match="configuration is invalid"):
         manager.sync_from_api()
     with pytest.raises(PurelymailError, match="no endpoint is guessed"):
         PurelymailApi("tok", {})

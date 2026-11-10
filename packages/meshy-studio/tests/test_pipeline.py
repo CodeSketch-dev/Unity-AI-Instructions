@@ -17,7 +17,7 @@ class FakeWorker:
     def __init__(self, out_dir: Path, script=None, *, submit_before: set | None = None):
         self.out_dir, self.script = out_dir, dict(script or {})
         self.submit_before = submit_before or set()  # account ids whose failures happen AFTER Generate was clicked
-        self.calls, self.released = [], []
+        self.calls, self.released, self.released_all = [], [], False
         self.cancel_event = threading.Event()
         self.cancel_probe = self.on_credits = self.on_submitted = self.on_progress = self.deadline = None
         self.lock = threading.Lock()
@@ -27,6 +27,9 @@ class FakeWorker:
 
     def release_account(self, account_id):
         self.released.append(account_id)
+
+    def release_all(self):
+        self.released_all = True
 
     def run_one(self, account_id, image_path, *, account_key=None, wait_for_login_ms=0):
         with self.lock:
@@ -141,11 +144,16 @@ def test_paused_job_resumes_when_an_account_returns(tmp_path):
 
 def test_invalid_credentials_and_verification_mark_accounts(tmp_path):
     db, svc, img = make(tmp_path, {1: WorkerState.INVALID_CREDENTIALS, 2: WorkerState.MANUAL_VERIFICATION}, n=3)
-    svc.enqueue(str(img))
+    jid = svc.enqueue(str(img))
     svc.run_pending()
     a = {x.id: x for x in db.list_accounts()}
     assert a[1].authorized is False and a[1].status == "Invalid credentials"
-    assert a[2].status == "Needs verification" and a[3].status == "Ready"
+    assert a[2].status == "Needs verification" and a[3].status == "Not connected"
+    job = db.get_job(jid)
+    assert job.status == "Paused" and job.account_id == 2 and "CAPTCHA" in job.error
+    assert [call[0] for call in svc.worker.calls] == [1, 2]  # never rotates to account 3
+    svc.resume_jobs([jid])
+    assert svc.manual_account_id == 2 and db.get_job(jid).status == "Pending"
 
 
 def test_user_can_pin_another_account_and_failure_pauses_instead_of_falling_through(tmp_path):
@@ -218,6 +226,23 @@ def test_worker_crash_does_not_kill_the_queue(tmp_path, monkeypatch):
     svc.worker.script = {}
     good = svc.enqueue(str(img))
     assert svc.run_pending() == 1 and db.get_job(good).status == "Completed"
+
+
+def test_background_stop_cancels_waits_and_releases_worker_resources(tmp_path):
+    entered = threading.Event()
+
+    def blocking(worker, account_id, image):
+        entered.set()
+        assert worker.cancel_event.wait(3)
+        return WorkerResult(WorkerState.CANCELED, account_id, "stopped")
+
+    db, svc, img = make(tmp_path, {1: blocking}, n=1, poll_seconds=0.01)
+    job_id = svc.enqueue(str(img))
+    svc.start_background()
+    assert entered.wait(2)
+    assert svc.stop(cancel_running=True, wait_seconds=2) is True
+    assert not any(thread.is_alive() for thread in svc._threads)
+    assert svc.worker.released_all is True and db.get_job(job_id).status == "Canceled"
 
 
 # ---- cancel / pause / emergency stop -----------------------------------------------------------------------------

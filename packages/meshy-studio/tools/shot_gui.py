@@ -3,7 +3,7 @@ import sys, tempfile
 sys.path.insert(0, ".")
 from pathlib import Path
 from PySide6.QtGui import QColor, QImage
-from PySide6.QtWidgets import QApplication
+
 import os
 os.environ["MESHY_AUTOSTART"] = "0"
 from app.main import MeshyMainWindow, create_app

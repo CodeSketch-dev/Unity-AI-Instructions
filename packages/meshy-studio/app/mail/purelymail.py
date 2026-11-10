@@ -22,9 +22,20 @@ class PurelymailError(RuntimeError):
 
 
 API_DISABLED_REASON = (
-    "Purelymail API management is disabled: the official management API documentation is not available to this app, "
-    "so no endpoint is guessed. Mailbox reading (IMAP) works. To enable API calls, copy the base URL, token header "
-    "and endpoint paths from the documentation in your Purelymail account into data/settings.json (key purelymail_api).")
+    "Purelymail API management configuration is invalid; no endpoint is guessed. Restore the bundled official "
+    "OpenAPI defaults or provide a complete purelymail_api override in data/settings.json.")
+
+# Verified against Purelymail's published OpenAPI document. Authentication is an API key header, not Bearer auth.
+OFFICIAL_API_CONFIG: dict[str, Any] = {
+    "base_url": "https://purelymail.com",
+    "token_header": "Purelymail-Api-Token",
+    "endpoints": {"list_users": "/api/v0/listUser", "create_user": "/api/v0/createUser",
+                  "modify_user": "/api/v0/modifyUser"},
+    "payload_templates": {"create_user": {
+        "userName": "{local}", "domainName": "{domain}", "password": "{password}",
+        "enableSearchIndexing": True,
+    }},
+}
 
 
 def api_config_valid(config: Any) -> bool:
@@ -33,10 +44,7 @@ def api_config_valid(config: Any) -> bool:
 
 
 class PurelymailApi:
-    """Client for a Purelymail management API that the USER configured from the official documentation.
-
-    Nothing is assumed: base URL, token header and endpoint paths all come from `config` and there are no defaults.
-    The transport is injectable for tests."""
+    """Purelymail management client using verified OpenAPI configuration; transport is injectable for tests."""
 
     def __init__(self, token: str, config: dict[str, Any],
                  transport: Callable[[str, dict[str, str], bytes], bytes] | None = None):
@@ -44,7 +52,7 @@ class PurelymailApi:
             raise PurelymailError("Purelymail API token is not configured")
         if not api_config_valid(config):
             raise PurelymailError(API_DISABLED_REASON)
-        self._token = token
+        self._token, self._config = token, config
         self.base_url, self.header, self.endpoints = config["base_url"].rstrip("/"), config["token_header"], config["endpoints"]
         self._transport = transport or self._post
 
@@ -81,6 +89,26 @@ class PurelymailApi:
             if address:
                 addresses.append(address)
         return addresses
+
+    def create_user(self, address: str, password: str) -> Any:
+        """Create one mailbox using an endpoint and payload template copied from the owner's official API docs."""
+        if "@" not in address or not password:
+            raise PurelymailError("A valid mailbox address and password are required")
+        template = (self._config.get("payload_templates") or {}).get("create_user")
+        if not isinstance(template, dict) or not template:
+            raise PurelymailError("create_user payload template is not configured; no request schema is guessed")
+        local, domain = address.lower().split("@", 1)
+        values = {"address": address.lower(), "local": local, "domain": domain, "password": password}
+        payload = {key: value.format_map(values) if isinstance(value, str) else value for key, value in template.items()}
+        try:
+            return self.call("create_user", payload)
+        except PurelymailError:
+            raise PurelymailError("create_user failed; verify the configured endpoint/template and Purelymail account") from None
+
+    def modify_user_password(self, address: str, password: str) -> Any:
+        if "@" not in address or not password:
+            raise PurelymailError("A valid mailbox address and password are required")
+        return self.call("modify_user", {"userName": address.strip().lower(), "newPassword": password})
 
 
 @dataclass(frozen=True, slots=True)

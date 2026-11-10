@@ -6,11 +6,13 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from app.mail.purelymail import OFFICIAL_API_CONFIG
+
 DEFAULTS: dict[str, Any] = {
     "concurrency": 1,           # parallel jobs (each on its own account, own browser)
     "job_timeout_minutes": 30,  # whole job; checked at every step boundary
     "max_retries": 2,           # automatic retries, only for failures BEFORE the job was submitted to Meshy
-    "purelymail_api": None,     # {"base_url", "token_header", "endpoints": {"list_users", "list_domains", "check_credit"}}
+    "purelymail_api": OFFICIAL_API_CONFIG,
 }
 
 

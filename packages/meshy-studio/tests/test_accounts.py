@@ -8,14 +8,16 @@ from app.security.credentials import MemoryCredentialStore
 def test_parse_account_line_accepts_supported_formats():
     basic = parse_account_line("first@example.com|pw")
     full = parse_account_line("second@example.com|pw2|recover@example.com|JBSWY3DPEHPK3PXP")
+    otp = parse_account_line("otp@example.com")
     assert basic.email == "first@example.com"
     assert basic.recovery_email is None
     assert full.recovery_email == "recover@example.com"
     assert full.totp_secret == "JBSWY3DPEHPK3PXP"
+    assert otp.password is None and otp.auth_mode == "email_otp"
 
 
 def test_parse_account_line_rejects_invalid_data():
-    for line in ("", "not-an-email|pw", "a@example.com", "a@example.com|"):
+    for line in ("", "not-an-email|pw", "a@example.com|"):
         try:
             parse_account_line(line)
         except ValueError:

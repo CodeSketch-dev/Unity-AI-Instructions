@@ -111,7 +111,9 @@ class BrowserHostWidget(QWidget):
         self._onboarding_timer.stop()
         if self._context is not None:
             self._context.close()
-        # The Playwright driver is shared per thread by BrowserManager; keep it alive.
+        close_driver = getattr(self.browser_manager, "close_thread_driver", None)
+        if close_driver is not None:
+            close_driver()
         self._context = self._playwright = self._page = None
         self._hwnd = None
         self.state_changed.emit("stopped")

@@ -1,6 +1,6 @@
 ---
 name: studio-night-loop
-description: Use when the owner leaves the agent running unattended (cron loop, asleep, cannot confirm permissions): how to run a per-minute director loop safely, split work with Codex by file ownership, keep hard limits, and stop only on evidence.
+description: "Use when the owner leaves the agent running unattended (cron loop, asleep, cannot confirm permissions): how to run a per-minute director loop safely, split work with Codex by file ownership, keep hard limits, and stop only on evidence."
 triggers: cron, night loop, unattended, treo may, di ngu, tu stop cron, codex, director loop, khong the confirm
 ---
 

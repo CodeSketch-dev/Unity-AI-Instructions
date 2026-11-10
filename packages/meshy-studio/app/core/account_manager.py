@@ -15,9 +15,10 @@ EMAIL = re.compile(r"^[^\s@|]+@[^\s@|]+\.[^\s@|]+$")
 @dataclass(frozen=True, slots=True)
 class ParsedAccount:
     email: str
-    password: str
+    password: str | None
     recovery_email: str | None = None
     totp_secret: str | None = None
+    auth_mode: str = "google"
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,6 +30,8 @@ class ImportResult:
 
 def parse_account_line(line: str) -> ParsedAccount:
     parts = [part.strip() for part in line.strip().split("|")]
+    if len(parts) == 1 and EMAIL.match(parts[0]):
+        return ParsedAccount(parts[0].lower(), None, auth_mode="email_otp")
     if len(parts) not in (2, 4) or not EMAIL.match(parts[0]) or not parts[1]:
         raise ValueError("Expected email|password or email|password|recovery_email|totp_secret")
     recovery = parts[2] or None if len(parts) == 4 else None
@@ -68,7 +71,9 @@ class AccountManager:
                 self.database._connection.execute("UPDATE accounts SET profile_path=? WHERE id=?", (str(final), account_id))
             try:
                 self.credentials.set(parsed.email, "email", parsed.email)
-                self.credentials.set(parsed.email, "password", parsed.password)
+                self.credentials.set(parsed.email, "auth_mode", parsed.auth_mode)
+                if parsed.password:
+                    self.credentials.set(parsed.email, "password", parsed.password)
                 if parsed.totp_secret:
                     self.credentials.set(parsed.email, "totp", parsed.totp_secret)
             except Exception:

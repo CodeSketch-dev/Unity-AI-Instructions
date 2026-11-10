@@ -37,10 +37,11 @@ def check(name: str, ok: bool, detail: str = "") -> bool:
     return bool(ok)
 
 
-def find_window(timeout: float = 60):
+def find_window(timeout: float = 60, exclude_handles: set[int] | None = None):
     end = time.time() + timeout
     while time.time() < end:
         found = Desktop(backend="uia").windows(title="Meshy AI Studio", visible_only=True)
+        found = [window for window in found if window.handle not in (exclude_handles or set())]
         if found:
             return Desktop(backend="uia").window(handle=found[0].handle)
         time.sleep(0.5)
@@ -48,13 +49,14 @@ def find_window(timeout: float = 60):
 
 
 def launch(workdir: Path):
+    existing = {window.handle for window in Desktop(backend="uia").windows(title="Meshy AI Studio", visible_only=True)}
     started = time.time()
     startup = subprocess.STARTUPINFO()
     startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     startup.wShowWindow = 4  # SW_SHOWNOACTIVATE: the window appears but never takes the focus
     proc = subprocess.Popen([str(workdir / "MeshyAIStudio.exe")], cwd=str(workdir), env=dict(os.environ, MESHY_AUTOSTART="0"),
                             startupinfo=startup)
-    win = find_window()
+    win = find_window(exclude_handles=existing)
     return proc, win, time.time() - started
 
 
@@ -223,7 +225,10 @@ def main() -> int:
         if vase:
             press(vase[0])
         press(win.child_window(title="Cancel selected", control_type="Button"))
-        check("Cancel selected works", wait_text(win, "Canceled 1") is not None)
+        cancel_status = wait_text(win, "Canceled 1")
+        cancel_rows = {Path(r[2]).stem: r[1] for r in job_rows(workdir / "data" / "meshy.sqlite3")}
+        check("Cancel selected works", cancel_status is not None or cancel_rows.get("vase") == "Canceled",
+              "status label observed" if cancel_status is not None else "persisted SQLite state observed")
         time.sleep(0.5)
         shot(win, "05_after_cancel")
         states = {Path(r[2]).stem: r[1] for r in job_rows(workdir / "data" / "meshy.sqlite3")}

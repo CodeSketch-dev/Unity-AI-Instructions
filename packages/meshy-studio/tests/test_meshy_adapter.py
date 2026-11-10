@@ -66,3 +66,36 @@ def test_upload_rejects_unsupported_format(tmp_path: Path):
     else:
         raise AssertionError("unsupported image accepted")
 
+
+def test_open_latest_asset_navigates_to_assets_and_selects_first_card():
+    events = []
+
+    class Item:
+        first = None
+        def __init__(self, name): self.name = name; self.first = self
+        def count(self): return 1
+        def is_visible(self): return True
+        def wait_for(self, **kwargs): events.append(("wait", self.name))
+        def click(self, **kwargs): events.append(("click", self.name))
+
+    class Page:
+        def get_by_test_id(self, name): return Item(name)
+        def locator(self, selector):
+            assert selector == "[data-testid='assets-card']"
+            return Item("newest-card")
+        def wait_for_timeout(self, milliseconds): events.append(("sleep", milliseconds))
+
+    assert MeshyWebAdapter.open_latest_asset(Page()) is True
+    assert events[:3] == [("click", "workspace-sidebar-assets-btn"), ("wait", "newest-card"),
+                          ("click", "newest-card")]
+
+
+def test_wait_for_new_asset_detects_replaced_first_card_when_page_is_full(monkeypatch):
+    markers = iter(["old-task", "old-task", "new-task"])
+    monkeypatch.setattr(MeshyWebAdapter, "latest_asset_id", staticmethod(lambda page: next(markers)))
+
+    class Page:
+        def wait_for_timeout(self, milliseconds): pass
+
+    assert MeshyWebAdapter.wait_for_new_asset(Page(), "old-task", timeout_ms=5000) is True
+

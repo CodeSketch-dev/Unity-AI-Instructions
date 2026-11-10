@@ -428,12 +428,15 @@ class MeshyMainWindow(QMainWindow):
         if not ids:
             return
         submitted = [i for i in ids if self.database.get_job(i).submitted]
-        if submitted and not self._confirm(
-                f"{len(submitted)} of these job(s) were already submitted to Meshy. Retrying creates a NEW generation and may spend "
-                "credits again.\n\nRetry anyway?"):
+        if submitted:
             ids = [i for i in ids if i not in submitted]
+            self.status.setText(
+                f"Blocked {len(submitted)} submitted job(s): reconcile their Meshy server status before creating a new generation")
         count = self.database.requeue_jobs(ids)
-        self.status.setText(f"Re-queued {count} job(s)")
+        if not submitted:
+            self.status.setText(f"Re-queued {count} job(s)")
+        elif count:
+            self.status.setText(self.status.text() + f"; re-queued {count} unsubmitted job(s)")
         self._refresh_jobs()
 
     @Slot()
@@ -448,8 +451,9 @@ class MeshyMainWindow(QMainWindow):
     @Slot()
     def _emergency_stop(self) -> None:
         self.pipeline.emergency_stop()
-        self.pipeline.release_all_browsers()
-        self.status.setText("EMERGENCY STOP: nothing new is sent, running jobs stop at their next step, queue paused, browsers closed "
+        # Worker-owned Playwright contexts are thread-affine; let their owning threads close them.
+        self.pipeline.stop()
+        self.status.setText("EMERGENCY STOP: nothing new is sent, running jobs stop at their next step, queue paused, browsers closing "
                             "(Meshy tasks already submitted keep running on the server)")
         self._refresh_jobs()
 
@@ -574,6 +578,11 @@ class MeshyMainWindow(QMainWindow):
         page_layout.addWidget(self.mail_table, 1)
         row = QHBoxLayout()
         row.addWidget(self._button("Add mailbox...", self._add_mailbox))
+        self.create_mailbox_button = self._button("Create mailbox via API...", self._create_mailbox, secondary=True)
+        self.create_mailbox_button.setEnabled(self.mail.create_enabled())
+        self.create_mailbox_button.setToolTip(
+            "" if self.mail.create_enabled() else "Disabled: configure the official create_user endpoint and payload template in Settings.")
+        row.addWidget(self.create_mailbox_button)
         self.sync_button = self._button("Sync from API", self._sync_mailboxes, secondary=True)
         row.addWidget(self.sync_button)
         row.addWidget(self._button("Check login", self._check_mailbox, secondary=True))
@@ -587,7 +596,7 @@ class MeshyMainWindow(QMainWindow):
         self.sync_button.setEnabled(enabled)
         self.sync_button.setToolTip("" if enabled else "Disabled: no verified management-API configuration (see Settings).")
         self.mail_note.setText(
-            "Existing mailboxes only; the API token and mailbox passwords stay in the Windows credential store. Reading mail uses "
+            "Mailbox passwords and the API token stay in the Windows credential store. Reading mail uses "
             "IMAP (imap.purelymail.com:993). " + ("Management API: enabled with your configuration." if enabled else
                                                   "Management API calls are DISABLED: no official endpoint information is configured, "
                                                   "and none is guessed."))
@@ -626,6 +635,26 @@ class MeshyMainWindow(QMainWindow):
             return
         days, ok = QInputDialog.getInt(self, "Add mailbox", "Days until it expires (0 = never):", 0, 0, 3650)
         self.mail.add_mailbox(address.strip(), password, expires_in_days=days or None)
+        self._refresh_mailboxes()
+
+    @Slot()
+    def _create_mailbox(self) -> None:
+        address, ok = QInputDialog.getText(self, "Create Purelymail mailbox", "Mailbox address on your Purelymail domain:")
+        if not ok or "@" not in address:
+            return
+        password, ok = QInputDialog.getText(self, "Create Purelymail mailbox", "Mailbox password:", QLineEdit.EchoMode.Password)
+        if not ok or not password:
+            return
+        days, ok = QInputDialog.getInt(self, "Create Purelymail mailbox", "Days until it expires (0 = never):", 0, 0, 3650)
+        if not ok:
+            return
+        self.status.setText(f"Creating {address.strip().lower()} in Purelymail...")
+        self._background(lambda: self.mail.create_mailbox(address, password, expires_in_days=days or None),
+                         lambda _id, error: self._after_create_mailbox(address, error))
+
+    def _after_create_mailbox(self, address: str, error: Exception | None) -> None:
+        self.status.setText(f"Create failed: {type(error).__name__}: {error}" if error else
+                            f"Created Purelymail mailbox {address.strip().lower()}")
         self._refresh_mailboxes()
 
     @Slot()
@@ -715,7 +744,7 @@ class MeshyMainWindow(QMainWindow):
     def closeEvent(self, event) -> None:
         """Closing the window stops the local queue; unfinished jobs are restored on the next start (never re-submitted)."""
         self._timer.stop()
-        self.pipeline.stop()
+        self.pipeline.stop(cancel_running=True, wait_seconds=5)
         super().closeEvent(event)
 
 

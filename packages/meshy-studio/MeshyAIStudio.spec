@@ -14,6 +14,9 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+# Qt 6.12 uses Windows' system ICU. Build environments may have an unrelated ICU on PATH (for example Poppler's ICU 78);
+# PyInstaller would collect it as icuuc.dll and QtCore then fails at startup with "specified procedure could not be found".
+a.binaries = [entry for entry in a.binaries if not entry[0].lower().startswith("icu")]
 pyz = PYZ(a.pure)
 
 exe = EXE(

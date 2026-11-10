@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 os.environ["MESHY_AUTOSTART"] = "0"
@@ -16,6 +17,23 @@ def test_drop_enqueues_job_and_rejects_bad_file(tmp_path):
     window._enqueue(str(tmp_path / "x.txt"))
     assert window.status.text().startswith("Rejected")
     assert len(window.database.list_jobs()) == 1
+
+
+def test_windows_explorer_url_drop_queues_all_valid_images(tmp_path):
+    from PySide6.QtCore import QMimeData, QPointF, Qt, QUrl
+    from PySide6.QtGui import QDropEvent
+    window = make_window(tmp_path)
+    first = tmp_path / "one.png"; first.write_bytes(b"x")
+    second = tmp_path / "two.webp"; second.write_bytes(b"x")
+    invalid = tmp_path / "notes.txt"; invalid.write_text("x")
+    mime = QMimeData()
+    mime.setUrls([QUrl.fromLocalFile(str(path)) for path in (first, second, invalid)])
+    event = QDropEvent(QPointF(20, 20), Qt.DropAction.CopyAction, mime,
+                       Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier)
+    window.dropEvent(event)
+    assert event.isAccepted()
+    assert {Path(job.image_path).name for job in window.database.list_jobs()} == {"one.png", "two.webp"}
+    assert "notes.txt" in window.reject_label.text()
 
 
 def test_queue_shows_previews_and_cancels_selected_jobs(tmp_path):
@@ -147,12 +165,11 @@ def test_queue_pause_resume_and_retry_confirmation(tmp_path):
     assert window.database.get_job(job).status == "Pending"
     window.database.update_job(job, status="Failed", submitted=1)
     asked = []
-    window._confirm = lambda text: asked.append(text) or False  # the user says no
+    window._confirm = lambda text: asked.append(text) or False
     window._refresh_jobs(); select(job); window._retry_selected()
-    assert asked and "NEW generation" in asked[0] and window.database.get_job(job).status == "Failed"
-    window._confirm = lambda text: True
-    window._refresh_jobs(); select(job); window._retry_selected()
-    assert window.database.get_job(job).status == "Pending" and window.database.get_job(job).submitted == 0
+    assert asked == []  # this is not a confirmation bypass: retry is blocked until server reconciliation exists
+    assert "reconcile" in window.status.text().lower()
+    assert window.database.get_job(job).status == "Failed" and window.database.get_job(job).submitted == 1
 
 
 def test_library_lists_filters_and_removes_only_the_record(tmp_path):

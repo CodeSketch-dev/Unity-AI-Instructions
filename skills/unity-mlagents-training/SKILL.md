@@ -1,6 +1,6 @@
 ---
 name: unity-mlagents-training
-description: Use when setting up Unity ML-Agents training of NPC bots on Windows with an RTX 50-series GPU (Unity 6, com.unity.ml-agents 4.x, python mlagents 1.1.0, PyTorch cu128): exact working pins, ONNX export traps, one-process topology for shared experience.
+description: "Use when setting up Unity ML-Agents training of NPC bots on Windows with an RTX 50-series GPU (Unity 6, com.unity.ml-agents 4.x, python mlagents 1.1.0, PyTorch cu128): exact working pins, ONNX export traps, one-process topology for shared experience."
 triggers: ml-agents, mlagents, train npc, training bot, onnx, ppo, gail, behavioral cloning, shared policy, huan luyen bot, npc tu hoc
 ---
 

@@ -253,7 +253,7 @@
 - mesh-scene-combiner - Combine static meshes by material - Editor bake stores renderer lists, runtime CombineMeshes runs as a budgeted loading task, dynamic things excluded. Use when a scene has thousands of static MeshRenderers and draw calls are high.
 
 ## meshy
-- meshy-model-gen - Generate a textured ~10K-triangle GLB from an image through the Meshy MCP (packages/meshy-studio): generate_model, job_status, accounts, quota rotation. Use when asked to gen/make a 3D model from an image or to set up the Meshy tool.
+- meshy-model-gen - Generate textured ~10K-triangle GLB/FBX assets through the Meshy queue with email OTP, CAPTCHA handoff, crash safety and credit-aware rotation. Use when generating 3D models or operating Meshy Studio.
 
 ## minigame
 - minigame-consistency-contract - One design system across all minigames: fill a consistency matrix against the reference games (shop, popups, bars, icons, pets, labels, camera, fog, audio, perf) before building or fixing, and sweep each defect class everywhere. Use for new minigames, ports, clones, owner defect reports.

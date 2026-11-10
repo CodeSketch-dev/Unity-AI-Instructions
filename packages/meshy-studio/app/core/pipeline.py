@@ -151,7 +151,13 @@ class PipelineService:
         return self.database.pause_jobs(job_ids)
 
     def resume_jobs(self, job_ids: list[int]) -> int:
-        return self.database.resume_jobs(job_ids)
+        resumed = self.database.resume_jobs(job_ids)
+        for job_id in job_ids:
+            job = self.database.get_job(job_id)
+            if job.account_id and job.error and "CAPTCHA" in job.error.upper():
+                self.database.mark_account(job.account_id, "Ready", authorized=True)
+                self.manual_account_id = job.account_id
+        return resumed
 
     def use_account(self, account_id: int | None) -> None:
         """Pin all jobs to one account the user chose (overrides rest/quota status); None = automatic rotation."""
@@ -268,8 +274,13 @@ class PipelineService:
             LOG.info("job %s canceled (local only%s)", job.id, "; the Meshy task keeps running" if submitted else "")
             self._release_when_idle(slot, account.id)
             return
-        if state in (WorkerState.QUOTA_LIMITED, WorkerState.INVALID_CREDENTIALS, WorkerState.MANUAL_VERIFICATION,
-                     WorkerState.WAITING_FOR_LOGIN):
+        if state == WorkerState.MANUAL_VERIFICATION:
+            db.mark_account(account.id, "Needs verification", session_valid=False)
+            db.update_job(job.id, status=JobStatus.PAUSED.value, account_id=account.id,
+                          error=f"CAPTCHA waiting on account #{account.id}: {result.message}")
+            LOG.warning("job %s paused on account #%s for manual CAPTCHA; account rotation disabled", job.id, account.id)
+            return
+        if state in (WorkerState.QUOTA_LIMITED, WorkerState.INVALID_CREDENTIALS, WorkerState.WAITING_FOR_LOGIN):
             self._mark_account(account, result)
             getattr(self._worker_for(slot), "release_account", lambda _id: None)(account.id)
             if submitted:
@@ -361,12 +372,36 @@ class PipelineService:
             thread.start()
 
     def _loop(self, slot: int) -> None:
-        while not self._stop.is_set():
+        worker = self._worker_for(slot)
+        try:
+            while not self._stop.is_set():
+                try:
+                    self._drain(slot)
+                except Exception:
+                    LOG.exception("pipeline loop error")
+                self._stop.wait(self.poll_seconds)
+        finally:
             try:
-                self._drain(slot)
+                getattr(worker, "shutdown", getattr(worker, "release_all", lambda: None))()
             except Exception:
-                LOG.exception("pipeline loop error")
-            self._stop.wait(self.poll_seconds)
+                LOG.exception("worker %d cleanup failed", slot)
 
-    def stop(self) -> None:
+    def stop(self, *, cancel_running: bool = False, wait_seconds: float = 0) -> bool:
+        """Stop queue threads; optionally cancel local work and wait for bounded cleanup.
+
+        Returns True when every worker thread stopped before the timeout. Remote Meshy tasks are never canceled here.
+        """
         self._stop.set()
+        if cancel_running:
+            with self._state_lock:
+                workers = list(self._workers)
+            for worker in workers:
+                getattr(worker, "request_cancel", lambda: None)()
+        if wait_seconds > 0:
+            deadline = time.monotonic() + wait_seconds
+            current = threading.current_thread()
+            for thread in list(self._threads):
+                if thread is current:
+                    continue
+                thread.join(max(0, deadline - time.monotonic()))
+        return not any(thread.is_alive() for thread in self._threads)

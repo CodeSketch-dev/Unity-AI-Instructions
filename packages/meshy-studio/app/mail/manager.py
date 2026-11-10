@@ -8,6 +8,7 @@ from app.security.credentials import CredentialStore
 
 PROVIDER = "purelymail"
 TOKEN_KEY = ("_purelymail", "api_token")
+DEFAULT_PASSWORD_KEY = ("_purelymail", "default_mail_password")
 EXPIRY_WARNING_DAYS = 7
 
 
@@ -25,9 +26,19 @@ class MailboxManager:
     def set_api_token(self, token: str) -> None:
         self.credentials.set(*TOKEN_KEY, token)
 
+    def set_default_password(self, password: str) -> None:
+        if not password:
+            raise PurelymailError("Default mailbox password cannot be empty")
+        self.credentials.set(*DEFAULT_PASSWORD_KEY, password)
+
     def api_enabled(self) -> bool:
         """The management API is only used with an endpoint configuration the user supplied; there are no defaults."""
         return api_config_valid(self._api_config())
+
+    def create_enabled(self) -> bool:
+        config = self._api_config() or {}
+        return (self.api_enabled() and bool((config.get("endpoints") or {}).get("create_user"))
+                and bool((config.get("payload_templates") or {}).get("create_user")))
 
     def api(self) -> PurelymailApi:
         if not self.api_enabled():
@@ -50,6 +61,37 @@ class MailboxManager:
                 self.database.upsert_mailbox(address.lower(), PROVIDER, None)
                 added.append(address.lower())
         return added
+
+    def create_mailbox(self, address: str, password: str | None = None, *, expires_in_days: int | None = None) -> int:
+        """Provision one mailbox idempotently, then store credentials only after server confirmation."""
+        normalized = address.strip().lower()
+        if normalized.count("@") != 1 or not all(normalized.split("@", 1)):
+            raise PurelymailError("A valid mailbox address is required")
+        password = password or self.credentials.get(*DEFAULT_PASSWORD_KEY)
+        if not password:
+            raise PurelymailError("No mailbox password supplied and no default password is stored")
+        api = self.api()
+        existing = {user.strip().lower() for user in api.list_users()}
+        if normalized in existing:
+            if not self._imap_factory(normalized, password).check_login():
+                raise PurelymailError("Mailbox already exists but the supplied password was not verified")
+        else:
+            try:
+                api.create_user(normalized, password)
+            except PurelymailError as create_error:
+                # A timeout can happen after the server commits. Reconcile before reporting failure or retrying.
+                if normalized not in {user.strip().lower() for user in api.list_users()}:
+                    raise create_error
+            if normalized not in {user.strip().lower() for user in api.list_users()}:
+                raise PurelymailError("create_user returned without the mailbox appearing in listUser")
+        return self.add_mailbox(normalized, password, expires_in_days=expires_in_days)
+
+    def change_password(self, address: str, password: str) -> None:
+        normalized = address.strip().lower()
+        self.api().modify_user_password(normalized, password)
+        if not self._imap_factory(normalized, password).check_login():
+            raise PurelymailError("Password update was not verified by IMAP")
+        self.credentials.set(normalized, "mail_password", password)
 
     def check(self, address: str) -> str:
         """Login test over IMAP; stores the result. Returns the new status."""

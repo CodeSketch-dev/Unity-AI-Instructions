@@ -14,15 +14,26 @@ class BrowserManager:
         self.profiles_root.mkdir(parents=True, exist_ok=True)
         self._playwrights: dict[int, object] = {}
         self._chrome_procs: dict[int, subprocess.Popen] = {}
+        self._lock = threading.RLock()
 
     def _playwright_for_thread(self):
         """One Playwright driver per thread: a second sync_playwright().start() in the
         same thread raises 'Sync API inside the asyncio loop', which broke account rotation."""
         from playwright.sync_api import sync_playwright
         key = threading.get_ident()
-        if key not in self._playwrights:
-            self._playwrights[key] = sync_playwright().start()
-        return self._playwrights[key]
+        with self._lock:
+            if key not in self._playwrights:
+                self._playwrights[key] = sync_playwright().start()
+            return self._playwrights[key]
+
+    def close_thread_driver(self) -> bool:
+        """Stop the Playwright driver owned by the calling thread."""
+        with self._lock:
+            driver = self._playwrights.pop(threading.get_ident(), None)
+        if driver is None:
+            return False
+        driver.stop()
+        return True
 
     def profile_path(self, account_id: int) -> Path:
         if account_id <= 0:
@@ -62,7 +73,9 @@ class BrowserManager:
             port = 9222 + account_id
             cmd = [str(executable), f"--remote-debugging-port={port}", f"--user-data-dir={profile}",
                    f"--disable-extensions-except={extension_dir}", f"--load-extension={extension_dir}", url]
-            self._chrome_procs[account_id] = subprocess.Popen(cmd, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            process = subprocess.Popen(cmd, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            with self._lock:
+                self._chrome_procs[account_id] = process
             deadline = time.time() + 15
             browser = None
             while time.time() < deadline:
@@ -102,7 +115,8 @@ class BrowserManager:
                 context.close()
         except Exception:
             pass
-        proc = self._chrome_procs.pop(account_id, None)
+        with self._lock:
+            proc = self._chrome_procs.pop(account_id, None)
         if proc is not None and proc.poll() is None:
             proc.terminate()
         _kill_profile_chrome(self.profile_path(account_id))

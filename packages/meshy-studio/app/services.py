@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from app.automation.google_login import GoogleOAuthLogin
+from app.automation.meshy_email_login import MeshyEmailLogin
 from app.automation.meshy_worker import MeshyWebWorker
 from app.core.pipeline import PipelineService
 from app.mail.manager import MailboxManager
@@ -10,19 +11,23 @@ from app.security.credentials import CredentialStore, KeyringCredentialStore
 from app.settings import Settings
 
 
-def make_worker_factory(browser_manager: Any, settings: Settings,
-                        credentials: CredentialStore | None = None) -> Callable[[], MeshyWebWorker]:
+def make_worker_factory(browser_manager: Any, settings: Settings, credentials: CredentialStore | None = None,
+                        database: Any = None) -> Callable[[], MeshyWebWorker]:
     """One new worker per pipeline thread (each thread owns its Playwright driver and browser windows)."""
     store = credentials or KeyringCredentialStore()
+    mail = MailboxManager(database, store, api_config=lambda: settings.get("purelymail_api")) if database is not None else None
 
     def factory() -> MeshyWebWorker:
-        return MeshyWebWorker(browser_manager, google_login=GoogleOAuthLogin(store), export_dir=lambda: settings.export_dir)
+        return MeshyWebWorker(browser_manager, google_login=None,
+                              email_login=MeshyEmailLogin(mail.otp) if mail else None,
+                              auth_mode=lambda key: store.get(key, "auth_mode") or "google",
+                              export_dir=lambda: settings.export_dir)
     return factory
 
 
 def build_pipeline(database: Any, browser_manager: Any, settings: Settings,
                    credentials: CredentialStore | None = None) -> PipelineService:
-    factory = make_worker_factory(browser_manager, settings, credentials)
+    factory = make_worker_factory(browser_manager, settings, credentials, database)
     return PipelineService(database, factory(), concurrency=settings.concurrency, worker_factory=factory,
                            max_retries=settings.max_retries, job_timeout_seconds=settings.job_timeout_minutes * 60)
 

@@ -4,15 +4,16 @@ from pathlib import Path
 
 from app.automation.meshy_adapter import MeshyLoginState
 from app.automation.meshy_worker import MeshyWebWorker, WorkerState
+from app.automation.meshy_email_login import EmailLoginOutcome
 
 
 class Locator:
     def __init__(self, visible=True, enabled=True, count=1):
-        self.visible, self.enabled, self._count, self.clicked = visible, enabled, count, False
+        self.visible, self.enabled, self._count, self.clicked, self.click_count = visible, enabled, count, False, 0
 
     def is_visible(self): return self.visible
     def is_enabled(self): return self.enabled
-    def click(self, **kw): self.clicked = True
+    def click(self, **kw): self.clicked = True; self.click_count += 1
     def count(self): return self._count
     def inner_text(self): return ""
 
@@ -56,12 +57,36 @@ class Adapter:
     def _unused(self): pass
 
 
-def test_worker_stops_at_manual_google_login(tmp_path: Path):
+def test_worker_does_not_start_google_login(tmp_path: Path):
     page = Page(MeshyLoginState.LOGIN_REQUIRED)
     adapter = Adapter(page)
     result = MeshyWebWorker(object(), adapter).run_one(1, tmp_path / "a.png")
-    assert result.state == WorkerState.WAITING_FOR_LOGIN
-    assert adapter.started_google
+    assert result.state == WorkerState.INVALID_CREDENTIALS
+    assert not hasattr(adapter, "started_google")
+
+
+def test_worker_uses_email_otp_without_starting_google(tmp_path: Path):
+    page = Page(MeshyLoginState.LOGIN_REQUIRED)
+    adapter = Adapter(page)
+
+    class EmailLogin:
+        def attempt(self, actual_page, address):
+            assert address == "box@purelymail.com"
+            actual_page.state = MeshyLoginState.AUTHENTICATED
+            return EmailLoginOutcome.AUTHENTICATED
+
+    worker = MeshyWebWorker(object(), adapter, email_login=EmailLogin(), auth_mode=lambda key: "email_otp")
+    result = worker.run_one(1, tmp_path / "a.png", account_key="box@purelymail.com")
+    assert not hasattr(adapter, "started_google")
+    assert result.state == WorkerState.FAILED and "No output" in result.message
+
+
+def test_worker_rejects_legacy_google_account_before_opening_browser(tmp_path: Path):
+    adapter = Adapter(Page(MeshyLoginState.AUTHENTICATED))
+    worker = MeshyWebWorker(object(), adapter, auth_mode=lambda key: "google")
+    result = worker.run_one(1, tmp_path / "a.png", account_key="legacy@example.com")
+    assert result.state == WorkerState.INVALID_CREDENTIALS
+    assert adapter.context is None
 
 
 def test_worker_clicks_generate_once_and_keeps_context_open(tmp_path: Path):
@@ -72,10 +97,24 @@ def test_worker_clicks_generate_once_and_keeps_context_open(tmp_path: Path):
     worker.on_submitted = submitted.append
     worker.on_progress = progress.append
     result = worker.run_one(1, tmp_path / "a.png")
-    assert page.generate.clicked and submitted == [1]  # Generate clicked once; the pipeline learns a paid task may exist
+    assert page.generate.click_count == 1 and submitted == [1]  # exactly one paid submission attempt
     assert result.state == WorkerState.FAILED and "No output" in result.message  # no export folder: never a pretend success
     assert progress[0] == 10 and 1 in worker._contexts
     assert adapter.context.close_called is False
+
+
+def test_worker_never_clicks_generate_again_when_remote_card_is_delayed(tmp_path: Path):
+    class SlowRemote(Adapter):
+        def count_cards(self, page): return 3
+        def wait_for_new_asset(self, page, before, timeout_ms=90_000): return False
+
+    page = Page(MeshyLoginState.AUTHENTICATED)
+    worker = MeshyWebWorker(object(), SlowRemote(page))
+    submitted = []
+    worker.on_submitted = submitted.append
+    result = worker.run_one(1, tmp_path / "slow.png")
+    assert result.state == WorkerState.FAILED
+    assert page.generate.click_count == 1 and submitted == [1]
 
 
 def test_worker_does_not_rotate_on_ordinary_error(tmp_path: Path):

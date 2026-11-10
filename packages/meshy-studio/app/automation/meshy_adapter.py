@@ -178,8 +178,8 @@ class MeshyWebAdapter:
             if _busy_cards(page):
                 return False
             # Remesh must run on the newest card (the textured one); the viewer may still show the base mesh.
-            page.locator("[data-testid='assets-card']").first.click(force=True, timeout=3000)
-            page.wait_for_timeout(4000)
+            if not MeshyWebAdapter.open_latest_asset(page):
+                return False
             item = page.get_by_test_id("viewer-remesh-menu-remesh-btn")
             for _ in range(3):
                 page.get_by_test_id("viewer-remesh-btn").first.click(force=True, timeout=3000)
@@ -204,6 +204,10 @@ class MeshyWebAdapter:
         """Open Meshy's texture tool and submit the free 2K texture pass."""
         try:
             dismiss_onboarding(page, 6)
+            # After generation Meshy can leave the Image-to-3D form open. The texture toolbar exists only after selecting
+            # the generated model from Assets, so explicitly reconcile to the newest existing asset before continuing.
+            if not MeshyWebAdapter.open_latest_asset(page):
+                return False
             title = page.get_by_text("Độ phân giải texture", exact=False)
             if not (title.count() and title.first.is_visible()):
                 button = page.get_by_test_id("viewer-edit-texture-btn")
@@ -220,6 +224,22 @@ class MeshyWebAdapter:
         except Exception:
             LOG.warning('texture step failed', exc_info=True)
         return False
+
+    @staticmethod
+    def open_latest_asset(page: Any) -> bool:
+        """Open Assets and select the newest card without starting or spending on any remote task."""
+        try:
+            assets = page.get_by_test_id("workspace-sidebar-assets-btn")
+            if assets.count() and assets.first.is_visible():
+                assets.first.click(force=True, timeout=3000)
+            cards = page.locator("[data-testid='assets-card']")
+            cards.first.wait_for(state="visible", timeout=30000)
+            cards.first.click(force=True, timeout=3000)
+            page.wait_for_timeout(4000)
+            return True
+        except Exception:
+            LOG.warning("could not select the newest Meshy asset", exc_info=True)
+            return False
 
     @staticmethod
     def read_credits(page: Any) -> int | None:
@@ -241,13 +261,27 @@ class MeshyWebAdapter:
         except Exception:
             return 0
 
+    @staticmethod
+    def latest_asset_id(page: Any) -> str | None:
+        """Task id encoded in the newest asset preview URL; stable even when the list is capped at 10 cards."""
+        try:
+            source = page.locator("[data-testid='assets-card']").first.locator("img").first.get_attribute("src") or ""
+            match = re.search(r"/tasks/([^/]+)/", source)
+            return match.group(1) if match else None
+        except Exception:
+            return None
+
     @classmethod
-    def wait_for_new_asset(cls, page: Any, before: int, timeout_ms: int = 90_000) -> bool:
+    def wait_for_new_asset(cls, page: Any, before: int | str | None, timeout_ms: int = 90_000) -> bool:
         """Generate was clicked: wait until a NEW asset card appears (old cards must not count)."""
         import time
         deadline = time.monotonic() + timeout_ms / 1000
         while time.monotonic() < deadline:
-            if cls.count_cards(page) > before:
+            if isinstance(before, str):
+                current = cls.latest_asset_id(page)
+                if current is not None and current != before:
+                    return True
+            elif cls.count_cards(page) > int(before or 0):
                 return True
             page.wait_for_timeout(1000)
         return False
