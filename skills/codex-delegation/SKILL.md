@@ -39,3 +39,7 @@ REVIEW THE TESTS, not just the code: Codex wrote a "simulation" whose key metric
 - `Temp/` is wiped by an Editor restart: a running brief then reads empty ("No prompt provided via stdin"). Keep briefs in `docs/**/briefs` or recreate and rerun; check `.status` before waiting.
 - One owner per file: if two workers need the same file, serialize them. Commit worker output only after compile + tests + diff review.
 - Worker verdict log: luna = audits, plans, Blender scripts, mechanical edits, test scaffolds (good); UI measurement fixes and economy picks (bad without the numbers/rules in the brief).
+
+## Stopping a background Codex run
+- Stopping the background shell task (TaskStop) does NOT stop `codex exec`: the Codex process keeps running and writing files. Find your own run's PID (Win32_Process CreationDate = your launch time) and `taskkill /PID <pid> /T /F`; never kill every codex process (other sessions use Codex too).
+- Two Codex image runs at once both grab the "newest file" in ~/.codex/generated_images and scramble names: run image jobs one at a time.
