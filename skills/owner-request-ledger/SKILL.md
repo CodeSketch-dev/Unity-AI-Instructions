@@ -20,3 +20,8 @@ The owner must never see a request vanish. One append-only file per project: `do
 
 ## Seeding an old project
 Mine `docs/feedback-notes.md`, runbooks and the chat transcript once; add rows for every unfinished request; mark verified ones DONE with evidence, unknown ones OPEN.
+
+## Hidden-flag swallow (learned 2026-11)
+- Turning a feature off "until reworked" (`const bool X_ENABLED = false`) swallows the owner's task unless the same change adds an OPEN ledger row naming the flag and the rework. Never disable without that row.
+- Session-start sweep: grep `= false;` near owner/until/hidden/not finished and match each to an OPEN row; unmatched = swallowed, log it.
+- "Code exists" is not "live": verify in Play that the feature actually binds (e.g. `GetComponentInChildren` misses a SIBLING component; search from `transform.root`) before closing a row.
