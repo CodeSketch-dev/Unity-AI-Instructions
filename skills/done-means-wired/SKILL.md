@@ -30,3 +30,5 @@ Make only safe file-level changes, say exactly what remains unverified, and give
 
 ## Anti-patterns
 Reporting after only writing scripts; runtime fallback code standing in for authored wiring; fixing a Console error by deleting the offending asset.
+
+- Init-order trap: a feature installed in a system Initialize that needs another system (HUD, bar, player) silently never appears when that system is created later. Install lazily (retry in Update until both exist, then latch) and prove in Play that the object exists (count components), not only that the code compiles.
