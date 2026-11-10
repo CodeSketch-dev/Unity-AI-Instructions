@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+import time
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -11,7 +12,6 @@ from app.automation.model_export import job_folder, package_model, safe_name
 from app.paths import app_root
 from app.automation.meshy_adapter import MeshyLoginState, MeshyWebAdapter, _advance_onboarding, dismiss_onboarding
 from app.automation.google_login import GoogleLoginOutcome, GoogleOAuthLogin
-from app.core.scheduler import SchedulePolicy
 from app.security.redaction import redact
 
 
@@ -55,6 +55,10 @@ class MeshyWebWorker:
         self._active_account: int | None = None
         self.cancel_event = threading.Event()
         self.on_credits: Any = None  # callback(account_id, balance)
+        self.on_submitted: Any = None  # callback(account_id): Generate was clicked, a paid remote task may exist
+        self.on_progress: Any = None  # callback(percent)
+        self.deadline: float | None = None  # time.monotonic() limit for the whole job
+        self.cancel_probe: Any = None
         self.required_credits = REQUIRED_CREDITS
 
     def context_for(self, account_id: int) -> tuple[Any, Any]:
@@ -133,6 +137,7 @@ class MeshyWebWorker:
             self.adapter.upload_image(page, image_path)
             if not _has_uploaded_preview(page):
                 return WorkerResult(WorkerState.FAILED, account_id, "Upload preview was not visible")
+            self._progress(10)
             dismiss_onboarding(page, 10)  # a product tour can start right after the upload
             generate = _generate_button(page)
             if not generate.is_visible() or not generate.is_enabled():
@@ -146,6 +151,10 @@ class MeshyWebWorker:
                     _dismiss_modal(page)
                     return WorkerResult(WorkerState.QUOTA_LIMITED, account_id, "Account has no credits left")
                 raise
+            # From here a paid remote task may exist: the pipeline must never submit this job again by itself.
+            if callable(self.on_submitted):
+                self.on_submitted(account_id)
+            self._progress(20)
             wait_new_early = getattr(self.adapter, "wait_for_new_asset", None)
             if wait_new_early is not None and not wait_new_early(page, cards_before, 20_000):
                 if self._poll_visible_status(page) == WorkerState.QUOTA_LIMITED:
@@ -168,6 +177,8 @@ class MeshyWebWorker:
             wait_ready = getattr(self.adapter, "wait_for_cards_idle", None) or getattr(self.adapter, "wait_for_model_ready", None)
             if wait_ready is not None and not wait_ready(page):
                 return WorkerResult(WorkerState.FAILED, account_id, "Model did not reach a ready viewer state")
+            self._progress(45)
+            self._refresh_credits(page, account_id)
             if (stop := self._canceled(account_id)):
                 return stop
             idle = getattr(self.adapter, "wait_for_cards_idle", None)
@@ -180,6 +191,7 @@ class MeshyWebWorker:
                     idle(page)
                 elif wait_ready is not None:
                     wait_ready(page)
+            self._progress(65)
             if (stop := self._canceled(account_id)):
                 return stop
             optimize = getattr(self.adapter, "optimize_remesh_10k", None)
@@ -189,6 +201,7 @@ class MeshyWebWorker:
                     return WorkerResult(WorkerState.FAILED, account_id, "Remesh 10K could not start")
                 if idle is not None:
                     idle(page)
+            self._progress(85)
             if (stop := self._canceled(account_id)):
                 return stop
             if self.export_dir is not None and optimize is not None:
@@ -197,14 +210,17 @@ class MeshyWebWorker:
                 target = folder / f"{safe_name(Path(image_path).stem)}.glb"
                 info = self.exporter.export_latest(context, page, target)
                 self.close_stray_tabs(context, page)
-                extra = self.packager(info["path"])
+                try:
+                    extra = self.packager(info["path"])
+                except Exception as error:  # the verified GLB is already on disk: PNG/FBX problems are warnings
+                    extra = {"textures": [], "fbx": None, "warnings": [f"post-processing failed: {type(error).__name__}"]}
+                self._refresh_credits(page, account_id)
                 message = (f"Exported {info['triangles']} triangles, {len(extra['textures'])} PNG textures, "
                            f"FBX {'yes' if extra['fbx'] else 'no'} -> {folder}")
                 if extra["warnings"]:
                     message += " | " + "; ".join(extra["warnings"])
                 return WorkerResult(WorkerState.COMPLETED, account_id, message, str(info["path"]))
-            state = self._poll_visible_status(page)
-            return WorkerResult(state, account_id, "Generate clicked once; context remains open")
+            return WorkerResult(WorkerState.FAILED, account_id, "No output was produced (export folder or remesh step missing)")
         except Exception as error:
             return WorkerResult(WorkerState.FAILED, account_id, f"{type(error).__name__}: {redact(error)[:300]}")
         finally:
@@ -222,10 +238,25 @@ class MeshyWebWorker:
         self.cancel_event.set()
 
     def _canceled(self, account_id: int) -> WorkerResult | None:
-        probe = getattr(self, "cancel_probe", None)
+        probe = self.cancel_probe
         if self.cancel_event.is_set() or (probe is not None and probe()):
             return WorkerResult(WorkerState.CANCELED, account_id, "Canceled by user")
+        if self.deadline is not None and time.monotonic() > self.deadline:
+            return WorkerResult(WorkerState.FAILED, account_id, "Timed out (job time limit reached)")
         return None
+
+    def _progress(self, percent: int) -> None:
+        if callable(self.on_progress):
+            try:
+                self.on_progress(percent)
+            except Exception:
+                pass
+
+    def _refresh_credits(self, page: Any, account_id: int) -> None:
+        read = getattr(self.adapter, "read_credits", None)
+        balance = read(page) if read is not None else None
+        if balance is not None and callable(self.on_credits):
+            self.on_credits(account_id, balance)  # unreadable stays "unknown": never recorded as 0
 
     def release_account(self, account_id: int) -> None:
         """Close this account's whole browser window (used when rotating away from it)."""
@@ -248,43 +279,6 @@ class MeshyWebWorker:
     def switch_after_quota(self, account_id: int) -> tuple[Any, Any]:
         """Switching is explicit and only allowed after a confirmed quota result."""
         return self.context_for(account_id)
-
-    def run_with_rotation(self, accounts: list[Any], image_path: str | Path, scheduler: Any, *, account_key_for: Any = None, on_result: Any = None) -> WorkerResult:
-        """Run sequentially and switch to the next eligible account on quota."""
-        last: WorkerResult | None = None
-        attempted: set[int] = set()
-        while len(attempted) < len(accounts):
-            available = [a for a in accounts if a.id not in attempted]
-            if not available:
-                break
-            try:
-                selection = scheduler.select(available, SchedulePolicy.ROUND_ROBIN, allow_unvalidated=True)
-            except LookupError:
-                break
-            account = selection.account
-            attempted.add(account.id)
-            key = account_key_for(account) if callable(account_key_for) else None
-            result = self.run_one(account.id, image_path, account_key=key)
-            last = result
-            if callable(on_result):
-                on_result(account, result)
-            if result.state not in (WorkerState.QUOTA_LIMITED, WorkerState.WAITING_FOR_LOGIN, WorkerState.MANUAL_VERIFICATION, WorkerState.INVALID_CREDENTIALS):
-                return result
-            # Leave the exhausted session cleanly before opening the next
-            # profile. Profiles remain persisted, but the website session is
-            # explicitly logged out as the user requested.
-            try:
-                _, exhausted_context = self.context_for(account.id)
-                exhausted_page = exhausted_context.pages[0] if exhausted_context.pages else None
-                if exhausted_page is not None:
-                    self.adapter.logout_account(exhausted_page, getattr(account, "email", None))
-            except Exception:
-                pass
-            try:
-                self.release_account(account.id)
-            except Exception:
-                pass
-        return last or WorkerResult(WorkerState.FAILED, 0, "No eligible account remains")
 
     @staticmethod
     def _poll_visible_status(page: Any) -> WorkerState:

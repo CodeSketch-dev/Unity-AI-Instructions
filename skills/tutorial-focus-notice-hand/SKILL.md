@@ -54,6 +54,12 @@ A spotlight on a world point that is outside the screen leaves the four dim pane
 - Clamp the message with the RENDERED text bounds (`textBounds`), every frame while the target is a UI element at a screen edge; the text rect is often narrower than a no-wrap line.
 - Never freeze with `Time.timeScale = 0` to screenshot a tween-driven overlay: scaled-time tweens never start and the overlay stays invisible.
 
+## Unstable target: never measure once (measured trap, owner-reported)
+- A popup that just opened keeps changing its items for several frames (open tween, layout rebuild, pooled/scrolled cards, TMP refit). A one-shot measure inside `Focus()` sized the box from a half-built item: real case 335x100 at frame 0 vs 277.5x82.8 settled, so the hole was wrong.
+- Rule: `Canvas.ForceUpdateCanvases()` before the first measure, then RE-MEASURE the target every frame while the focus is shown (cached/reused Graphic list, no per-frame allocation, apply only when the size changes by > 0.25 px). The box follows the element, it never trusts a measurement taken at spawn time.
+- Test it in Play by opening the popup and focusing in the SAME frame: log target size, hole size and centre at frame 0 and after it settles; accept only hole = target + margin (+-0.3 px) and centre dx/dy <= 1 px.
+- Also wait/skip while the host is hidden (alpha 0 or `IsShown` false), otherwise the focus lands on an empty spot.
+
 ## One-tap focus (no second tap)
 - `Quest_Focus_Pointer.Focus(rect, msg, ...)` defaults to dismissOnClickFocusBox = true, so the first tap only closes the overlay and the real button needs a second tap. For a "tap this button" step build `FocusOptions { dismissOnClickFocusBox = false, dismissOnClickOutside = false }`: the hole stops raycasting and the tap lands on the real button. Prove it with an EventSystem RaycastAll at the button centre (top hit must be the button) and one simulated click.
 - End the focus from the step's own event (placed, stopped, bought), not from a tap on the overlay.

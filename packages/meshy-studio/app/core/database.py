@@ -8,6 +8,33 @@ from pathlib import Path
 from app.core.models import Account, Job, JobStatus
 
 
+def _add_columns(connection: sqlite3.Connection, table: str, columns: dict[str, str]) -> None:
+    existing = {row["name"] for row in connection.execute(f"PRAGMA table_info({table})")}
+    for name, kind in columns.items():
+        if name not in existing:
+            connection.execute(f"ALTER TABLE {table} ADD COLUMN {name} {kind}")
+
+
+def _m1_account_columns(connection: sqlite3.Connection) -> None:
+    _add_columns(connection, "accounts", {"cooldown_until": "TEXT", "credit_balance": "INTEGER", "credit_checked_at": "TEXT"})
+
+
+def _m2_job_columns(connection: sqlite3.Connection) -> None:
+    _add_columns(connection, "jobs", {"retry_at": "REAL", "queue_seq": "INTEGER"})
+
+
+def _m3_idempotency_and_timing(connection: sqlite3.Connection) -> None:
+    # submitted=1 once Generate was clicked and a new remote task appeared: such a job is never re-submitted automatically
+    _add_columns(connection, "jobs", {"submitted": "INTEGER NOT NULL DEFAULT 0", "started_at": "TEXT", "finished_at": "TEXT"})
+
+
+def _m4_library_metadata(connection: sqlite3.Connection) -> None:
+    _add_columns(connection, "models", {"folder": "TEXT", "formats": "TEXT", "triangles": "INTEGER", "size_bytes": "INTEGER"})
+
+
+MIGRATIONS = [_m1_account_columns, _m2_job_columns, _m3_idempotency_and_timing, _m4_library_metadata]
+
+
 class Database:
     def __init__(self, path: str | Path):
         self.path = Path(path)
@@ -73,17 +100,18 @@ class Database:
                 );
                 CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
             """)
-            columns = {row["name"] for row in self._connection.execute("PRAGMA table_info(accounts)")}
-            for name, kind in (("credit_balance", "INTEGER"), ("credit_checked_at", "TEXT")):
-                if name not in columns:
-                    self._connection.execute(f"ALTER TABLE accounts ADD COLUMN {name} {kind}")
-            if "cooldown_until" not in columns:
-                self._connection.execute("ALTER TABLE accounts ADD COLUMN cooldown_until TEXT")
-            job_columns = {row["name"] for row in self._connection.execute("PRAGMA table_info(jobs)")}
-            if "retry_at" not in job_columns:  # backoff: not before this epoch time
-                self._connection.execute("ALTER TABLE jobs ADD COLUMN retry_at REAL")
-            if "queue_seq" not in job_columns:  # re-queued jobs go to the back of the line
-                self._connection.execute("ALTER TABLE jobs ADD COLUMN queue_seq INTEGER")
+        self._migrate()
+
+    def schema_version(self) -> int:
+        return int(self._connection.execute("PRAGMA user_version").fetchone()[0])
+
+    def _migrate(self) -> None:
+        """Ordered, idempotent migrations tracked by PRAGMA user_version (safe on databases from older builds)."""
+        for target, step in enumerate(MIGRATIONS, start=1):
+            if self.schema_version() < target:
+                with self._lock, self._connection:
+                    step(self._connection)
+                    self._connection.execute(f"PRAGMA user_version={target}")
 
     def add_account(self, email: str, recovery_email: str | None, priority: int, profile_path: str) -> int:
         with self._lock, self._connection:
@@ -94,11 +122,13 @@ class Database:
             return int(cursor.lastrowid)
 
     def account_by_email(self, email: str) -> Account | None:
-        row = self._connection.execute("SELECT * FROM accounts WHERE email=? COLLATE NOCASE", (email,)).fetchone()
+        with self._lock:
+            row = self._connection.execute("SELECT * FROM accounts WHERE email=? COLLATE NOCASE", (email,)).fetchone()
         return self._account(row) if row else None
 
     def list_accounts(self) -> list[Account]:
-        rows = self._connection.execute("SELECT * FROM accounts ORDER BY priority,id").fetchall()
+        with self._lock:
+            rows = self._connection.execute("SELECT * FROM accounts ORDER BY priority,id").fetchall()
         return [self._account(row) for row in rows]
 
     def update_account(self, account_id: int, **fields: object) -> None:
@@ -131,6 +161,24 @@ class Database:
         with self._lock, self._connection:
             self._connection.execute(
                 "UPDATE accounts SET credit_balance=?, credit_checked_at=CURRENT_TIMESTAMP WHERE id=?", (balance, account_id))
+
+    def pause_jobs(self, job_ids: list[int]) -> int:
+        count = 0
+        with self._lock, self._connection:
+            for job_id in job_ids:
+                count += self._connection.execute(
+                    "UPDATE jobs SET status=?, updated_at=CURRENT_TIMESTAMP WHERE id=? AND status=?",
+                    (JobStatus.PAUSED.value, job_id, JobStatus.PENDING.value)).rowcount
+        return count
+
+    def resume_jobs(self, job_ids: list[int]) -> int:
+        count = 0
+        with self._lock, self._connection:
+            for job_id in job_ids:
+                count += self._connection.execute(
+                    "UPDATE jobs SET status=?, updated_at=CURRENT_TIMESTAMP WHERE id=? AND status=?",
+                    (JobStatus.PENDING.value, job_id, JobStatus.PAUSED.value)).rowcount
+        return count
 
     def pause_pending_jobs(self) -> int:
         with self._lock, self._connection:
@@ -173,16 +221,18 @@ class Database:
             return int(cursor.lastrowid)
 
     def get_job(self, job_id: int) -> Job:
-        row = self._connection.execute("SELECT * FROM jobs WHERE id=?", (job_id,)).fetchone()
+        with self._lock:
+            row = self._connection.execute("SELECT * FROM jobs WHERE id=?", (job_id,)).fetchone()
         if not row:
             raise KeyError(job_id)
         return self._job(row)
 
     def list_jobs(self) -> list[Job]:
-        return [self._job(row) for row in self._connection.execute("SELECT * FROM jobs ORDER BY id DESC")]
+        with self._lock:
+            return [self._job(row) for row in self._connection.execute("SELECT * FROM jobs ORDER BY id DESC")]
 
     def update_job(self, job_id: int, **fields: object) -> None:
-        allowed = {"status", "account_id", "meshy_task_id", "progress", "retries", "error", "result_path", "meshy_url", "retry_at"}
+        allowed = {"status", "account_id", "meshy_task_id", "progress", "retries", "error", "result_path", "meshy_url", "retry_at", "submitted", "started_at", "finished_at"}
         updates = {key: value for key, value in fields.items() if key in allowed}
         if not updates:
             return
@@ -226,7 +276,7 @@ class Database:
         with self._lock, self._connection:
             for job_id in job_ids:
                 cursor = self._connection.execute(
-                    "UPDATE jobs SET status=?,error=NULL,retries=0,updated_at=CURRENT_TIMESTAMP,"
+                    "UPDATE jobs SET status=?,error=NULL,retries=0,submitted=0,progress=0,started_at=NULL,finished_at=NULL,updated_at=CURRENT_TIMESTAMP,"
                     "queue_seq=(SELECT COALESCE(MAX(COALESCE(queue_seq,id)),0)+1 FROM jobs) WHERE id=? AND status IN (?,?)",
                     (JobStatus.PENDING.value, job_id, JobStatus.FAILED.value, JobStatus.CANCELED.value))
                 count += cursor.rowcount
@@ -234,13 +284,14 @@ class Database:
 
     def queue_position(self, job_id: int) -> int | None:
         """1-based place among Pending jobs (1 = next to run); None if not pending."""
-        row = self._connection.execute("SELECT status FROM jobs WHERE id=?", (job_id,)).fetchone()
-        if not row or row["status"] != JobStatus.PENDING.value:
-            return None
-        key = self._connection.execute("SELECT COALESCE(queue_seq,id) AS k FROM jobs WHERE id=?", (job_id,)).fetchone()["k"]
-        return int(self._connection.execute(
-            "SELECT COUNT(*) FROM jobs WHERE status=? AND (COALESCE(queue_seq,id)<? OR (COALESCE(queue_seq,id)=? AND id<=?))",
-            (JobStatus.PENDING.value, key, key, job_id)).fetchone()[0])
+        with self._lock:
+            row = self._connection.execute("SELECT status FROM jobs WHERE id=?", (job_id,)).fetchone()
+            if not row or row["status"] != JobStatus.PENDING.value:
+                return None
+            key = self._connection.execute("SELECT COALESCE(queue_seq,id) AS k FROM jobs WHERE id=?", (job_id,)).fetchone()["k"]
+            return int(self._connection.execute(
+                "SELECT COUNT(*) FROM jobs WHERE status=? AND (COALESCE(queue_seq,id)<? OR (COALESCE(queue_seq,id)=? AND id<=?))",
+                (JobStatus.PENDING.value, key, key, job_id)).fetchone()[0])
 
     def upsert_mailbox(self, email: str, provider: str, expires_at: str | None) -> int:
         with self._lock, self._connection:
@@ -251,7 +302,8 @@ class Database:
             return int(self._connection.execute("SELECT id FROM mailboxes WHERE email=?", (email,)).fetchone()["id"])
 
     def list_mailboxes(self) -> list[dict]:
-        return [dict(row) for row in self._connection.execute("SELECT * FROM mailboxes ORDER BY email")]
+        with self._lock:
+            return [dict(row) for row in self._connection.execute("SELECT * FROM mailboxes ORDER BY email")]
 
     def set_mailbox_status(self, email: str, status: str) -> None:
         with self._lock, self._connection:
@@ -259,17 +311,46 @@ class Database:
                 "UPDATE mailboxes SET status=?, last_checked_at=CURRENT_TIMESTAMP WHERE email=?", (status, email))
 
     def recover_jobs(self) -> int:
+        """After a crash/close: unsubmitted work is queued again; a job that was already submitted to Meshy is NOT
+        re-submitted (that would spend credits twice) - it is marked Failed so the user can check the workspace."""
         active = (
             JobStatus.CHECKING_ACCOUNT.value, JobStatus.UPLOADING.value, JobStatus.GENERATING.value,
-            JobStatus.DOWNLOADING.value, JobStatus.WAITING_FOR_LOGIN.value,
+            JobStatus.DOWNLOADING.value, JobStatus.WAITING_FOR_LOGIN.value, JobStatus.CANCEL_REQUESTED.value,
         )
         placeholders = ",".join("?" for _ in active)
         with self._lock, self._connection:
+            self._connection.execute(
+                f"UPDATE jobs SET status=?,error=?,finished_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP "
+                f"WHERE status IN ({placeholders}) AND submitted=1 AND status<>?",
+                (JobStatus.FAILED.value, "Interrupted after it was submitted to Meshy; not re-submitted automatically "
+                 "(check the Meshy workspace, then Retry if you accept spending credits again)", *active, JobStatus.CANCEL_REQUESTED.value))
+            self._connection.execute(
+                "UPDATE jobs SET status=?,error='Canceled by user',updated_at=CURRENT_TIMESTAMP WHERE status=?",
+                (JobStatus.CANCELED.value, JobStatus.CANCEL_REQUESTED.value))
             cursor = self._connection.execute(
                 f"UPDATE jobs SET status=?,updated_at=CURRENT_TIMESTAMP WHERE status IN ({placeholders})",
-                (JobStatus.PENDING.value, *active),
-            )
+                (JobStatus.PENDING.value, *active))
             return cursor.rowcount
+
+    # ---- library (exported models) ------------------------------------------------------------------------------
+    def add_model(self, job_id: int, name: str, source_image: str, account_id: int | None, file_path: str, folder: str,
+                  formats: str, triangles: int | None, size_bytes: int | None, thumbnail_path: str | None) -> int:
+        with self._lock, self._connection:
+            cursor = self._connection.execute(
+                "INSERT INTO models(job_id,name,source_image,account_id,status,file_path,folder,formats,triangles,size_bytes,thumbnail_path) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(job_id) DO UPDATE SET file_path=excluded.file_path, folder=excluded.folder, "
+                "formats=excluded.formats, triangles=excluded.triangles, size_bytes=excluded.size_bytes, thumbnail_path=excluded.thumbnail_path",
+                (job_id, name, source_image, account_id, "Exported", file_path, folder, formats, triangles, size_bytes, thumbnail_path))
+            return int(cursor.lastrowid)
+
+    def list_models(self) -> list[dict]:
+        with self._lock:
+            return [dict(row) for row in self._connection.execute("SELECT * FROM models ORDER BY id DESC")]
+
+    def delete_model_record(self, model_id: int) -> None:
+        """Removes the Library record only; files on disk are never touched."""
+        with self._lock, self._connection:
+            self._connection.execute("DELETE FROM models WHERE id=?", (model_id,))
 
     def close(self) -> None:
         self._connection.close()
@@ -284,5 +365,5 @@ class Database:
     def _job(row: sqlite3.Row) -> Job:
         return Job(*(row[key] for key in ("id", "image_path", "note", "status", "account_id", "meshy_task_id",
                                            "progress", "retries", "error", "result_path", "meshy_url",
-                                           "created_at", "updated_at")))
+                                           "created_at", "updated_at", "submitted", "started_at", "finished_at")))
 

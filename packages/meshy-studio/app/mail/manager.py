@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 
-from app.mail.purelymail import ImapMailbox, PurelymailApi, PurelymailError
+from app.mail.purelymail import API_DISABLED_REASON, ImapMailbox, PurelymailApi, PurelymailError, api_config_valid
 from app.security.credentials import CredentialStore
 
 PROVIDER = "purelymail"
@@ -15,16 +15,24 @@ class MailboxManager:
     """Existing mailboxes only: track them, check login, read mail. Passwords/tokens live in the CredentialStore."""
 
     def __init__(self, database: Any, credentials: CredentialStore,
-                 api_factory: Callable[[str], PurelymailApi] = PurelymailApi,
+                 api_config: Callable[[], dict | None] = lambda: None,
+                 api_factory: Callable[[str, dict], PurelymailApi] = PurelymailApi,
                  imap_factory: Callable[..., ImapMailbox] = ImapMailbox):
         self.database, self.credentials = database, credentials
+        self._api_config = api_config
         self._api_factory, self._imap_factory = api_factory, imap_factory
 
     def set_api_token(self, token: str) -> None:
         self.credentials.set(*TOKEN_KEY, token)
 
+    def api_enabled(self) -> bool:
+        """The management API is only used with an endpoint configuration the user supplied; there are no defaults."""
+        return api_config_valid(self._api_config())
+
     def api(self) -> PurelymailApi:
-        return self._api_factory(self.credentials.get(*TOKEN_KEY) or "")
+        if not self.api_enabled():
+            raise PurelymailError(API_DISABLED_REASON)
+        return self._api_factory(self.credentials.get(*TOKEN_KEY) or "", self._api_config())
 
     def add_mailbox(self, address: str, password: str, *, expires_in_days: int | None = None) -> int:
         expires = (datetime.now(timezone.utc) + timedelta(days=expires_in_days)).strftime("%Y-%m-%d %H:%M:%S") \

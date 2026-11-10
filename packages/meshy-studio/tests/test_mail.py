@@ -5,7 +5,9 @@ import pytest
 
 from app.core.database import Database
 from app.mail.manager import MailboxManager
-from app.mail.purelymail import ImapMailbox, PurelymailApi, PurelymailError, extract_otp
+from app.mail.purelymail import API_DISABLED_REASON, ImapMailbox, PurelymailApi, PurelymailError, extract_otp
+
+CONFIG = {"base_url": "https://api.example.test/v1", "token_header": "X-Test-Token", "endpoints": {"list_users": "users/list"}}
 from app.security.credentials import MemoryCredentialStore
 
 RAW = (b"From: Meshy <noreply@meshy.ai>\r\nSubject: 481675 is your Meshy verification code\r\n"
@@ -59,31 +61,48 @@ def test_api_client_uses_header_and_never_leaks_token():
         seen.update(url=url, headers=headers, body=body)
         return json.dumps({"result": {"users": [{"userName": "a", "domainName": "purelymail.com"}]}}).encode()
 
-    api = PurelymailApi("SECRET-TOKEN", transport=transport)
+    api = PurelymailApi("SECRET-TOKEN", CONFIG, transport=transport)
     assert api.list_users() == ["a@purelymail.com"]
-    assert seen["headers"]["Purelymail-Api-Token"] == "SECRET-TOKEN" and seen["url"].endswith("/listUser")
+    assert seen["headers"]["X-Test-Token"] == "SECRET-TOKEN" and seen["url"] == "https://api.example.test/v1/users/list"
 
     def broken(url, headers, body):
         raise OSError("boom SECRET-TOKEN")
 
     with pytest.raises(PurelymailError) as error:
-        PurelymailApi("SECRET-TOKEN", transport=broken).list_users()
+        PurelymailApi("SECRET-TOKEN", CONFIG, transport=broken).list_users()
     assert "SECRET-TOKEN" not in str(error.value)
     with pytest.raises(PurelymailError):
-        PurelymailApi("")
+        PurelymailApi("", CONFIG)
 
 
 def test_api_error_payload_becomes_exception():
-    api = PurelymailApi("t", transport=lambda *a: json.dumps({"error": {"message": "nope"}}).encode())
-    with pytest.raises(PurelymailError):
-        api.list_domains()
+    api = PurelymailApi("t", {**CONFIG, "endpoints": {"list_users": "u", "list_domains": "d"}},
+                        transport=lambda *a: json.dumps({"error": {"message": "nope"}}).encode())
+    with pytest.raises(PurelymailError, match="nope"):
+        api.call("list_domains")
+    with pytest.raises(PurelymailError, match="not configured"):
+        PurelymailApi("t", CONFIG).call("check_credit")
+
+
+def test_no_endpoint_is_ever_guessed(tmp_path):
+    called = []
+    db = Database(tmp_path / "t.sqlite3")
+    manager = MailboxManager(db, MemoryCredentialStore(), api_factory=lambda *a: called.append(a))  # default: no configuration
+    manager.set_api_token("tok")
+    assert manager.api_enabled() is False
+    with pytest.raises(PurelymailError, match="disabled"):
+        manager.sync_from_api()
+    with pytest.raises(PurelymailError, match="no endpoint is guessed"):
+        PurelymailApi("tok", {})
+    assert called == [] and "no endpoint is guessed" in API_DISABLED_REASON
 
 
 def test_manager_tracks_mailboxes_and_expiry(tmp_path):
     db = Database(tmp_path / "t.sqlite3")
     store = MemoryCredentialStore()
-    manager = MailboxManager(db, store, imap_factory=lambda a, p: ImapMailbox(a, p, imap_factory=FakeImap),
-                             api_factory=lambda token: PurelymailApi(token, transport=lambda *a: json.dumps(
+    manager = MailboxManager(db, store, api_config=lambda: CONFIG,
+                             imap_factory=lambda a, p: ImapMailbox(a, p, imap_factory=FakeImap),
+                             api_factory=lambda token, config: PurelymailApi(token, config, transport=lambda *a: json.dumps(
                                  {"result": {"users": ["new@purelymail.com", "a@purelymail.com"]}}).encode()))
     manager.add_mailbox("A@purelymail.com", "good", expires_in_days=3)
     manager.add_mailbox("b@purelymail.com", "bad", expires_in_days=90)

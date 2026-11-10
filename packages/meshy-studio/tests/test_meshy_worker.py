@@ -1,3 +1,4 @@
+import time
 from types import SimpleNamespace
 from pathlib import Path
 
@@ -67,10 +68,13 @@ def test_worker_clicks_generate_once_and_keeps_context_open(tmp_path: Path):
     page = Page(MeshyLoginState.AUTHENTICATED, body="Generating")
     adapter = Adapter(page)
     worker = MeshyWebWorker(object(), adapter)
+    submitted, progress = [], []
+    worker.on_submitted = submitted.append
+    worker.on_progress = progress.append
     result = worker.run_one(1, tmp_path / "a.png")
-    assert result.state == WorkerState.GENERATING
-    assert page.generate.clicked
-    assert 1 in worker._contexts
+    assert page.generate.clicked and submitted == [1]  # Generate clicked once; the pipeline learns a paid task may exist
+    assert result.state == WorkerState.FAILED and "No output" in result.message  # no export folder: never a pretend success
+    assert progress[0] == 10 and 1 in worker._contexts
     assert adapter.context.close_called is False
 
 
@@ -82,22 +86,6 @@ def test_worker_does_not_rotate_on_ordinary_error(tmp_path: Path):
     assert 1 in worker._contexts
 
 
-
-def test_rotation_moves_on_after_invalid_credentials(tmp_path: Path):
-    from types import SimpleNamespace
-    from app.core.scheduler import Scheduler
-    from app.automation.meshy_worker import WorkerResult
-
-    class W(MeshyWebWorker):
-        def run_one(self, account_id, image_path, *, account_key=None, wait_for_login_ms=120_000):
-            state = WorkerState.INVALID_CREDENTIALS if account_id == 1 else WorkerState.GENERATING
-            return WorkerResult(state, account_id, "x")
-    accounts = [SimpleNamespace(id=i, email=f"{i}@x.com", priority=i, authorized=True, session_valid=False, status="Ready", active_jobs=0) for i in (1, 2)]
-    seen = []
-    result = W(object(), Adapter(Page(MeshyLoginState.AUTHENTICATED))).run_with_rotation(
-        accounts, tmp_path / "a.png", Scheduler(), on_result=lambda a, r: seen.append((a.id, r.state)))
-    assert result.account_id == 2 and result.state == WorkerState.GENERATING
-    assert seen == [(1, WorkerState.INVALID_CREDENTIALS), (2, WorkerState.GENERATING)]
 
 
 def test_worker_exports_after_texture_and_remesh(tmp_path: Path):
@@ -133,24 +121,6 @@ def test_worker_fails_when_remesh_cannot_start(tmp_path: Path):
     assert worker.run_one(1, tmp_path / "a.png").state == WorkerState.FAILED
 
 
-def test_rotation_closes_the_browser_of_the_account_it_leaves(tmp_path: Path):
-    from types import SimpleNamespace
-    from app.core.scheduler import Scheduler
-    from app.automation.meshy_worker import WorkerResult
-    closed = []
-
-    class Manager:
-        def close_account(self, account_id, context=None): closed.append(account_id)
-
-    class W(MeshyWebWorker):
-        def run_one(self, account_id, image_path, *, account_key=None, wait_for_login_ms=120_000):
-            return WorkerResult(WorkerState.QUOTA_LIMITED if account_id == 1 else WorkerState.GENERATING, account_id, "x")
-        def context_for(self, account_id): return object(), Context(Page(MeshyLoginState.AUTHENTICATED))
-    accounts = [SimpleNamespace(id=i, email=f"{i}@x.com", priority=i, authorized=True, session_valid=False, status="Ready", active_jobs=0) for i in (1, 2)]
-    adapter = Adapter(Page(MeshyLoginState.AUTHENTICATED)); adapter.logout_account = lambda page, email=None: True
-    W(Manager(), adapter).run_with_rotation(accounts, tmp_path / "a.png", Scheduler())
-    assert closed == [1]
-
 
 def test_close_stray_tabs_keeps_only_workspace_page():
     class Tab:
@@ -179,4 +149,56 @@ def test_enough_credit_continues(tmp_path: Path):
     class CreditAdapter(Adapter):
         def read_credits(self, page): return 100
     page = Page(MeshyLoginState.AUTHENTICATED)
-    assert MeshyWebWorker(object(), CreditAdapter(page)).run_one(1, tmp_path / "a.png").state == WorkerState.GENERATING
+    result = MeshyWebWorker(object(), CreditAdapter(page)).run_one(1, tmp_path / "a.png")
+    assert page.generate.clicked and result.state != WorkerState.QUOTA_LIMITED
+
+
+def test_unreadable_credit_is_unknown_not_zero(tmp_path: Path):
+    seen = []
+
+    class BlindAdapter(Adapter):
+        def read_credits(self, page): return None  # the sidebar could not be read
+
+    page = Page(MeshyLoginState.AUTHENTICATED)
+    worker = MeshyWebWorker(object(), BlindAdapter(page))
+    worker.on_credits = lambda account_id, balance: seen.append(balance)
+    result = worker.run_one(1, tmp_path / "a.png")
+    assert result.state != WorkerState.QUOTA_LIMITED and seen == [] and page.generate.clicked
+
+
+def test_deadline_and_cancel_stop_the_job_at_a_step_boundary(tmp_path: Path):
+    page = Page(MeshyLoginState.AUTHENTICATED)
+    worker = MeshyWebWorker(object(), Adapter(page))
+    worker.deadline = time.monotonic() - 1
+    result = worker.run_one(1, tmp_path / "a.png")
+    assert result.state == WorkerState.FAILED and "Timed out" in result.message and not page.generate.clicked
+    worker.deadline = None
+    worker.request_cancel()
+    assert worker.run_one(1, tmp_path / "a.png").state == WorkerState.CANCELED and not page.generate.clicked
+
+
+def test_credit_is_refreshed_after_generation_and_a_packaging_crash_keeps_the_glb(tmp_path: Path):
+    balances = iter([100, 70, 60])  # before, after generate, after export: the real number each time
+
+    class Full(Adapter):
+        def read_credits(self, page): return next(balances)
+        def apply_texture(self, page): return True
+        def optimize_remesh_10k(self, page): return True
+        def wait_for_cards_idle(self, page, timeout_ms=0): return True
+
+    class FakeExporter:
+        def export_latest(self, context, page, target):
+            from glb_fixture import make_mesh_glb
+            return {"path": make_mesh_glb(target, 12), "triangles": 12, "images": 1}
+
+    def exploding_packager(glb):
+        raise RuntimeError("blender missing")
+
+    seen = []
+    worker = MeshyWebWorker(object(), Full(Page(MeshyLoginState.AUTHENTICATED)), export_dir=tmp_path, exporter=FakeExporter(),
+                            packager=exploding_packager)
+    worker.on_credits = lambda account_id, balance: seen.append(balance)
+    result = worker.run_one(1, tmp_path / "gate.png")
+    assert result.state == WorkerState.COMPLETED and Path(result.result_path).is_file()  # the GLB is kept
+    assert "post-processing failed" in result.message
+    assert seen == [100, 70, 60]

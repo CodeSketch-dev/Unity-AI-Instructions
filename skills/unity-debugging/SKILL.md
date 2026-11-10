@@ -40,3 +40,4 @@ Find the cause, then fix the cause. A null check that hides a missing reference 
 - Prefer fixing the data/wiring over adding defensive code; add defensive code only at true boundaries (loaded data, external input).
 - Don't delete assets or scripts to silence errors.
 - If it's another agent's work in progress, coordinate first (`multi-agent-coexistence`).
+- A gameplay sequence that silently stops after "it worked yesterday" (cutscene vanishes, step never ends) usually threw inside an async/UniTask chain: read the first `Exception` in the Console, not the visual symptom. Real case: an `#if UNITY_EDITOR` QA log wrote to `docs/qa/x.txt`; the folder disappeared with a repo move and the exception aborted the whole reveal. Debug/QA file writes in gameplay code must check the directory (or catch) and never throw into the gameplay flow; moving or cutting a project can also drop git-ignored folders (keystore, QA output), so re-verify those after a move.

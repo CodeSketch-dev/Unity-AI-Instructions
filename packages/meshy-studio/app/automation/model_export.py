@@ -198,8 +198,11 @@ def package_model(glb: Path, root: Path, log: Log = print) -> dict[str, Any]:
             except Exception as error:
                 out["warnings"].append(f"PNG re-encode failed ({type(error).__name__}); FBX may embed WebP")
                 source = glb
-            if export_fbx(blender, source, glb.with_suffix(".fbx")):
-                out["fbx"] = glb.with_suffix(".fbx")
-    if blender is not None and out["fbx"] is None:
-        out["warnings"].append("FBX export failed")
+            try:
+                if export_fbx(blender, source, glb.with_suffix(".fbx")):
+                    out["fbx"] = glb.with_suffix(".fbx")
+                else:
+                    out["warnings"].append("FBX export failed (Blender returned an error)")
+            except Exception as error:  # e.g. subprocess.TimeoutExpired: the GLB and PNGs must survive
+                out["warnings"].append(f"FBX export failed: {type(error).__name__}")
     return out

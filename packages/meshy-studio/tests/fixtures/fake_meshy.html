@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>fake meshy</title>
+<div id="credits"><span>75</span><button data-testid="sidebar-upgrade-btn">Nang cap</button></div>
+<div id="tour" role="dialog"><button id="gotit">Hiểu rồi!</button></div>
+<div role="tabpanel" data-state="active"><input type="file" id="file" accept=".png,.jpg,.jpeg,.webp" style="display:none"></div>
+<button data-testid="workspace-generate-btn" id="gen">Tạo ra</button>
+<div id="cards"></div>
+<script>
+document.getElementById('gotit').onclick = () => document.getElementById('tour').remove();
+document.getElementById('gen').onclick = () => {
+  const card = document.createElement('div'); card.setAttribute('data-testid', 'assets-card'); card.textContent = '10%';
+  document.getElementById('cards').prepend(card);
+  setTimeout(() => card.textContent = 'ready', 700);
+};
+</script>

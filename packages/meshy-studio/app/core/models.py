@@ -50,4 +50,7 @@ class Job:
     meshy_url: str | None
     created_at: str
     updated_at: str
+    submitted: int = 0
+    started_at: str | None = None
+    finished_at: str | None = None
 

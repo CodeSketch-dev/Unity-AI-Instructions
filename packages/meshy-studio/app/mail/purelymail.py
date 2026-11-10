@@ -14,10 +14,6 @@ from typing import Any, Callable
 # IMAP settings are from Purelymail's "Technical Setup" page (verified).
 IMAP_HOST = "imap.purelymail.com"
 IMAP_PORT = 993
-# The management API is NOT documented on the public site, so these defaults are an UNVERIFIED assumption.
-# Override them in Settings once you have the official documentation from your Purelymail account.
-DEFAULT_API_BASE = "https://purelymail.com/api/v0"
-DEFAULT_TOKEN_HEADER = "Purelymail-Api-Token"
 OTP_PATTERN = re.compile(r"(?<!\d)(\d{6})(?!\d)")
 
 
@@ -25,14 +21,31 @@ class PurelymailError(RuntimeError):
     pass
 
 
-class PurelymailApi:
-    """Thin client for the Purelymail management API (JSON over POST). The transport is injectable for tests."""
+API_DISABLED_REASON = (
+    "Purelymail API management is disabled: the official management API documentation is not available to this app, "
+    "so no endpoint is guessed. Mailbox reading (IMAP) works. To enable API calls, copy the base URL, token header "
+    "and endpoint paths from the documentation in your Purelymail account into data/settings.json (key purelymail_api).")
 
-    def __init__(self, token: str, base_url: str = DEFAULT_API_BASE, header: str = DEFAULT_TOKEN_HEADER,
+
+def api_config_valid(config: Any) -> bool:
+    return (isinstance(config, dict) and bool(config.get("base_url")) and bool(config.get("token_header"))
+            and isinstance(config.get("endpoints"), dict) and bool(config["endpoints"]))
+
+
+class PurelymailApi:
+    """Client for a Purelymail management API that the USER configured from the official documentation.
+
+    Nothing is assumed: base URL, token header and endpoint paths all come from `config` and there are no defaults.
+    The transport is injectable for tests."""
+
+    def __init__(self, token: str, config: dict[str, Any],
                  transport: Callable[[str, dict[str, str], bytes], bytes] | None = None):
         if not token:
             raise PurelymailError("Purelymail API token is not configured")
-        self._token, self.base_url, self.header = token, base_url.rstrip("/"), header
+        if not api_config_valid(config):
+            raise PurelymailError(API_DISABLED_REASON)
+        self._token = token
+        self.base_url, self.header, self.endpoints = config["base_url"].rstrip("/"), config["token_header"], config["endpoints"]
         self._transport = transport or self._post
 
     @staticmethod
@@ -41,32 +54,33 @@ class PurelymailApi:
         with urllib.request.urlopen(request, timeout=30) as response:
             return response.read()
 
-    def call(self, endpoint: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+    def call(self, name: str, payload: dict[str, Any] | None = None) -> Any:
+        path = self.endpoints.get(name)
+        if not path:
+            raise PurelymailError(f"endpoint '{name}' is not configured")
         headers = {"Content-Type": "application/json", self.header: self._token}
         try:
-            raw = self._transport(f"{self.base_url}/{endpoint}", headers, json.dumps(payload or {}).encode("utf-8"))
+            raw = self._transport(f"{self.base_url}/{path.lstrip('/')}", headers, json.dumps(payload or {}).encode("utf-8"))
         except Exception as error:  # never include the token in the message
-            raise PurelymailError(f"{endpoint} failed: {type(error).__name__}") from None
+            raise PurelymailError(f"{name} failed: {type(error).__name__}") from None
         data = json.loads(raw.decode("utf-8") or "{}")
         if isinstance(data, dict) and data.get("error"):
-            raise PurelymailError(f"{endpoint} returned an error: {data['error']}")
-        return data.get("result", data) if isinstance(data, dict) else {"result": data}
+            raise PurelymailError(f"{name} returned an error: {data['error']}")
+        return data.get("result", data) if isinstance(data, dict) else data
 
     def list_users(self) -> list[str]:
-        result = self.call("listUser")
-        users = result.get("users", []) if isinstance(result, dict) else []
-        return [user["userName"] + "@" + user["domainName"] if isinstance(user, dict) and "domainName" in user
-                else str(user) for user in users]
-
-    def list_domains(self) -> list[str]:
-        result = self.call("listDomains")
-        domains = result.get("domains", []) if isinstance(result, dict) else []
-        return [domain["name"] if isinstance(domain, dict) else str(domain) for domain in domains]
-
-    def check_credit(self) -> float | None:
-        result = self.call("checkAccountCredit")
-        value = result.get("credit") if isinstance(result, dict) else None
-        return float(value) if value is not None else None
+        result = self.call("list_users")
+        users = result.get("users", []) if isinstance(result, dict) else result
+        addresses = []
+        for user in users or []:
+            if isinstance(user, dict):
+                address = user.get("address") or user.get("email") or (
+                    f"{user['userName']}@{user['domainName']}" if "userName" in user and "domainName" in user else None)
+            else:
+                address = str(user)
+            if address:
+                addresses.append(address)
+        return addresses
 
 
 @dataclass(frozen=True, slots=True)

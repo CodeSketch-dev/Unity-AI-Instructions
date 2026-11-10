@@ -34,7 +34,7 @@ def test_queue_shows_previews_and_cancels_selected_jobs(tmp_path):
         window._enqueue(str(path))
     ids = [j.id for j in sorted(window.database.list_jobs(), key=lambda j: j.id)]
     table = window.jobs_table
-    assert table.columnCount() == 6 and table.rowCount() == 4
+    assert table.columnCount() == 8 and table.rowCount() == 4
     assert all(not table.item(r, 0).icon().isNull() for r in range(4))  # a preview thumbnail on every row
     rows = {int(table.item(r, 1).text()): r for r in range(4)}
     assert [table.item(rows[i], 3).text() for i in ids] == ["Queued #1", "Queued #2", "Queued #3", "Queued #4"]
@@ -79,7 +79,7 @@ def test_pin_account_and_credit_column(tmp_path):
     window.database.set_credit(2, 115)
     window._refresh_accounts()
     credits = {window.accounts_table.item(r, 0).text(): window.accounts_table.item(r, 2).text() for r in range(2)}
-    assert credits == {"a1@x.com": "15  (low)", "a2@x.com": "115"}
+    assert credits == {"a1@x.com": "15 (low)", "a2@x.com": "115"}
     assert "1 account(s) low" in window.alert.text()
     row = next(r for r in range(2) if window.accounts_table.item(r, 0).text() == "a2@x.com")  # the table may be sorted
     window.accounts_table.selectRow(row)
@@ -98,6 +98,119 @@ def test_mail_page_lists_added_mailboxes_and_logs_page_reads_the_log(tmp_path):
     logging.getLogger("meshy.test").info("hello password=SECRET123 done")
     for handler in logging.getLogger("meshy").handlers:
         handler.flush()
+    window.navigation.setCurrentRow(window.page_names.index("Logs"))
     window._refresh_logs()
     text = window.log_view.toPlainText()
     assert "hello" in text and "SECRET123" not in text  # secrets are redacted in the log file
+
+
+def test_generate_page_queues_many_files_and_lists_rejections(tmp_path):
+    window = make_window(tmp_path)
+    good = []
+    for n in range(3):
+        image = tmp_path / f"ok{n}.png"; image.write_bytes(b"x"); good.append(str(image))
+    (tmp_path / "doc.txt").write_text("x")
+    queued, rejected = window.enqueue_many(good + [str(tmp_path / "doc.txt"), str(tmp_path / "missing.png")])
+    assert queued == 3 and len(rejected) == 2
+    assert "doc.txt" in window.reject_label.text() and "missing.png" in window.reject_label.text()
+    assert window.recent.count() == 3  # a thumbnail entry per queued image
+    assert len(window.database.list_jobs()) == 3
+
+
+def test_export_folder_and_settings_survive_a_restart(tmp_path):
+    window = make_window(tmp_path)
+    window.settings.export_dir = tmp_path / "elsewhere"
+    page = window.settings_page
+    page.concurrency.setValue(1); page.timeout.setValue(45); page.retries.setValue(3)
+    page.apply()
+    again = make_window(tmp_path)
+    assert again.settings.export_dir == tmp_path / "elsewhere" and again.export_label.text() == str(tmp_path / "elsewhere")
+    assert (again.settings.job_timeout_minutes, again.settings.max_retries) == (45, 3)
+    assert again.pipeline.job_timeout_seconds == 45 * 60 and again.pipeline.max_retries == 3
+
+
+def test_queue_pause_resume_and_retry_confirmation(tmp_path):
+    from PySide6.QtCore import QItemSelectionModel
+    window = make_window(tmp_path)
+    window._owns_runner = False
+    image = tmp_path / "i.png"; image.write_bytes(b"x")
+    window._enqueue(str(image)); window._refresh_jobs()
+    def select(job_id):
+        table = window.jobs_table
+        row = next(r for r in range(table.rowCount()) if int(table.item(r, 1).text()) == job_id)
+        table.clearSelection()
+        table.selectionModel().select(table.model().index(row, 0), QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows)
+    job = window.database.list_jobs()[0].id
+    select(job); window._pause_selected()
+    assert window.database.get_job(job).status == "Paused"
+    select(job); window._resume_selected()
+    assert window.database.get_job(job).status == "Pending"
+    window.database.update_job(job, status="Failed", submitted=1)
+    asked = []
+    window._confirm = lambda text: asked.append(text) or False  # the user says no
+    window._refresh_jobs(); select(job); window._retry_selected()
+    assert asked and "NEW generation" in asked[0] and window.database.get_job(job).status == "Failed"
+    window._confirm = lambda text: True
+    window._refresh_jobs(); select(job); window._retry_selected()
+    assert window.database.get_job(job).status == "Pending" and window.database.get_job(job).submitted == 0
+
+
+def test_library_lists_filters_and_removes_only_the_record(tmp_path):
+    from PySide6.QtCore import QItemSelectionModel
+    window = make_window(tmp_path)
+    folder = tmp_path / "Export" / "gate_1"
+    folder.mkdir(parents=True)
+    glb = folder / "gate.glb"; glb.write_bytes(b"glb")
+    window.database.create_job("a.png")
+    window.database.add_model(1, "gate", "a.png", None, str(glb), str(folder), "FBX,GLB", 9449, 1_600_000, None)
+    window.database.add_model(2 if window.database.create_job("b.png") else 2, "vase", "b.png", None, str(tmp_path / "gone.glb"), str(tmp_path / "Export" / "vase_1"), "GLB", 100, 10, None)
+    library = window.library_page
+    library.refresh()
+    assert library.table.rowCount() == 2
+    library.search.setText("gat")
+    assert library.table.rowCount() == 1 and "gate" in library.table.item(0, 1).text()
+    library.search.setText(""); library.format_filter.setCurrentText("FBX"); assert library.table.rowCount() == 1
+    library.format_filter.setCurrentIndex(0)
+    row = next(r for r in range(2) if "vase" in library.table.item(r, 1).text())
+    assert "(file missing)" in library.table.item(row, 1).text()  # a record whose file vanished is flagged, not hidden
+    opened = []
+    library._opener = opened.append
+    row = next(r for r in range(2) if "gate" in library.table.item(r, 1).text())
+    library.table.selectionModel().select(library.table.model().index(row, 0), QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows)
+    assert library.open_model() and opened == [str(glb)] and library.open_folder() and opened[-1] == str(folder)
+    library._confirm = lambda text: False
+    assert library.remove_record() is False and len(window.database.list_models()) == 2
+    library._confirm = lambda text: "NOT deleted" in text
+    assert library.remove_record() is True
+    assert len(window.database.list_models()) == 1 and glb.exists()  # the record went, the file stayed
+
+
+def test_logs_filter_and_export_hide_secrets(tmp_path):
+    import logging
+    window = make_window(tmp_path)
+    log = logging.getLogger("meshy.pipeline")
+    log.info("job 5 started on account #2")
+    log.warning("job 6 failed: token=ABC123 cookie: sessionid=xyz otp 481675")
+    log.error("job 7 crashed")
+    for handler in logging.getLogger("meshy").handlers:
+        handler.flush()
+    page = window.logs_page
+    page.refresh()
+    assert "job 5" in page.view.toPlainText()
+    page.level.setCurrentText("ERROR only")
+    assert "job 7" in page.view.toPlainText() and "job 5" not in page.view.toPlainText()
+    page.level.setCurrentIndex(0); page.needle.setText("job 6")
+    target = tmp_path / "exported.txt"
+    assert page.export(str(target)) == str(target)
+    text = target.read_text(encoding="utf-8")
+    assert "job 6" in text and "ABC123" not in text and "sessionid=xyz" not in text and "481675" not in text
+
+
+def test_selecting_a_nav_item_without_changing_current_row_still_switches_the_page(tmp_path):
+    """UI Automation / screen readers 'select' an item; that must open the page just like a mouse click does."""
+    window = make_window(tmp_path)
+    window.navigation.blockSignals(True)
+    window.navigation.item(1).setSelected(True)  # selection only, no currentRowChanged
+    window.navigation.blockSignals(False)
+    window._on_nav_selected()
+    assert window.pages.currentIndex() == 1 and window.page_title.text() == "Queue"

@@ -6,16 +6,16 @@ import sys
 import time
 from pathlib import Path
 
-from app.automation.browser_manager import BrowserManager
-from app.automation.google_login import GoogleOAuthLogin
-from app.automation.meshy_worker import MeshyWebWorker
-from app.paths import app_root
-from app.settings import Settings
 from app import bootstrap
+from app.automation.browser_manager import BrowserManager
 from app.core.account_manager import AccountManager
 from app.core.database import Database
 from app.core.pipeline import PipelineService, acquire_runner_lock
+from app.logs import setup_logging
+from app.paths import app_root
 from app.security.credentials import KeyringCredentialStore
+from app.services import build_pipeline
+from app.settings import Settings
 
 
 def data_root() -> Path:
@@ -23,10 +23,10 @@ def data_root() -> Path:
 
 
 def build_service(root: Path) -> PipelineService:
+    setup_logging(root)
     browser = BrowserManager(root / "profiles")
     database = Database(root / "data" / "meshy.sqlite3")
-    worker = MeshyWebWorker(browser, google_login=GoogleOAuthLogin(KeyringCredentialStore()), export_dir=lambda: Settings(root).export_dir)
-    return PipelineService(database, worker)
+    return build_pipeline(database, browser, Settings(root))
 
 
 def main() -> int:

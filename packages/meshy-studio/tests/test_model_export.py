@@ -3,6 +3,7 @@ import json
 import struct
 from pathlib import Path
 
+import pytest
 from PIL import Image
 
 from app.automation import model_export as m
@@ -77,3 +78,30 @@ def test_settings_export_dir_default_and_roundtrip(tmp_path):
     assert settings.export_dir == tmp_path / "Export"
     settings.export_dir = tmp_path / "elsewhere"
     assert Settings(tmp_path).export_dir == tmp_path / "elsewhere"
+
+
+@pytest.mark.skipif(m.find_blender(Path(__file__).parent) is None, reason="Blender is not installed")
+def test_blender_converts_a_real_glb_to_fbx_and_png(tmp_path):
+    from glb_fixture import make_mesh_glb
+    glb = make_mesh_glb(tmp_path / "gate.glb", triangles=12)
+    result = m.package_model(glb, Path(__file__).parent, log=lambda msg: None)
+    assert result["fbx"] is not None and result["warnings"] == []
+    fbx = result["fbx"].read_bytes()
+    assert fbx.startswith(b"Kaydara FBX Binary") and len(fbx) > 1000
+    assert len(result["textures"]) == 1 and Image.open(result["textures"][0]).format == "PNG"
+
+
+def test_blender_failure_is_reported_not_swallowed(tmp_path, monkeypatch):
+    import subprocess
+    glb = make_glb(tmp_path / "gate.glb")
+    assert m.export_fbx(Path("blender.exe"), glb, tmp_path / "a.fbx", lambda cmd, **kw: type("R", (), {"returncode": 1})()) is False
+
+    def hang(cmd, **kw):
+        raise subprocess.TimeoutExpired(cmd, 1)
+    with pytest.raises(subprocess.TimeoutExpired):
+        m.export_fbx(Path("blender.exe"), glb, tmp_path / "a.fbx", hang)
+    monkeypatch.setattr(m, "ensure_blender", lambda root, log=print: Path("blender.exe"))
+    monkeypatch.setattr(m, "export_fbx", lambda *a, **k: hang(["blender"]))
+    result = m.package_model(glb, tmp_path, log=lambda msg: None)  # a hung Blender becomes a warning, files survive
+    assert result["fbx"] is None and any("TimeoutExpired" in w for w in result["warnings"]) and glb.exists()
+    assert len(result["textures"]) == 2

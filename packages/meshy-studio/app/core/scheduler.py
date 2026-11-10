@@ -21,7 +21,8 @@ class Selection:
 
 class Scheduler:
     def __init__(self):
-        self._round_robin_index = 0
+        self._tick = 0
+        self._last_used: dict[int, int] = {}
 
     def select(self, accounts: list[Account], policy: SchedulePolicy, manual_account_id: int | None = None, *, allow_unvalidated: bool = False) -> Selection:
         # A profile without a validated session is still eligible: the worker
@@ -41,8 +42,8 @@ class Scheduler:
         if policy == SchedulePolicy.LEAST_BUSY:
             selected = min(eligible, key=lambda a: (a.active_jobs, a.priority, a.id))
             return Selection(selected, f"Least busy ({selected.active_jobs} active jobs)")
-        ordered = sorted(eligible, key=lambda a: (a.priority, a.id))
-        selected = ordered[self._round_robin_index % len(ordered)]
-        self._round_robin_index += 1
-        return Selection(selected, "Next eligible account in round-robin order")
-
+        # Round robin = least recently used first (stable when accounts drop out of the eligible list)
+        selected = min(eligible, key=lambda a: (self._last_used.get(a.id, -1), a.priority, a.id))
+        self._tick += 1
+        self._last_used[selected.id] = self._tick
+        return Selection(selected, "Least recently used eligible account (round robin)")
