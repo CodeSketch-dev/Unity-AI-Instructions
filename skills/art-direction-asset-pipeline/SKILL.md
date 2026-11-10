@@ -55,3 +55,10 @@ Five blocks, invariant first: PURPOSE, SUBJECT, VIEW, ART DIRECTION (from the st
 - Research current popularity before claiming a character is trending. Public visibility is not evidence of advertising spend; label that uncertainty and keep character provenance in the asset manifest.
 
 Related: `ui-always` (UI work gate), `blender-procedural-assets`, `vertex-color-baking`, `game-feel-polish`.
+
+## Codex art regeneration traps (owner correction 2026-11-10)
+- A brief that says "regenerate at 3x" lets Codex just Lanczos-upscale the old PNG (it did): stair-steps and blur stay. Brief MUST say "call the image_generation tool for every sprite, do not resample/sharpen the old file; if the tool is unavailable STOP", and the report must list the generating call per image. Check the report/log for `resize|Lanczos` before accepting.
+- Raster output still has chroma-key magenta fringe and stair-step contours: post-process with a contour smoother (supersample 2x, gaussian sigma ~15 px on the alpha mask and on a dark-outline mask, smoothstep AA, inpaint fill colour under the outline, recompose) so outlines read as pen-tool curves; look at an 8x nearest crop of a corner, not the full sprite.
+- Swapping a sprite for a higher-res one: scale `spritePixelsToUnits` by new_w/old_w (so sliced borders keep their canvas size), set `spriteBorder` to the corner caps only, and raise the Android override `maxTextureSize` (a 1024 override silently downsizes 1500+ px sprites = blur).
+- Full-screen dim/cutout panels (tutorial focus) must be 10000 units, never 3500: wide foldable aspects (2658x960) expose gaps.
+- Verify icon aliases (`ic_ad` was mapped to a calendar icon) by looking at the Play screenshot of every button using them.
