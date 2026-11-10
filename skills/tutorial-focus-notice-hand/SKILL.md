@@ -56,7 +56,7 @@ A spotlight on a world point that is outside the screen leaves the four dim pane
 
 ## Unstable target: never measure once (measured trap, owner-reported)
 - A popup that just opened keeps changing its items for several frames (open tween, layout rebuild, pooled/scrolled cards, TMP refit). A one-shot measure inside `Focus()` sized the box from a half-built item: real case 335x100 at frame 0 vs 277.5x82.8 settled, so the hole was wrong.
-- Rule: `Canvas.ForceUpdateCanvases()` before the first measure, then RE-MEASURE the target every frame while the focus is shown (cached/reused Graphic list, no per-frame allocation, apply only when the size changes by > 0.25 px). The box follows the element, it never trusts a measurement taken at spawn time.
+- Rule: `Canvas.ForceUpdateCanvases()` before the first measure, then RE-MEASURE the target every frame in `LateUpdate` (after the popup tween/DOTween moved it in Update) while the focus is shown (cached/reused Graphic list, no per-frame allocation, apply only when the size changes by > 0.25 px). The box follows the element, it never trusts a measurement taken at spawn time.
 - Test it in Play by opening the popup and focusing in the SAME frame: log target size, hole size and centre at frame 0 and after it settles; accept only hole = target + margin (+-0.3 px) and centre dx/dy <= 1 px.
 - Also wait/skip while the host is hidden (alpha 0 or `IsShown` false), otherwise the focus lands on an empty spot.
 
