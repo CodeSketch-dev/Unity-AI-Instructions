@@ -252,6 +252,17 @@ class MeshyWebWorker:
                 target = folder / f"{safe_name(Path(image_path).stem)}.glb"
                 info = self.exporter.export_latest(context, page, target)
                 self.close_stray_tabs(context, page)
+                digest = _file_digest(info["path"])
+                seen = getattr(self, "_exported_digests", None)
+                if seen is None:  # seed with every earlier export so a restart cannot hide a re-download
+                    seen = self._exported_digests = {d for d in (_file_digest(g) for g in Path(base).rglob("*.glb")
+                                                                  if Path(g) != Path(info["path"])) if d}
+                if digest and digest in seen:
+                    # the newest card was an OLD model: never report a re-download of a previous result as a new job
+                    return WorkerResult(WorkerState.FAILED, account_id,
+                                        "Exported model is identical to an earlier export (no new generation was found)")
+                if digest:
+                    seen.add(digest)
                 try:
                     extra = self.packager(info["path"])
                 except Exception as error:  # the verified GLB is already on disk: PNG/FBX problems are warnings
@@ -396,3 +407,11 @@ def _generate_button(page: Any) -> Any:
     except Exception:
         pass
     return page.get_by_role("button", name="Tạo ra", exact=True)
+
+
+def _file_digest(path: Any) -> str | None:
+    import hashlib
+    try:
+        return hashlib.md5(Path(path).read_bytes()).hexdigest()
+    except Exception:
+        return None
