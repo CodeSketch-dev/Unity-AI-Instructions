@@ -35,3 +35,6 @@ Render the sprite sliced at small (120x60), medium (220x70), wide (400x80) and t
 - Add new art under NEW keys first (never overwrite a live key until a pilot popup is reviewed). Names with a sliced-family prefix (board_, card_, ribbon_, btn_...) need a non-zero border; ribbons with folded tails must not be sliced, so give them a non-sliced prefix (title_, badge_, fx_).
 - A sprite-factory/registry rebuild menu only shows new keys after `AssetDatabase.SaveAssets()` plus a script reload; until then kit audits report "failed to load". Check the factory with a one-line probe before running tests.
 - Source art authored at 1x must be upscaled to the kit's pixels-per-unit convention before measuring borders; scan only the header band reliably, derive other borders from corner radius and verify in the sprite preview.
+
+## Shape rule + squeeze trap (owner 2026-11-10)
+Buttons are rectangles/squares with smooth moderate corner radius (~20-25% of height); never pill, hexagon, octagon or diamond. If a sliced Image is shorter than 2 x the vertical border in canvas units (border_px / (spritePPU/100)), Unity squeezes the corner caps vertically and the ends turn pointed (hexagon look). Fix at the sprite: small corner radius, border = corner cap only, PPU high enough that the cap in canvas units <= half the shortest button height.
