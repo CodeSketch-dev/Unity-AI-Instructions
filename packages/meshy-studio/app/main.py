@@ -20,6 +20,7 @@ from app.core.account_manager import AccountManager
 from app.core.database import Database
 from app.core.job_options import DEFAULT_POLYCOUNT, MAX_POLYCOUNT, MIN_POLYCOUNT, GenMode, JobOptions, RigType
 from app.core.pipeline import acquire_runner_lock
+from app.mail.provisioner import AccountProvisioner, MailboxRule
 from app.logs import setup_logging
 from app.paths import app_root
 from app.security.credentials import KeyringCredentialStore
@@ -73,6 +74,10 @@ class MeshyMainWindow(QMainWindow):
             print(f"accounts.txt import failed: {type(error).__name__}")
         self.mail = build_mail_manager(self.database, self.settings, credentials)
         self.pipeline = build_pipeline(self.database, self.browser_manager, self.settings, credentials)
+        self.pipeline.provisioner = AccountProvisioner(
+            self.database, self.mail, self.account_manager,
+            rule=lambda: MailboxRule.from_settings(self.settings.get("mailbox_rule")),
+            enabled=lambda: bool(self.settings.get("auto_provision")))
         self.meshy_worker = self.pipeline.worker
         self._bg_done.connect(lambda done, result: done(*result))
         self._thumbs: dict[str, QIcon] = {}
@@ -410,6 +415,17 @@ class MeshyMainWindow(QMainWindow):
         ids = [int(self.jobs_table.item(row, 1).text()) for row in rows if self.jobs_table.item(row, 1) is not None]
         return sorted(ids)  # act on jobs in their original order
 
+    def _queue_blocker(self, accounts: list) -> str:
+        """Why queued jobs are not starting (shown instead of staying silent)."""
+        if self.pipeline.halted:
+            return "Queue stopped: press Resume queue"
+        if not accounts:
+            return "No Meshy account yet: add accounts.txt / import on Accounts, or set the Purelymail token + shared password for auto-create"
+        if not self.pipeline._usable_accounts():
+            return "No account can run a job right now (no credit, resting, or needs verification)" + (
+                "; auto-create is on and will add one" if self.settings.get("auto_provision") else "")
+        return ""
+
     @Slot()
     def _refresh_jobs(self) -> None:
         keep = set(self._selected_job_ids())
@@ -418,7 +434,9 @@ class MeshyMainWindow(QMainWindow):
         # running first, then the queue in run order, then everything else (paused/finished, newest first)
         jobs.sort(key=lambda j: (0, 0, j.id) if j.status in RUNNING
                   else (1, positions[j.id], j.id) if positions[j.id] else (2, 0, -j.id))
-        emails = {a.id: a.email for a in self.database.list_accounts()}
+        accounts = self.database.list_accounts()
+        emails = {a.id: a.email for a in accounts}
+        blocker = self._queue_blocker(accounts)
         now = time.time()
         self.jobs_table.setRowCount(len(jobs))
         for row, job in enumerate(jobs):
@@ -431,7 +449,7 @@ class MeshyMainWindow(QMainWindow):
             preview.setIcon(self._thumbnail(job.image_path))
             self.jobs_table.setItem(row, 0, preview)
             values = (str(job.id), Path(job.image_path).name, status, progress, emails.get(job.account_id, ""), elapsed,
-                      job.error or job.note)
+                      job.error or (blocker if position else "") or job.note)
             for col, value in enumerate(values, start=1):
                 item = QTableWidgetItem(value)
                 if col == 3:
@@ -630,6 +648,22 @@ class MeshyMainWindow(QMainWindow):
         token_row.addWidget(self.mail_token, 1)
         token_row.addWidget(self._button("Save token", self._save_mail_token))
         page_layout.addLayout(token_row)
+        pw_row = QHBoxLayout()
+        self.mail_default_pw = QLineEdit()
+        self.mail_default_pw.setEchoMode(QLineEdit.EchoMode.Password)
+        self.mail_default_pw.setPlaceholderText("Shared password for every auto-created mailbox (stored in the Windows credential store)")
+        pw_row.addWidget(self.mail_default_pw, 1)
+        pw_row.addWidget(self._button("Save password", self._save_default_mail_password))
+        page_layout.addLayout(pw_row)
+        self.auto_provision_check = QCheckBox("Auto-create the next mailbox + account when no account has credit left")
+        self.auto_provision_check.setChecked(bool(self.settings.get("auto_provision")))
+        rule = MailboxRule.from_settings(self.settings.get("mailbox_rule"))
+        self.auto_provision_check.setToolTip(
+            f"Rule: {rule.address_for(1).replace('000001', '#' * rule.digits)} with the next free number "
+            f"(for example {rule.address_for(3)}), at most {rule.max_per_hour} per hour. Mailboxes that already follow the rule "
+            "are adopted as accounts first. Needs the API token and the shared password.")
+        self.auto_provision_check.toggled.connect(lambda on: self.settings.set("auto_provision", bool(on)))
+        page_layout.addWidget(self.auto_provision_check)
         self.mail_table = QTableWidget(0, 4)
         self.mail_table.setHorizontalHeaderLabels(["Mailbox", "Status", "Expires", "Last checked"])
         self._style_table(self.mail_table)
@@ -661,6 +695,12 @@ class MeshyMainWindow(QMainWindow):
                                                   "Management API calls are DISABLED: no official endpoint information is configured, "
                                                   "and none is guessed."))
         self._refresh_mailboxes()
+
+    def _save_default_mail_password(self) -> None:
+        if self.mail_default_pw.text():
+            self.mail.set_default_password(self.mail_default_pw.text())
+            self.mail_default_pw.clear()
+            self.status.setText("Shared mailbox password saved")
 
     @Slot()
     def _refresh_mailboxes(self) -> None:

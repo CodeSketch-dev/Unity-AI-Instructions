@@ -105,6 +105,8 @@ class PipelineService:
         self._current: dict[int, int] = {}  # slot -> job id
         self.manual_account_id: int | None = None
         self.halted = False
+        self.provisioner: Any = None  # AccountProvisioner: makes a new account when none is usable
+        self._last_provision = 0.0
 
     # ---- configuration ----------------------------------------------------------------------------------------------
     @property
@@ -229,6 +231,8 @@ class PipelineService:
                 self.database.resume_paused_jobs()  # a resting account is back: waiting jobs continue by themselves
             account = self._reserve_account()
             if account is None:
+                if self._provision_account():
+                    continue
                 break
             job = self.database.claim_next_job()
             if job is None:
@@ -240,6 +244,17 @@ class PipelineService:
                 self._release_account(account.id)
             processed += 1
         return processed
+
+    def _provision_account(self) -> bool:
+        """No account can take a job and work is waiting: ask the provisioner (at most every 30 s) for a fresh one."""
+        if self.provisioner is None or self.halted or self.manual_account_id is not None or self._usable_accounts():
+            return False
+        if not any(j.status == JobStatus.PENDING.value for j in self.database.list_jobs()):
+            return False
+        if time.monotonic() - self._last_provision < 30:
+            return False
+        self._last_provision = time.monotonic()
+        return bool(self.provisioner.ensure_account())
 
     def _attempt(self, slot: int, job: Any, account: Any) -> None:
         db, worker = self.database, self._worker_for(slot)

@@ -13,6 +13,8 @@ DEFAULTS: dict[str, Any] = {
     "job_timeout_minutes": 30,  # whole job; checked at every step boundary
     "max_retries": 2,           # automatic retries, only for failures BEFORE the job was submitted to Meshy
     "purelymail_api": OFFICIAL_API_CONFIG,
+    "auto_provision": True,     # when no account can take a job, adopt/create the next rule-named mailbox + account
+    "mailbox_rule": {"prefix": "codesketch", "domain": "purelymail.com", "digits": 6, "max_per_hour": 3},
 }
 
 
