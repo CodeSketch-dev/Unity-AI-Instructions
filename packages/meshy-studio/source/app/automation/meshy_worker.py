@@ -83,12 +83,15 @@ class MeshyWebWorker:
         try:
             _, context = self._contexts[account_id]
             page = next(p for p in context.pages if "meshy.ai" in str(p.url))
-            folder = (self.export_dir.parent if self.export_dir else Path.cwd()) / "output" / "diagnostics"
+            folder = app_root() / "output" / "diagnostics"  # fixed place (export_dir may be a callable)
             folder.mkdir(parents=True, exist_ok=True)
             import time
-            page.screenshot(path=str(folder / f"{time.strftime('%Y%m%d_%H%M%S')}_acc{account_id}.png"))
+            stamp = time.strftime('%Y%m%d_%H%M%S')
+            page.screenshot(path=str(folder / f"{stamp}_acc{account_id}.png"))
+            (folder / f"{stamp}_acc{account_id}.html").write_text(page.content()[:400_000], encoding="utf-8")  # DOM for fixing selectors
         except Exception:
-            pass
+            import logging
+            logging.getLogger("meshy.worker").warning("could not save the diagnostics snapshot", exc_info=True)
 
     def _run_one(self, account_id: int, image_path: str | Path, *, account_key: str | None = None, wait_for_login_ms: int = 120_000,
                  options: JobOptions | None = None) -> WorkerResult:
@@ -111,6 +114,12 @@ class MeshyWebWorker:
                 login_state = self.adapter.classify_login_state(page)
             if login_state == MeshyLoginState.MANUAL_VERIFICATION:
                 return WorkerResult(WorkerState.MANUAL_VERIFICATION, account_id, "Manual verification required")
+            # A saved session shows the guest header for a moment while the page loads: re-check before signing in again.
+            for _ in range(16):
+                if login_state != MeshyLoginState.LOGIN_REQUIRED:
+                    break
+                page.wait_for_timeout(500)
+                login_state = self.adapter.classify_login_state(page)
             if login_state == MeshyLoginState.LOGIN_REQUIRED:
                 mode = self.auth_mode(account_key) if account_key else "google"
                 if mode == "email_otp" and self.email_login and account_key:
@@ -148,10 +157,11 @@ class MeshyWebWorker:
             self.adapter.open_model_tab(page)
             dismiss_onboarding(page)
             self.adapter.upload_image(page, image_path)
+            textured_in_form = False
             if options.mode == GenMode.TOPOLOGY:
                 configure = getattr(self.adapter, "configure_topology", None)
-                if configure is not None:
-                    configure(page, options.polycount)  # Meshy 7 + Smart Topology + polygon count; raises before any spend
+                if configure is not None:  # Meshy 7 + Smart Topology + texture + polygon count; raises before any spend
+                    textured_in_form = bool(configure(page, options.polycount))
             else:
                 select_mode = getattr(self.adapter, "select_generation_mode", None)
                 if select_mode is not None:
@@ -203,7 +213,7 @@ class MeshyWebWorker:
                 return stop
             idle = getattr(self.adapter, "wait_for_cards_idle", None)
             texture = getattr(self.adapter, "apply_texture", None)
-            if texture is not None:
+            if texture is not None and not textured_in_form:
                 open_latest = getattr(self.adapter, "open_latest_asset", None)
                 if open_latest is not None:
                     open_latest(page)

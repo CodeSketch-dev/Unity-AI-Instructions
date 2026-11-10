@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from app.automation.meshy_export import MeshyExportError, inspect_glb
-from app.automation.meshy_worker import WorkerResult, WorkerState
+from app.automation.meshy_worker import REQUIRED_CREDITS, WorkerResult, WorkerState
 from app.core.job_options import JobOptions
 from app.core.models import JobStatus
 from app.core.scheduler import Scheduler, SchedulePolicy
@@ -107,6 +107,7 @@ class PipelineService:
         self.halted = False
         self.provisioner: Any = None  # AccountProvisioner: makes a new account when none is usable
         self._last_provision = 0.0
+        self._sticky_id: int | None = None  # the account in use; changes only when it becomes unusable
 
     # ---- configuration ----------------------------------------------------------------------------------------------
     @property
@@ -208,9 +209,19 @@ class PipelineService:
             if self.manual_account_id is not None:
                 chosen = free[0]
             else:
-                chosen = self.scheduler.select(free, SchedulePolicy.ROUND_ROBIN, allow_unvalidated=True).account
+                chosen = self._sticky_choice(free) or self.scheduler.select(free, SchedulePolicy.ROUND_ROBIN, allow_unvalidated=True).account
+            self._sticky_id = chosen.id
             self._busy_accounts.add(chosen.id)
             return chosen
+
+    def _sticky_choice(self, free: list[Any]) -> Any | None:
+        """Keep using the same account while it is still usable (no credit exhaustion): never rotate just for variety.
+        With no current account, start with the one that has the most known credit (>= a model's cost)."""
+        for account in free:
+            if account.id == self._sticky_id:
+                return account
+        funded = [a for a in free if a.credit_balance is not None and a.credit_balance >= REQUIRED_CREDITS]
+        return max(funded, key=lambda a: a.credit_balance) if funded else None
 
     def _release_account(self, account_id: int) -> None:
         with self._state_lock:

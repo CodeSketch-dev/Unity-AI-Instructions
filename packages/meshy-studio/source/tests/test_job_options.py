@@ -74,3 +74,11 @@ def test_automatic_remeshes_and_rigs_last(tmp_path):
 def test_no_options_behaves_like_before(tmp_path):
     steps = _run(tmp_path, None)
     assert steps == [("mode", False), "texture", "remesh"]
+
+
+def test_topology_textured_in_form_skips_the_separate_texture_step(tmp_path):
+    class InForm(StepAdapter):
+        def configure_topology(self, page, polycount): self.steps.append(("topology", polycount)); return True
+    adapter = InForm(Page(MeshyLoginState.AUTHENTICATED))
+    MeshyWebWorker(object(), adapter).run_one(1, tmp_path / "a.png", options=JobOptions(GenMode.TOPOLOGY, 1500))
+    assert adapter.steps == [("topology", 1500)]

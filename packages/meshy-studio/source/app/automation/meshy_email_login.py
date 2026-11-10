@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from enum import StrEnum
 from typing import Any, Callable
 
@@ -31,21 +32,36 @@ class MeshyEmailLogin:
             baseline = self._otp_provider(address, sender="meshy", subject="verification", within_minutes=5)
             if not _click_named(page, ("Nhận mã", "Get code", "Send code")):
                 return EmailLoginOutcome.FAILED
-            code = None
+            # The mailbox is polled by a background thread from the moment the code is requested, so the code is already
+            # in hand when the owner finishes the CAPTCHA and is typed in at once (no waiting for the next 3 s IMAP poll).
+            found: dict[str, str | None] = {"code": None}
+            arrived, stop = threading.Event(), threading.Event()
+
+            def watch() -> None:
+                while not stop.is_set():
+                    try:
+                        candidate = self._otp_provider(address, sender="meshy", subject="verification", within_minutes=5)
+                    except Exception:  # a transient IMAP hiccup must not abort the login: the next poll retries
+                        candidate = None
+                    if candidate and candidate != baseline:
+                        found["code"] = candidate
+                        arrived.set()
+                        return
+                    stop.wait(0.3)
+
+            threading.Thread(target=watch, daemon=True, name="otp-watch").start()
             saw_captcha = False
-            for _ in range(self._max_polls):
-                page.wait_for_timeout(1000)
-                # Always poll the mailbox first: a CAPTCHA marker (often a hidden iframe) must never stop code entry.
-                try:
-                    code = self._otp_provider(address, sender="meshy", subject="verification", within_minutes=5)
-                except Exception:  # a transient IMAP hiccup must not abort the login: the next poll retries
-                    code = None
-                if code and code != baseline:
-                    break
-                code = None
-                if _captcha_visible(page) and not saw_captcha:
-                    page.bring_to_front()
-                    saw_captcha = True
+            try:
+                for tick in range(self._max_polls * 4):
+                    page.wait_for_timeout(50)
+                    if arrived.wait(0.2):
+                        break
+                    if tick % 4 == 0 and not saw_captcha and _captcha_visible(page):
+                        page.bring_to_front()  # the owner solves it; the code is read meanwhile
+                        saw_captcha = True
+            finally:
+                stop.set()
+            code = found["code"]
             if not code:
                 return EmailLoginOutcome.MANUAL_VERIFICATION if saw_captcha else EmailLoginOutcome.OTP_UNAVAILABLE
             field = page.locator(CODE_FIELD).first

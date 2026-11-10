@@ -350,3 +350,21 @@ def test_runner_lock_acquired_once_per_process(tmp_path):
     lock = tmp_path / "r.lock"
     assert acquire_runner_lock(lock) is True
     assert runner_lock_held(lock) is False  # we own it
+
+
+def test_same_account_is_reused_while_it_has_credit(tmp_path):
+    db, svc, img = make(tmp_path, {}, n=3)
+    first = svc._reserve_account(); svc._release_account(first.id)
+    again = [svc._reserve_account() for _ in range(1)]
+    assert again[0].id == first.id  # no rotation for variety
+    svc._release_account(again[0].id)
+    db.mark_account(first.id, "Quota Limited", cooldown_hours=24)  # out of credit: only now another account is used
+    other = svc._reserve_account()
+    assert other.id != first.id
+
+
+def test_funded_account_with_known_credit_is_chosen_first(tmp_path):
+    db, svc, img = make(tmp_path, {}, n=3)
+    db.set_credit(3, 100)  # known credit >= a model's cost: preferred at the start (this path once crashed with a NameError)
+    chosen = svc._reserve_account()
+    assert chosen.id == 3

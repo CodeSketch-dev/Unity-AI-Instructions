@@ -186,15 +186,15 @@ class MeshyWebAdapter:
             raise MeshyWebError("Smart Topology tab was not found")
 
     @staticmethod
-    def configure_topology(page: Any, polycount: int) -> None:
-        """Smart Topology form: model Meshy 7 (always), polygon count, texture toggle off (texture is its own step)."""
+    def configure_topology(page: Any, polycount: int) -> bool:
+        """Smart Topology form (verified against the live page): Kết cấu (texture) ON reveals the Mô hình options, so
+        pick Meshy 7 and 2K, then the polygon count. The mesh and its texture come out of ONE generation, so the
+        separate texture step is not needed afterwards (returns True = already textured)."""
         MeshyWebAdapter.select_generation_mode(page, True)
-        model = page.get_by_text("Meshy 7", exact=True)
-        if not (model.count() and model.first.is_visible()):
-            raise MeshyWebError("Meshy 7 model option was not found")
-        model.first.click(force=True, timeout=3000)
-        label = page.get_by_text("Số lượng đa giác", exact=True).first
-        field = label.locator("xpath=ancestor::div[.//input][1]").locator("input[type='text'], input[type='number'], input:not([type])").last
+        MeshyWebAdapter._set_texture_toggle(page, True)
+        MeshyWebAdapter._pick_model(page, "Meshy 7")
+        MeshyWebAdapter._pick_model(page, "2K")
+        field = MeshyWebAdapter._polygon_field(page)
         field.click(timeout=3000)
         field.fill(str(int(polycount)))
         field.press("Enter")
@@ -203,19 +203,51 @@ class MeshyWebAdapter:
         value = re.sub(r"\D", "", field.input_value() or "")
         if value != str(int(polycount)):
             raise MeshyWebError(f"Polygon count could not be set (wanted {polycount}, form shows {value or 'nothing'})")
-        MeshyWebAdapter._set_texture_toggle(page, False)
+        return True
+
+    @staticmethod
+    def _pick_model(page: Any, name: str) -> None:
+        """Click the model option (segmented control) whose whole text is `name`, by DOM text so role/test-id changes do not matter.
+        The form re-renders after the Smart Topology tab opens, so retry for ~10 s."""
+        import time
+        end = time.monotonic() + 10
+        while time.monotonic() < end:
+            clicked = page.evaluate(_PICK_TEXT_JS, name)
+            if clicked:
+                page.wait_for_timeout(400)
+                return
+            page.wait_for_timeout(500)
+        raise MeshyWebError(f"{name} model option was not found")
+
+    @staticmethod
+    def _polygon_field(page: Any) -> Any:
+        """The numeric box next to the polygon slider: found by its label, else by being the only visible all-digit text input."""
+        label = page.get_by_text("Số lượng đa giác", exact=True)
+        if label.count():
+            field = label.first.locator("xpath=ancestor::div[.//input][1]").locator("input").last
+            if field.count():
+                return field
+        for index in range(page.locator("input").count()):
+            candidate = page.locator("input").nth(index)
+            try:
+                if candidate.is_visible() and re.fullmatch(r"\d{2,6}", candidate.input_value() or ""):
+                    return candidate
+            except Exception:
+                continue
+        raise MeshyWebError("Polygon count input was not found")
 
     @staticmethod
     def _set_texture_toggle(page: Any, on: bool) -> None:
-        """The 'Kết cấu' switch in the form: generating the mesh and the texture are separate steps here."""
-        try:
-            label = page.get_by_text("Kết cấu", exact=True).first
-            switch = label.locator("xpath=ancestor::div[.//*[@role='switch']][1]").locator("[role='switch']").first
-            state = switch.get_attribute("aria-checked")
-            if state is not None and (state == "true") != on:
-                switch.click(force=True, timeout=2000)
-        except Exception:
-            LOG.warning("texture toggle not adjusted", exc_info=True)
+        """The 'Kết cấu' switch (a button with role=switch): set it and verify aria-checked, or raise before anything is spent."""
+        label = page.get_by_text("Kết cấu", exact=True).first
+        switch = label.locator("xpath=ancestor::div[.//*[@role='switch']][1]").locator("[role='switch']").first
+        for _ in range(3):
+            if (switch.get_attribute("aria-checked") == "true") == on:
+                page.wait_for_timeout(500)
+                return
+            switch.click(force=True, timeout=3000)
+            page.wait_for_timeout(800)
+        raise MeshyWebError("The Kết cấu (texture) switch could not be set")
 
     RIG_CARDS = {"humanoid": "Nhân hình", "quadruped": "Chó bốn chân", "auto": "Giàn khoan thông minh"}
 
@@ -467,6 +499,18 @@ def _is_selected(locator: Any) -> bool:
     except Exception:
         return False
 
+
+_PICK_TEXT_JS = r"""(name) => {
+  const norm = s => (s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+  const want = norm(name);
+  const hits = [...document.querySelectorAll('button, [role=radio], [role=tab], [role=option], label, div, span')]
+    .filter(el => el.offsetParent !== null && norm(el.innerText || el.textContent) === want);
+  if (!hits.length) return false;
+  hits.sort((a, b) => (a.getBoundingClientRect().width * a.getBoundingClientRect().height) - (b.getBoundingClientRect().width * b.getBoundingClientRect().height));
+  const target = hits[0];
+  (target.closest('button, [role=radio], [role=tab], [role=option], label') || target).click();
+  return true;
+}"""
 
 _SURVEY_JS = """() => {
   const buttons = [...document.querySelectorAll('button')].filter(b => b.offsetParent);
