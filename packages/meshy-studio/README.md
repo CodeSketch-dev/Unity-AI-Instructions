@@ -4,7 +4,7 @@ Unattended image -> textured ~10K-triangle GLB through the Meshy web app, driven
 Claude Code / Codex call it through MCP; a headless runner (or the desktop app) does the work.
 
 Flow per job: sign in (Google, TOTP supported) -> dismiss onboarding/tours -> upload -> Generate -> Texture 2K ->
-Remesh 10K triangles -> download GLB via the meshy-ai-to-stl decoder -> `Export/<image>_acc<N>_10k.glb`.
+Remesh 10K triangles -> download GLB via the meshy-ai-to-stl decoder -> `<export folder>/<image>_<timestamp>/` with `<image>.glb`, `<image>.fbx` (Blender, headless) and `textures/*.png` (Meshy's WebP converted). The export folder is set in the app (button on the main page) and defaults to `Export/`.
 Accounts rotate automatically on quota (24 h rest), bad password, or verification prompts.
 
 ## Setup on a new machine

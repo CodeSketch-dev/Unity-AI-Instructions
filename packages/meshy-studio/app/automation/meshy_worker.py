@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 
 from app.automation.meshy_export import MeshyExporter
+from app.automation.model_export import job_folder, package_model, safe_name
+from app.paths import app_root
 from app.automation.meshy_adapter import MeshyLoginState, MeshyWebAdapter, _advance_onboarding, dismiss_onboarding
 from app.automation.google_login import GoogleLoginOutcome, GoogleOAuthLogin
 from app.core.scheduler import SchedulePolicy
@@ -36,11 +38,13 @@ class MeshyWebWorker:
     """Sequential web worker. It intentionally never accepts credentials or closes contexts."""
 
     def __init__(self, browser_manager: Any, adapter: MeshyWebAdapter | None = None, google_login: GoogleOAuthLogin | None = None,
-                 *, export_dir: str | Path | None = None, exporter: MeshyExporter | None = None):
+                 *, export_dir: Any = None, exporter: MeshyExporter | None = None, packager: Any = None):
         self.browser_manager = browser_manager
         self.adapter = adapter or MeshyWebAdapter(browser_manager)
         self.google_login = google_login
-        self.export_dir = Path(export_dir) if export_dir else None
+        # a folder, or a callable returning the folder (read per job so the GUI can change it live)
+        self.export_dir = export_dir if callable(export_dir) or export_dir is None else Path(export_dir)
+        self.packager = packager or (lambda glb: package_model(glb, app_root()))
         self.exporter = exporter or MeshyExporter()
         self._contexts: dict[int, tuple[Any, Any]] = {}
         self._active_account: int | None = None
@@ -164,11 +168,17 @@ class MeshyWebWorker:
                 if idle is not None:
                     idle(page)
             if self.export_dir is not None and optimize is not None:
-                target = self.export_dir / f"{Path(image_path).stem}_acc{account_id}_10k.glb"
+                base = self.export_dir() if callable(self.export_dir) else self.export_dir
+                folder = job_folder(base, image_path)
+                target = folder / f"{safe_name(Path(image_path).stem)}.glb"
                 info = self.exporter.export_latest(context, page, target)
                 self.close_stray_tabs(context, page)
-                return WorkerResult(WorkerState.COMPLETED, account_id,
-                                    f"Exported {info['triangles']} triangles, {info['images']} textures", str(info["path"]))
+                extra = self.packager(info["path"])
+                message = (f"Exported {info['triangles']} triangles, {len(extra['textures'])} PNG textures, "
+                           f"FBX {'yes' if extra['fbx'] else 'no'} -> {folder}")
+                if extra["warnings"]:
+                    message += " | " + "; ".join(extra["warnings"])
+                return WorkerResult(WorkerState.COMPLETED, account_id, message, str(info["path"]))
             state = self._poll_visible_status(page)
             return WorkerResult(state, account_id, "Generate clicked once; context remains open")
         except Exception as error:

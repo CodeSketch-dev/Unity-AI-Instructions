@@ -4,10 +4,14 @@ import sys
 import os
 from pathlib import Path
 
-from PySide6.QtCore import QTimer, Qt, Slot
-from PySide6.QtWidgets import QApplication, QLabel, QListWidget, QMainWindow, QPushButton, QStackedWidget, QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QFileDialog, QLineEdit
+import threading
+
+from PySide6.QtCore import QTimer, Qt, Signal, Slot
+from PySide6.QtWidgets import QHBoxLayout, QApplication, QLabel, QListWidget, QMainWindow, QPushButton, QStackedWidget, QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QFileDialog, QLineEdit
 
 from app.paths import app_root
+from app.settings import Settings
+from app import bootstrap
 from app.automation.browser_manager import BrowserManager
 from app.automation.google_login import GoogleOAuthLogin
 from app.automation.meshy_worker import MeshyWebWorker
@@ -19,24 +23,34 @@ from app.core.pipeline import PipelineService, acquire_runner_lock
 
 
 class MeshyMainWindow(QMainWindow):
+    bootstrap_done = Signal(bool, str)
+
     def __init__(self, project_root: str | Path | None = None):
         super().__init__()
         root = Path(project_root or app_root())
         self.setWindowTitle("Meshy AI Studio")
         self.resize(1100, 720)
         self.setAcceptDrops(True)
+        self.settings = Settings(root)
         self.browser_manager = BrowserManager(root / "profiles")
         self.database = Database(root / "data" / "meshy.sqlite3")
         self.account_manager = AccountManager(self.database, KeyringCredentialStore(), root / "profiles")
-        self.meshy_worker = MeshyWebWorker(self.browser_manager, google_login=GoogleOAuthLogin(KeyringCredentialStore()), export_dir=root / "Export")
+        self.meshy_worker = MeshyWebWorker(self.browser_manager, google_login=GoogleOAuthLogin(KeyringCredentialStore()), export_dir=lambda: self.settings.export_dir)
         self.browser_host = BrowserHostWidget(self.browser_manager)
+        try:
+            bootstrap.import_bundled_accounts(root, self.account_manager)
+        except Exception as error:  # a broken accounts.txt must not stop the app
+            print(f"accounts.txt import failed: {type(error).__name__}")
         self.pipeline = PipelineService(self.database, self.meshy_worker)
         self._build_ui()
         self._refresh_accounts()
         self._refresh_jobs()
         self._owns_runner = False
+        self.bootstrap_done.connect(self._on_bootstrap_done)
         if os.environ.get("MESHY_AUTOSTART", "1") != "0":
-            self._start_pipeline(root)
+            self._root = root
+            self.status.setText("Preparing decoder and browser (first start only)...")
+            threading.Thread(target=self._bootstrap, args=(root,), daemon=True).start()
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._refresh_accounts)
         self._timer.timeout.connect(self._refresh_jobs)
@@ -77,6 +91,19 @@ class MeshyMainWindow(QMainWindow):
         generate = QPushButton("Generate 3D")
         generate.clicked.connect(self._generate_from_ui)
         chat_layout.insertWidget(3, generate)
+        self.export_label = QLabel()
+        self.export_label.setWordWrap(True)
+        self.export_label.setObjectName("exportLabel")
+        choose_export = QPushButton("Choose export folder...")
+        choose_export.clicked.connect(self._choose_export_dir)
+        open_export = QPushButton("Open")
+        open_export.clicked.connect(self._open_export_dir)
+        export_row = QHBoxLayout()
+        export_row.addWidget(self.export_label, 1)
+        export_row.addWidget(choose_export)
+        export_row.addWidget(open_export)
+        chat_layout.insertLayout(0, export_row)
+        self._refresh_export_label()
         accounts_page = self.pages.widget(1)
         accounts_layout = accounts_page.layout()
         accounts_layout.addWidget(QLabel("Account pool — tự chọn account còn session và credit"))
@@ -108,6 +135,23 @@ class MeshyMainWindow(QMainWindow):
         if not self.browser_host.hosted:
             self.browser_host.start(self._first_account_id())
         self.status.setText("Meshy profile opened — complete Google sign-in manually if requested")
+
+    def _refresh_export_label(self) -> None:
+        self.export_label.setText(f"Export folder: {self.settings.export_dir}  (each model gets its own sub-folder: GLB, textures/*.png, FBX)")
+
+    @Slot()
+    def _choose_export_dir(self) -> None:
+        folder = QFileDialog.getExistingDirectory(self, "Choose export folder", str(self.settings.export_dir))
+        if folder:
+            self.settings.export_dir = folder
+            self._refresh_export_label()
+            self.status.setText(f"Export folder set to {folder}")
+
+    @Slot()
+    def _open_export_dir(self) -> None:
+        folder = self.settings.export_dir
+        folder.mkdir(parents=True, exist_ok=True)
+        os.startfile(str(folder)) if hasattr(os, "startfile") else None
 
     @Slot()
     def _choose_image(self) -> None:
@@ -149,6 +193,17 @@ class MeshyMainWindow(QMainWindow):
         self.status.setText(f"Job {job_id} queued — runs automatically" if self._owns_runner
                             else f"Job {job_id} queued — another runner process will pick it up")
         self._refresh_jobs()
+
+    def _bootstrap(self, root: Path) -> None:
+        messages: list[str] = []
+        ok = bootstrap.prepare(root, messages.append)
+        self.bootstrap_done.emit(ok, messages[-1] if messages else "")
+
+    @Slot(bool, str)
+    def _on_bootstrap_done(self, ok: bool, message: str) -> None:
+        if not ok:
+            self.status.setText(f"Setup incomplete: {message}")
+        self._start_pipeline(self._root)
 
     def _start_pipeline(self, root: Path) -> None:
         if acquire_runner_lock(root / "data" / "runner.lock"):

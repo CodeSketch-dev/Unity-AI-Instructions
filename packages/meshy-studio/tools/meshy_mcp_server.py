@@ -75,8 +75,13 @@ def call_tool(name: str, args: dict):
             return {"error": "job not found"}
         finally:
             db.close()
+        files = []
+        if job.result_path and Path(job.result_path).parent.is_dir():
+            folder = Path(job.result_path).parent
+            files = sorted(str(p.relative_to(folder)) for p in folder.rglob("*") if p.is_file())
         return {"job_id": job.id, "status": job.status, "progress": job.progress, "error": job.error,
-                "account_id": job.account_id, "retries": job.retries, "result_path": job.result_path}
+                "account_id": job.account_id, "retries": job.retries, "result_path": job.result_path,
+                "result_folder": str(Path(job.result_path).parent) if job.result_path else None, "files": files}
     if name == "list_jobs":
         db = _db()
         jobs = db.list_jobs()[: int(args.get("limit", 20))]

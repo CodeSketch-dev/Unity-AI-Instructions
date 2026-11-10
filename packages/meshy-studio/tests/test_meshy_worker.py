@@ -114,10 +114,15 @@ def test_worker_exports_after_texture_and_remesh(tmp_path: Path):
             return {"path": target, "triangles": 9445, "images": 3}
 
     page = Page(MeshyLoginState.AUTHENTICATED)
-    worker = MeshyWebWorker(object(), FullAdapter(page), export_dir=tmp_path, exporter=FakeExporter())
+    packaged = []
+    packager = lambda glb: packaged.append(glb) or {"textures": [1, 2, 3], "fbx": "x.fbx", "warnings": []}
+    worker = MeshyWebWorker(object(), FullAdapter(page), export_dir=lambda: tmp_path, exporter=FakeExporter(), packager=packager)
     result = worker.run_one(1, tmp_path / "gate.png")
     assert result.state == WorkerState.COMPLETED
-    assert result.result_path.endswith("gate_acc1_10k.glb")
+    folder = Path(result.result_path).parent
+    assert folder.parent == tmp_path and folder.name.startswith("gate_")  # one sub-folder per model
+    assert result.result_path.endswith("gate.glb") and packaged == [Path(result.result_path)]
+    assert "3 PNG textures" in result.message and "FBX yes" in result.message
     assert calls == ["idle", "texture", "idle", "remesh", "idle", "export"]
 
 
