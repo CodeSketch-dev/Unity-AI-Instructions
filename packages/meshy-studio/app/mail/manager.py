@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 
 from app.mail.purelymail import API_DISABLED_REASON, ImapMailbox, PurelymailApi, PurelymailError, api_config_valid
-from app.mail.default_key import default_token
+from app.mail.default_key import default_mail_password, default_token
 from app.security.credentials import CredentialStore
 
 PROVIDER = "purelymail"
@@ -26,6 +26,10 @@ class MailboxManager:
 
     def set_api_token(self, token: str) -> None:
         self.credentials.set(*TOKEN_KEY, token)
+
+    def shared_password(self) -> str:
+        """Shared mailbox password: the one saved in the credential store, else the built-in default."""
+        return self.credentials.get(*DEFAULT_PASSWORD_KEY) or default_mail_password()
 
     def set_default_password(self, password: str) -> None:
         if not password:
@@ -68,7 +72,7 @@ class MailboxManager:
         normalized = address.strip().lower()
         if normalized.count("@") != 1 or not all(normalized.split("@", 1)):
             raise PurelymailError("A valid mailbox address is required")
-        password = password or self.credentials.get(*DEFAULT_PASSWORD_KEY)
+        password = password or self.shared_password()
         if not password:
             raise PurelymailError("No mailbox password supplied and no default password is stored")
         api = self.api()

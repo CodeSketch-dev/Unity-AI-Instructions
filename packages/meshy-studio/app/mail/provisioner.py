@@ -66,7 +66,7 @@ class AccountProvisioner:
         for address in self._known_addresses():
             if rule.counter_of(address) is None or self.database.account_by_email(address):
                 continue
-            password = self.mail.credentials.get(address, "mail_password") or self.mail.credentials.get(*_default_key())
+            password = self.mail.credentials.get(address, "mail_password") or self.mail.shared_password()
             if not password:
                 continue
             if not self.database.account_by_email(address):
@@ -104,8 +104,3 @@ class AccountProvisioner:
         except Exception:
             LOG.exception("could not provision a mailbox/account")
             return 0
-
-
-def _default_key() -> tuple[str, str]:
-    from app.mail.manager import DEFAULT_PASSWORD_KEY
-    return DEFAULT_PASSWORD_KEY

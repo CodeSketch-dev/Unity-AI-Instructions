@@ -59,7 +59,9 @@ def test_disabled_missing_password_and_hourly_cap(tmp_path: Path):
     _, _, api, prov = build(tmp_path / "a", [], enabled=False)
     assert prov.ensure_account() == 0 and api.created == []
     _, _, api, prov = build(tmp_path / "b", [], password=None)
-    assert prov.ensure_account() == 0 and api.created == []  # no shared password: nothing is created
+    assert prov.ensure_account() == 1  # no stored password: the built-in default is used, so a fresh clone just works
+    from app.mail.default_key import default_mail_password
+    assert api.created == [("codesketch000001@purelymail.com", default_mail_password())]
     _, _, api, prov = build(tmp_path / "c", [])
     results = [prov.ensure_account() for _ in range(5)]
     assert results == [1, 1, 1, 0, 0] and len(api.created) == 3  # max 3 per hour
