@@ -27,3 +27,5 @@ CODEX BRIEFS: name owned files, forbid deleting shared helpers (grep usages befo
 AUTOMATION: a reminder the owner types twice becomes a mechanism (skill studio-hook-factory): rule in studio_rules.json, hook or failing audit, proven by a dry run. The Stop retro gate blocks finishing after an owner correction until the skills repo is updated and published.
 MEMORY: this digest + AGENTS.md + feedback notes are your memory; when the owner corrects you, write it into the matching skill, AGENTS.md and the project docs in the same session.
 LOOP RULE: a wake that says 'nothing changed' while unblocked backlog slices exist is a defect (owner: 'ngao a? code full game'). Skip blocked items, dispatch the next unblocked slice, and when the list is empty derive slices from the spec coverage matrix (skill studio-loop-runbook, NEVER IDLE).
+
+SUPERPOWERS GATE (owner 2026-11-11, enforced by skill_enforce_hook.ps1 Stop gate): every multi-step task calls the matching superpowers skill with the Skill tool BEFORE working (writing-plans / brainstorming / systematic-debugging) and verification-before-completion before reporting done. The owner must never have to prompt for it.
