@@ -345,6 +345,7 @@ class MeshyMainWindow(QMainWindow):
         folder.mkdir(parents=True, exist_ok=True)
         if hasattr(os, "startfile"):
             os.startfile(str(folder))
+        self.status.setText(f"Opened {folder}")
 
     @Slot()
     def _choose_image(self) -> None:
@@ -596,7 +597,7 @@ class MeshyMainWindow(QMainWindow):
                                    tip="Run all jobs on this account (overrides its rest period); paused jobs continue"))
         bar.addWidget(self._button("Automatic rotation", self._auto_rotation, secondary=True))
         bar.addWidget(self._button("Import list (.txt)", self._import_accounts, secondary=True))
-        bar.addWidget(self._button("Refresh", self._refresh_accounts, secondary=True))
+        bar.addWidget(self._button("Refresh", self._refresh_accounts_clicked, secondary=True))
         bar.addStretch(1)
         page_layout.addLayout(bar)
         self.accounts_table = QTableWidget(0, 6)
@@ -612,6 +613,11 @@ class MeshyMainWindow(QMainWindow):
         note.setObjectName("muted")
         note.setWordWrap(True)
         page_layout.addWidget(note)
+
+    @Slot()
+    def _refresh_accounts_clicked(self) -> None:
+        self._refresh_accounts()
+        self.status.setText(f"Accounts refreshed ({self.accounts_table.rowCount()})")
 
     @Slot()
     def _refresh_accounts(self) -> None:
@@ -755,6 +761,8 @@ class MeshyMainWindow(QMainWindow):
             self.mail.set_default_password(self.mail_default_pw.text())
             self.mail_default_pw.clear()
             self.status.setText("Shared mailbox password saved")
+        else:
+            self.status.setText("Type the shared password first (empty keeps the built-in default)")
 
     @Slot()
     def _refresh_mailboxes(self) -> None:
@@ -778,6 +786,8 @@ class MeshyMainWindow(QMainWindow):
             self.mail.set_api_token(self.mail_token.text().strip())
             self.mail_token.clear()
             self.status.setText("Purelymail token saved")
+        else:
+            self.status.setText("Paste your own Purelymail API key first (leave it empty to keep using the built-in one)")
 
     @Slot()
     def _add_mailbox(self) -> None:

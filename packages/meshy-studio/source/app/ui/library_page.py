@@ -43,7 +43,7 @@ class LibraryPage(QWidget):
         layout.addLayout(bar)
         buttons = QHBoxLayout()
         for text, handler, secondary in (("Open model", self.open_model, False), ("Show in folder", self.open_folder, True),
-                                         ("Remove record", self.remove_record, True), ("Refresh", self.refresh, True)):
+                                         ("Remove record", self.remove_record, True), ("Refresh", self.refresh_clicked, True)):
             button = QPushButton(text)
             if secondary:
                 button.setObjectName("secondary")
@@ -120,6 +120,10 @@ class LibraryPage(QWidget):
                 self.database.delete_model_record(model["id"])
             changed += 1
         return changed
+
+    def refresh_clicked(self, *_args) -> None:
+        self.refresh()
+        self.message.emit(f"Library refreshed ({self.table.rowCount()} model(s))")
 
     def refresh(self, *_args) -> None:
         self.sync_with_disk()
