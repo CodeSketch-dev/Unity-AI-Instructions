@@ -16,3 +16,5 @@ description: "World-space and HUD text rules: one rich-text label with rarity/si
 - Squash/pop tweens target a child wrapper at scale 1, never an object another script rescales; stop tweens on pool release.
 - Occlusion fade: give targets `SuspendUntil(time)` and call it on reveal/landing moments; only settled objects fade.
 - Text centring: Capline alignment plus the sprite face offset, never a per-label nudge (`ui-text-tmp` Optical centring).
+
+- World-to-screen HUD stickers: ScreenPointToLocalPointInRectangle returns coordinates relative to the canvas CENTRE: anchor the sticker at (0.5,0.5) and clamp it to a play zone that excludes both HUD rails, the top row and the bottom bar, or it lands on top of buttons.
