@@ -154,6 +154,13 @@ class MeshyWebWorker:
                 if balance < needed:
                     return WorkerResult(WorkerState.QUOTA_LIMITED, account_id,
                                         f"Only {balance} credits left (a model needs {needed})")
+            ids_before = None  # task ids that exist before Generate: the export must pick a NEWER task (never the previous model)
+            task_ids = getattr(self.exporter, "task_ids", None)
+            if task_ids is not None:
+                try:
+                    ids_before = task_ids(page)
+                except Exception:
+                    ids_before = None
             self.adapter.open_model_tab(page)
             dismiss_onboarding(page)
             self.adapter.upload_image(page, image_path)
@@ -174,7 +181,7 @@ class MeshyWebWorker:
             if not generate.is_visible() or not generate.is_enabled():
                 return WorkerResult(WorkerState.FAILED, account_id, "Generate button was not enabled")
             count_cards = getattr(self.adapter, "count_cards", None)
-            cards_before = count_cards(page) if count_cards is not None else 0
+            cards_before = _asset_marker(self.adapter, page, count_cards)  # newest task id: the asset list is capped at 10 cards, a count never grows
             try:
                 generate.click(timeout=8000)
             except Exception:
@@ -250,7 +257,11 @@ class MeshyWebWorker:
                 base = self.export_dir() if callable(self.export_dir) else self.export_dir
                 folder = job_folder(base, image_path)
                 target = folder / f"{safe_name(Path(image_path).stem)}.glb"
-                info = self.exporter.export_latest(context, page, target)
+                import inspect
+                if "exclude_ids" in inspect.signature(self.exporter.export_latest).parameters:
+                    info = self.exporter.export_latest(context, page, target, exclude_ids=ids_before)
+                else:  # simple exporters (tests) without the exclude parameter
+                    info = self.exporter.export_latest(context, page, target)
                 self.close_stray_tabs(context, page)
                 digest = _file_digest(info["path"])
                 seen = getattr(self, "_exported_digests", None)

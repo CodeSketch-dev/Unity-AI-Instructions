@@ -51,6 +51,27 @@ def inspect_glb(path: str | Path) -> dict[str, int]:
     return {"triangles": triangles, "images": len(document.get("images", [])), "materials": len(document.get("materials", []))}
 
 
+def pick_new_task(tasks: list[dict[str, Any]], exclude: set[str] | None, *, max_triangles: int = 15_000) -> tuple[dict[str, Any] | None, str]:
+    """Pure rule (tests): with `exclude`, only the newest task that is NOT in it counts; it must be SUCCEEDED
+    (state "ready"), else "waiting" (still running / not listed yet) or "failed". Without `exclude`: old behaviour,
+    newest SUCCEEDED textured task."""
+    def usable(task: dict[str, Any]) -> bool:
+        url = ((task.get("result") or {}).get("texture") or {}).get("modelUrl")
+        return task.get("status") == "SUCCEEDED" and bool(url) and 0 < task.get("triangleCount", 0) <= max_triangles
+    if exclude is None:
+        found = next((t for t in tasks if usable(t)), None)
+        return (found, "ready") if found else (None, "waiting")
+    fresh = [t for t in tasks if str(t.get("id")) not in exclude]
+    if not fresh:
+        return None, "waiting"
+    newest = fresh[0]  # list is newest first
+    if usable(newest):
+        return newest, "ready"
+    if str(newest.get("status", "")).upper() in ("FAILED", "CANCELED", "CANCELLED", "EXPIRED"):
+        return None, "failed"
+    return None, "waiting"
+
+
 class MeshyExporter:
     """Downloads the selected Meshy asset as GLB via the bundled meshy-ai-to-stl decoder."""
 
@@ -61,11 +82,25 @@ class MeshyExporter:
         vendor = self.extension_dir / "vendor"
         return (vendor / "mesh_loader.js").exists() and (vendor / "mesh_loader.wasm").exists()
 
-    def export_latest(self, context: Any, page: Any, out_path: str | Path, *, max_triangles: int = 15_000) -> dict[str, Any]:
-        """Download the newest finished low-poly (remeshed) task as GLB and verify it."""
+    def export_latest(self, context: Any, page: Any, out_path: str | Path, *, max_triangles: int = 15_000,
+                      exclude_ids: set[str] | None = None, wait_s: float = 900.0) -> dict[str, Any]:
+        """Download the task THIS job created as GLB and verify it.
+
+        exclude_ids = task ids that existed before Generate was clicked: only a newer task is accepted, and the export
+        waits for it to finish instead of falling back to an older finished task (that exported the previous model)."""
+        import time
         if not self.decoder_ready():
             raise MeshyExportError("Decoder files missing; run setup-vendor.ps1 in docs/vendor/meshy-ai-to-stl")
-        task = self.latest_task(page, max_triangles=max_triangles)
+        deadline = time.monotonic() + wait_s
+        while True:
+            task, state = pick_new_task(self.task_list(page), exclude_ids, max_triangles=max_triangles)
+            if state == "ready":
+                break
+            if state == "failed":
+                raise MeshyExportError("The new Meshy task failed")
+            if time.monotonic() > deadline:
+                raise MeshyExportError("The new Meshy task did not finish in time")
+            page.wait_for_timeout(10_000)
         response = context.request.get(task["result"]["texture"]["modelUrl"])
         if not response.ok:
             raise MeshyExportError(f"Model download failed: HTTP {response.status}")
@@ -76,7 +111,19 @@ class MeshyExporter:
         return {"path": out, "task_id": task["id"], **info}
 
     @staticmethod
+    def task_ids(page: Any) -> set[str]:
+        """Ids of every task in the account's list right now (call BEFORE clicking Generate)."""
+        return {str(t.get("id")) for t in MeshyExporter.task_list(page) if t.get("id")}
+
+    @staticmethod
     def latest_task(page: Any, *, max_triangles: int = 15_000) -> dict[str, Any]:
+        task, state = pick_new_task(MeshyExporter.task_list(page), None, max_triangles=max_triangles)
+        if task is None:
+            raise MeshyExportError("No finished low-poly textured task found")
+        return task
+
+    @staticmethod
+    def task_list(page: Any) -> list[dict[str, Any]]:
         """Capture the app's own task-list response on reload (the API needs the page's auth).
 
         The body is read inside the response handler: Playwright drops it once the page navigates again.
@@ -104,12 +151,7 @@ class MeshyExporter:
             page.remove_listener("response", on_response)
         if not tasks:
             raise MeshyExportError("Meshy task list was not loaded")
-        for task in tasks:  # newest first
-            result = task.get("result") or {}
-            url = (result.get("texture") or {}).get("modelUrl")
-            if task.get("status") == "SUCCEEDED" and url and 0 < task.get("triangleCount", 0) <= max_triangles:
-                return task
-        raise MeshyExportError("No finished low-poly textured task found")
+        return tasks
 
     def _decode(self, context: Any, raw: list[int]) -> bytes:
         page_file = self.extension_dir / CONVERT_PAGE

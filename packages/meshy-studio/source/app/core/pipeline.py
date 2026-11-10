@@ -361,9 +361,11 @@ class PipelineService:
             db.mark_account(account.id, "Login failed", cooldown_hours=LOGIN_RETRY_HOURS, session_valid=False)
 
     def _release_when_idle(self, slot: int, account_id: int) -> None:
-        """Close the browser window once the queue is empty so no windows are left behind."""
+        """Close the browser window only when no job can still use it (none pending or paused): keeping it open
+        between jobs saves the reopen + login + CAPTCHA every time (owner 2026-11-11)."""
         release = getattr(self._worker_for(slot), "release_account", None)
-        if release is not None and not any(j.status == JobStatus.PENDING.value for j in self.database.list_jobs()):
+        waiting = (JobStatus.PENDING.value, JobStatus.PAUSED.value)
+        if release is not None and not any(j.status in waiting for j in self.database.list_jobs()):
             try:
                 release(account_id)
             except Exception:
