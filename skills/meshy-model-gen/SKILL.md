@@ -26,3 +26,5 @@ triggers: meshy, gen model, generate model, image to 3d, glb, fbx, 3d model from
 - Do NOT use the FBX from `unity_import` directly: its UVs came out damaged (wrong colours, soft). Convert the GLB with `blender_atlas` `unwrap:"keep"` (one model, 2048) and bind the atlas to a URP/Lit material: correct, crisp.
 - `unwrap:"smart"` shreds bevel-heavy Meshy meshes into thousands of tiny islands (texture gets worse even at 4K, even after weld). Use `keep` for such models; Meshy's own UVs are the better packing.
 - A white render means no material texture bound (FBX has none); bind atlas.png to `_BaseMap` yourself.
+- Meshy meshes are bevel-heavy and fragmented (~380 shells, 2.4k xatlas charts, same count at every xatlas setting): re-unwrapping (smart_project, xatlas) never beats Meshy's own UVs. `blender_atlas` now defaults to `unwrap:"keep"`; use atlas only to share one texture/material across models.
+- Close MeshyAIStudio.exe before rebuilding (build_exe.bat copies over it); check job_status first so no running job is lost.

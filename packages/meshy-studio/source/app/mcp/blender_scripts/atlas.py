@@ -17,7 +17,7 @@ SIZE = int(cfg.get("atlas_size", 2048))
 MARGIN_PX = int(cfg.get("margin_px", 8))
 OUT = cfg["output_dir"]
 FORMATS = cfg.get("formats", ["fbx"])
-UNWRAP = cfg.get("unwrap", "smart")
+UNWRAP = cfg.get("unwrap", "keep")
 ANGLE = float(cfg.get("angle_limit", 66))
 os.makedirs(OUT, exist_ok=True)
 reset()
@@ -58,7 +58,52 @@ for o in allm:
     mesh.attributes[src].data.foreach_get("vector", buf)
     mesh.uv_layers.new(name="AtlasUV")
     mesh.attributes["AtlasUV"].data.foreach_set("vector", buf)
-    if UNWRAP == "smart":
+    if UNWRAP == "xatlas":
+        # xatlas builds few large, low-distortion charts even on bevelled/noisy AI meshes (Blender smart_project shreds them).
+        vend = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "vendor", "xatlas_blender")
+        sys.path.insert(0, os.path.normpath(vend))
+        import bmesh
+        import numpy as np
+        import xatlas
+        bm = bmesh.new()
+        bm.from_mesh(mesh)
+        bmesh.ops.triangulate(bm, faces=bm.faces[:])
+        bm.to_mesh(mesh)
+        bm.free()
+        mesh.update()
+        mesh.uv_layers.new(name="AtlasUV") if "AtlasUV" not in mesh.uv_layers else None
+        pos = np.empty(len(mesh.vertices) * 3, dtype=np.float32)
+        mesh.vertices.foreach_get("co", pos)
+        pos = pos.reshape(-1, 3)
+        tri = np.empty(len(mesh.polygons) * 3, dtype=np.uint32)
+        mesh.polygons.foreach_get("vertices", tri)
+        # weld split vertices by position: Meshy exports near triangle soup (hard-edge splits), which makes every face its own chart
+        span = float(np.max(pos.max(axis=0) - pos.min(axis=0))) or 1.0
+        key = np.round((pos - pos.min(axis=0)) / (span * 2e-5)).astype(np.int64)
+        _, first, inverse = np.unique(key, axis=0, return_index=True, return_inverse=True)
+        pos = pos[first]
+        tri = inverse.reshape(-1)[tri].astype(np.uint32)
+        co = xatlas.ChartOptions()
+        co.max_iterations = 4
+        co.normal_deviation_weight = 2.0
+        co.max_cost = float(cfg.get("chart_cost", 8.0))
+        po = xatlas.PackOptions()
+        po.resolution = SIZE
+        po.padding = max(MARGIN_PX // 2, 2)
+        po.bruteForce = False
+        atl = xatlas.Atlas()
+        atl.add_mesh(pos, tri.reshape(-1, 3))
+        atl.generate(co, po, False)
+        vmap, new_idx, uvs = atl[0]
+        new_idx = np.asarray(new_idx, dtype=np.int64).reshape(-1)
+        if len(new_idx) != len(tri):
+            raise RuntimeError("xatlas changed the triangle count")
+        loop_uv = np.asarray(uvs, dtype=np.float32)[new_idx]
+        mesh.uv_layers.active = mesh.uv_layers["AtlasUV"]
+        mesh.attributes["AtlasUV"].data.foreach_set("vector", loop_uv.reshape(-1).tolist())
+        mesh.update()
+        original_uv[o.name] = original_uv[o.name]  # bake still reads colour through the original UVs
+    elif UNWRAP == "smart":
         # Meshy's own unwrap is shredded into hundreds of tiny islands; a fresh angle-based unwrap gives large clean islands.
         # The bake below still reads colours through the ORIGINAL UVs, so the look is kept.
         mesh.uv_layers.active = mesh.uv_layers["AtlasUV"]
