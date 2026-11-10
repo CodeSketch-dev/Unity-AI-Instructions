@@ -29,3 +29,5 @@ triggers: native ad, native half, native rect, native size, admob native, native
 
 - Editor fake overlay on the Game View: map game pixels into the GAME IMAGE rect (GameView internal viewInWindow + targetInView / pixelsPerPoint), never the whole window (toolbar, scale slider, letterbox margins shift and enlarge it). Check it by eye in the Game View: game-view screenshots do not include Editor overlays.
 - An Editor overlay element (IMGUIContainer on the Game View root) must be sized to its own rect: a full-window element with pickingMode Position eats every click, so game buttons (popup close) look dead.
+- Best Editor fake = in-game Screen Space Overlay canvas (sorting 30000) placed in screen pixels (B&S NativeHalf_FakeView): matches the device rect at any Game View zoom, is visible in game screenshots, and only its own panel/close take clicks. Avoid Editor-window IMGUI overlays.
+- SketchEngine Popup.Close destroys the popup at the end of the close tween: a persistent, reused modal must be re-instantiated per open (KT pattern) or the X does nothing / reopen breaks.
