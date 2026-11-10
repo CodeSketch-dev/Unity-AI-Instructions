@@ -27,3 +27,6 @@ Owner rule (standing, every project): when a UI gets new art/texture/frame, the 
   `foreach Transform t in FindObjectsByType<Transform>(Include): if t.name.EndsWith("(Clone)") && t.gameObject.scene.IsValid() -> report/DestroyImmediate` (plus any `PrefabUtility.IsAddedGameObjectOverride` object under a UI prefab instance that no code references).
 - The Game view in Edit mode must show the same screen as Play at the same moment (HUD, popups closed). If a board, placeholder text (Trail, Rarity, Lorem, New Text) or foreign-game art (Knife Tower clones) is visible in Edit mode, it is a bug: fix the prefab, not the runtime.
 - When a layout or UI is redesigned, update the prefab and its builder so Edit mode and the builder output both equal the final Play look; a builder that is run again must reproduce it (idempotent).
+
+- Bakers must reference ASSET sprites: a sprite generated at runtime (procedural rounded rect, Texture2D created in code) is not serialized into the baked prefab and silently becomes null (plain rectangle in Play). Load kit sprites with AssetDatabase.LoadAssetAtPath and verify the baked prefab in Play.
+- One loading look across scenes: keep the loader alive (DontDestroyOnLoad) through scene activation and fade it after the first frames of the new scene; never fade out before activation (the old scene canvas flashes).
