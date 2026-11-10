@@ -34,3 +34,5 @@ Choose numbers with a pacing table before writing code; keep every amount owned 
 - Offline pays days -> client clock, no cap, corrupt timestamp.
 
 Formulas and a worked table: `references/formulas.md`. Simulate with the project's own sim (`auto-balance-loop`) and keep the pacing target within the documented tolerance.
+
+- When gameplay changes how much one action yields (blocks per swing, hits per tap), point the sim at the SAME pure function the game uses (never a copied table); re-run before/after and judge the long-run anchor (+-5%) separately from early purchase times, which jump 30-300% from one cap step.
