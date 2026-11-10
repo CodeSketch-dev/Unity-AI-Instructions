@@ -32,7 +32,7 @@ def _snapshot(window):
     return window.status.text(), tuple(texts)
 
 
-def test_every_button_is_enabled_and_responds(tmp_path, monkeypatch):
+def test_every_button_is_enabled_and_responds(tmp_path, monkeypatch, _no_real_launches):
     from PySide6.QtWidgets import QApplication, QPushButton
     from app.main import MeshyMainWindow
     app = QApplication.instance() or QApplication([])
@@ -56,6 +56,7 @@ def test_every_button_is_enabled_and_responds(tmp_path, monkeypatch):
         if _snapshot(window) == before and len(DIALOGS) == dialogs:
             silent.append(text)
     assert not errors, errors
+    assert _no_real_launches, 'Open folder must have been invoked (into the stub, never a real Explorer window)'
     assert not disabled, f"buttons that cannot be clicked: {disabled}"
     assert not silent, f"buttons that did nothing visible: {silent}"
 

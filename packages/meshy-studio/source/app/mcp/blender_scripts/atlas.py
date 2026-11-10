@@ -4,6 +4,7 @@ Method: copy each UV map to an 'AtlasUV' layer, pack every island of every model
 base colour into the shared image through the packed UVs (Cycles, diffuse colour only), then give every mesh the same
 material and export each model on its own. Meshes must be static (no armature)."""
 import json
+import math
 import os
 import sys
 
@@ -16,6 +17,8 @@ SIZE = int(cfg.get("atlas_size", 2048))
 MARGIN_PX = int(cfg.get("margin_px", 8))
 OUT = cfg["output_dir"]
 FORMATS = cfg.get("formats", ["fbx"])
+UNWRAP = cfg.get("unwrap", "smart")
+ANGLE = float(cfg.get("angle_limit", 66))
 os.makedirs(OUT, exist_ok=True)
 reset()
 
@@ -55,6 +58,17 @@ for o in allm:
     mesh.attributes[src].data.foreach_get("vector", buf)
     mesh.uv_layers.new(name="AtlasUV")
     mesh.attributes["AtlasUV"].data.foreach_set("vector", buf)
+    if UNWRAP == "smart":
+        # Meshy's own unwrap is shredded into hundreds of tiny islands; a fresh angle-based unwrap gives large clean islands.
+        # The bake below still reads colours through the ORIGINAL UVs, so the look is kept.
+        mesh.uv_layers.active = mesh.uv_layers["AtlasUV"]
+        bpy.ops.object.select_all(action="DESELECT")
+        o.select_set(True)
+        bpy.context.view_layer.objects.active = o
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.select_all(action="SELECT")
+        bpy.ops.uv.smart_project(angle_limit=math.radians(ANGLE), island_margin=0.0, correct_aspect=True, scale_to_bounds=False)
+        bpy.ops.object.mode_set(mode="OBJECT")
 
 # ---- pack all islands together on temporary duplicates ------------------------------------------------------------
 dups = []
@@ -83,7 +97,7 @@ bpy.ops.object.mode_set(mode="EDIT")
 bpy.ops.mesh.select_all(action="SELECT")
 if cfg.get("density", "equalize") == "equalize":
     bpy.ops.uv.average_islands_scale()
-bpy.ops.uv.pack_islands(rotate=False, margin=MARGIN_PX / SIZE)
+bpy.ops.uv.pack_islands(rotate=bool(cfg.get("rotate", True)), rotate_method="ANY", shape_method="CONCAVE", margin=MARGIN_PX / SIZE)
 bpy.ops.object.mode_set(mode="OBJECT")
 
 jm = joined.data

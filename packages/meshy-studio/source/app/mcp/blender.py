@@ -98,7 +98,9 @@ def blender_convert(args: dict) -> dict:
              inputs={"type": "array", "items": {"type": "object", "required": ["path"], "properties": {"path": STR, "name": STR}}},
              output_dir=STR, atlas_size={"type": "integer", "enum": [512, 1024, 2048, 4096]},
              formats={"type": "array", "items": {"type": "string", "enum": ["fbx", "glb"]}},
-             margin_px=INT, density={"type": "string", "enum": ["equalize", "keep"]}))
+             margin_px=INT, density={"type": "string", "enum": ["equalize", "keep"]},
+             unwrap={"type": "string", "enum": ["smart", "keep"], "description": "smart (default): re-unwrap every mesh into few large clean islands, then bake the original look into them (Meshy UVs are shredded into hundreds of tiny islands that waste atlas space). keep: reuse Meshy UVs."},
+             angle_limit={"type": "number", "description": "Smart unwrap angle in degrees (default 66; higher = fewer, larger islands)."}))
 def blender_atlas(args: dict) -> dict:
     inputs = []
     seen: set[str] = set()
@@ -115,5 +117,6 @@ def blender_atlas(args: dict) -> dict:
     output.mkdir(parents=True, exist_ok=True)
     return run_blender("atlas.py", {"inputs": inputs, "output_dir": str(output.resolve()),
                                     "atlas_size": int(args.get("atlas_size", 2048)), "formats": args.get("formats") or ["fbx"],
-                                    "margin_px": int(args.get("margin_px", 8)), "density": args.get("density", "equalize")},
+                                    "margin_px": int(args.get("margin_px", 8)), "density": args.get("density", "equalize"),
+                                    "unwrap": args.get("unwrap", "smart"), "angle_limit": float(args.get("angle_limit", 66))},
                        timeout=1800)
