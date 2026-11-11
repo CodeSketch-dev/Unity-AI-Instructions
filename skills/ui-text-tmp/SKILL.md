@@ -48,3 +48,6 @@ Thick black rims on big text look heavy and clumsy, but the game must stay light
 
 ## Black haze behind text = fix on sight (owner rule 2026-11-11)
 A dark halo / smear behind a label (hard black UNDERLAY drop shadow, outline width >= 0.7, face dilate >= 0.5) is a defect wherever it is seen, in any screenshot or audit: fix it at the shared TMP material, never per label. Check `UNDERLAY_ON` and `_OutlineWidth` / `_FaceDilate` / `_UnderlayColor` alpha of the font materials; target outline ~0.30, dilate ~0.28, navy-black outline (0.04,0.06,0.14), underlay off or alpha <= 0.35 with softness ~0.25 and offset |y| <= 0.5. Then screenshot small and large text in Play.
+
+## Every TMP has the outline (owner rule 2026-11-11)
+Every TextMeshPro text, UGUI and world, ships with an outlined material (width > 0.01). On sight of a plain/outline-less text (screenshot or audit) fix it at the prefab. Tool: `TMP_OutlineEnforcer` (menu Game/UI/TMP: enforce outline) scans first-party prefabs, swaps Bounce "UTM AvoBold SDF" texts to the outlined preset, reports other fonts. Also keep the TMP_SDF shaders patched with `max(alphaClip..., 0.01)` (see tmp-shader-alpha-clip-fix).

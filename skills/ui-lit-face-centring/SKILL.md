@@ -20,3 +20,6 @@ Glossy kit buttons are layered top to bottom: outline, highlight, body (light), 
 - The vertical offset belongs in ONE shared place (the icon + label row padding of the button content layout / the label margin helper). Per-family tweaks (3 px, 6 px "lifts") rot: calibrate them against the lit face with the scan, then remove compensations that the scan shows are wrong. In the reference project the bright families (lips 16/11) needed NO extra vertical padding once the old lifts were removed; the old lifts had made rows 2.5-6.5 px too low.
 - After changing the shared rule, refresh existing prefabs' content layout WITHOUT rebuilding them (hand edits stay), re-measure one text-only button, one icon+text button and one price button.
 - The ink audit script must use the same face definition (body extended up through the highlight), otherwise it reports false failures.
+
+## Lock-style compact buttons (owner rule 2026-11-11)
+A label stretched over a button sprite with a dark bottom band sits low if the bottom inset is only the lip. Measure from a screenshot: caps centre vs lit-face centre (top edge .. start of dark band); raise the label rect bottom by 2 x the dx in UI units (the rect centre moves half of it). Do not report a label aligned from rect maths alone.
