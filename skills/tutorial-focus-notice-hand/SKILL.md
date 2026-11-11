@@ -63,3 +63,5 @@ A spotlight on a world point that is outside the screen leaves the four dim pane
 ## One-tap focus (no second tap)
 - `Quest_Focus_Pointer.Focus(rect, msg, ...)` defaults to dismissOnClickFocusBox = true, so the first tap only closes the overlay and the real button needs a second tap. For a "tap this button" step build `FocusOptions { dismissOnClickFocusBox = false, dismissOnClickOutside = false }`: the hole stops raycasting and the tap lands on the real button. Prove it with an EventSystem RaycastAll at the button centre (top hit must be the button) and one simulated click.
 - End the focus from the step's own event (placed, stopped, bought), not from a tap on the overlay.
+
+- Tutorial hand: put the fingertip on the lower-right corner of the target face (anchor ~0.92/0.10), never over the label; kids must still read what they tap. Check every guided target in a fresh-save capture.
