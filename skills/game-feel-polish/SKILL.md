@@ -55,3 +55,4 @@ Source: third-party example. Inspired by: gamedev-skills/awesome-gamedev-agent-s
 
 ## Every grant is announced (owner rule)
 Anything the player receives or buys (currency, items, pets, eggs, boosters, skins, packs, popup rewards) shows a short notification text line, and currencies also fly to their bar. Implement ONE central facade fed from the grant choke points (save Add* methods, IAP payout sink) via an event, not per-call-site code; coalesce high-frequency grants (e.g. per-dig cash) so the lane never spams; pooled prefab-authored notice; stack lane outside protected HUD slots.
+Retrofit tip: when many call sites already fly currency by hand, do not edit them. Record the amounts they flew inside the one fly entry point and let the central notice fly only the unflown remainder (no double fly, no Suppress at 28 sites). Transient notices live in the existing notice lane (a single row of chips), buffered while a toast owns the lane.
