@@ -63,3 +63,8 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 - Offset tuning: never trust a fixed units->px ratio (measured 0.5-1.3 px/unit depending on scaler/HLG). Apply half the suggested correction, re-measure, then interpolate between the two readings (secant step). Widgets with attention shake/pulse carry +-3 px noise: stop at that band.
 
 - Icon-only buttons on translucent/round plates: the pixel scan finds only part of the face and reports big dy. Verify with geometry first (child rects span vs plate rect) before moving anything.
+
+## Known false positives (do not "fix" by hand)
+- Gauges / depth strips / progress rails whose marker and labels are positioned by a value: the audit sees "icon + label without HLG" and a big dy. Wrapping them in a layout group breaks the positioning. Document the row as a gauge false positive in the ledger and, if it repeats, teach the audit script to skip them.
+- Icon-only translucent plates (jump/arrow buttons) and pulsing widgets (reward/claim chips) vary a few px with the animation phase; judge them by a Play capture, not by the number.
+- Tile labels like a wide word on a narrow tile can show 2-4 px dx from glyph side bearing; no hand nudge, record it and move on.
