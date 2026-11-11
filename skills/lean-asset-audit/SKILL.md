@@ -50,3 +50,5 @@ Before/after table from the same commands, proof CSVs saved with the report, eve
 - Measure on the same machine state; say plainly when RAM or load-time effects were not measured on a device.
 
 See also: `tech-debt`, `import-presets`, `repo-hygiene-gitignore-audit`, `asset-transfer-closure`, `profiling-evidence`.
+
+- "Not referenced" audits by GUID grep miss assets wired through a registry ScriptableObject filled by an Editor menu: check the registry asset (and its wiring menu) before declaring a pack unused or re-wiring it.
