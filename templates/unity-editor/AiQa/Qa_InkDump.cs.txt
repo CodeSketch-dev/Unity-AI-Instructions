@@ -63,6 +63,25 @@ namespace AiQa
             return list;
         }
 
+        // Corner badges / stickers / notify dots are decoration: any node with a "Badge" or "Dot" ancestor (up to the measured host) is not button ink.
+        static bool InBadge(Transform t, Transform host)
+        {
+            for (Transform p = t; p != null && p != host; p = p.parent)
+                if (p.name.Contains("Badge") || p.name.Contains("Dot")) return true;
+            return false;
+        }
+
+        static bool Faded(Transform t)
+        {
+            for (Transform p = t; p != null; p = p.parent)
+            {
+                CanvasGroup g = p.GetComponent<CanvasGroup>();
+                if (g != null && g.alpha < .05f) return true;
+                if (g != null && g.ignoreParentGroups) break;
+            }
+            return false;
+        }
+
         static bool InScope(Transform t, List<Transform> scopes)
         {
             if (scopes.Count == 0) return true;
@@ -78,10 +97,10 @@ namespace AiQa
             Rect rect = ScreenRect(rt, canvas); if (!Visible(rect)) return null;
             var parts = new List<string>();
             foreach (TMP_Text t in host.GetComponentsInChildren<TMP_Text>(false))
-                if (t != null && !t.name.Contains("Badge") && !t.transform.parent.name.Contains("Badge") && !string.IsNullOrEmpty(t.text)) parts.Add("{\"type\":\"text\",\"name\":\"" + t.name + "\",\"rect\":" + R(TextInk(t, canvas)) + "}");
+                if (t != null && !InBadge(t.transform, host) && !string.IsNullOrEmpty(t.text)) parts.Add("{\"type\":\"text\",\"name\":\"" + t.name + "\",\"rect\":" + R(TextInk(t, canvas)) + "}");
             foreach (Image im in host.GetComponentsInChildren<Image>(false))
             {
-                if (im == null || im.name.Contains("Badge") || im.name.Contains("Dot") || im == bg || im.sprite == null || im.color.a < 0.05f || im.transform == host) continue;
+                if (im == null || InBadge(im.transform, host) || im == bg || im.sprite == null || im.color.a < 0.05f || im.transform == host) continue;
                 Rect ir = ScreenRect(im.rectTransform, canvas);
                 if (ir.width > rect.width * 0.8f || ir.height > rect.height * 0.9f) continue;   // frames / glows, not icons
                 parts.Add("{\"type\":\"icon\",\"name\":\"" + im.name + "\",\"rect\":" + R(ir) + "}");
@@ -93,13 +112,13 @@ namespace AiQa
 
         public static string Run(string path)
         {
-            List<Transform> scopes = PopupScopes();
+            List<Transform> scopes = PopupScopes();   // widgets under a CanvasGroup with alpha < 0.05 are hidden: never measure them (false fails)
             var sb = new StringBuilder();
             sb.Append("{\"screen\":[").Append(Screen.width).Append(',').Append(Screen.height).Append("],\"items\":[");
             bool first = true;
             foreach (Selectable s in Object.FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
-                if (s.name.Contains("Backdrop") || s.name.Contains("Dim")) continue;
+                if (s.name.Contains("Backdrop") || s.name.Contains("Dim") || Faded(s.transform)) continue;
                 string json = ItemJson(s.transform, s.targetGraphic, "button", scopes);
                 if (json == null) continue;
                 if (!first) sb.Append(','); first = false; sb.Append(json);
@@ -107,7 +126,7 @@ namespace AiQa
             // frames / cards / pills that are not buttons but hold a label (and maybe an icon): the frame rect is the face
             foreach (Image fr in Object.FindObjectsByType<Image>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
-                if (fr.sprite == null || fr.GetComponentInParent<Selectable>() != null || fr.GetComponent<TMP_Text>() != null) continue;
+                if (fr.sprite == null || Faded(fr.transform) || fr.GetComponentInParent<Selectable>() != null || fr.GetComponent<TMP_Text>() != null) continue;
                 bool hasLabel = false;
                 foreach (Transform c in fr.transform) if (c.GetComponent<TMP_Text>() != null && c.gameObject.activeInHierarchy) { hasLabel = true; break; }
                 if (!hasLabel || fr.name.Contains("Header") || fr.name.Contains("Background")) continue;

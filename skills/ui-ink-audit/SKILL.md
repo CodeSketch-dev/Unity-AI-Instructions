@@ -50,3 +50,14 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 - Ignore notify dots/badges in the scan; wait for the modal pop-in/slide to settle (30-40 frames) before capturing, otherwise the offset is animation state.
 - Prefab text rects baked for one width (landscape chip) spill past the face when the host is narrower (portrait): stretch the label to the live host width with an inset instead of a fixed width.
 - Confirm a suspected artifact with a 5x crop and your own silhouette scan before touching layout; keep the audit as a regression gate, not the truth.
+
+- The dump must skip widgets under a CanvasGroup with alpha <= 0.01 (parked/faded buttons) and badge/sticker children (notify dot, x2 sticker): otherwise hidden widgets and overhanging badges show up as fake dx/dy and overlap failures. Name badge children consistently so the dump can skip them.
+- Before chasing unstable audit numbers, check whether they repeat: sample the widget several times; a value that changes between runs is a measurement artefact (stale bake, translucent plate over moving 3D), a value that repeats is a real offset. Convert px to layout units from a measured step (e.g. 11 px per 17 units) instead of guessing the sign.
+- Readings that jump between captures on one widget usually mean an attention shake/pulse with a corner pivot (rotation swings the content). Centre the pivot (compensate position), then measure; never tune padding from noisy samples.
+- A fix in a SHARED builder (tab, button, plate) changes every screen that uses it: after tuning it on one screen, re-measure every other family member (other popups with the same tab/button) in the same pass, or the fix becomes a regression elsewhere.
+
+- Trap: a reward/offline popup opened on top makes the audit measure the screen hidden UNDER it (false fails). Claim/close blocking popups first, then re-open the target screen and capture.
+
+- Trap: ink numbers identical to the pixel after a builder edit = the screen is a BAKED prefab; re-run its bake before re-measuring. Rect-centred content on a plate whose lit face is shorter than the rect still reads low: centre on the face (ui-lit-face-centring), not the rect.
+
+- Offset tuning: never trust a fixed units->px ratio (measured 0.5-1.3 px/unit depending on scaler/HLG). Apply half the suggested correction, re-measure, then interpolate between the two readings (secant step). Widgets with attention shake/pulse carry +-3 px noise: stop at that band.

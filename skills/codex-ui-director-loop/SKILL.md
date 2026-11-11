@@ -13,3 +13,6 @@ triggers: codex, delegate ui, director, brief, owned files, giao codex, review c
 5. **Finish**: EditMode green, one commit with the reports + captures in docs/reports, push. Extract skills when the owner says he is satisfied (or the standing "extract the essence" order).
 
 6. Every brief (UI or code) carries the ARCHITECTURE LAW line: layered calls (SDK <- adapter <- decision layer), single responsibility, one type per file, pure rules + injected clock; the director rejects diffs that skip a layer.
+
+## Art briefs always carry the rules block
+Every Codex art brief must paste the project's art-rules block (image_generation only, keep the design, constant outline thickness, vector-smooth edges, 9-slice corners only, size cap) and demand a report of the generating call. The director re-measures outline uniformity and rebuilds it (art-direction-asset-pipeline/uniform_outline.py) before import. Rules not in the brief are not followed.

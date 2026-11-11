@@ -11,7 +11,7 @@ $sid = [string]$j.session_id
 if (-not $sid) { $sid = 'nosession' }
 $state = Join-Path ([IO.Path]::GetTempPath()) ('skill_enforce_' + ($sid -replace '[^A-Za-z0-9_-]', '') + '.json')
 function Load-State { if (Test-Path -LiteralPath $state) { try { return Get-Content -Raw -LiteralPath $state | ConvertFrom-Json } catch {} } return [pscustomobject]@{ uiedit = $false; uiskill = $false; audit = $false; blocks = 0 } }
-function Ensure-State($s) { foreach ($k in @('edits','rblocks')) { if ($null -eq $s.PSObject.Properties[$k]) { $s | Add-Member -NotePropertyName $k -NotePropertyValue 0 } }; if ($null -eq $s.PSObject.Properties['retro']) { $s | Add-Member -NotePropertyName retro -NotePropertyValue $false }; return $s }
+function Ensure-State($s) { foreach ($k in @('edits','rblocks','sblocks')) { if ($null -eq $s.PSObject.Properties[$k]) { $s | Add-Member -NotePropertyName $k -NotePropertyValue 0 } }; if ($null -eq $s.PSObject.Properties['retro']) { $s | Add-Member -NotePropertyName retro -NotePropertyValue $false }; if ($null -eq $s.PSObject.Properties['super']) { $s | Add-Member -NotePropertyName super -NotePropertyValue $false }; return $s }
 function Save-State($s) { try { ($s | ConvertTo-Json -Compress) | Set-Content -LiteralPath $state -Encoding ascii } catch {} }
 function Emit([string]$evName, [string]$text) { @{ hookSpecificOutput = @{ hookEventName = $evName; additionalContext = $text } } | ConvertTo-Json -Depth 5 -Compress }
 
@@ -32,7 +32,7 @@ if ($ev -eq 'PostToolUse') {
   try { $inp = ($j.tool_input | ConvertTo-Json -Compress -Depth 6) } catch {}
   $uiPath = '(?i)\.prefab|popup|shop|hud|button|label|iap|currency|_ui|[/\\]ui[/\\]|toast|tab_|card|icon'
   $changed = $false
-  if ($tool -eq 'Skill') { if ($inp -match '(?i)ui-always|ui-center-alignment|ui-layout-audit') { $s.uiskill = $true; $changed = $true } }
+  if ($tool -eq 'Skill') { if ($inp -match '(?i)superpowers:') { $s.super = $true; $changed = $true }; if ($inp -match '(?i)ui-always|ui-center-alignment|ui-layout-audit') { $s.uiskill = $true; $changed = $true } }
   elseif ($tool -match '^(Edit|Write|MultiEdit|NotebookEdit)$') { $fp = ''; try { $fp = [string]$j.tool_input.file_path } catch {}; if ($fp -match $uiPath -and $fp -notmatch '(?i)\.(md|ps1|json|txt|py|bat)$') { $s.uiedit = $true; $s.audit = $false; $changed = $true } }
   elseif ($tool -match '(?i)gameobject-(modify|component-(add|modify|destroy)|create|duplicate|set-parent)|assets-prefab-(save|create)|assets-modify') { $s.uiedit = $true; $s.audit = $false; $changed = $true }
   elseif ($tool -match '(?i)console-get-logs') {
@@ -56,6 +56,14 @@ elseif ($ev -eq 'Stop' -or $ev -eq 'SubagentStop') {
     Save-State $s
     $reason = 'UI was edited in this session but no layout audit ran afterwards. Before finishing: load ui-always (+ ui-center-alignment, ui-layout-audit), run the layout audit (Qa_UiAudit.Run on the changed screens: text centred in the free gap between neighbouring icons/buttons, no overlap, >= 6 px padding on all sides, ScrollRect margin >= 12 px, outline on every text, readable font size), fix every violation at its shared source, re-capture and look at the screenshot. If the edit had no visible UI effect, say so explicitly in your final message.'
     @{ decision = 'block'; reason = $reason } | ConvertTo-Json -Compress
+  }
+  # superpowers gate (owner standing order 2026-11-11): real work without ANY superpowers skill call is blocked once
+  if (-not $active -and -not $s.super -and [int]$s.edits -ge 2 -and [int]$s.sblocks -lt 1) {
+    $s.sblocks = [int]$s.sblocks + 1
+    Save-State $s
+    $reason = 'SUPERPOWERS GATE: this session changed code/assets but never invoked a superpowers skill. Owner standing order: invoke them yourself, never wait to be asked. Now call the Skill tool with the matching one (superpowers:verification-before-completion before reporting done; superpowers:writing-plans for a plan; superpowers:systematic-debugging for a bug; superpowers:requesting-code-review for a finished change), follow it, then finish.'
+    @{ decision = 'block'; reason = $reason } | ConvertTo-Json -Compress
+    exit 0
   }
   # automation gates (clone must use the frame tool, swallowed delegation, completion claim vs open ledger rows): clone_gate.ps1
   $cg = Join-Path $PSScriptRoot 'clone_gate.ps1'

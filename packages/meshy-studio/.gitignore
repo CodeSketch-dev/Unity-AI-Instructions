@@ -1,11 +1,2 @@
-# Local state, secrets and build output never go to git
-data/
-profiles/
+MeshyAIStudio.exe
 Export/
-output/
-dist/
-build/
-docs/vendor/
-*.exe
-.pytest_cache/
-__pycache__/

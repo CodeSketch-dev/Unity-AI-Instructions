@@ -41,3 +41,8 @@ The gate-matrix test is green and the real-device checklist ran. Every placement
 
 ## Call chain (owner law)
 Game decision layer (e.g. `Dig_Ads`: WHEN) -> game adapter `AdsHelper` (the only file that references the SDK) -> shared SDK facade (`SketchSdk`: mechanism, providers, pure policy / fit helpers, Editor fake provider). The SDK never knows popups, shops or currencies; the decision layer never calls the SDK directly.
+
+## Editor fake provider contract (owner 2026-11-10)
+- In the Editor EVERY format is ready (`IsReady` true) and rewarded completes immediately with `true` (Knife Tower AdsHelper parity), otherwise reward buttons are disabled or grant nothing and the whole reward flow cannot be played.
+- The fake native in-rect panel (label with its pixel size + close button with the real countdown) must appear in BOTH the Game view and the Device Simulator: find the window by type name `GameView` OR `SimulatorWindow` (the Simulator is a different type), prefer the focused/visible one. Break and Steal ships the same fake (`NativeHalf_FakeProvider`/`FakeView`); read it before porting.
+- Verify with a Play script (`Dig_Ads.ShowRewarded` returns started + granted) because the IMGUI overlay is not captured by ScreenCapture.

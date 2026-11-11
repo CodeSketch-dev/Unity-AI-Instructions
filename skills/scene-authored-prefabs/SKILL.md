@@ -37,3 +37,6 @@ Prefab exists once (no duplicate baked copy), the scene instance is a prefab ins
 - `.gitignore` can swallow folders named like Unity templates (`Tutorial`, `Examples`): `git check-ignore -v` every new folder.
 - Provenance of the style: [references/PROVENANCE.md](references/PROVENANCE.md).
 - Runtime binders (`transform.Find("Row" + x)`) must use FIXED object names, never localized text: baked children keep the language they were baked in, so a lookup built from `Localize.Get(...)` returns null in any other language, aborts the HUD initialise halfway and every later system then hits nulls. A chaos/random-tap PlayMode test run in a second language catches this class; fixed in two places in one project.
+
+## Play is the truth (owner rule)
+- Judge a map/scene in Play. Diff Edit vs Play (per path: activeInHierarchy, Renderer.enabled) after 5 s of Play; every object Play disables, hides, replaces or never uses is removed from the scene in Edit Mode (or its runtime toggle removed). Target: 0 Edit-only objects. Never leave Play-unused leftovers in the scene.

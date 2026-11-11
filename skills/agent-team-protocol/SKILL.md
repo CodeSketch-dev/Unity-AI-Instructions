@@ -40,3 +40,6 @@ Operating manual; see `editor-lane-single-writer` (what is serial) and `multi-ag
 - The brief makes the agent's FIRST notes line `Skills read: <names + one fact from each>`; the coordinator rejects a report with `Skills read: none`.
 - A "before/after" evidence pair must be two different captures. A copy or a missing "after" capture = the fix is NOT verified, whatever the agent concludes.
 - An agent that classifies audit findings as false positives must name the checker rule and show numbers (pair centre vs frame); the checker is then fixed (measure icon+label pairs) instead of ignoring the finding.
+
+- Compile only when no agent is still writing into the same assembly: a half-written file from a running agent breaks the build for everyone. Collect finished agents, wait for the last writer, then compile/bake/test once.
+- Wide audits (every sellable, every screen) blow the turn budget: brief them to write the report file by turn ~10 and update it after each section, so a turn-limit stop still leaves a usable artefact.

@@ -86,6 +86,7 @@
 ## codex
 - codex-delegation - Delegate well-specified CODE-ONLY tasks to the Codex CLI (cheap model) as a managed worker to save Claude tokens: write a brief, run codex exec in the background, then compile/test/review yourself. Use for pure logic, tests, data tables, boilerplate; keep design and Editor work on Claude.
 - codex-ui-director-loop - Director workflow for UI work done by Codex CLI: plan doc + brief with owned files and measured defects, round files, review by Play capture and pixel measurement, protect shared helpers. Use when you delegate any UI/layout task to Codex or another coding agent.
+- codex-ui-sprite-brief - Use when asking Codex (or any image model) to generate UI sprites: the ready brief template with the binding quality rules (image_generation only, constant outline, rounded rect, corner-cap 9-slice, size cap, no clipping, name-colour match) and the acceptance loop with sprite_audit.py.
 
 ## coding
 - coding-discipline-karpathy - Use when writing or changing code: four rules - surface assumptions, simplest code that works, surgical changes (every changed line traces to the request), goal-driven execution with verifiable success criteria. Adapted from Karpathy on LLM coding pitfalls.
@@ -512,6 +513,7 @@
 
 ## tmp
 - tmp-font-optimization - TextMeshPro font and text performance: static main font plus dynamic fallbacks, padding ratio, atlas size, autosize cost, world text, CJK. Use when TMP atlases bloat memory, glyph weight differs, text spikes CPU or a multilingual build is large.
+- tmp-shader-alpha-clip-fix - Use for ANY TextMeshPro work (new project, package update, text looks smeared/dark behind glyphs, outline artefacts): patch the TMP SDF shaders' alpha clip line, guard it with a test, and follow the careful-TMP checklist.
 - tmp-sprite-icons - One shared TextMeshPro Sprite Asset for inline icons (cash, gem, power, egg, star) used by world TextMeshPro text via sprite tags, built by an Editor baker, with a pure string helper. Use when text must carry a currency/stat icon in 3D or world-space labels.
 
 ## token
@@ -533,6 +535,7 @@
 ## ui
 - ui-9slice-buttons - Cut sprite 9-slice borders (spriteBorder) for buttons, tabs and plates so Sliced images stretch with no notch, seam or broken outline. Use when importing or restyling a button sprite, or one shows artifacts at some size. Part of the ui-always set.
 - ui-always - MANDATORY first step for ANY Unity UI work: buttons, text/TMP, icons, popups, shops, tabs, HUD, currency bars, price plates, prefab layout, UI screenshots (nut, chu, bang, giao dien), also in subagents. Loads the UI skill set and the measured-centring gate.
+- ui-art-quality-gate - Use when generating, replacing or reviewing UI sprites (buttons, boards, tags, icons) with an image model or script: strict art-director review checklist, measurable pass criteria, the pipeline that produced smooth uniform-outline 9-slice buttons, and the traps that cost hours.
 - ui-builder - Describe a screen as a ui-spec (layout contract), lint it, convert it to anchors, and build the prefab with an idempotent Editor builder. Use when a GDD or reference defines a screen's elements and it must come out right from one prompt.
 - ui-button-anatomy - Required components and behavior of every button: press scale, click sfx on pointer down, grayscale disabled, per-state variants, notify dot, hit areas. Use when creating or auditing any button, tab or HUD icon. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-center-alignment - Mandatory centring audit for any Unity UI work (bars, pills, buttons, icon+text, currency bars, popups, tabs). Use whenever you build or edit UI; verify by script that content is geometrically centred before finishing. Part of the ui-always set: read skills/ui-always first for any UI task.
@@ -543,6 +546,7 @@
 - ui-exact-clone-workflow - Clone a reference UI screen exactly: capture the reference, extract sprites and fonts, build prefabs, compare by pixels at several aspect ratios. Use when a screen must match a reference game or mockup.
 - ui-feedback-toasts - Timing recipes for toasts, announcement banners, warning messages, count-up counters and attention loops. Use when a screen needs transient feedback (reward received, error, warning, currency change).
 - ui-icon-label-layout - Lay out icon + label inside buttons, pills and price plates with a HorizontalLayoutGroup child instead of hand offsets. Use when a button has an icon and text, a currency price, or the text looks off-centre. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-icon-outline-bake - Use when UI icons look thin/inconsistent next to the plates: bake one thick uniform navy outline into every icon PNG (idempotent ledger, layouts do not move, generated C# skip-list for any runtime outline ring).
 - ui-icon-text-everywhere - Every toast, currency value, reward or status text is an ICON on the left plus TextMeshPro on the right (UI in a HorizontalLayoutGroup, world text with a TMP sprite tag). Use when adding or touching any toast, popup number, floating value, currency label, notice lane or overhead text.
 - ui-ink-audit - Use on any UI edit, Play test or screenshot in every Unity project: audit UI by pixels (icon+text centred on the button face, titles on their band, no overlaps) and fix the [InkAudit] FAIL lines it reports.
 - ui-layout-audit - Automatic layout audit of live UI in Play Mode (text centred in the free gap, overlap, padding, ScrollRect margins, missing outline, tiny fonts); fix every violation at its shared source. Use after ANY UI change and before reporting UI done.
@@ -556,7 +560,9 @@
 - ui-popup-from-demo - Build popups/HUD buttons that match demo screenshots 1:1 via an idempotent editor builder and screenshot compare loop, generating only missing icons. Use when given demo images or "match the demo exactly".
 - ui-reward-popup-recipe - Layout recipe for small reward / claim / welcome / free-cash popups: stacked plates, cash icon + amount in one HLG, equal-height button pair, x2 sticker near the corner, padding numbers, acceptance checks. Use when building or fixing any popup with an amount and CLAIM buttons.
 - ui-scaling-safe-area-checklist - Checklist for UI that survives phone, tablet and notch aspect ratios: CanvasScaler, anchors and pivots, safe area, event-driven HUD, screen stack, text growth. Use when UI breaks on other resolutions or before sign-off of any screen.
+- ui-screenshot-defect-analysis - Use whenever the owner sends a UI screenshot or says something looks wrong/ugly/dirty: produce a numbered defect table from the image BEFORE touching code (overlap, padding, alignment, missing text, outline family, words-vs-icons, clipping, contrast), fix every row, re-capture, compare.
 - ui-scroll-board - Rules for scroll lists/grids (shop, inventory, collections) and list+preview popups: inset ScrollRect, rounded mask, slim scrollbar, spacing, state colours. Use when creating/fixing a ScrollRect list or its preview. Part of the ui-always set: read skills/ui-always first for any UI task.
+- ui-sprite-audit - Use before importing ANY generated or edited UI sprite: run sprite_audit.py (outline uniformity/thickness, exact rounded rectangle, corner cap, size cap, clipping, magenta fringe) and reject on FAIL; a hook-style gate so bad Codex art never reaches the game.
 - ui-style-rules - Standing visual defaults for Roblox-style mobile UI (icon size, ad badge, text centring, dim, gaps, NEW tag, cards) from past corrections. Use before/after any popup, shop, HUD button or card. Part of the ui-always set.
 - ui-tabs - Tab strip and content panels switched by a StaticBus tab-selected event with on/off frames and notify dots. Use for side-tab shops, inventory categories and settings sections. Part of the ui-always set: read skills/ui-always first for any UI task.
 - ui-text-autofit-system - MANDATORY for any UI, popup, HUD, button, world-canvas or code-built text: install/use the automatic TMP fitting system (auto size, padding, no overflow). Part of the ui-always set; read ui-always first.
