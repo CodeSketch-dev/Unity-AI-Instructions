@@ -41,3 +41,7 @@ The HUD is a small number of fixed zones. Putting each element in its convention
 
 ## Verification (always)
 Capture the Game view at 9:16, 9:20 (tall notch phone) and 3:4 (tablet), plus landscape if supported. Check: safe area respected, no overlap, nothing cut off, targets reachable. Attach screenshots to the report. Then continue with `ui-clone` for fidelity against the reference.
+
+## Swapping two controls
+- Define the thumb-rest corner and the sweep position as named SLOT constants first; controls take a slot, and dependents (contextual button beside the corner, tile columns above a slot) reference the slot, not the control. A swap is then a two-line change instead of a hunt through every DIG_/JUMP_ reference.
+- Do the swap in landscape AND the portrait plan together, then run the stacked-gap and clearance tests before capturing.
