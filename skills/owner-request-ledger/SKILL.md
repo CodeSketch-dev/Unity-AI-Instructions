@@ -25,3 +25,5 @@ Mine `docs/feedback-notes.md`, runbooks and the chat transcript once; add rows f
 - Turning a feature off "until reworked" (`const bool X_ENABLED = false`) swallows the owner's task unless the same change adds an OPEN ledger row naming the flag and the rework. Never disable without that row.
 - Session-start sweep: grep `= false;` near owner/until/hidden/not finished and match each to an OPEN row; unmatched = swallowed, log it.
 - "Code exists" is not "live": verify in Play that the feature actually binds (e.g. `GetComponentInChildren` misses a SIBLING component; search from `transform.root`) before closing a row.
+
+- Before working an audit row, grep git log for its id/keywords: many "swallowed" rows are already fixed in a commit and only the ledger close is missing; close them with the commit hash, and check later owner directives that supersede the row.
