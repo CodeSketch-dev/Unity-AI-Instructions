@@ -45,3 +45,7 @@ Build output path, size, version numbers, settings changed, what was verified vs
 - Verify before shipping: unzip the APK and `grep -a` the new value in `assets/bin/Data/*` (the serialized level data), not only in `global-metadata.dat` (that only holds the C# literal).
 - Fix: write the field into the prefab/scene (or set it through SerializedObject in the build script), rebuild, re-grep; restore the temporary edit afterwards.
 - Put the connect address on the phone debug overlay (addr / transport state / attempts) so one screenshot shows what the build really uses.
+
+## Release hygiene: debug overlays
+- SRDebugger (SketchEngine plugin) auto-initialises in every build; its Settings.asset `_triggerEnableMode` must be 3 (DevelopmentBuildsOnly) or the debug tap trigger ships to players. Grep for the Settings asset before any release build.
+- Unity MCP: long bake menus in one script-execute call time out ("after 10 retries") and can restart the Editor; run 2-4 bake menu items per call and confirm each returns True.
