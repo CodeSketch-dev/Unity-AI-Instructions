@@ -30,3 +30,5 @@ Every balance variable is coupled: zone access, boss chase/recovery, tool effect
 - Does the loop preserve the reference's relative rhythm without dead ends or runaway growth?
 - Do generated values remain monotonic where the reference is monotonic and bounded where feedback would otherwise explode?
 - Test with a fresh save and a representative mid-game save; report assumptions separately from observed facts.
+
+- Daily free-item ad routes (free next tool/upgrade) must be gated by reach (e.g. price <= 2x cash on hand), else the sim showed players skip tiers (tier 18 vs 9, +26% late depth). Always sim a new free route before shipping and assert late-game pacing within +-5%.
