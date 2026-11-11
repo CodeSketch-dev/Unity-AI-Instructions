@@ -63,6 +63,17 @@ namespace AiQa
             return list;
         }
 
+        static bool Faded(Transform t)
+        {
+            for (Transform p = t; p != null; p = p.parent)
+            {
+                CanvasGroup g = p.GetComponent<CanvasGroup>();
+                if (g != null && g.alpha < .05f) return true;
+                if (g != null && g.ignoreParentGroups) break;
+            }
+            return false;
+        }
+
         static bool InScope(Transform t, List<Transform> scopes)
         {
             if (scopes.Count == 0) return true;
@@ -93,13 +104,13 @@ namespace AiQa
 
         public static string Run(string path)
         {
-            List<Transform> scopes = PopupScopes();
+            List<Transform> scopes = PopupScopes();   // widgets under a CanvasGroup with alpha < 0.05 are hidden: never measure them (false fails)
             var sb = new StringBuilder();
             sb.Append("{\"screen\":[").Append(Screen.width).Append(',').Append(Screen.height).Append("],\"items\":[");
             bool first = true;
             foreach (Selectable s in Object.FindObjectsByType<Selectable>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
-                if (s.name.Contains("Backdrop") || s.name.Contains("Dim")) continue;
+                if (s.name.Contains("Backdrop") || s.name.Contains("Dim") || Faded(s.transform)) continue;
                 string json = ItemJson(s.transform, s.targetGraphic, "button", scopes);
                 if (json == null) continue;
                 if (!first) sb.Append(','); first = false; sb.Append(json);
@@ -107,7 +118,7 @@ namespace AiQa
             // frames / cards / pills that are not buttons but hold a label (and maybe an icon): the frame rect is the face
             foreach (Image fr in Object.FindObjectsByType<Image>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
             {
-                if (fr.sprite == null || fr.GetComponentInParent<Selectable>() != null || fr.GetComponent<TMP_Text>() != null) continue;
+                if (fr.sprite == null || Faded(fr.transform) || fr.GetComponentInParent<Selectable>() != null || fr.GetComponent<TMP_Text>() != null) continue;
                 bool hasLabel = false;
                 foreach (Transform c in fr.transform) if (c.GetComponent<TMP_Text>() != null && c.gameObject.activeInHierarchy) { hasLabel = true; break; }
                 if (!hasLabel || fr.name.Contains("Header") || fr.name.Contains("Background")) continue;
