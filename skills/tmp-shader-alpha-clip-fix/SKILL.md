@@ -17,3 +17,6 @@ Guard it with an EditMode test that fails when a TMP package update restores the
 - Underlay: only with enough padding; test before enabling globally.
 ## 3. Before reporting any text change
 Zoom screenshot (4x) of small and big text in Play; look for halo, clipped glyph tops, neighbour fragments; change ONE material/shader suspect at a time and revert on no improvement. See also `tmp-font-optimization`, `ui-text-tmp`.
+
+## 4. Asset values must equal runtime values (owner 2026-11-11: "fixed yesterday, why again?")
+A runtime override (code that lowers `_OutlineWidth` / `_FaceDilate` at boot) hides a bad asset only in Play: Edit Mode, Scene view and prefab previews still show the asset values (slivers of neighbouring glyphs, heavy outline on a padding-9 atlas). Set the SAME numbers (reference 0.30 / 0.28) in the shared material assets AND the font preset material, make the font builder use the same constants, and guard it with an EditMode test that loads the assets. Dark text under a tutorial focus / popup dim is the dim layer, not the font: compare against a capture without the dim before touching materials.
