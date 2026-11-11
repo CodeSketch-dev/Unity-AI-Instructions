@@ -26,3 +26,7 @@ Renderer count, batches and set-pass before/after, bake ms, combine ms behind th
 - Offline-merged FBX scene variants have zero runtime cost but cost build size and drift; prefer bake + runtime combine.
 
 Details, code sample and a one-mesh-per-scene alternative: [references/combiner-details.md](references/combiner-details.md).
+
+## Static batching vs runtime combine (trap, measured 2026-11-11)
+- Unity static batching replaces a renderer's mesh at build/play, so a runtime combiner (`CombineMeshes`) cannot read those meshes: it skips them. Do not "fix" that by clearing BatchingStatic on hundreds of objects (it lost existing static flags and batches did not drop). Pick ONE strategy per object group: either static batching, or an Editor-baked combined mesh per material.
+- The biggest batch lever is fewer distinct materials: bake small prop families into one shared atlas first (`blender_atlas`, several inputs, unwrap keep), then combine. Measure batches/SetPass in Play before and after EVERY single change; never stack several changes before measuring, and always keep a pre-change backup/commit to restore from.
