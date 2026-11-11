@@ -47,3 +47,8 @@ Source: third-party example. Inspired by: gamedev-skills/awesome-gamedev-agent-s
 - Hit-stop must wait in real time (WaitForSecondsRealtime or UniTask ignoring time scale) or it never resumes at timeScale 0; trigger once per impact and let only the newest call restore time scale.
 - Ease almost everything; overshoot (back/elastic) for pops, ease-out for settle. Juice must return to rest; permanent exaggeration stops reading as feedback.
 - Feedback must never block input: keep it short and let input buffer through it. Offer a reduce shake/flash option.
+
+## Feel audits go stale fast: gap lists must be re-verified before wiring
+- A written feel audit (gap list with file:line) drifts within days: in one project 4 of 8 "gaps" were already fixed by the time an agent was sent to close them. Brief the agent to re-read each target first and report "already done" instead of duplicating; budget for ~50 % skips.
+- Highest-leverage feel fixes are central: put haptics/sounds in the shared audio call (PlaySell/PlayCollect/PlayRebirth) so every call site gains them, then wire the one pattern everywhere else: fly the currency to the HUD pill + claim sound + pill bump/card punch (`FlyCurrency` + `PlayClaim` + `ClaimFeedback`). Passive income gets a throttled pill bump on the existing chime gate (the bump helper owns its own throttle) so it feels connected to the bar.
+- Verify in Play by claiming one reward of each kind, not by reading code: the pill must bump and the numbers must count.
