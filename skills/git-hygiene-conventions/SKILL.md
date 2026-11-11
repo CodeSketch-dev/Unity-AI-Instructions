@@ -52,3 +52,7 @@ Compile clean, EditMode PASS/SKIP equal to baseline, missing-script/reference ch
 2. Before pushing: `git count-objects -vH` (size-pack), `git status --short | grep -c '^??'` (untracked count: hundreds means a missing ignore), and the blob sizes of the range: `git rev-list --objects <base>..HEAD | git cat-file --batch-check='%(objecttype) %(objectsize:disk) %(rest)'` summed; stop above a few tens of MiB or any single blob > 5 MiB.
 3. Keep big, derived or purchased content out of git with .gitignore (vendor art packs, art staging, screenshots, research video, agent working folders), like the Break and Steal .gitignore: research / reports / screenshots / staging / qa folders, `.agents/`, generated graph indexes, FBX sources > 100 MB.
 4. If the owner says "do not push", commit locally only and keep telling him what is waiting. History rewrite / gc / filter-repo needs his explicit go.
+
+## Explicit-path commits with a shared tree (trap)
+- `git commit -- <paths>` aborts the WHOLE commit if any path is gitignored/unknown (e.g. a report under an ignored `docs/reports/`). Run `git check-ignore -v <path>` first and drop ignored files; confirm `git log -1` shows your commit before pushing.
+- `git push` publishes every local commit, including other sessions' unpushed ones on the same branch: check `git log origin/master..HEAD` first and expect them to go out.
