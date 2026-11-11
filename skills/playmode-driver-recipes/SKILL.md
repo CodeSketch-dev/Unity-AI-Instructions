@@ -43,3 +43,7 @@ Report numbers and screenshot paths; state what only a device can verify.
 - Deleting the save files and entering Play in the same call right after a previous Play stopped can leave the old state (the stopping session rewrites its save, or the game reads cached data). Sequence: stop Play, wait until not playing, delete files + PlayerPrefs, THEN enter Play.
 - Before trusting the run, check the first screen is the first-time flow (tutorial, no returning-player popups such as daily login). Returning-player values (same reward amounts as the real save) mean the run is NOT fresh: discard it.
 - Always keep the backup/restore pair (copy persistent folder aside, restore after) and restore even when the run is discarded.
+
+## Do not log a defect from one capture right after an action (trap)
+- Damped systems (label overlap nudges, fly-ins, popup pops, count-ups) settle in 0.3-1 s. A frame captured the instant after a click can show a transient overlap that is gone later. Before writing a defect row: wait ~2-3 s, capture again, and only log what persists; note "transient" otherwise.
+- Check the system's own resolver exists first (e.g. a stack/declutter pass) and whether its size estimates match the real text width, instead of assuming it is missing.
