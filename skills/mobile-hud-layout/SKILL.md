@@ -45,3 +45,6 @@ Capture the Game view at 9:16, 9:20 (tall notch phone) and 3:4 (tablet), plus la
 ## Swapping two controls
 - Define the thumb-rest corner and the sweep position as named SLOT constants first; controls take a slot, and dependents (contextual button beside the corner, tile columns above a slot) reference the slot, not the control. A swap is then a two-line change instead of a hunt through every DIG_/JUMP_ reference.
 - Do the swap in landscape AND the portrait plan together, then run the stacked-gap and clearance tests before capturing.
+
+## When you swap control positions, grep the layout tests by relation, not by number
+- A control swap (e.g. jump and dig exchange corners) leaves other layout tests encoding the OLD relation ("A sits up-left of B"): they fail in a different test group than the one you ran. After a swap run every HUD layout group (declutter, trio, responsive) and rewrite assertions as relations that survive (side by side, gap >= GAP above/below the right neighbour), keeping a one-line note of the superseding owner request.
