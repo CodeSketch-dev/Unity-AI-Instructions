@@ -47,6 +47,18 @@
       "event": "PostToolUse",
       "match": "(edit|write).*\\.cs",
       "inject": "SWALLOW GUARD: if this edit sets a feature/UI flag to false (const bool X_ENABLED = false, ENABLED = false, hidden 'until reworked'), add an OPEN row to docs/owner-requests.md in the SAME change naming the flag and the rework, or the owner's task is silently swallowed. Also never close a task on 'code exists': prove it is live in Play (bound, tappable, visible)."
+    },
+    {
+      "id": "currency_bar_contract",
+      "event": "PreToolUse",
+      "match": "(currency|coinpill|gempill|cashbar|gembar|pill_kt_currency|pilllayout|currency_bar)",
+      "inject": "CURRENCY BAR: load skill ui-currency-bar-contract BEFORE editing. Icon centre on the frame's LEFT EDGE (overhangs, covers the bar edge), never inside the frame; one shared builder/prefab; keep a test that fails when the icon sits inside; screenshot every place the bar appears."
+    },
+    {
+      "id": "skills_not_used",
+      "event": "UserPromptSubmit",
+      "match": "co skills|co skill|khong dung skill|ko dung skill|dung skill di|skills ma|skill ma",
+      "inject": "OWNER: a matching skill exists and was not applied. Find it now (skills/INDEX.md / router), load it, redo the work by its contract, add an enforceable check (test/audit/hook) so it cannot be skipped again, then publish."
     }
   ]
 }
