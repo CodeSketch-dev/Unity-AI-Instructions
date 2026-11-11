@@ -28,3 +28,9 @@ Gaps between stacked rows >= 16 (equal), bottom padding under the buttons about 
 - A page-fit helper takes a DESIGN size: give it the reference scroll height (about 700), or the host stays short and the cards cannot grow. After changing the builder, re-bake the modal prefabs and rebuild the UI factory.
 - When two old owner notes conflict (big + scroll vs all visible) the newest owner words win; leave the superseded rule in a code comment so it is not re-applied.
 - Scroll content needs its side padding INSIDE the content (widen the group and offset the cards by the pad), not as an offset of the content rect: an elastic ScrollRect springs an offset content back to 0 and the first card (today) stays clipped by the viewport edge. Reference padding about 70 left / 100 right; also add the pad to the "centre on today" maths.
+
+## Reward reveal showcase (owner 2026-11-11: "no FX, no notice, no info about what I got")
+- Every "you got X" moment (spin, daily, offer, hatch, quest) ends in ONE shared showcase, never a bare toast: black dim (~0.88), rotating light rays behind a big icon that pops in (OutBack), "YOU WON!" title, name + amount (largest text), CLAIM unlocked after ~0.6 s so the reveal is seen.
+- Cash / gems: lift the REAL currency pill above the dim (nested Canvas, overrideSorting) and fly the icon into it on CLAIM, count-up on landing. Eggs: list the pets they can hatch (<= 6 icons spread over the tier, rarest always included, icons only). Cosmetics: NEW sticker + podium glow.
+- Put the rules (kind mapping, pet preview, dim / pop curves, claim delay) in a pure class with EditMode tests; drive the real flow in a PlayMode test (open, check pill lifted, claim, pill lowered).
+- Art order for a new visual family (owner order): plan doc -> Codex CONCEPT sheet -> director review -> asset brief derived from the approved concept -> audit -> import -> re-skin; placeholder art in the scaffold stays uncommitted until then.

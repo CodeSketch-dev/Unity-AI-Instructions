@@ -16,3 +16,6 @@ triggers: codex, delegate ui, director, brief, owned files, giao codex, review c
 
 ## Art briefs always carry the rules block
 Every Codex art brief must paste the project's art-rules block (image_generation only, keep the design, constant outline thickness, vector-smooth edges, 9-slice corners only, size cap) and demand a report of the generating call. The director re-measures outline uniformity and rebuilds it (art-direction-asset-pipeline/uniform_outline.py) before import. Rules not in the brief are not followed.
+
+## Concept first (owner 2026-11-11)
+For a new screen or visual family: plan, then ONE Codex concept sheet of all variants (same layout grid, house style), review it harshly, and only then brief the individual assets "exactly to that concept" (attach the approved concept as an `-i` reference). Never generate final assets before the concept is approved. A heredoc containing quotes can break the shell tool: write briefs with the file-write tool.
