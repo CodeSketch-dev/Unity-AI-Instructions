@@ -47,3 +47,6 @@ Report numbers and screenshot paths; state what only a device can verify.
 ## Do not log a defect from one capture right after an action (trap)
 - Damped systems (label overlap nudges, fly-ins, popup pops, count-ups) settle in 0.3-1 s. A frame captured the instant after a click can show a transient overlap that is gone later. Before writing a defect row: wait ~2-3 s, capture again, and only log what persists; note "transient" otherwise.
 - Check the system's own resolver exists first (e.g. a stack/declutter pass) and whether its size estimates match the real text width, instead of assuming it is missing.
+
+## New HUD widget gate check
+A widget gated like a sibling (e.g. hidden until FTUE ends) can stay inactive in a returning-player Play run; force-activating it with SetActive does not show it if a parent is stashed. Before committing a new HUD chip, find which gate hides it and capture it visible (or say "not seen in Play"); EditMode layout tests alone do not prove it renders.
