@@ -40,7 +40,7 @@
       "event": "UserPromptSubmit",
       "match": "textmesh|text mesh|tmp|textmeshpro|font sdf|alpha clip|chu bi|vet den|outline chu|shader chu",
       "flag": "tmp",
-      "inject": "TEXTMESHPRO RULE: load skill tmp-shader-alpha-clip-fix (and tmp-font-optimization). Ensure the TMP_SDF shaders carry the clamped alpha clip (max(alphaClip..., 0.01)); keep the guard test green; change one text suspect at a time and zoom-check in Play."
+      "inject": "TEXTMESHPRO RULE: load skill tmp-shader-alpha-clip-fix (and tmp-font-optimization). Ensure the TMP_SDF shaders carry the clamped alpha clip (max(alphaClip..., 0.01)); keep the guard test green; change one text suspect at a time and zoom-check in Play. EVERY TMP (UGUI and world) must have an outlined material and no black smear/halo: if you see a text without outline or with a dark haze (hard underlay, outline >= 0.7, dilate >= 0.5), fix it at the shared material/prefab yourself, no project C# tool, no asking (skill ui-text-tmp)."
     },
     {
       "id": "disabled_flag_needs_ledger",
