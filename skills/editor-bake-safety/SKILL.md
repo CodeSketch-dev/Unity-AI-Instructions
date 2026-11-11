@@ -15,3 +15,5 @@ Lessons from baking 250+ item thumbnails (Unity 6, URP, MCP script-execute):
 - A busy Editor importing hundreds of new PNGs looks hung (`Responding=False`): wait and poll `editor-application-get-state`; do not launch a second Unity on the same project.
 - Skipping existing files (`overwrite=false`) hides stale bad outputs: scan outputs for the defect and re-bake only those.
 - Save-scene dialogs block MCP: discard unsaved scene changes after a bake instead of saving (project hygiene helper), then run the full test suite.
+
+- Trap: a bake that rewrites prefabs can change their root fileID; any registry asset (factory list of prefab refs) then points at dead IDs and runtime reports "not baked" -> HUD half-built. After every bake (and after an interrupted one, e.g. machine shutdown) re-run the registry/factory build and enter Play once to confirm.
