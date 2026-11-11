@@ -42,3 +42,7 @@ Each rule comes from a real mistake. Follow the habit, it is cheaper than the re
 
 - Changing a code default (`Tuning.Default()`, field initialiser) does nothing when the value is serialized on a prefab/scene/SO: grep the .prefab/.asset for the field and measure the result in Play before claiming it changed.
 - Prefab vs code-built drift: code that does `go.GetComponent<Button>()` on an instantiated prefab finds nothing when the baked prefab keeps the Button on a child -> listener never attached = dead tap. Use GetComponentInChildren(true) and TAP it in Play (invoke onClick and check the popup opened) before closing the task.
+
+## Audit reports go stale: grep the code before briefing a build (trap)
+- A "gap" listed in an old audit/spec may already be implemented under another name. Before dispatching an agent to build it, grep the live code for the feature (price tables, routes, UI handlers) and put the hits in the brief. Skipping this produced a duplicate class that had to be deleted the same day.
+- Tell build agents: "if an equivalent already exists, stop and report; do not add a parallel system." When a report proves stale, fix or flag the report too.
