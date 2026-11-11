@@ -10,3 +10,5 @@ triggers: day night, night reset, world reset, countdown, skybox, pit reset, epo
 - Surface/ground must exist before anyone stands there (build colliders synchronously).
 - Unlock and restore day skybox together; HUD shows timer chip and lock countdown.
 - Test: repeated cycles with no leaked tweens, listeners or duplicate content (`scene-teardown-safety`).
+
+- Timed world events (night, rush, reset): test them by overriding the save clock delegate (now = real + offset to ~12 s before the phase) on a fresh save; capture warning, transition and lock banners and check every centre banner against contextual buttons that appear nearby.
