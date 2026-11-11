@@ -18,3 +18,7 @@ Every currency bar anywhere (gameplay HUD, shop header, popup header, minigame H
 - Side-by-side bars (shop/popup header): switching to overhanging icons needs the row gap raised to >= overhang (~0.57 x frame height) + 8, else the right bar icon covers the left bar end. Bakes run while the Editor still compiles use the OLD constants: read a constant back (e.g. return it from the bake script) before trusting a bake.
 
 - Same plate everywhere: shop/popup headers must NOT use a lighter/alternate plate option; a guard test walks every baked UI prefab and fails on any currency bar whose plate sprite differs from the HUD one or whose icon sits inside the frame.
+
+## One value size across bars (measured trap)
+- Autofit with a large fontSizeMax makes a 1-digit value render huge (55) while "240.8K" shrinks to 32 in the same HUD column: the gem bar looked oversized next to cash. Put ONE shared max (about the size the longest realistic value settles at, e.g. 36) in the shared bar builder; autofit may only shrink from it. Never pass a per-bar max.
+- Audit: dump fontSize/fontSizeMax of every bar value in Play (CoinPill/GemPill/BagPill and shop-header copies); sizes of short values must not exceed the cap. Re-bake all UI prefabs after changing the builder (chunk the bake menus, 2-3 per MCP call) and rebuild the UI factory.
