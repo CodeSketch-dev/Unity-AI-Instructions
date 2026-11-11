@@ -13,3 +13,5 @@ triggers: icon outline, vien icon, outline icon, icon mong, bake outline, icon d
 - Verify in a Play screenshot: icon rim looks as thick as the button rim; icon + label rows stay centred.
 
 - Mixed icon families: one row icon from an old/reference atlas next to new-kit icons reads grey and dull. Check every row of a screen with a sprite-source dump (sprite.texture.name per icon) and replace the stragglers in one pass.
+
+- Adding a new icon: drop the PNG, copy importer settings from a sibling icon, rebuild the sprite registry, then reload scripts (static lookup caches keep the old miss). Call sites using an atlas-first lookup keep returning the old atlas sprite: point them at the new name directly.
