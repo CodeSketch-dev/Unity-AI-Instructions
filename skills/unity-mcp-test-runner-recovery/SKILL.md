@@ -11,3 +11,5 @@ triggers: tests-run timeout, testrunnerapi, stuck tests, phantom failures, stale
 - After Play with domain reload off, request a script reload before EditMode.
 - Run PlayMode in small class groups (Filter groupNames/testNames), delete the results file first, wait for "done pass=N fail=M"; a full run can hang >10 min.
 - Order-dependent PlayMode failures with domain reload off: suspect a persistent singleton (`PersistAcrossScenes`) whose reloaded-scene duplicate self-destroys. `Find()` helpers using FindFirstObjectByType can return the doomed duplicate (destroyed input/audio); prefer `HasInstance ? Instance : Find...`. Diagnose with a state probe, do not guess static leaks.
+
+- EditorApplication.isCompiling can stay true for minutes after a Hot Reload package change while the log shows "Finished compiling" and scriptCompilationFailed is false: check the Editor.log tail, then enter Play anyway instead of polling forever.
