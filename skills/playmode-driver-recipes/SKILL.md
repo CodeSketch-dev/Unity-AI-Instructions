@@ -31,3 +31,5 @@ Report numbers and screenshot paths; state what only a device can verify.
 - Game View size: pick the entry by WIDTH>HEIGHT inside the group of the CURRENT build target (`GameViewSizes.currentGroupType`, e.g. Android), never an index taken from the Standalone group. A wrong index gave 1080x2160 / 720x1280 portrait on a landscape game. Verify `Screen.width > Screen.height` before every capture.
 - Offline / welcome popups re-open every time the Editor regains focus in Play; claim them with a UI click right before each capture and again after a long wait.
 - Long QA runs: write results to a file from an EditorApplication.update driver (timeScale up to 4-8, restored in a finally) and wait on the file with Monitor, never with sleep chains.
+
+- Testing offline/return flows in the Editor: with domain reload off the save object and its "boot evaluation done" cache survive Play exits, and a script reload resets any clock override you set. Instead, rewrite the persisted last-seen timestamp in the save on disk (or via the data API) while stopped, then enter Play once.
