@@ -18,3 +18,7 @@ description: "World-space and HUD text rules: one rich-text label with rarity/si
 - Text centring: Capline alignment plus the sprite face offset, never a per-label nudge (`ui-text-tmp` Optical centring).
 
 - World-to-screen HUD stickers: ScreenPointToLocalPointInRectangle returns coordinates relative to the canvas CENTRE: anchor the sticker at (0.5,0.5) and clamp it to a play zone that excludes both HUD rails, the top row and the bottom bar, or it lands on top of buttons.
+
+## Many labels at once: separate in screen space (pattern)
+- When one action can raise several world bars/labels at the same time (area swing, multi-hit), each is placed per target and they stack on one spot. Add ONE pass after placement: per active label keep its screen footprint (px width, px height incl. name, px-per-metre, centre) and push each later label straight up along the camera up vector until it clears the earlier ones (skip when already clear or the gap is huge). Keep the pool small (cap) so the pass is O(n^2) over a handful.
+- Verify with a Play capture during a multi-target hit, plus the existing label tests; do not hide labels to avoid overlap.
