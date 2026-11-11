@@ -15,3 +15,6 @@ triggers: tests-run timeout, testrunnerapi, stuck tests, phantom failures, stale
 - EditorApplication.isCompiling can stay true for minutes after a Hot Reload package change while the log shows "Finished compiling" and scriptCompilationFailed is false: check the Editor.log tail, then enter Play anyway instead of polling forever.
 
 - Hot Reload trap: with a Hot Reload package installed, editing a const may never rebuild the runtime DLL (its timestamp stays old) and bakes keep the old value. Check Library/ScriptAssemblies/<asm>.dll mtime; if older than the edit, CompilationPipeline.RequestScriptCompilation(CleanBuildCache), then read the const back before baking.
+
+## Waiting for results
+The results file holds "running" while tests execute and a "done pass=N fail=M" line at the end; poll for the `^done` line, not the file mtime (a fresh "running" file passes any mtime check and a stale "done" file from a previous run looks finished). Delete or overwrite it before starting a run.
