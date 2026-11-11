@@ -36,3 +36,6 @@ Service checklist and install order: `app-services-bootstrap`. Gate matrix and r
 
 ## Verify
 Editor mock flows (success, failure, cancel); rewards granted exactly once; entitlements persist after restart; no gameplay blocking when ads fail to load; no ads in the FTUE; `done-means-wired` wiring check for the buttons.
+
+## Dismissing a rewarded offer still pays something (owner rule)
+When a free-reward popup is closed without the ad (so an interstitial may follow), pay a small consolation (e.g. 25 % of the offer, at least 1 premium currency) with the normal "+" notice and fly, so an interstitial is never a pure loss. Gacha/wish systems: insure the Nth pull (pity) on both routes; the paid route guarantees a better tier than the ad route, with separate counters.
