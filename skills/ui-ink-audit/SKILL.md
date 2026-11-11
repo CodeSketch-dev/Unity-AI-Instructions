@@ -59,3 +59,5 @@ The pixel scan reads the screenshot behind a button that is not drawn (alpha 0 /
 - Trap: a reward/offline popup opened on top makes the audit measure the screen hidden UNDER it (false fails). Claim/close blocking popups first, then re-open the target screen and capture.
 
 - Trap: ink numbers identical to the pixel after a builder edit = the screen is a BAKED prefab; re-run its bake before re-measuring. Rect-centred content on a plate whose lit face is shorter than the rect still reads low: centre on the face (ui-lit-face-centring), not the rect.
+
+- Offset tuning: never trust a fixed units->px ratio (measured 0.5-1.3 px/unit depending on scaler/HLG). Apply half the suggested correction, re-measure, then interpolate between the two readings (secant step). Widgets with attention shake/pulse carry +-3 px noise: stop at that band.
