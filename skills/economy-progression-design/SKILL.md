@@ -32,3 +32,5 @@ Every balance variable is coupled: zone access, boss chase/recovery, tool effect
 - Test with a fresh save and a representative mid-game save; report assumptions separately from observed facts.
 
 - Daily free-item ad routes (free next tool/upgrade) must be gated by reach (e.g. price <= 2x cash on hand), else the sim showed players skip tiers (tier 18 vs 9, +26% late depth). Always sim a new free route before shipping and assert late-game pacing within +-5%.
+
+- Relative goals (weekly community/parade/rival targets) must use PRIOR-period averages, never totals that include the current period, plus a real floor and an FTUE gate; otherwise a fresh save meets 100% instantly and receives end-tier rewards. Cap granted item tiers to what the player could reach (depth/level).
