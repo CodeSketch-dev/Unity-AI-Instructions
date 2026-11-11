@@ -6,6 +6,8 @@ triggers: popup, dialog, modal, board, close button, dim, escape, back button, p
 
 # Popup anatomy
 
+**Start with `ui-popup-build-checklist`** (reference prefab first, compact not full page, original KT buttons + colour roles, big text, lit-face centring proven by a Play test, baked-sprite traps). This file is the structure reference.
+
 From the studio reference projects (verified in prefabs). The reference wins when it differs; the standing look defaults are in `ui-style-rules`.
 
 ## Tree
