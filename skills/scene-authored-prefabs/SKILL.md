@@ -40,3 +40,5 @@ Prefab exists once (no duplicate baked copy), the scene instance is a prefab ins
 
 ## Play is the truth (owner rule)
 - Judge a map/scene in Play. Diff Edit vs Play (per path: activeInHierarchy, Renderer.enabled) after 5 s of Play; every object Play disables, hides, replaces or never uses is removed from the scene in Edit Mode (or its runtime toggle removed). Target: 0 Edit-only objects. Never leave Play-unused leftovers in the scene.
+
+- Inactive junk is trash (owner, repeated): never replace-and-deactivate. After a swap DELETE the old object from the scene/prefab in the same change (after a path/GUID unused-proof for the asset itself, separate asset-deletion commit). Also delete anything runtime SetActive(false)s on load or never reads; if runtime needs it hidden then shown, keep it, else remove it. Final check: count scene objects that are inactive in Edit Mode; target 0 unexplained.
