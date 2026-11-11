@@ -22,3 +22,8 @@ Gaps between stacked rows >= 16 (equal), bottom padding under the buttons about 
 **Acceptance (measure, then look at the screenshot)**: paddings >= 24 / gaps >= 16 by rect math; equal button heights; row centre = content centre; sticker rect inside the window; ink centre of every label within 2 px of its lit-face centre; amount fits its card for the longest value; compact and full variants both balanced; capped / localized strings fit. Put the geometry in pure helpers with EditMode tests (row centring, sticker containment, equal heights).
 
 - Reveal spots (hatch, spawn, reward drop) must keep a minimum distance from the player (~3 m): items placed "at the feet" make the reveal cover the character. Push the spot away along player->spot (fallback: towards the area centre) and keep it inside the area bounds.
+
+## Daily-login day cards: big + horizontal scroll beats "all days visible" (owner correction, twice)
+- Fitting all 7+ day cards into one row shrinks them to ~245 px and the owner calls it tiny. Reference (Knife Tower style) day card is ~431 x 617 in a horizontal scroll, today slightly larger, scroll opens centred on today. Size the card group by the free HEIGHT (about 92 %, today's card pulses +5 %), cap at the reference size, let the rest scroll; never size by free width.
+- A page-fit helper takes a DESIGN size: give it the reference scroll height (about 700), or the host stays short and the cards cannot grow. After changing the builder, re-bake the modal prefabs and rebuild the UI factory.
+- When two old owner notes conflict (big + scroll vs all visible) the newest owner words win; leave the superseded rule in a code comment so it is not re-applied.
