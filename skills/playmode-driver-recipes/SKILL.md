@@ -50,3 +50,10 @@ Report numbers and screenshot paths; state what only a device can verify.
 
 ## New HUD widget gate check
 A widget gated like a sibling (e.g. hidden until FTUE ends) can stay inactive in a returning-player Play run; force-activating it with SetActive does not show it if a parent is stashed. Before committing a new HUD chip, find which gate hides it and capture it visible (or say "not seen in Play"); EditMode layout tests alone do not prove it renders.
+
+## Proving a behaviour test (owner 2026-11-11: "create test cases yourself and test carefully")
+- Every behaviour change ships a PlayMode test that drives the real flow (real pad / button / input device), not only a pure-rule EditMode test. Keyboard: queue a `KeyboardState` on the Input System keyboard (the PlayMode asmdef needs the Input System reference); a held touch: call the joystick's pointer handler.
+- Mutation check before trusting green: disable the fix, recompile (refresh) and confirm the test goes red, then restore. A first-try pass proves nothing; a pass on a stale compile proves less (a 6/6 once came from code that had not recompiled yet).
+- A `TestRunnerApi` callback object created in `script-execute` is lost when Play Mode reloads the domain: read results from the project's result writer file instead. That file is stale until rewritten (`running` then `done pass=N`): delete it before the run, wait for `done`, and check the count equals the number of tests (a stray `pass=1` was another run).
+- Input locks (intro, popups) zero the stick and keys: clear the lock in the test setup; otherwise the precondition fails randomly.
+- Never wait blindly on a result file: check Editor state, console and file mtime first; waiting 7 minutes on a file that never appears cost the owner's trust.
