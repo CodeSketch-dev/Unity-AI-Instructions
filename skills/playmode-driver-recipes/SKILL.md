@@ -35,3 +35,6 @@ Report numbers and screenshot paths; state what only a device can verify.
 - Testing offline/return flows in the Editor: with domain reload off the save object and its "boot evaluation done" cache survive Play exits, and a script reload resets any clock override you set. Instead, rewrite the persisted last-seen timestamp in the save on disk (or via the data API) while stopped, then enter Play once.
 
 - A static clock delegate set before entering Play is reset by [RuntimeInitializeOnLoadMethod] static resets on Play start: an Editor-only persisted offset (EditorPrefs / ScriptableSingleton read by the clock) is the reliable way to fake elapsed time across a Play boot.
+
+## Shared Editor guard
+- Before a Play test that calls a discard-unsaved-scene-changes helper, check `git status` / the other session progress file mtime: another agent may hold unsaved scene edits in the same Editor, and the discard deletes them. Wait until it commits or is idle, or save its scene first.
