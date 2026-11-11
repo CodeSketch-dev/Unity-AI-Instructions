@@ -46,3 +46,7 @@ Each rule comes from a real mistake. Follow the habit, it is cheaper than the re
 ## Audit reports go stale: grep the code before briefing a build (trap)
 - A "gap" listed in an old audit/spec may already be implemented under another name. Before dispatching an agent to build it, grep the live code for the feature (price tables, routes, UI handlers) and put the hits in the brief. Skipping this produced a duplicate class that had to be deleted the same day.
 - Tell build agents: "if an equivalent already exists, stop and report; do not add a parallel system." When a report proves stale, fix or flag the report too.
+
+## Hypothesis experiments: measure, then keep or revert (rule)
+- A tweak to an estimate constant (label width, spacing, threshold) is an experiment, not a fix. Change one value, re-run the same scenario, compare the same measured numbers (screen positions or px sizes). No measurable change = revert at once, log the result and the next lead; never commit it "because it is more correct".
+- When a measured list contradicts the picture (an item visible on screen but absent from the system's own active list), investigate that contradiction first: it usually means a second code path draws it.
