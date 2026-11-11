@@ -33,3 +33,5 @@ Report numbers and screenshot paths; state what only a device can verify.
 - Long QA runs: write results to a file from an EditorApplication.update driver (timeScale up to 4-8, restored in a finally) and wait on the file with Monitor, never with sleep chains.
 
 - Testing offline/return flows in the Editor: with domain reload off the save object and its "boot evaluation done" cache survive Play exits, and a script reload resets any clock override you set. Instead, rewrite the persisted last-seen timestamp in the save on disk (or via the data API) while stopped, then enter Play once.
+
+- A static clock delegate set before entering Play is reset by [RuntimeInitializeOnLoadMethod] static resets on Play start: an Editor-only persisted offset (EditorPrefs / ScriptableSingleton read by the clock) is the reliable way to fake elapsed time across a Play boot.
