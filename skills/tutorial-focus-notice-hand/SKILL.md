@@ -65,3 +65,7 @@ A spotlight on a world point that is outside the screen leaves the four dim pane
 - End the focus from the step's own event (placed, stopped, bought), not from a tap on the overlay.
 
 - Tutorial hand: put the fingertip on the lower-right corner of the target face (anchor ~0.92/0.10), never over the label; kids must still read what they tap. Check every guided target in a fresh-save capture.
+
+## Notice placement: one collision check at the END (trap)
+- A tutorial message placed by several stacked rules (free-spot search, then "beside the button", then per-target nudges) can silently undo the HUD-avoid step: the last rule wins and may cover currency pills or rails. Run the protected-rect check on the FINAL position, not only inside the first rule.
+- Currency pills are always visible, unlike unlock-gated buttons: protect them first, and prefer covering a minor chip (depth, day) over cash. Verify with a Play capture at the worst step (top-edge target + wide message), not only at the first step.
