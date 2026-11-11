@@ -13,3 +13,5 @@ triggers: tests-run timeout, testrunnerapi, stuck tests, phantom failures, stale
 - Order-dependent PlayMode failures with domain reload off: suspect a persistent singleton (`PersistAcrossScenes`) whose reloaded-scene duplicate self-destroys. `Find()` helpers using FindFirstObjectByType can return the doomed duplicate (destroyed input/audio); prefer `HasInstance ? Instance : Find...`. Diagnose with a state probe, do not guess static leaks.
 
 - EditorApplication.isCompiling can stay true for minutes after a Hot Reload package change while the log shows "Finished compiling" and scriptCompilationFailed is false: check the Editor.log tail, then enter Play anyway instead of polling forever.
+
+- Hot Reload trap: with a Hot Reload package installed, editing a const may never rebuild the runtime DLL (its timestamp stays old) and bakes keep the old value. Check Library/ScriptAssemblies/<asm>.dll mtime; if older than the edit, CompilationPipeline.RequestScriptCompilation(CleanBuildCache), then read the const back before baking.
