@@ -20,3 +20,5 @@ Gaps between stacked rows >= 16 (equal), bottom padding under the buttons about 
 - Every button carries `UIPressPrimeTween`, pivot (0.5, 0.5), click sfx + haptic.
 
 **Acceptance (measure, then look at the screenshot)**: paddings >= 24 / gaps >= 16 by rect math; equal button heights; row centre = content centre; sticker rect inside the window; ink centre of every label within 2 px of its lit-face centre; amount fits its card for the longest value; compact and full variants both balanced; capped / localized strings fit. Put the geometry in pure helpers with EditMode tests (row centring, sticker containment, equal heights).
+
+- Reveal spots (hatch, spawn, reward drop) must keep a minimum distance from the player (~3 m): items placed "at the feet" make the reveal cover the character. Push the spot away along player->spot (fallback: towards the area centre) and keep it inside the area bounds.
