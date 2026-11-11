@@ -14,3 +14,5 @@ Every currency bar anywhere (gameplay HUD, shop header, popup header, minigame H
 5. Reuse check (mandatory when you touch UI): `grep` the project for a second implementation of a currency bar (names like CurrencyBar, MoneyBar, GemBar, Header currency, KT/Knife variants). More than one = merge them into the shared prefab; the shop headers must be instances of it.
 6. Audit: add/keep an audit rule that flags a currency bar whose icon rect lies fully inside its frame rect (icon centre x > frame left edge + icon width/2) or whose prefab is not an instance of the shared bar; the batch UI audit must report 0 before any UI task is done.
 7. Verify: screenshot the bar in every place it appears (each HUD, each shop header, each popup) and compare to the reference bar; print icon rect vs frame rect.
+
+- Side-by-side bars (shop/popup header): switching to overhanging icons needs the row gap raised to >= overhang (~0.57 x frame height) + 8, else the right bar icon covers the left bar end. Bakes run while the Editor still compiles use the OLD constants: read a constant back (e.g. return it from the bake script) before trusting a bake.
