@@ -79,7 +79,8 @@ rem ---- 4. pipeline agents, commands and hook scripts -> Claude only ----------
 if exist "%REPO%\agents" call :install_tree "%REPO%\agents" "%CLAUDE_HOME%\agents" "agents"
 if exist "%REPO%\commands" call :install_tree "%REPO%\commands" "%CLAUDE_HOME%\commands" "commands"
 if exist "%REPO%\hooks" call :install_tree "%REPO%\hooks" "%CLAUDE_HOME%\pipeline-hooks\hooks" "hook scripts"
-if exist "%REPO%\ui_gate_reminder.ps1" call :install_tree "%REPO%" "%CLAUDE_HOME%\pipeline-hooks\hooks" "ui gate hook"
+rem one file only: copying the whole repo with /E hung on locked tool profiles (packages\meshy-studio) with robocopy's default 1M retries
+if exist "%REPO%\ui_gate_reminder.ps1" robocopy "%REPO%" "%CLAUDE_HOME%\pipeline-hooks\hooks" ui_gate_reminder.ps1 /R:1 /W:1 /NFL /NDL /NJH /NJS /NP >nul
 
 rem ---- 5. user settings (hook + skill visibility) and all Unity projects -------------------
 set "NOPROFLAG="
@@ -131,7 +132,7 @@ for /d %%S in ("%REPO%\skills\*") do call :install_one_skill "%%~fS" "%SK_DEST%\
 exit /b 0
 
 :install_tree
-robocopy "%~1" "%~2" /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP >nul
+robocopy "%~1" "%~2" /E /R:1 /W:1 /XD __pycache__ /NFL /NDL /NJH /NJS /NP >nul
 set "ROBO=%errorlevel%"
 set /a "ROBO_COPIED=ROBO & 1"
 if %ROBO% GEQ 8 (
@@ -143,7 +144,7 @@ if %ROBO_COPIED% NEQ 0 echo Updated %~3 -^> %~2
 exit /b 0
 
 :install_one_skill
-robocopy "%~1" "%~2" /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP >nul
+robocopy "%~1" "%~2" /E /R:1 /W:1 /XD __pycache__ /NFL /NDL /NJH /NJS /NP >nul
 set "ROBO=%errorlevel%"
 set /a "ROBO_COPIED=ROBO & 1"
 if %ROBO% GEQ 8 (
