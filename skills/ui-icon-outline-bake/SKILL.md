@@ -11,3 +11,5 @@ triggers: icon outline, vien icon, outline icon, icon mong, bake outline, icon d
 - The generated C# HashSet lets runtime outline helpers (a scaled dark copy behind the icon) skip baked icons, otherwise the rim is doubled.
 - Scope: icon folders only (ic_*, icon_*, egg thumbnails); not plates, backgrounds, pets, atlas sheets. Also bake atlas copies of the same icons (e.g. a UiBaked folder) or the old thin art keeps showing.
 - Verify in a Play screenshot: icon rim looks as thick as the button rim; icon + label rows stay centred.
+
+- Mixed icon families: one row icon from an old/reference atlas next to new-kit icons reads grey and dull. Check every row of a screen with a sprite-source dump (sprite.texture.name per icon) and replace the stragglers in one pass.
