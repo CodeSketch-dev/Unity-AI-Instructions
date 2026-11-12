@@ -43,3 +43,8 @@ Symptom: glyph fragments of a neighbouring letter appear inside text ("alphabet 
 
 ## Dark smudge around glyphs: investigate before changing (2026-11-10)
 Ruled out by the owner / by test in one project: (1) the UI material underlay (alpha .55, offset .12/-.6): disabling it did not remove the smudge; (2) raising atlasPadding in place (breaks outlines, see above). Still open suspects: shader clip path (`UNITY_UI_CLIP_RECT` / RectMask2D softness), mipmapped or minified SDF atlas, legacy Text + TMP drawn twice on the same label (Dig_Text mirror), CanvasScaler minification. Process: get the exact screen and glyph from the owner (a one-letter crop is not enough), reproduce it in Play at that spot with a 4x zoom screenshot, toggle ONE suspect at a time (material keyword, duplicate renderer, clip), compare crops, keep the change only if the crop improves; never ship a global text-material change on a guess and revert at once when the owner says it is not the cause.
+
+## Word spaces vanish in a copied SDF font asset (measured 2026-11-12)
+- Symptom: "Random Player" renders "RandomPlayer". Not a missing glyph, not outline/dilate: a font asset created with the full kerning table (43k pairs, 831 with the space as 2nd glyph, e.g. e+space = -34 vs space advance 44) shrinks the space to ~0.6 vs 1.7.
+- Check first: glyph table has space with normal advance; then count kerning pairs involving the space; compare with kerning OFF.
+- Fix: regenerate the asset in place (same GUID, same TTF, static atlas 1024, ASCII + needed Vietnamese/Latin only, padding ratio unchanged) without space kerning pairs. File went 21.9 MB -> 12.1 MB. Keep a backup of the original outside the repo. Never edit the reference project's asset.
