@@ -1,0 +1,11 @@
+{
+  "must_contain": [
+    "(?is)unsubscribe.{0,100}(does not|cannot).{0,40}invalidate",
+    "(?is)already captured.{0,200}(active lifetime|generation)",
+    "(?is)generation.{0,100}source identity",
+    "(?is)rebind.{0,100}same source",
+    "(?is)disable.{0,100}invoke"
+  ],
+  "must_not_contain": ["PixelDemolish", "Demolition", "banner"],
+  "triggers_any": ["captured callback", "stale callback", "unsubscribe", "rebind"]
+}

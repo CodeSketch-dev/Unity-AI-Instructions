@@ -1,6 +1,7 @@
 ---
 name: scene-teardown-safety
-description: "Prevent teardown-order bugs when switching scenes or modes: destroyed pooled objects in OnDisable, surviving popup roots, leaked tweens/tasks/listeners, duplicate singletons. Use when adding scene or mode switching, pools, or after a MissingReferenceException on exit."
+description: "Use when callbacks may arrive after a Unity owner is disabled, destroyed, or rebound, or when scene/mode transitions leave stale listeners, tweens, tasks or roots."
+triggers: captured callback, stale callback, callback lifetime, unsubscribe, rebind, stale listener, callback cu, goi lai callback, huy dang ky
 ---
 
 # Scene teardown safety
@@ -14,7 +15,9 @@ Bugs hide until you switch scenes/modes repeatedly: objects are destroyed in arb
 4. **DontDestroyOnLoad** roots (popup canvas, audio, EventSystem): exactly one instance; a new scene's duplicate destroys itself in `Awake`. Popups that survive a load are closed or reset in the scene-exit hook. Only root objects can be DDOL. Code after `base.Awake()` in a derived singleton still runs once in the doomed duplicate: guard with `Instance != this` (`persistent-root-prefab`).
 5. **Duplicates**: one `EventSystem`, one `AudioListener`, one camera brain per loaded set. Singleton `Awake` handles a second instance.
 6. **Lifetime pairing** (see `async-cancellation`, `static-bus-events`): every tween killed, task cancelled, bus listener removed in the matching callback; static collections reset on `SubsystemRegistration`.
-7. **Leave clean**: save data before leaving (`save-and-crash-safety`), restore `Time.timeScale = 1`, unmute/restore audio ducking, re-enable input, clear selected UI object.
+7. **Invalidate callbacks as well as subscriptions**: unsubscribe prevents later event lookups, but does not invalidate a delegate already captured by a publisher or a callback already queued/in flight. Guard callback work against the receiver's current active lifetime. For replaceable bindings, capture a binding generation and the source identity; ignore calls when either is stale. Increment the generation before unbinding, including when rebinding the same source object.
+8. **Prove stale calls are inert**: capture a callback, disable/unsubscribe, then invoke the captured delegate and assert no state changes. Repeat after rebinding to a different source and after rebinding to the same source; assert only the current binding updates state.
+9. **Leave clean**: save data before leaving (`save-and-crash-safety`), restore `Time.timeScale = 1`, unmute/restore audio ducking, re-enable input, clear selected UI object.
 
 ## Repeatable scene-flow test (Play Mode, see `playmode-driver-recipes`)
 Loop 5x: enter mode A -> play 3 s -> open and close a popup -> switch to mode B -> back. After each lap assert: Console has 0 new errors/warnings of type Missing/Destroyed/NullReference, `FindObjectsByType<EventSystem>()==1`, one AudioListener, `timeScale==1`, object count stable (no growth), no `(Clone)` leftovers outside pools.

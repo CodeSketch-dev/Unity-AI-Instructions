@@ -436,7 +436,7 @@
 - scene-flow-loading - Build gated Unity splash and loading flows. Use when startup needs a studio logo, game artwork, progress, async tasks, app-open/native ads, or delayed scene activation.
 - scene-naming-conventions - Scene, prefab and asset naming conventions and folders for a clone project, checked by the naming lint. Use when creating scenes, prefabs or assets.
 - scene-optimizer-bake - One-button, idempotent pre-build scene bake (combine groups, culling lists, NavMesh, waypoints, feature bakes) callable from menu and Unity MCP. Use when a scene needs several bake steps run in the right order.
-- scene-teardown-safety - Prevent teardown-order bugs when switching scenes or modes: destroyed pooled objects in OnDisable, surviving popup roots, leaked tweens/tasks/listeners, duplicate singletons. Use when adding scene or mode switching, pools, or after a MissingReferenceException on exit.
+- scene-teardown-safety - Use when callbacks may arrive after a Unity owner is disabled, destroyed, or rebound, or when scene/mode transitions leave stale listeners, tweens, tasks or roots.
 
 ## scope
 - scope-check - Detect feature creep: diff current work against the plan or backlog and flag additions with their cost. Use before merging a batch, when a task grows, or on 'did we drift from the plan'.
