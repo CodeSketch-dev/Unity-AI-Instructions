@@ -20,3 +20,5 @@ What is displayed must equal what is rolled: roll by sum of weights, `random * t
 - Kill rewards: none in the melee reference; the egg-breaking reference rewards the egg's pet plus deposit money; the digging reference gives currency per dig/bomb.
 
 Persist pity counters before showing a result; choose the result before the animation (`gacha-box`, `jackpot-slot` patterns). Probabilities are tuned by `economy-autobalance-simulator`.
+- Zone pools (owner rule, verified on a lane game): every zone/biome keeps several species with clearly different incomes (like the reference eggs), even zones that a progressing player crosses in minutes. A player who never trains and stays in one zone must see variety; a single-species zone is a defect. Spread the whole catalogue over all zones (early zones get the most species), keep income strictly rising with pool order, and keep the original income range per zone.
+- Time caps requested on a flow (e.g. throw flight max 8 s) go into BOTH the data (last anchor) and a hard clamp in the rule function, with an EditMode test over the full range.
