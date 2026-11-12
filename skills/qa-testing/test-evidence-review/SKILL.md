@@ -1,7 +1,7 @@
 ---
 name: test-evidence-review
 description: "Audit whether tests, screenshots and logs actually prove a claim; list weak-evidence red flags and the missing proof. Use before reporting done, when reviewing a test report, or when a green result seems too easy."
-triggers: evidence review, test proof, weak evidence, verify claim, screenshot proof, false positive test, bang chung, kiem chung, test khong du, bao cao that
+triggers: evidence review, test proof, weak evidence, verify claim, screenshot proof, screenshot capture completion, frame-end capture, PNG MIME, false positive test, bang chung, kiem chung, test khong du, bao cao that
 ---
 
 # Test evidence review
@@ -19,6 +19,8 @@ Use before saying "verified". A claim needs proof that would FAIL if the claim w
 - Test passes but asserts nothing about the changed behaviour, or mocks the thing under test.
 - Skipped tests counted as pass; the SKIP count changed silently.
 - Screenshot taken before the state was reached, in the wrong scene or resolution, or never looked at.
+- A screenshot API completes at frame end, but input or UI mutation begins before the capture result arrives; the audit and image may describe different states. Wait for capture completion before interacting.
+- A PNG viewer shows black or missing layers. Check the original bytes and PNG signature/hash first; if the bytes are valid PNG but the response MIME is generic (for example `application/octet-stream`), normalize the media type to `image/png` and inspect again before changing the scene.
 - Console "clean" read before the action ran, or filtered to warnings only.
 - Compile success used as proof of serialization, prefab or scene correctness.
 - EditMode result used for a Play Mode claim; Editor numbers presented as device numbers.

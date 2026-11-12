@@ -8,6 +8,8 @@
   {"q": "merge two duplicate skills and rename one without breaking hooks", "should": ["skill-architect"]},
   {"q": "review the agentskills.io spec and check my SKILL.md files", "should": ["skill-architect"]},
   {"q": "Align the price label inside the shop button and add press animation", "not": ["skill-architect"]},
+  {"q": "Review weak evidence: should a frame-end screenshot capture complete before I tap or mutate the UI?", "should": ["test-evidence-review"]},
+  {"q": "My PNG screenshot viewer shows black layers with application/octet-stream MIME; verify the screenshot evidence", "should": ["test-evidence-review"]},
   {"q": "bots stutter on waypoint corners at high speed", "not": ["skill-architect"]},
   {"q": "set up FishNet NetworkObject spawning for pickups", "not": ["skill-architect"]},
   {"q": "balance the egg hatch economy for day-one retention", "not": ["skill-architect"]}

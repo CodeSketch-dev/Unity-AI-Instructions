@@ -1,0 +1,10 @@
+{
+  "must_contain": [
+    "(?is)capture.*(complete|completion|finish).*before.*(input|tap|interaction)",
+    "(?is)(PNG|image).*bytes.*(MIME|media type)|MIME.*(PNG|image/png)"
+  ],
+  "must_not_contain": [
+    "(?i)pixel-smash|C:\\\\Unity\\\\GitProject"
+  ],
+  "triggers_any": ["screenshot", "capture", "MIME"]
+}
