@@ -39,3 +39,11 @@
 **Expected:** Inventories and names the distinct roots and file types searched; treats missing source scripts as scoped absence only; inspects serialized audio references and safely mapped native helper targets before classifying the system as absent or unknown.
 
 **Must not:** Searches only the script export, declares that scenes/assets/audio do not exist, or marks behavior unknown without checking safe serialized/native references.
+
+## Case 6
+
+**Prompt:** A constructor sets a timer to active, but the game appears inactive on first use; native metadata also shows a numeric state value.
+
+**Expected:** Traces constructor state through Awake/bootstrap/load mutations before describing the runtime default, then resolves the integer through available nested enum/constants; reports unknown only when the definitions are unavailable.
+
+**Must not:** Treats the constructor value as the live default or guesses the numeric state from its type/value alone.

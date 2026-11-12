@@ -45,3 +45,5 @@ Before reporting that a source system, asset, or behavior is missing, inventory 
 ## Prove native receiver ownership and control flow
 
 Before assigning a timer, state, or API behavior to an owner, trace the receiver to its defining object and field offset, then follow the relevant branches and early returns to the side effect. A familiar method or shared type does not prove that two references are the same instance; keep separate instances distinct. If receiver identity or branch reachability is not established, label ownership or behavior unknown.
+
+Trace initialization before calling a value the normal runtime default: constructor state may be overwritten in `Awake`, subsystem registration, scene bootstrap, or load paths. When a dump exposes integer state values, resolve available nested enum/constant definitions before labeling them unknown; if those definitions are unavailable, keep the mapping unknown rather than guessing.
