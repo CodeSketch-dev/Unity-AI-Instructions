@@ -29,3 +29,8 @@ Pattern from knife-tower and monkey-escape (VERIFIED unless marked). Look first 
 Compare the asset values with the feel table; walk edges, thin platforms and slopes in Play Mode via Unity MCP; check coyote/buffer by eye (0.5 s is very forgiving, lower it if the reference feels stricter). Not compiled or run in this session.
 
 More: `references/gotchas.md`, `freelook-third-person-camera`, `platform-kit`, `roblox-character-camera` (generic Roblox numbers), `mobile-input-controls`.
+
+## Scale and jump parity with the reference (owner 2026-11-12, raised twice: "character/glass bigger than the map, jumps hit ceilings")
+- Before tuning a cloned platformer, write a scale-parity table from the ORIGINAL: player height, jump apex (v^2/2g) and air time, run speed, carried-object size vs player height, ledge/gap/ceiling heights, camera pitch/distance/FOV. Tag each value seen/inferred/unknown (spec files, frames); ask for frames only for unknowns.
+- Compare ours quantity by quantity (capsule, KCC step/slope, jump up speed + gravity, pane size, camera). A deviation is fixed at the cheapest consistent side: scale the MAP/props up (colliders, checkpoints, zones together) or retune jump/pane to the original; never shrink the character alone.
+- Guard it: an EditMode test asserting jump apex < the minimum authored ceiling clearance on walkways, plus a Play check that the scripted pilot never hits a ceiling collider (log ceiling contacts).
