@@ -70,3 +70,9 @@ Grade every sprite REWORK unless all hold: (1) same design/aspect as the referen
 
 ## Importer override trap (owner 2026-11-10: new buttons looked lumpy for hours)
 Editing a sprite's `.meta` (PPU, border) does nothing if a project AssetPostprocessor forces them (a kit importer that sets spritePixelsPerUnit and reads borders from a manifest json). Before swapping art: grep the Editor folder for `OnPreprocessTexture` / `spriteBorder`, change the manifest (add a per-sprite `ppu`), force a reimport, then re-read the .meta to prove the values stuck and dump the live Sprite (ppu, border, rect) in Play. Symptom of the old 200-PPU/52-border on a 1024 px sprite: ghost outlines, pointed ends, doubled lips.
+
+## Minigame thumbnail briefs (owner 2026-11-12: six regenerations for one thumbnail)
+- Facts first: a thumbnail must show the game's REAL gameplay and subject. Ask the owner (or read the reference) who chases whom and what is stolen/collected before briefing; never add generic villains (police, guards, uniforms). Subject (egg, pet) is large, clear and fully visible.
+- Composition: medium-wide shot, subject plus whole hero inside the middle 1024 px (the Big card crops to a square), chasers behind the hero.
+- Style: copy the file name of an already accepted thumbnail ("same style as thumb_x.png") and say "reduce brightness/glow about 15 percent"; never switch to a flat or moody style when the owner says "too bright".
+- Process: keep every near-accepted version (copy to docs/art-archive) before overwriting, because "like the first one" needs the old image; the codex_task call times out but the file lands 3-10 min later, so monitor the output mtime (not the call result) and re-brief only if no file appears.
