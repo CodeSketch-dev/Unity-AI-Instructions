@@ -25,6 +25,8 @@ Generators that "just work once" are the most dangerous code in a Unity project:
 - Another agent or the human may be using the same Editor; expect Play Mode to be interrupted by their QA, and never run a long tool while they are mid-test (`multi-agent-coexistence`).
 
 ## After running
+Recover native prefab components through `LoadPrefabContents` or a preview scene. Instantiating then destroying temporary objects in the active scene still marks it dirty. Check the scene's dirty state before converter stages; save only owned output assets and unload the preview without saving the source prefab.
+
 Verify counts (renderers, materials, objects) against expectations, open the result, read the Console, save, and note any manual step the tool cannot do. Record the tool's name and parameters in the plan or notes so the result is reproducible.
 
 ## Idempotency drift
