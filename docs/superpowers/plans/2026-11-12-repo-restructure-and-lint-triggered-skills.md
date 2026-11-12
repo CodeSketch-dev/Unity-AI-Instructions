@@ -86,6 +86,10 @@ lint/  engine.py  run_lint.py  rules/*.py  tests/
 
 **Per-project install (owner confirmed: agents only work well after sync into the Unity project):** `sync_claude_setup.ps1` also copies `lint/` to `<project>\.claude\lint\` and writes the PostToolUse hook into the project's `.claude\settings.json` (idempotent, command uses a project-relative path so it survives other machines). Codex in that project runs `python .claude/lint/run_lint.py <file>` (documented in the project `.claude/ai-instructions.md` block and the hub preamble). Skills already land in `<project>\.claude\skills`, matching the message path.
 
+**Same behaviour for Claude and Codex:** rules live once in `lint/rules/` and are synced into every project like skills (new rule = next sync, no per-agent config). Claude gets it per edit via the hook; Codex has no hooks, so `run_lint.py --changed` lints every file in `git status` of the project and is required by the hub preamble before reporting done. Both print the identical micro-prompt (`.claude/skills/<name>/SKILL.md`). Test: same bad fixture, hook path and `--changed` path emit byte-identical messages.
+
+**Git hygiene:** the managed ignore block that sync already writes ignores `/.claude/` (and `.agents/`, `CLAUDE.local.md`), so `.claude/lint/` and the project hook settings never reach the Unity repo. Verify per project with `git check-ignore -v .claude/lint/run_lint.py`; if a project already TRACKS `.claude/` files, report them (do not untrack automatically).
+
 - [ ] **Step 1:** Test: pipe `{"tool_input":{"file_path":"<fixture .cs with new GameObject>"}}` to the hook, expect exit 2 and the micro-prompt on stderr; non-`.cs` file expect exit 0 and no output.
 - [ ] **Step 2:** Implement hook (ASCII, 5 s budget, `python` missing -> exit 0). **Step 3:** register in sync; run sync; expect `settings.json` contains exactly one lint hook entry (idempotent on second run).
 
