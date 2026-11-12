@@ -1,7 +1,7 @@
 ---
 name: audio-import-and-mixer-optimization
 description: "Audio import and mixer tuning for mobile: load type, compression, sample rate, force mono for 3D, mixer depth and effects, snapshots, DSP buffer. Use when audio memory is high, DSP CPU spikes, 3D sound plays one channel or SFX load stalls."
-triggers: audio memory, audio import, load type, vorbis, aac, sample rate, force to mono, audio mixer, mixer snapshot, dsp buffer, audio cpu, streaming audio, bo nho am thanh, nen am thanh, am thanh 3d, mixer am thanh
+triggers: audio memory, audio import, load type, vorbis, aac, sample rate, force to mono, audio mixer, mixer snapshot, dsp buffer, audio cpu, streaming audio, WAV, sample width, PCM8, bo nho am thanh, nen am thanh, am thanh 3d, mixer am thanh
 ---
 
 # Audio import and mixer optimization
@@ -19,6 +19,11 @@ Source: official (Unity-Technologies/skills/optimize-audio, audio-setup-mixers),
 - Keep sources as WAV: re-encoding an MP3 loses quality permanently.
 - A 3D AudioSource (`spatialBlend` > 0) with a stereo clip plays unevenly: set Force To Mono on the importer and check rolloff.
 - Vorbis quality 0.5-0.7 for SFX, higher for voice; check artifacts by ear.
+
+## Diagnose source WAV data
+- Read WAV metadata through named getters and record channels, sample width, sample rate, and frame count separately. Sample width is bytes per sample, not channel count.
+- Decode from the actual sample width and encoding: PCM8 uses unsigned samples; PCM16 uses signed little-endian samples. Do not infer encoding from file size, channel count, or a generator's intended settings alone.
+- Before reporting peak, RMS, or headroom, cross-check the decoder assumptions against the WAV header and, when available, the generator configuration. If they disagree, stop and resolve the mismatch rather than interpreting the measurement.
 
 ## Mixer
 - Keep group depth at most 3 (Master > SFX/Music/UI > optional sub-bus). Each level costs DSP every frame.

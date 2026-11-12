@@ -1,0 +1,15 @@
+{
+  "must_contain": [
+    "named getters",
+    "actual sample width",
+    "PCM8.{0,30}unsigned",
+    "PCM16.{0,30}signed",
+    "sample width.{0,60}channel count",
+    "cross.check.{0,60}(header|generator)"
+  ],
+  "must_not_contain": [
+    "pixel-smash",
+    "C:\\\\Unity\\\\GitProject"
+  ],
+  "triggers_any": ["WAV", "sample width", "PCM8"]
+}
