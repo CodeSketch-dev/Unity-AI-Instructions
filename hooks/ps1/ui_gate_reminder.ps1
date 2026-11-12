@@ -43,7 +43,7 @@ $routes = @(
 )
 $set = New-Object 'System.Collections.Generic.List[string]'
 foreach ($r in $routes) { if ($prompt -match $r.re) { foreach ($n in $r.s.Split(' ')) { if (-not $set.Contains($n)) { $set.Add($n) } } } }
-# Data-driven routing over EVERY skill (tools/build_skill_router.py builds skill_router.json from the skills' own names/descriptions/triggers),
+# Data-driven routing over EVERY skill (tools/skillkit/build_skill_router.py builds skill_router.json from the skills' own names/descriptions/triggers),
 # so new skills are picked up automatically. Vietnamese is matched after diacritics are stripped.
 $router = Join-Path $PSScriptRoot 'skill_router.json'; if (-not (Test-Path -LiteralPath $router)) { $router = Join-Path $PSScriptRoot '..\..\data\skill_router.json' }
 if (Test-Path -LiteralPath $router) {

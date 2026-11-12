@@ -39,4 +39,4 @@ Intake (owner message -> ledger row, automatic) -> plan (superpowers, automatic)
 - Before moving: snapshot installed file hashes and the `settings.json` hook command list; after: run sync, pipe a sample prompt into the installed hook, compare test pass/skip counts.
 
 ## Code anti-patterns
-A repeatable code pattern (something a regex can catch in C#) is a lint rule, not a prose rule: use skill `capture-pattern-with-lint` (skill + `lint/rules/<name>.py` + fixtures). The linter message sends Claude Code and Codex to the skill file.
+A repeatable code pattern (something a regex can catch in C#) is a lint rule, not a prose rule: use skill `capture-pattern-with-lint` (skill + `tools/lint/rules/<name>.py` + fixtures). The linter message sends Claude Code and Codex to the skill file.

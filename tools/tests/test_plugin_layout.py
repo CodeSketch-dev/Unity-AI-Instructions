@@ -97,7 +97,7 @@ class CommandAndManifestTests(unittest.TestCase):
 
 class InstallTests(unittest.TestCase):
     def test_hooks_snippet_has_no_plugin_variable_left(self):
-        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        sys.path.insert(0, os.path.join(ROOT, "tools", "sync"))
         import install_hooks
         with open(os.path.join(ROOT, "hooks", "hooks.json"), encoding="utf-8") as f:
             data = json.load(f)
@@ -108,10 +108,10 @@ class InstallTests(unittest.TestCase):
 
 class ListingBudgetTests(unittest.TestCase):
     def test_hubs_fit_a_200k_context_and_keep_clone_entrypoints(self):
-        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        sys.path.insert(0, os.path.join(ROOT, "tools", "skillkit"))
         import skill_budget
         skills = skill_budget.read_skills(os.path.join(ROOT, "skills"))
-        hubs = skill_budget.read_hubs(os.path.join(ROOT, "tools", "hubs.txt"))
+        hubs = skill_budget.read_hubs(os.path.join(ROOT, "tools", "skillkit", "hubs.txt"))
         hub_chars, rest_names, _ = skill_budget.cost(skills, hubs)
         budget_200k = 200000 * skill_budget.CHARS_PER_TOKEN * 0.01
 
@@ -120,10 +120,10 @@ class ListingBudgetTests(unittest.TestCase):
                          "qa-fix-retest-loop", "new-game-bootstrap"}.issubset(hubs))
 
     def test_hubs_exist_and_fit_a_large_context(self):
-        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        sys.path.insert(0, os.path.join(ROOT, "tools", "skillkit"))
         import skill_budget
         skills = skill_budget.read_skills(os.path.join(ROOT, "skills"))
-        hubs = skill_budget.read_hubs(os.path.join(ROOT, "tools", "hubs.txt"))
+        hubs = skill_budget.read_hubs(os.path.join(ROOT, "tools", "skillkit", "hubs.txt"))
         self.assertEqual([h for h in hubs if h not in skills], [])
         self.assertLessEqual(len(hubs), 45)
         hub_chars, rest_names, _ = skill_budget.cost(skills, hubs)

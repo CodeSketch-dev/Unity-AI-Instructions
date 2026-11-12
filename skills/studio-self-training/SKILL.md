@@ -12,7 +12,7 @@ triggers: retro, self training, train agents, update skill, new skill, publish, 
 4. `publish.bat "<message>"` (full repo path, background, read output); on exit 2 re-apply onto upstream by hand and publish again.
 5. Tell the owner one line: skills added/changed.
 ## New project
-1. Place the project beside the repo or add its folder to `projects.txt`.
+1. Place the project beside the repo or add its folder to `data/projects.txt`.
 2. Run `sync.bat /nopause`: installs rules, skills, agents, hooks, router; open a new session.
 3. In the project: create `docs/feedback-notes.md`, `docs/skill-candidates.md`, `docs/agent-handoff.md` on first use; project-only contracts go in its `AGENTS.md`, reusable ones go to the shared skills.
 ## Token habits
@@ -23,4 +23,4 @@ The prompt-router hook adds a one-line self-training reminder to every prompt (a
 
 
 ## How the agent memory is wired (owner question 2026-11-10)
-Three layers keep AGENTS.md in the agent's head: (1) the global `~/.claude/CLAUDE.md` block + the project `CLAUDE.md` (`@AGENTS.md`) are loaded at session start; (2) the SessionStart hook `studio_brain_digest.ps1` (registered by `tools/sync_claude_setup.ps1` for startup / resume / clear / compact) re-injects `STUDIO-BRAIN-DIGEST.md` + the live `UI REFLEXES` section of AGENTS.md; (3) per-user auto-memory files (`feedback_*.md`) for owner corrections. On another machine: `git pull` the instructions repo, run `sync.bat /nopause`, open a NEW session. Keep the digest short (<= 45 lines) and update it whenever a new standing rule is added.
+Three layers keep AGENTS.md in the agent's head: (1) the global `~/.claude/CLAUDE.md` block + the project `CLAUDE.md` (`@AGENTS.md`) are loaded at session start; (2) the SessionStart hook `studio_brain_digest.ps1` (registered by `tools/sync/sync_claude_setup.ps1` for startup / resume / clear / compact) re-injects `STUDIO-BRAIN-DIGEST.md` + the live `UI REFLEXES` section of AGENTS.md; (3) per-user auto-memory files (`feedback_*.md`) for owner corrections. On another machine: `git pull` the instructions repo, run `sync.bat /nopause`, open a NEW session. Keep the digest short (<= 45 lines) and update it whenever a new standing rule is added.

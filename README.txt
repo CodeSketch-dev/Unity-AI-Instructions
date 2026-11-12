@@ -5,7 +5,7 @@ Repository: https://github.com/CodeSketch-dev/Unity-AI-Instructions.git
 
 Purpose
 - AGENTS.md is the single source of truth for global instructions.
-- skills\ holds the skill suite (see skills\README.md; plan: docs\SKILL-SUITE-PLAN.md).
+- skills\ holds the skill suite (see skills\README.md; plan: docs\guides\SKILL-SUITE-PLAN.md).
 - One sync tool: sync.bat. Double-click to run; no PowerShell needed.
 
 What sync.bat does
@@ -42,5 +42,5 @@ Troubleshooting
 5. Skill helper scripts need Python on PATH. sync.bat itself does not.
 
 NEW PROJECT / SELF-TRAINING
-- Put the Unity project next to this repo (the parent folder is scanned) or add its folder to projects.txt, then run sync.bat /nopause. The project gets the shared rules (CLAUDE.md block + .claude/ai-instructions.md), all skills, agents, hooks and the skill router; Codex gets the same rules via ~/.codex/AGENTS.md.
+- Put the Unity project next to this repo (the parent folder is scanned) or add its folder to data/projects.txt, then run sync.bat /nopause. The project gets the shared rules (CLAUDE.md block + .claude/ai-instructions.md), all skills, agents, hooks and the skill router; Codex gets the same rules via ~/.codex/AGENTS.md.
 - Agents train the studio themselves: at the end of every task they update or add skills (see "Studio self-training loop" in AGENTS.md and skill studio-self-training), then run publish.bat. Other agents and the other machine read those skills after sync.bat.

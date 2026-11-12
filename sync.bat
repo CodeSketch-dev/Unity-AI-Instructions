@@ -5,7 +5,7 @@ rem  Sync AGENTS.md + skills to Claude and Codex. Double-click to run.
 rem    AGENTS.md  ->  %USERPROFILE%\.claude\CLAUDE.md  va  %USERPROFILE%\.codex\AGENTS.md
 rem    skills\*   ->  %USERPROFILE%\.claude\skills\    va  %USERPROFILE%\.codex\skills\
 rem    + user settings.json: UI-gate hook enabled, UI skills un-hidden (no name-only)
-rem    + every Unity project found next to this repo (and in projects.txt):
+rem    + every Unity project found next to this repo (and in data/projects.txt):
 rem        CLAUDE.md block, .claude\ai-instructions.md, .claude\skills  (works for cloud sessions too)
 rem  Options: /nopause   /nopull (skip git pull)   /nopro (skip per-project step)
 rem  Runs git pull --ff-only if the repository is clean; skips pull when there are uncommitted changes.
@@ -73,7 +73,7 @@ if exist "%REPO%\skills" (
 
 rem ---- 3b. skill router data: every skill (also future ones) becomes auto-routable by the prompt hook
 where python >nul 2>&1
-if not errorlevel 1 if exist "%REPO%\tools\build_skill_router.py" python "%REPO%\tools\build_skill_router.py" "%REPO%\skills" "%REPO%\data\skill_router.json"
+if not errorlevel 1 if exist "%REPO%\tools\skillkit\build_skill_router.py" python "%REPO%\tools\skillkit\build_skill_router.py" "%REPO%\skills" "%REPO%\data\skill_router.json"
 
 rem ---- 4. pipeline agents, commands and hook scripts -> Claude only ------------------------
 if exist "%REPO%\agents" call :install_tree "%REPO%\agents" "%CLAUDE_HOME%\agents" "agents"
@@ -86,8 +86,8 @@ if exist "%REPO%\data" robocopy "%REPO%\data" "%CLAUDE_HOME%\pipeline-hooks\hook
 rem ---- 5. user settings (hook + skill visibility) and all Unity projects -------------------
 set "NOPROFLAG="
 if defined NOPRO set "NOPROFLAG=-NoProjects"
-if exist "%REPO%\tools\sync_claude_setup.ps1" (
-    powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\tools\sync_claude_setup.ps1" -Repo "%REPO%" -ClaudeHome "%CLAUDE_HOME%" %NOPROFLAG%
+if exist "%REPO%\tools\sync\sync_claude_setup.ps1" (
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO%\tools\sync\sync_claude_setup.ps1" -Repo "%REPO%" -ClaudeHome "%CLAUDE_HOME%" %NOPROFLAG%
     if errorlevel 1 set "RESULT=1"
 )
 

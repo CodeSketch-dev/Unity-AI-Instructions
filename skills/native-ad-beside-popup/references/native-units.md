@@ -35,4 +35,4 @@ Primary references:
 
 ## Maintainer verification
 
-Run `python -I tools/skill_lint.py skills`; review the above positive/negative scenarios against the description and triggers. The scenarios are review cases, not an executed automated behavior eval. Publish through the instruction repository's normal combined publish flow after all concurrent skill changes are ready.
+Run `python -I tools/skillkit/skill_lint.py skills`; review the above positive/negative scenarios against the description and triggers. The scenarios are review cases, not an executed automated behavior eval. Publish through the instruction repository's normal combined publish flow after all concurrent skill changes are ready.

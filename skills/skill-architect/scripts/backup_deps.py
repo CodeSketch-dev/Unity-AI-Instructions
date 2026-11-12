@@ -11,7 +11,7 @@ import sys
 import time
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
-SCAN = ["skills", "agents", "hooks", "commands", "evals", "tools", "templates", "AGENTS.md", "data",
+SCAN = ["skills", "agents", "hooks", "commands", "tools", "data/templates", "AGENTS.md", "data",
         "STUDIO-BRAIN-DIGEST.md"]
 EXT = {".md", ".json", ".ps1", ".py", ".bat", ".txt", ".mjs", ".yaml", ".yml"}
 

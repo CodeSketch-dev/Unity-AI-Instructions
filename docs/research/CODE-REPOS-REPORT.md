@@ -36,4 +36,4 @@ Repos (local clones in `C:\Unity\GitProject\_skill-research`, treated as untrust
 Added 5 skills, improved 5 existing skills (scene-flow-loading, save-and-crash-safety, game-audio-system, state-machine-template, async-cancellation), duplicate 2, skipped 4 groups, incompatible 2 groups.
 
 ## Lint
-`tools/skill_lint.py skills`: no error or warning mentions any new or edited skill (repo-wide totals pre-existing: 29 errors, 123 warnings).
+`tools/skillkit/skill_lint.py skills`: no error or warning mentions any new or edited skill (repo-wide totals pre-existing: 29 errors, 123 warnings).

@@ -2,9 +2,9 @@
 on labelled queries. No model call. Proves the description/triggers route the right skill; not that an agent obeys it.
 
 Usage: py -I scripts/trigger_eval.py [queries.json] [--skill <name>]
-queries.json: [{"q": "...", "should": ["skill"], "not": ["skill"]}]  (default evals/skill-architect/trigger-queries.json)
+queries.json: [{"q": "...", "should": ["skill"], "not": ["skill"]}]  (default tools/evals/skill-architect/trigger-queries.json)
 A "should" skill must be in the top 12 (the hook limit); a "not" skill must not be in the list.
-Run tools/build_skill_router.py first when skills changed (publish.bat does it).
+Run tools/skillkit/build_skill_router.py first when skills changed (publish.bat does it).
 """
 import json
 import os
@@ -38,7 +38,7 @@ def main():
     a = sys.argv[1:]
     only = a[a.index("--skill") + 1] if "--skill" in a else None
     pos = [x for i, x in enumerate(a) if not x.startswith("--") and (i == 0 or a[i - 1] != "--skill")]
-    path = pos[0] if pos else os.path.join(REPO, "evals", "skill-architect", "trigger-queries.json")
+    path = pos[0] if pos else os.path.join(REPO, "tools", "evals", "skill-architect", "trigger-queries.json")
     cases = json.load(open(path, encoding="utf-8"))
     fail = total = 0
     for c in cases:

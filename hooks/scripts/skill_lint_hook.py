@@ -1,6 +1,6 @@
 """PostToolUse hook for Edit|Write on SKILL.md: lint the edited skill and feed errors back (exit 2 = message to the agent).
 
-Runs the repo's tools/skill_lint.py on the skills directory that contains the file (so duplicate names and collisions
+Runs the repo's tools/skillkit/skill_lint.py on the skills directory that contains the file (so duplicate names and collisions
 are caught). Silent when the file is not a SKILL.md or the linter is missing.
 """
 import os
@@ -18,7 +18,7 @@ def main():
         return 0
     skills_dir = os.path.dirname(os.path.dirname(path))
     plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT") or hooklib.project_dir(event)
-    lint = os.path.join(plugin_root, "tools", "skill_lint.py")
+    lint = os.path.join(plugin_root, "tools", "skillkit", "skill_lint.py")
     if not os.path.isfile(lint):
         return 0
     r = subprocess.run([sys.executable, "-I", lint, skills_dir], capture_output=True, text=True, timeout=30)

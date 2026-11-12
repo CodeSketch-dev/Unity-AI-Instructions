@@ -17,7 +17,7 @@ An always-on watcher costs real CPU in Play Mode (measured: about +160% of one c
 2. Apply with `AiQa.Qa_InkFix.Run()` in Edit Mode (menu Tools/Qa/Apply Ink Fixes): changes are clamped (8 units per step, 16 max padding, skip when > 20), only failing items are touched. Always look at the screenshot afterwards; if a result looks wrong (tiny text, squeezed button) revert that prefab.
 3. For judgment calls: take the screenshot and LOOK at it (or give it to an agent) before accepting any auto change.
 
-Install: `sync.bat` copies `Qa_InkDump` and `Qa_InkFix` (`templates/unity-editor/AiQa/*.cs.txt`, namespace `AiQa`) to `Assets/_AiQa/Editor/` of every Unity project with uGUI/TMP, and `ink_audit.py` to `<project>/.claude/skills/ui-ink-audit/`. Needs `python` + Pillow.
+Install: `sync.bat` copies `Qa_InkDump` and `Qa_InkFix` (`data/templates/unity-editor/AiQa/*.cs.txt`, namespace `AiQa`) to `Assets/_AiQa/Editor/` of every Unity project with uGUI/TMP, and `ink_audit.py` to `<project>/.claude/skills/ui-ink-audit/`. Needs `python` + Pillow.
 
 ## What the agent must do (every task, every Play test, every autoplay)
 1. After UI work and after Play tests, audit the screens you touched or opened (steps above). A screen nobody opened is NOT audited.

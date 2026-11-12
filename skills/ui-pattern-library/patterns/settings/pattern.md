@@ -24,4 +24,4 @@ Settings data block, locale list (`Factory_Localize`), optional links (privacy, 
 1. Home button: in-game only (default) / always. 2. Extra rows: none (default) / rate, privacy, restore. 3. Slider instead of toggle for volume.
 
 ## Checks
-All three toggles persist across restart; language change updates visible text without restart; sub-panel closes before the popup; contract validates with `ui_spec_tool.py lint`; `ui-validator` clean at 3 aspects.
+All three toggles persist across restart; language change updates visible text without restart; sub-panel closes before the popup; contract validates with `ui_spec_tool.py tools/lint`; `ui-validator` clean at 3 aspects.

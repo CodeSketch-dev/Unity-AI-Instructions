@@ -5,7 +5,7 @@ description: "Canvas/popup structure for mobile uGUI: root canvas, SafeArea, Pop
 
 # Unity UI
 
-Mobile landscape (Android/iOS, incl. low-end). Values: project `project-config.yaml` (template in `templates/`) > defaults here.
+Mobile landscape (Android/iOS, incl. low-end). Values: project `project-config.yaml` (template in `data/templates/`) > defaults here.
 
 ## Structure
 - The persistent root prefab owns THREE overlay canvases (contract and values: `persistent-root-prefab`): HUD `Canvas` sort 2506, `Canvas_Popup` sort 12506 (views, popups, loading, internet, native slot), `Transition` sort 20000. All Screen Space Overlay, Scale With Screen Size, Match Mode **Expand**, match 0, ref. res. `ui.referenceResolution` (default 1920x1080). Order rule HUD < popup < transition < debug overlay; do not renumber an existing project. Per-mode HUD canvases (inside a player/GUI prefab) sit below the persistent HUD. Do not add further root canvases; nested Canvas only for measured rebuild isolation.

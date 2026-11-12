@@ -1,4 +1,4 @@
-# Generic data-driven studio hook. Registered for UserPromptSubmit and Stop by tools/sync_claude_setup.ps1 (usage: -Event UserPromptSubmit | Stop).
+# Generic data-driven studio hook. Registered for UserPromptSubmit and Stop by tools/sync/sync_claude_setup.ps1 (usage: -Event UserPromptSubmit | Stop).
 # Rules live in studio_rules.json next to this script. ASCII only (PowerShell 5.1).
 # - UserPromptSubmit: strips diacritics from the owner's prompt, applies the rules, injects the matching texts, arms the retro gate (flag 'correction')
 #   and logs corrections to ~/.claude/studio_corrections.log; a correction that repeats an earlier one is escalated ("build a hook / audit, not prose").

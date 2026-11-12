@@ -1,6 +1,6 @@
 ---
 name: skill-quality-rubric
-description: "Score, lint, test and improve a SKILL.md: structural checklist, behavioural eval spec, test-fix-retest loop with keep/revert on score. Use when writing, reviewing or tuning a skill or adding an evals/ spec."
+description: "Score, lint, test and improve a SKILL.md: structural checklist, behavioural eval spec, test-fix-retest loop with keep/revert on score. Use when writing, reviewing or tuning a skill or adding an tools/evals/ spec."
 triggers: skill quality, skill rubric, skill lint, skill test, improve skill, eval spec, skill review, kiem tra skill, cai thien skill, danh gia skill, viet skill
 ---
 
@@ -16,13 +16,13 @@ Use when a skill is new, edited, mis-triggers, or is never loaded.
 5. No project, game or class names (project contracts belong in that project AGENTS.md).
 6. Verification names a concrete check (Console, MCP tool, test, screenshot), not "make sure it works".
 7. No interactive prompts; the skill says "decide, log, continue" for small choices.
-8. No overlap: description does not share a 6-word shingle with another skill (`py -I tools/skill_lint.py skills`).
+8. No overlap: description does not share a 6-word shingle with another skill (`py -I tools/skillkit/skill_lint.py skills`).
 
 ## 2. Behavioural spec
 Write 3-5 one-line scenarios: a prompt, the expected skill choice, and 2-3 observable behaviours (what it reads, what it refuses to do, what it reports). Include one negative prompt where the skill must NOT fire.
 
-## 3. Add an evals/ spec
-Copy an existing `evals/trigger-*` folder to `evals/trigger-<topic>/`:
+## 3. Add an tools/evals/ spec
+Copy an existing `tools/evals/trigger-*` folder to `tools/evals/trigger-<topic>/`:
 - `prompt.md`: frontmatter `max_turns`, `allowed_tools: [Read, Glob, Grep, Skill]`, then one natural-language prompt that does not name the skill.
 - `graders/criteria.md`: frontmatter `type: llm`, `weight: 1`, then one paragraph: which skill must be consulted first and the 2-3 behaviours that prove it was followed.
 

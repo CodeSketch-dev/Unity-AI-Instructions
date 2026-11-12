@@ -6,7 +6,7 @@ triggers: rename scripts, move scripts, split classes, one class per file, refac
 
 # Unity script migration (GUID-safe, batch, verified)
 
-Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). Target layout: flat `Logic/<Feature>/<Prefix>_<Part>.cs`; per-minigame code `Logic/Minigame/<Name>/<XXX>_<Part>.cs` (set `runtimeFolder` accordingly); editor code in `Scripts/Editor/<Feature>`. All project settings live in `Tools/migration.json` (copy `tools/migration.example.json`; keys documented in `migration_config.py`): game prefix, namespace, roots, runtime/editor/event folders. Test templates with `{{Prefix}}`/`{{Namespace}}` placeholders: `templates/Prefix_TestBus.cs`, `templates/IPrefix_Source.cs`.
+Tools: `skills/unity-script-migration/tools/` (copy to the project's `Tools/`). Target layout: flat `Logic/<Feature>/<Prefix>_<Part>.cs`; per-minigame code `Logic/Minigame/<Name>/<XXX>_<Part>.cs` (set `runtimeFolder` accordingly); editor code in `Scripts/Editor/<Feature>`. All project settings live in `Tools/migration.json` (copy `tools/migration.example.json`; keys documented in `migration_config.py`): game prefix, namespace, roots, runtime/editor/event folders. Test templates with `{{Prefix}}`/`{{Namespace}}` placeholders: `data/templates/Prefix_TestBus.cs`, `data/templates/IPrefix_Source.cs`.
 
 | Tool | Does |
 |---|---|

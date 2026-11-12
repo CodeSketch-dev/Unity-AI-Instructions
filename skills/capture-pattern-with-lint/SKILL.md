@@ -10,9 +10,9 @@ Goal: a lesson must not depend on an agent remembering it. The linter is the tri
 
 ## Steps (all in this repo, never in a Unity project)
 1. **Skill** `skills/<kebab-name>/SKILL.md`, under ~40 lines: frontmatter (`name`, `Use when ...` description < 300 chars, `triggers:` incl. Vietnamese without accents), why it is banned, ordered fix steps with a verification, legit exceptions. No game or class names unless it is a project contract.
-2. **Rule** `lint/rules/<snake_name>.py` exporting `RULE = Rule(id, pattern, why, skill, require=None)`. `id` is the kebab skill/rule name, `skill` is the folder from step 1, `why` is one short sentence (the engine appends the mandatory-read path and the opt-out). Add `require=` when the pattern alone is too broad (file-level second condition). Keep it a regex over one line; do not add an AST engine for one rule.
-3. **Fixtures + test** `lint/tests/fixtures/bad_<name>.cs` and `good_<name>.cs`, then a test in `lint/tests/` that asserts the bad fixture is flagged at the right line, the good one is clean, and `// lint-ok:<id> <reason>` suppresses. Run `python -m pytest lint/tests -q` and watch the new test fail before the rule exists (TDD).
-4. **Prove it**: `python lint/run_lint.py <bad fixture>` must print `[RULE <id>] ... MANDATORY: read .claude/skills/<skill>/SKILL.md ...` and exit 2.
+2. **Rule** `tools/lint/rules/<snake_name>.py` exporting `RULE = Rule(id, pattern, why, skill, require=None)`. `id` is the kebab skill/rule name, `skill` is the folder from step 1, `why` is one short sentence (the engine appends the mandatory-read path and the opt-out). Add `require=` when the pattern alone is too broad (file-level second condition). Keep it a regex over one line; do not add an AST engine for one rule.
+3. **Fixtures + test** `tools/lint/tests/fixtures/bad_<name>.cs` and `good_<name>.cs`, then a test in `tools/lint/tests/` that asserts the bad fixture is flagged at the right line, the good one is clean, and `// lint-ok:<id> <reason>` suppresses. Run `python -m pytest tools/lint/tests -q` and watch the new test fail before the rule exists (TDD).
+4. **Prove it**: `python tools/lint/run_lint.py <bad fixture>` must print `[RULE <id>] ... MANDATORY: read .claude/skills/<skill>/SKILL.md ...` and exit 2.
 5. **Publish**: `publish.bat "<message>"` (runs layout lint, rule tests, skill lint, then syncs). Rules reach Unity projects on the next `sync.bat`.
 
 ## False-positive checklist (a rule that cries wolf gets ignored)

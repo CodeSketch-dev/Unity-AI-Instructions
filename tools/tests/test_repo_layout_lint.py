@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, ".."))
+sys.path.insert(0, os.path.join(HERE, "..", "publish"))
 
 import repo_layout_lint as rl  # noqa: E402
 
@@ -49,6 +49,27 @@ class LayoutLintTests(unittest.TestCase):
     def test_dot_dirs_are_ignored(self):
         root = make_repo(files=["AGENTS.md"], dirs=[".git", ".local", ".publish-backup"])
         self.assertEqual(rl.check_layout(root), [])
+
+
+class WidthTests(unittest.TestCase):
+    def test_folder_with_too_many_entries_is_flagged(self):
+        root = make_repo(files=["AGENTS.md"] + ["docs/note%d.md" % i for i in range(rl.MAX_ENTRIES + 1)])
+        msgs = rl.check_layout(root)
+        self.assertTrue(any("docs/" in m and "entries" in m for m in msgs), msgs)
+
+    def test_exempt_folder_may_be_wide(self):
+        root = make_repo(files=["AGENTS.md"] + ["tools/tests/t%d.py" % i for i in range(rl.MAX_ENTRIES + 5)])
+        self.assertEqual([m for m in rl.check_layout(root) if "tools/tests" in m], [])
+
+    def test_old_top_level_dirs_are_flagged(self):
+        root = make_repo(files=["AGENTS.md"], dirs=["lint", "evals", "templates", "packages"])
+        flagged = " ".join(rl.check_layout(root))
+        for d in ("lint/", "evals/", "templates/", "packages/"):
+            self.assertIn(d, flagged)
+
+    def test_projects_txt_must_live_in_data(self):
+        root = make_repo(files=["AGENTS.md", "projects.txt"])
+        self.assertTrue(any("projects.txt" in m for m in rl.check_layout(root)))
 
 
 if __name__ == "__main__":

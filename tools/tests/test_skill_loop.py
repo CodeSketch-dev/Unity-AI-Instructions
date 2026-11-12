@@ -6,7 +6,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, ".."))
+sys.path.insert(0, os.path.join(HERE, "..", "skillkit"))
 import skill_loop  # noqa: E402
 
 GOOD = '---\nname: demo\ndescription: "Demo skill used for tests. Use when testing the loop helper."\ntriggers: demo, loop\n---\n\n# Demo\nbody line\n'
@@ -30,8 +30,8 @@ class LoopTests(unittest.TestCase):
 
     def test_clean_scores_100_and_spec_failure_costs_10(self):
         self.assertEqual(skill_loop.score(self.skills, "demo")["score"], 100)
-        os.makedirs(os.path.join(self.root, "evals", "skill-specs"))
-        with open(os.path.join(self.root, "evals", "skill-specs", "demo.json"), "w") as f:
+        os.makedirs(os.path.join(self.root, "tools", "evals", "skill-specs"))
+        with open(os.path.join(self.root, "tools", "evals", "skill-specs", "demo.json"), "w") as f:
             json.dump({"must_contain": ["absent phrase"], "triggers_any": ["loop"]}, f)
         r = skill_loop.score(self.skills, "demo")
         self.assertEqual(r["score"], 90)

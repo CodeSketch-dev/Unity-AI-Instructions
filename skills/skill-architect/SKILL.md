@@ -20,10 +20,10 @@ Detail lives in `references/` (load only the file the current step needs). Scrip
 2. **Find a pattern**: check `skills/INDEX.md` for an existing skill first (merge beats a near-copy); then at most 1-2 vendor examples by fetching only the needed `SKILL.md` (see `references/anthropic-patterns.md` for which). Spec rules: `references/spec-essence.md`.
 3. **Draft or edit** (`references/authoring-checklist.md`): description = what + `Use when ...` + concrete user words, slightly assertive; `triggers:` in English + Vietnamese without accents; optional `not:` negative phrases to stop misfires; imperative steps; one verification line.
 4. **Test** (cheap -> expensive):
-   - static: `py -I tools/skill_lint.py skills` (0 errors) and `inventory.py --only <name>`;
-   - routing: add 6+ labelled queries to `evals/skill-architect/trigger-queries.json` (should-fire plus near-miss should-not), run `py -I skills/skill-architect/scripts/trigger_eval.py --skill <name>` after `py -I tools/build_skill_router.py skills data/skill_router.json`;
-   - behaviour: add `evals/trigger-<name>/` (prompt that does not name the skill + grader criteria) and `evals/skill-specs/<name>.json`; for important skills run with vs without the skill (see `skill-quality-rubric`, `skill-test-loop`).
-5. **Iterate**: change one thing, re-score; keep on equal-or-better, revert otherwise (`tools/skill_loop.py`). Max 3-4 rounds.
+   - static: `py -I tools/skillkit/skill_lint.py skills` (0 errors) and `inventory.py --only <name>`;
+   - routing: add 6+ labelled queries to `tools/evals/skill-architect/trigger-queries.json` (should-fire plus near-miss should-not), run `py -I skills/skill-architect/scripts/trigger_eval.py --skill <name>` after `py -I tools/skillkit/build_skill_router.py skills data/skill_router.json`;
+   - behaviour: add `tools/evals/trigger-<name>/` (prompt that does not name the skill + grader criteria) and `tools/evals/skill-specs/<name>.json`; for important skills run with vs without the skill (see `skill-quality-rubric`, `skill-test-loop`).
+5. **Iterate**: change one thing, re-score; keep on equal-or-better, revert otherwise (`tools/skillkit/skill_loop.py`). Max 3-4 rounds.
 6. **Publish**: `cmd //c "<repo>\publish.bat" "<msg>"` in the background (lint, index, router, sync, push). Report: files changed, lint totals before/after, trigger pass count, what was NOT verified.
 
 ## Creation priorities for this studio

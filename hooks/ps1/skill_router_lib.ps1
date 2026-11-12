@@ -1,5 +1,5 @@
 # Shared skill routing (ASCII only). Dot-source: . "$PSScriptRoot\skill_router_lib.ps1"; Get-RoutedSkills $text $max
-# Scores free text (English or Vietnamese) against every skill in skill_router.json (built by tools/build_skill_router.py).
+# Scores free text (English or Vietnamese) against every skill in skill_router.json (built by tools/skillkit/build_skill_router.py).
 # Returns @{ strong = bool; names = string[]; closest = string }. Matches are capped at 5. strong = best score >= 6.
 # Negative triggers: a skill's optional "x" list (frontmatter `not:`) subtracts 3 per phrase found in the prompt.
 function Get-RoutedMatch([string]$text, [int]$max = 5) {

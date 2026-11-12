@@ -62,7 +62,7 @@ Reference: gamedev-skills/awesome-gamedev-agent-skills (Apache-2.0, local clone 
 1. **Gap in domain pairs:** add to the AGENTS routing list: perf/FPS questions -> `perf-triage-ladder` first then `mobile-perf-audit`; art sets -> `art-direction-asset-pipeline`; economy pacing/rebirth/offline -> `simulator-pacing-checks` + `economy-progression-design`; new mechanic idea -> `prototype-keep-kill`; map layout -> `level-whitebox-checklist` + `zone-level-design`; UI resolution breakage -> `ui-scaling-safe-area-checklist` after `ui-always`.
 2. **Ordered output:** the hook hint should list matches in composition order (process/discipline first, then concrete engine/project skill) and cap at 4-5 names, as the reference router does, instead of a flat top-N by score.
 3. **Pivot detection:** when the new prompt's best match differs from the last routed set, say "re-route" and drop the previous set (matches our skill-context lifecycle rule).
-4. **Negative triggers:** several skills share words (`ui`, `economy`, `camera`). Add an optional `not:` frontmatter list (for example `not: shop card layout`) used by tools/build_skill_router.py to subtract weight. Needs a hook and builder change by the owner.
+4. **Negative triggers:** several skills share words (`ui`, `economy`, `camera`). Add an optional `not:` frontmatter list (for example `not: shop card layout`) used by tools/skillkit/build_skill_router.py to subtract weight. Needs a hook and builder change by the owner.
 5. **Description budget:** 29 lint errors exist today (many ui-* descriptions over 300 characters, 11 skill folders lacking SKILL.md, 3 unquoted YAML scalars). Router quality depends on short descriptions; fix these before adding more routing logic. None are from this change.
 6. **Vietnamese map:** VI_MAP in the builder lacks terms for the new skills; the new `triggers:` lines already include unaccented Vietnamese so no builder change is required, but add entries for "ban mau" (prototype), "can bang" (balance, exists), "giat" (stutter) if scoring misses them.
 7. **Gap statement:** have the hook say "no matching skill; using closest X" when the top score is below threshold, mirroring the reference's gap rule, so the agent does not invent skill names.
@@ -70,4 +70,4 @@ Reference: gamedev-skills/awesome-gamedev-agent-skills (Apache-2.0, local clone 
 ## Not done / limits
 - No hook scripts, skill_router.json, INDEX.md or any Unity project touched; `publish.bat` not run (owner/coordinator should run it so INDEX.md and skill_router.json regenerate).
 - New skills are untested against real tasks; they are checklists distilled from the reference, plus our house rules.
-- tools/skill_lint.py: zero findings for the 7 new skills and 3 extended skills; repo-wide 29 pre-existing errors remain (see proposal 5).
+- tools/skillkit/skill_lint.py: zero findings for the 7 new skills and 3 extended skills; repo-wide 29 pre-existing errors remain (see proposal 5).

@@ -7,7 +7,7 @@ The studio clones Roblox games into local single-player Unity mobile games. Toda
 
 ## Goals
 - G1 One-prompt UI that is right the first time (no follow-up size fixes): principles and tokens mined from real prefabs, an idempotent builder, a validator, screenshot QA.
-- G2 Complete systems coverage for Roblox-style games (see `docs/pipeline-catalog.md` and reports 01-22).
+- G2 Complete systems coverage for Roblox-style games (see `docs/catalog/pipeline-catalog.md` and reports 01-22).
 - G3 Very low token cost: progressive disclosure, a small always-loaded index, detail in references/scripts, cheap hooks.
 - G4 No repeated mistakes: every recurring correction becomes a rule with its reason.
 - G5 Unattended operation: interactive in Claude Code and headless in local batch runner, with iteration caps and resume state on disk.
@@ -31,7 +31,7 @@ Server/multiplayer, UGC, store-compliance rules about drop odds (designer decide
 1 material goal; AGENTS.md wording merge; no odds-compliance rule; shared generic ads layer (per-app keys); start everything now; agent may self-propose missing domains and run them; hundreds to 1000+ skills acceptable.
 
 ## Left to the builder
-Skill names/grouping, packaging as a plugin, hook details, tool languages (C# editor tools, Python scripts), wave order, how to split tasks across subagents, lint/trigger-eval tooling.
+Skill names/grouping, packaging as a plugin, hook details, tool languages (C# editor tools, Python scripts), wave order, how to split tasks across subagents, tools/lint/trigger-eval tooling.
 
 ## Inputs
-`docs/pipeline-catalog.md` + `docs/pipeline-catalog/01..22-*.md` (22 mined/designed reports), existing `skills/` (49) and `docs/SKILL-SUITE-PLAN.md`.
+`docs/catalog/pipeline-catalog.md` + `docs/catalog/pipeline-catalog/01..22-*.md` (22 mined/designed reports), existing `skills/` (49) and `docs/guides/SKILL-SUITE-PLAN.md`.

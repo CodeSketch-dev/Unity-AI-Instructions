@@ -76,7 +76,7 @@
       "id": "capture_pattern_lint",
       "event": "UserPromptSubmit",
       "match": "rut kinh nghiem|luu pattern|luu lai pattern|save this pattern|capture this pattern|learn from this mistake|learn from this bug|luu loi nay|tao lint rule|lint rule",
-      "inject": "CAPTURE PATTERN: follow skill capture-pattern-with-lint in this session: (1) short skill skills/<name>/SKILL.md, (2) lint/rules/<name>.py whose message points to .claude/skills/<name>/SKILL.md, (3) bad/good fixtures + pytest lint/tests (RED first), run python lint/run_lint.py on the bad fixture to prove it fires, (4) publish.bat. Do not ask; decide and record a Ruling."
+      "inject": "CAPTURE PATTERN: follow skill capture-pattern-with-lint in this session: (1) short skill skills/<name>/SKILL.md, (2) tools/lint/rules/<name>.py whose message points to .claude/skills/<name>/SKILL.md, (3) bad/good fixtures + pytest tools/lint/tests (RED first), run python tools/lint/run_lint.py on the bad fixture to prove it fires, (4) publish.bat. Do not ask; decide and record a Ruling."
     }
   ]
 }

@@ -82,7 +82,7 @@ class GitTests(unittest.TestCase):
             self.assertIsNotNone(self.cmd(c), c)
 
     def test_safe_allowed(self):
-        for c in ("git status", "git diff --stat", "git log -5", "git add -A", "git commit -m x", "ls", "py -I tools/skill_lint.py skills"):
+        for c in ("git status", "git diff --stat", "git log -5", "git add -A", "git commit -m x", "ls", "py -I tools/skillkit/skill_lint.py skills"):
             self.assertIsNone(self.cmd(c), c)
 
     def test_commits_can_be_disabled(self):

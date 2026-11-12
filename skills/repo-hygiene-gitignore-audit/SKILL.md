@@ -27,7 +27,7 @@ A Unity template `.gitignore` often has broad patterns (`Assets/**/Demo*`, `Tuto
 
 ## Private studio files never reach teammates
 - `sync.bat` keeps the studio skills local: `.claude/` (skills, ai-instructions copy), `CLAUDE.local.md` (the managed block lives here, not in the shared `CLAUDE.md`) and `Assets/_AiQa/` are ignored. Teammates get a clean repo; only machines that cloned the AI-Instructions repo and ran `sync.bat` load the skills.
-- Two idempotent writers, both from `tools/sync_claude_setup.ps1`: (1) the Unity project's own `.gitignore` gets only the MISSING private lines appended (never rewritten); (2) the git ROOT `.gitignore` (or `.git/info/exclude` when root == Unity folder) gets a marker-delimited block (tool output, scratch/backup folders, generated docs subfolders and media). Rerunning replaces the block, no duplicates.
+- Two idempotent writers, both from `tools/sync/sync_claude_setup.ps1`: (1) the Unity project's own `.gitignore` gets only the MISSING private lines appended (never rewritten); (2) the git ROOT `.gitignore` (or `.git/info/exclude` when root == Unity folder) gets a marker-delimited block (tool output, scratch/backup folders, generated docs subfolders and media). Rerunning replaces the block, no duplicates.
 - Ignore rules do not untrack: a file already committed stays tracked until `git rm --cached`. After sync, `git status` may show `CLAUDE.md` modified (old block stripped): review it, never commit private files.
 
 ## Also
