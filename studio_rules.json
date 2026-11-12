@@ -59,6 +59,12 @@
       "event": "UserPromptSubmit",
       "match": "co skills|co skill|khong dung skill|ko dung skill|dung skill di|skills ma|skill ma",
       "inject": "OWNER: a matching skill exists and was not applied. Find it now (skills/INDEX.md / router), load it, redo the work by its contract, add an enforceable check (test/audit/hook) so it cannot be skipped again, then publish."
+    },
+    {
+      "id": "kt_no_invention",
+      "event": "UserPromptSubmit",
+      "match": "knife tower|speed keyboard|speedkeyboard|giong y chang|100% nhu|che linh tinh|ref chuan|nhu knife",
+      "inject": "NO INVENTION: Knife Tower Speed Keyboard is the owner's hand-written 100% reference (code style, structure, UI). Read its prefab YAML/scripts directly (read-only), list EVERY KT element (sprites, fonts, sizes, positions, which screen holds which button, e.g. Shop/Skins entry), reproduce exactly, add and move nothing. Your report MUST contain a KT-vs-ours element diff table and a Play capture next to the KT reference; otherwise REWORK. Skill: ui-exact-clone-workflow (NO-INVENTION LAW)."
     }
   ]
 }
