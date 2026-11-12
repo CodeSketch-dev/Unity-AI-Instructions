@@ -18,3 +18,4 @@ Metrics: frame ms (CPU/GPU), GC alloc per frame, batches/set-pass, vertices, phy
 4. Unity MCP stats (rendering/script stats) count as Editor evidence; say so. If MCP is unavailable, say nothing was measured.
 5. A structural count (renderers, materials, batches) is acceptable proof of a structural change; it is not proof of an FPS gain.
 6. Never present an estimate as a measurement. Use `mobile-perf-audit` for the audit procedure.
+7. Population benchmarks must assert the intended live population and relationships remain throughout the measured window; objects falling out, expiring or being collected can turn a full-pool test into an empty-loop result. Report active counts, warmup, step count and conditions. Allocate timing/report helpers before the GC baseline, and label calling-thread allocations separately from job-worker or whole-frame allocations.
