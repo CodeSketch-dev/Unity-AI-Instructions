@@ -7,6 +7,7 @@ description: "TextMeshPro conventions: fonts, outline materials, autosize, color
 
 Facts from the studio evidence notes (KT 451 TMPs, VERIFIED); defaults, not law.
 
+- **NEVER a dark, grey or navy text face (owner order 2026-11-12, always on)**: every label, title, number and toast keeps the shared WHITE (light) face with the dark outline, on dark AND light boards, like the reference game. Never fix legibility by darkening or greying the face (reads as dim/dead text); use the outline/underlay of the shared material or a darker plate behind. Audit: grep UI prefabs for TMP `m_fontColor` that is not white/approved = defect.
 - **Outline via material presets**, not the Outline component: a bold display font with outline widths ~0.35/0.75/1.0 and a heavier font 15-50, white face, black outline/underlay. World-space text uses the instancing/billboard variant.
 - **Autosize on** (about 80% of labels): min 18 almost always, max by role (36-52 common, 72 titles). Use no-wrap and Center/Middle alignment ~88%; do not use Overflow to hide a label that does not fit. Vertical centring: see Optical centring below; set it once in the text factory, never a per-label nudge.
 - **Raycast Target off** on non-interactive TMPs (82%) and decorative Images.
