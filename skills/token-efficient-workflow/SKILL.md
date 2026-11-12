@@ -50,3 +50,6 @@ Most tokens in a clone session are spent on four things: re-learning the project
 
 ## Self-check before a big step
 Is there an index/map for this? Can a script summarize it? Can I batch it? Is the reference/intent unambiguous? If any answer is "no", fix that first.
+
+## Cheap model for mechanical media work (owner 2026-11-12)
+- Reference-video work (yt-dlp download, ffmpeg contact sheets/frames, measuring ratios from frames, grepping YAML) runs in a subagent with `model: haiku`; keep Sonnet/Opus for design, code and reviews. Always use coarse sheets first (fps 1/6, 320 px tiles), dense frames only on the 6-8 informative moments, small jpg copies into docs.
