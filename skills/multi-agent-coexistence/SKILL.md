@@ -40,8 +40,6 @@ If both versions change the same lines in incompatible ways, stop. Show the user
 - **Shared Editor state**: check Editor state before editing (not in Play Mode; edits made in Play Mode are lost); expect the other agent's QA to start/stop Play Mode or change `timeScale`; avoid long generator runs while someone is testing; keep MCP calls short (`unity-mcp-workflow`).
 - **Subagents** you spawn count as another writer: give them disjoint files and never let two write the same scene/prefab.
 
-## Shared documents
-
 ## Background-only Unity work
 - When the owner requests background-only work, inspect the existing Game View's `enterPlayModeBehavior` before Play and require `PlayUnfocused`. Avoiding explicit `Focus()` calls is insufficient: `PlayFocused` itself requests focus. Use only the verified project's existing view; do not create/focus a window or change another Editor's preferences.
 - Isolate QA from physical gameplay and UI input even when Unity reports itself focused. Allow only project-owned non-native synthetic devices or explicit QA commands, clean them up afterward, and keep global input focus policies unchanged. Verify a passive session stays stable and the owned synthetic interaction still works. Do not infer OS foreground state solely from Unity's focus flags.
