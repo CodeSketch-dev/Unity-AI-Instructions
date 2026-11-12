@@ -36,6 +36,11 @@ class EngineTests(unittest.TestCase):
         for p in (os.path.join("Assets", "Editor", "X.cs"), os.path.join("Assets", "Tests", "X.cs")):
             self.assertEqual(engine.lint_text(p, "BadCall(1);\n", rules=[RULE]), [])
 
+    def test_vendor_and_reference_paths_are_excluded(self):
+        for vendor in (("Packages", "com.x", "Runtime"), ("Assets", "Plugins", "Lib"), ("ReferenceSource~", "Demo", "Assets")):
+            path = os.path.join(*vendor, "Thing.cs")
+            self.assertEqual(engine.lint_text(path, "BadCall(1);" + chr(10), rules=[RULE]), [], path)
+
     def test_other_file_types_ignored(self):
         self.assertEqual(engine.lint_text("notes.txt", "BadCall(1);\n", rules=[RULE]), [])
 

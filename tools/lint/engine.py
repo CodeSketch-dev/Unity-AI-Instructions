@@ -38,11 +38,14 @@ def load_rules():
     return out
 
 
+VENDOR_DIRS = ("Packages", "Library", "PackageCache", "Plugins", "ThirdParty", "ReferenceSource~")
+
+
 def _applies(rule, path):
     if not path.lower().endswith(rule.ext):
         return False
     parts = path.replace(chr(92), "/").split("/")
-    return not any(p in rule.exclude_dirs for p in parts[:-1])
+    return not any(p in rule.exclude_dirs or p in VENDOR_DIRS for p in parts[:-1])
 
 
 def lint_text(path, text, rules=None):
