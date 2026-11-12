@@ -33,6 +33,8 @@ def _mine(p):
     md = str(Path(p["progress"]).with_name("candidates.md"))
     miner.write_candidates(cands, md)
     made = [str(miner.make_train_task(c, p["tasks"])) for c in cands]
+    hits = miner.mine_lint_hits(miner.find_hits_files(REPO))
+    miner.write_hits_report(hits, str(Path(p["progress"]).with_name("lint-hits.md")))
     return cands, made
 
 

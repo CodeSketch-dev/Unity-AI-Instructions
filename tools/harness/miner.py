@@ -87,3 +87,42 @@ def mine_lint_hits(paths):
                 except (ValueError, KeyError):
                     continue
     return c
+
+
+SKIP_DIRS = {".git", "Library", "Temp", "node_modules", "obj", "Packages", "Assets"}
+
+
+def _roots(repo):
+    roots = [str(Path(repo).resolve().parent)]
+    listing = Path(repo) / "data" / "projects.txt"
+    if listing.is_file():
+        for line in listing.read_text(encoding="utf-8", errors="replace").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and os.path.isdir(line):
+                roots.append(line)
+    return roots
+
+
+def find_hits_files(repo, depth=3):
+    """hits.jsonl files of synced Unity projects (siblings of the repo and folders in data/projects.txt)."""
+    found = []
+    for root in _roots(repo):
+        base = root.rstrip(chr(92) + chr(47)).count(os.sep)
+        for cur, dirs, files in os.walk(root):
+            dirs[:] = [d for d in dirs if d not in SKIP_DIRS and cur.count(os.sep) - base < depth]
+            if os.path.basename(cur) == "lint" and os.path.basename(os.path.dirname(cur)) == ".claude" and "hits.jsonl" in files:
+                p = os.path.join(cur, "hits.jsonl")
+                if os.path.getsize(p) and p not in found:
+                    found.append(p)
+    return found
+
+
+def write_hits_report(counter, md_path):
+    lines = ["# Lint rules that fire most in real projects (generated, do not edit)", ""]
+    if not counter:
+        lines.append("No lint hits recorded yet.")
+    for rule, n in counter.most_common():
+        lines.append("- %s: %d hits" % (rule, n))
+    os.makedirs(os.path.dirname(md_path), exist_ok=True)
+    with open(md_path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines) + "\n")

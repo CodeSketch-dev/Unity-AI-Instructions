@@ -114,5 +114,24 @@ class LintHitsTests(unittest.TestCase):
         self.assertEqual(os.path.getsize(hits), size)
 
 
+class FindHitsTests(unittest.TestCase):
+    def test_finds_project_hits_files_and_reports_top_rules(self):
+        root = tempfile.mkdtemp()
+        repo = os.path.join(root, "repo")
+        os.makedirs(repo)
+        lint = os.path.join(root, "GameA", ".claude", "lint")
+        os.makedirs(lint)
+        with open(os.path.join(lint, "hits.jsonl"), "w") as f:
+            f.write(('{"rule": "r1"}' + chr(10)) * 3 + '{"rule": "r2"}' + chr(10))
+        os.makedirs(os.path.join(root, "Empty", ".claude", "lint"))
+        found = miner.find_hits_files(repo)
+        self.assertEqual([os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(p)))) for p in found], ["GameA"])
+        md = os.path.join(root, "hits.md")
+        miner.write_hits_report(miner.mine_lint_hits(found), md)
+        text = open(md, encoding="utf-8").read()
+        self.assertLess(text.index("r1"), text.index("r2"))
+        self.assertIn("3", text)
+
+
 if __name__ == "__main__":
     unittest.main()
