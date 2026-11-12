@@ -24,6 +24,7 @@ Trigger: the task says clone / like the original / same as X / fix a flow, FX, c
 - `ffmpeg`/`yt-dlp` are installed on the owner machine (winget); if missing install via winget.
 
 ## 3. Coarse pass
+- For timed sheets use `scripts/clone_frames.py coarse`: it preserves source PTS with `select`. Do not label post-`fps` output time as source time: sparse sampling can shift the first tile by half an interval. Verify timestamp changes against a source-PTS burn-in and a known-color fixture before publishing helper changes.
 - Contact sheets: `ffmpeg -i v.mp4 -vf "fps=1/2,scale=320:-1,tile=5x4" sheets/s_%03d.jpg`; LOOK at every sheet, write a timeline (mm:ss, what happens, screen). Find: core loop, every popup/shop/index, FX moments, camera changes, transitions, biome/zone changes.
 - Subtitles/transcript give numbers and explanations; cross-check numbers against the wiki.
 

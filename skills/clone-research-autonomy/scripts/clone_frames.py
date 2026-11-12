@@ -39,10 +39,13 @@ def arg(name, default=None):
 
 def coarse(video, out):
     fps = float(arg("--fps", "0.5"))
+    if fps <= 0:
+        raise SystemExit("--fps must be positive")
     cols, rows, width = int(arg("--cols", "6")), int(arg("--rows", "5")), int(arg("--width", "320"))
     os.makedirs(out, exist_ok=True)
-    vf = "fps=%s,scale=%d:-1,%s,tile=%dx%d" % (fps, width, label(0), cols, rows)
-    run(["ffmpeg", "-y", "-loglevel", "error", "-i", video, "-vf", vf, os.path.join(out, "sheet_%03d.jpg")])
+    # Preserve source PTS: fps resets labels and selects interval-midpoint frames.
+    vf = "select='isnan(prev_selected_t)+gte(t-prev_selected_t,%s)',scale=%d:-1,%s,tile=%dx%d" % (1 / fps, width, label(0), cols, rows)
+    run(["ffmpeg", "-y", "-loglevel", "error", "-i", video, "-vf", vf, "-fps_mode", "vfr", os.path.join(out, "sheet_%03d.jpg")])
     print("sheets in", out)
 
 
