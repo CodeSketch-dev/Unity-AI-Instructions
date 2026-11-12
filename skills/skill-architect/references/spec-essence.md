@@ -15,7 +15,7 @@ Re-fetch https://agentskills.io/specification when in doubt; this is a working s
 | metadata | optional string->string map, unique key names |
 | allowed-tools | optional, space separated, experimental |
 
-House additions (this repo only, not in the spec): `triggers:` (comma list, EN + VI no accents, feeds `skill_router.json`), `not:` (negative phrases), description limit 300 chars, lint in `tools/skill_lint.py`.
+House additions (this repo only, not in the spec): `triggers:` (comma list, EN + VI no accents, feeds `data/skill_router.json`), `not:` (negative phrases), description limit 300 chars, lint in `tools/skill_lint.py`.
 
 ## Progressive disclosure budget
 1. metadata ~100 tokens, always loaded;

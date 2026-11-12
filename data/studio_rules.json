@@ -71,6 +71,12 @@
       "event": "UserPromptSubmit",
       "match": "man ngang|man doc|portrait|landscape|orientation|xoay man",
       "inject": "ORIENTATION RULE: read the project's orientation (AGENTS.md / ProjectSettings) first. Glass Together is LANDSCAPE ONLY: never design, build, capture or QA portrait layouts; use 16:9, 19.5:9, 20:9. If a tool or builder would set portrait, stop and fix it. Guard: EditMode test Orientation_Landscape_Tests."
+    },
+    {
+      "id": "capture_pattern_lint",
+      "event": "UserPromptSubmit",
+      "match": "rut kinh nghiem|luu pattern|luu lai pattern|save this pattern|capture this pattern|learn from this mistake|learn from this bug|luu loi nay|tao lint rule|lint rule",
+      "inject": "CAPTURE PATTERN: follow skill capture-pattern-with-lint in this session: (1) short skill skills/<name>/SKILL.md, (2) lint/rules/<name>.py whose message points to .claude/skills/<name>/SKILL.md, (3) bad/good fixtures + pytest lint/tests (RED first), run python lint/run_lint.py on the bad fixture to prove it fires, (4) publish.bat. Do not ask; decide and record a Ruling."
     }
   ]
 }

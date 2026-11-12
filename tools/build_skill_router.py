@@ -38,7 +38,7 @@ def words(text):
 
 def main():
     root = sys.argv[1] if len(sys.argv) > 1 else "skills"
-    out = sys.argv[2] if len(sys.argv) > 2 else "skill_router.json"
+    out = sys.argv[2] if len(sys.argv) > 2 else "data/skill_router.json"
     skills = []
     for folder in sorted(os.listdir(root)):
         p = os.path.join(root, folder, "SKILL.md")

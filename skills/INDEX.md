@@ -60,6 +60,9 @@
 ## camera
 - camera-occlusion-fade - Studio-addition cheap third-person occluder fade (not in the reference game): segment-vs-bounds test on a registered target list every 0.05-0.1 s, hysteresis, shared transparent twin material, instant or timed fade. Use when props or models block the player view.
 
+## capture
+- capture-pattern-with-lint - Use when the owner says 'learn from this mistake', 'save this pattern', 'rut kinh nghiem' or an agent hits a repeatable anti-pattern: write a short skill, then a lint rule whose error points to it, then prove the rule fires.
+
 ## ceo
 - ceo-parallel-agent-orchestration - Run a studio-style loop: split work into file-owned pieces, launch parallel file-only agents, main agent owns Editor and verification, loop on feedback. Use when a request spans many independent pieces or a long autonomous session.
 
@@ -296,6 +299,9 @@
 ## night
 - night-lighting-mobile - Readable, pretty night for mobile scenes: moonlit ambient and fog, sun kept above horizon at low intensity, fake glow lights, tier-gated fireflies, no extra realtime lights. Use when a day/night cycle looks too dark or flat.
 
+## no
+- no-runtime-manager-gameobject - Use when the linter flags [RULE no-runtime-manager-gameobject] or code builds a manager/system with new GameObject + AddComponent at runtime: replace it with a scene-authored prefab reference.
+
 ## npc
 - npc-bots-and-enemies - Bots that act like other players plus enemy/boss AI for single-player clones: shared character systems, tiers, wander/chase, cheap pathing, population. Use when the reference is multiplayer or adding rivals/bosses.
 - npc-fake-multiplayer-pattern - Make a single-player game feel populated: NPC players using the same character stack, names, believable actions, shared-world effects, tuned so the real player is never starved. Use when faking other players.
@@ -485,7 +491,7 @@
 
 ## studio
 - studio-boss-quality-bar - Boss-level quality gate: judge every result harshly with superpowers skills, never accept mediocre art/feel/perf, replan and redo until excellent. Use before reporting done, when reviewing agent output, when a result looks average, or for any polish, juice, game feel task.
-- studio-hook-factory - Turn any manual reminder the owner repeats into automation: a studio_rules.json rule, a hook, an audit script or a loop, proven with a dry run. Use when the owner corrects you twice, says 'always / every time / I have to ask', or asks to automate the studio.
+- studio-hook-factory - Turn any manual reminder the owner repeats into automation: a data/studio_rules.json rule, a hook, an audit script or a loop, proven with a dry run. Use when the owner corrects you twice, says 'always / every time / I have to ask', or asks to automate the studio.
 - studio-loop-runbook - Run an autonomous multi-hour studio session: cron wake every minute, backlog file as the single source of truth, code-only subagents + main agent owns the Editor, compile/test/commit gates, no-op while agents run. Use when the owner is away and work must continue until a backlog is done.
 - studio-night-loop - Use when the owner leaves the agent running unattended (cron loop, asleep, cannot confirm permissions): how to run a per-minute director loop safely, split work with Codex by file ownership, keep hard limits, and stop only on evidence.
 - studio-non-negotiables - The short list of studio gates no agent may skip (verification, UI measurement, prefab-first, proof before delete, single Editor writer, no unrequested commit...), each with how it is enforced and what evidence proves it. Use at the start of every task (pre-flight) and before reporting done.

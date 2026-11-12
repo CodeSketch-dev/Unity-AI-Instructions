@@ -17,3 +17,9 @@ _unity-pilots/roblox-shader-kit-pilot/
 
 # skill-architect backups and adaptive runtime data are local only
 .skill-backups/
+
+# superpowers executor scratch (ledger, hashes, one-off scripts)
+.superpowers/
+
+# generated tool output
+outputs/

@@ -281,6 +281,8 @@ foreach ($p in $projects) {
   # Keep AI-managed files and tool junk out of git. Never touches the Unity project's own .gitignore.
   Ensure-ProjectIgnore $p
   Update-ManagedIgnore $p
+  # Lint-Triggered Skills: engine + PostToolUse hook, project-local (.claude/ is git-ignored above)
+  try { & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Repo 'tools\install_project_lint.ps1') -Repo $Repo -Project $p | Out-Null; if ($LASTEXITCODE -ne 0) { Write-Host '  lint install FAILED (exit code ' + $LASTEXITCODE + ')' -ForegroundColor Yellow } } catch { Write-Host ("  lint install failed: " + $_.Exception.Message) -ForegroundColor Yellow }
   Write-Host ("project synced: " + $p)
 }
 if (-not $projects) { Write-Host 'no Unity projects found next to the repo (add roots to projects.txt)' }

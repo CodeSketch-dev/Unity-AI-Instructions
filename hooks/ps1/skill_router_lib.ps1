@@ -5,7 +5,7 @@
 function Get-RoutedMatch([string]$text, [int]$max = 5) {
   $max = [Math]::Max(1, [Math]::Min($max, 5))
   $res = [pscustomobject]@{ strong = $false; names = @(); closest = ''; top = 0 }
-  $router = Join-Path $PSScriptRoot 'skill_router.json'
+  $router = Join-Path $PSScriptRoot 'skill_router.json'; if (-not (Test-Path -LiteralPath $router)) { $router = Join-Path $PSScriptRoot '..\..\data\skill_router.json' }
   if (-not (Test-Path -LiteralPath $router) -or [string]::IsNullOrWhiteSpace($text)) { return $res }
   try {
     $rj = Get-Content -Raw -LiteralPath $router | ConvertFrom-Json
@@ -50,7 +50,7 @@ function Get-RoutedSkills([string]$text, [int]$max = 10) {
 }
 
 function Get-RoutedSkillsLegacy([string]$text, [int]$max = 10) {
-  $router = Join-Path $PSScriptRoot 'skill_router.json'
+  $router = Join-Path $PSScriptRoot 'skill_router.json'; if (-not (Test-Path -LiteralPath $router)) { $router = Join-Path $PSScriptRoot '..\..\data\skill_router.json' }
   if (-not (Test-Path -LiteralPath $router) -or [string]::IsNullOrWhiteSpace($text)) { return @() }
   try {
     $rj = Get-Content -Raw -LiteralPath $router | ConvertFrom-Json

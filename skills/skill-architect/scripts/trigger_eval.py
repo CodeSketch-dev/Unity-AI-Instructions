@@ -13,7 +13,7 @@ import sys
 import unicodedata
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
-ROUTER = json.load(open(os.path.join(REPO, "skill_router.json"), encoding="utf-8"))
+ROUTER = json.load(open(os.path.join(REPO, "data", "skill_router.json"), encoding="utf-8"))
 
 
 def route(q):

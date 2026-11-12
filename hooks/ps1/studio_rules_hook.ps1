@@ -2,7 +2,7 @@
 # Rules live in studio_rules.json next to this script. ASCII only (PowerShell 5.1).
 # - UserPromptSubmit: strips diacritics from the owner's prompt, applies the rules, injects the matching texts, arms the retro gate (flag 'correction')
 #   and logs corrections to ~/.claude/studio_corrections.log; a correction that repeats an earlier one is escalated ("build a hook / audit, not prose").
-# - Stop: the retro gate. If a correction was detected this session and the skills repo (skills/, AGENTS.md, STUDIO-BRAIN-DIGEST.md, studio_rules.json)
+# - Stop: the retro gate. If a correction was detected this session and the skills repo (skills/, AGENTS.md, STUDIO-BRAIN-DIGEST.md, data/studio_rules.json)
 #   has neither a new commit nor uncommitted changes since the correction, finishing is blocked (max 2 times) so the lesson is written down.
 param([string]$Event = 'UserPromptSubmit')
 [Console]::InputEncoding = [Text.Encoding]::UTF8
@@ -11,7 +11,7 @@ $raw = [Console]::In.ReadToEnd()
 $j = $null
 try { $j = $raw | ConvertFrom-Json } catch { exit 0 }
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$rulesPath = Join-Path $here 'studio_rules.json'
+$rulesPath = Join-Path $here 'studio_rules.json'; if (-not (Test-Path -LiteralPath $rulesPath)) { $rulesPath = Join-Path $here '..\..\data\studio_rules.json' }
 if (-not (Test-Path -LiteralPath $rulesPath)) { exit 0 }
 $rules = (Get-Content -LiteralPath $rulesPath -Raw | ConvertFrom-Json).rules
 
@@ -26,7 +26,7 @@ $repo = ''
 $repoFile = Join-Path $here 'studio_repo.txt'
 if (Test-Path -LiteralPath $repoFile) { $repo = (Get-Content -LiteralPath $repoFile -Raw).Trim() }
 function Get-RepoHead { if ($repo -and (Test-Path -LiteralPath $repo)) { try { (& git -C $repo rev-parse HEAD 2>$null | Select-Object -First 1) } catch { '' } } else { '' } }
-function Get-RepoDirty { if ($repo -and (Test-Path -LiteralPath $repo)) { try { @(& git -C $repo status --porcelain -- skills AGENTS.md STUDIO-BRAIN-DIGEST.md studio_rules.json 2>$null).Count } catch { 0 } } else { 0 } }
+function Get-RepoDirty { if ($repo -and (Test-Path -LiteralPath $repo)) { try { @(& git -C $repo status --porcelain -- skills AGENTS.md STUDIO-BRAIN-DIGEST.md data/studio_rules.json 2>$null).Count } catch { 0 } } else { 0 } }
 
 function Remove-Diacritics([string]$s) {
   $d = $s.Normalize([Text.NormalizationForm]::FormD)
@@ -79,7 +79,7 @@ if ($Event -eq 'Stop') {
   if ($state.blocks -ge 2) { $state.correction = $false; Save-State; exit 0 }
   $state.blocks = $state.blocks + 1
   Save-State
-  $reason = 'RETRO GATE: the owner corrected you or asked for a standing rule in this session, but the skills repo (Unity-AI-Instructions: skills/, AGENTS.md, STUDIO-BRAIN-DIGEST.md, studio_rules.json) has no new commit or change. Write the lesson into the matching generic skill / digest / audit rule, run publish.bat, then finish. If nothing reusable was learned, say so in one line.'
+  $reason = 'RETRO GATE: the owner corrected you or asked for a standing rule in this session, but the skills repo (Unity-AI-Instructions: skills/, AGENTS.md, STUDIO-BRAIN-DIGEST.md, data/studio_rules.json) has no new commit or change. Write the lesson into the matching generic skill / digest / audit rule, run publish.bat, then finish. If nothing reusable was learned, say so in one line.'
   (@{ decision = 'block'; reason = $reason } | ConvertTo-Json -Compress)
   exit 0
 }

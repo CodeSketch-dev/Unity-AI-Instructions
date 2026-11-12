@@ -73,14 +73,15 @@ if exist "%REPO%\skills" (
 
 rem ---- 3b. skill router data: every skill (also future ones) becomes auto-routable by the prompt hook
 where python >nul 2>&1
-if not errorlevel 1 if exist "%REPO%\tools\build_skill_router.py" python "%REPO%\tools\build_skill_router.py" "%REPO%\skills" "%REPO%\skill_router.json"
+if not errorlevel 1 if exist "%REPO%\tools\build_skill_router.py" python "%REPO%\tools\build_skill_router.py" "%REPO%\skills" "%REPO%\data\skill_router.json"
 
 rem ---- 4. pipeline agents, commands and hook scripts -> Claude only ------------------------
 if exist "%REPO%\agents" call :install_tree "%REPO%\agents" "%CLAUDE_HOME%\agents" "agents"
 if exist "%REPO%\commands" call :install_tree "%REPO%\commands" "%CLAUDE_HOME%\commands" "commands"
 if exist "%REPO%\hooks" call :install_tree "%REPO%\hooks" "%CLAUDE_HOME%\pipeline-hooks\hooks" "hook scripts"
-rem one file only: copying the whole repo with /E hung on locked tool profiles (packages\meshy-studio) with robocopy's default 1M retries
-if exist "%REPO%\ui_gate_reminder.ps1" robocopy "%REPO%" "%CLAUDE_HOME%\pipeline-hooks\hooks" ui_gate_reminder.ps1 /R:1 /W:1 /NFL /NDL /NJH /NJS /NP >nul
+rem installed layout stays FLAT (settings.json hook commands point at pipeline-hooks\hooks\<name>.ps1): flatten hooks\ps1 and data into it
+if exist "%REPO%\hooks\ps1" robocopy "%REPO%\hooks\ps1" "%CLAUDE_HOME%\pipeline-hooks\hooks" *.ps1 /R:1 /W:1 /NFL /NDL /NJH /NJS /NP >nul
+if exist "%REPO%\data" robocopy "%REPO%\data" "%CLAUDE_HOME%\pipeline-hooks\hooks" *.json /R:1 /W:1 /NFL /NDL /NJH /NJS /NP >nul
 
 rem ---- 5. user settings (hook + skill visibility) and all Unity projects -------------------
 set "NOPROFLAG="

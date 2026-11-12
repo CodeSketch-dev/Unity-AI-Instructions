@@ -11,3 +11,5 @@
 | OR-007 | 2026-11-12 | Confirmed: run sync into each Unity project so Claude and Codex both work (lint engine + hook must be installed per project) | sync / lint | OPEN | plan Task 4 per-project install |
 | OR-008 | 2026-11-12 | Lint must work the same way for Claude and Codex (shared, synced into projects) | lint | OPEN | plan Task 4 (--changed mode, identical messages test) |
 | OR-009 | 2026-11-12 | After sync, gitignore the synced files so nothing stray is pushed to the Unity project repo | git hygiene | OPEN | already covered by sync managed ignore block (/.claude/); plan Task 4 adds check-ignore verification |
+| OR-010 | 2026-11-12 | Restructure the AI instructions (the game studio brain) first and make them solid, THEN sync into the Unity projects | order of work | OPEN | plan order kept; no per-project sync until Task 8 verification (use /nopro before) |
+| OR-011 | 2026-11-12 | (found while building) tool-event rules in data/studio_rules.json (PreToolUse/PostToolUse) are never consumed by any hook: dead config; make real or delete | hygiene | OPEN | see ledger note Task 7 |

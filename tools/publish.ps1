@@ -13,9 +13,12 @@ Step 'lint, index, router'
 $py = (Get-Command python -ErrorAction SilentlyContinue)
 if ($py) {
   & python tools\skill_index.py skills | Set-Content -Encoding utf8 skills\INDEX.md
-  & python tools\build_skill_router.py skills skill_router.json
+  & python tools\build_skill_router.py skills data\skill_router.json
   $lint = & python tools\skill_lint.py skills 2>&1
   $lint | Select-Object -Last 3
+  # Standard gate: tidy repo layout + lint rule tests must pass before anything is committed or synced to projects
+  & python tools\publish_gate.py
+  if ($LASTEXITCODE -ne 0) { Write-Host 'PUBLISH BLOCKED: repo layout or lint tests failed (see above, read docs/REPO-LAYOUT.md)' -ForegroundColor Red; exit 1 }
 } else { Write-Host 'python not found: skipped lint/index/router (committed router/index are used)' -ForegroundColor Yellow }
 
 # 2. live locally first

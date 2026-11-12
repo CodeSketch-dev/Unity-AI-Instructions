@@ -1,0 +1,55 @@
+import os
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, ".."))
+
+import repo_layout_lint as rl  # noqa: E402
+
+
+def make_repo(files=(), dirs=()):
+    root = Path(tempfile.mkdtemp())
+    for d in dirs:
+        (root / d).mkdir(parents=True, exist_ok=True)
+    for f in files:
+        p = root / f
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("x", encoding="utf-8")
+    return root
+
+
+class LayoutLintTests(unittest.TestCase):
+    def test_clean_tree_passes(self):
+        root = make_repo(files=["AGENTS.md", "sync.bat", "skills/a/SKILL.md", "hooks/ps1/x.ps1", "data/skill_router.json"])
+        self.assertEqual(rl.check_layout(root), [])
+
+    def test_stray_ps1_at_root_is_flagged(self):
+        root = make_repo(files=["AGENTS.md", "stray_hook.ps1"])
+        msgs = rl.check_layout(root)
+        self.assertEqual(len(msgs), 1)
+        self.assertIn("stray_hook.ps1", msgs[0])
+        self.assertIn("docs/REPO-LAYOUT.md", msgs[0])
+
+    def test_unknown_root_dir_is_flagged(self):
+        root = make_repo(files=["AGENTS.md"], dirs=["random_stuff"])
+        self.assertTrue(any("random_stuff" in m for m in rl.check_layout(root)))
+
+    def test_json_data_must_live_in_data(self):
+        root = make_repo(files=["AGENTS.md", "skill_router.json"])
+        msgs = rl.check_layout(root)
+        self.assertTrue(any("skill_router.json" in m and "data/" in m for m in msgs))
+
+    def test_skill_folder_without_skill_md_is_flagged(self):
+        root = make_repo(files=["AGENTS.md", "skills/broken/notes.txt"])
+        self.assertTrue(any("skills/broken" in m for m in rl.check_layout(root)))
+
+    def test_dot_dirs_are_ignored(self):
+        root = make_repo(files=["AGENTS.md"], dirs=[".git", ".local", ".publish-backup"])
+        self.assertEqual(rl.check_layout(root), [])
+
+
+if __name__ == "__main__":
+    unittest.main()
