@@ -1,0 +1,18 @@
+{
+  "must_contain": [
+    "project's MCP configuration",
+    "Application\\.dataPath",
+    "Server-Sent Events",
+    "repository root",
+    "first complete JSON"
+  ],
+  "must_not_contain": [
+    "D:/GitProject/",
+    "C:/Unity/GitProject/"
+  ],
+  "triggers_any": [
+    "Unity MCP",
+    "project endpoint",
+    "sai project Unity"
+  ]
+}

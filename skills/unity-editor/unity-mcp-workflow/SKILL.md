@@ -1,6 +1,7 @@
 ---
 name: unity-mcp-workflow
-description: "Drive the Unity Editor through MCP safely: discover tools, inspect read-only first, edit prefab assets not scene overrides, batch, save, compile, read Console, screenshot, fallback. Use for any scene/prefab/asset/Play Mode/Console task."
+description: "Use when inspecting or changing Unity through MCP, especially when selecting the project endpoint, verifying project identity, handling MCP timeouts, or using scene/prefab/asset/Play Mode/Console tools."
+triggers: Unity MCP, editor MCP, project endpoint, MCP URL, wrong Unity project, Application.dataPath, MCP SSE timeout, MCP hangs, project identity, du lieu path Unity, sai project Unity, ket noi MCP
 ---
 
 # Unity MCP workflow
@@ -11,6 +12,12 @@ MCP is the only way to know the real Editor state. File edits do not prove that 
 1. List the available Unity MCP tools and check connection status; prefer the team's default server (ivanmurzak) and do not mix servers for one operation. Never invent a tool name.
 2. Read `Application.dataPath` through a read-only call FIRST and require the exact expected project path, then confirm the target scene. A connected global MCP endpoint can belong to another live Editor. Before ANY mutation, including stop/start Play, compare the returned path; mismatch means no mutation. Prefer the project-scoped endpoint from the project's MCP config over a global endpoint, and revalidate identity after reconnect.
 3. Read the Console first to know the baseline errors. Record the latest sequence/timestamp and classify existing entries as baseline before any mutation; never clear the Console before preserving that baseline.
+
+## Portable endpoint and response handling
+- Resolve the MCP endpoint from the current project's MCP configuration, with an explicit override only for isolated tests. Do not hard-code a machine-local host, port, project ID, or report path.
+- Before any `tools/call` other than the identity check, execute a read-only script that logs an identity marker with `Application.dataPath` and throws unless the normalized path matches the intended project. Fail closed on a mismatch, script error, or unexpected success response; repeat the check after reconnecting.
+- Derive report destinations from the current project/repository root. Do not write to an absolute path from another machine.
+- HTTP MCP may return a long-lived Server-Sent Events stream. Parse the first complete JSON `data:` event instead of waiting for response EOF. Tests should mock the real response envelope, including session headers and structured tool results.
 
 ## Stale-state guard
 Before any MCP mutation or save of a scene/prefab, run `workspace_guard.py check` (skill `multi-agent-coexistence`): if the file changed on disk since you read it, reload it in the Editor first, otherwise the save overwrites the other agent's work.
