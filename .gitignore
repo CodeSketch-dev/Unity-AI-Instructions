@@ -23,3 +23,11 @@ _unity-pilots/roblox-shader-kit-pilot/
 
 # generated tool output
 outputs/
+
+# lint hit log (written by run_lint.py, local only)
+hits.jsonl
+tools/harness/__pycache__/
+
+# harness runtime files (locks and baselines are local; progress.jsonl/md stay tracked as shared memory)
+docs/log/harness/locks/
+docs/log/harness/baselines/

@@ -1,0 +1,57 @@
+{
+  "read-only": {
+    "claude": {
+      "permission_mode": "default",
+      "allowed": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "disallowed": [
+        "Edit",
+        "Write",
+        "Bash",
+        "WebFetch"
+      ],
+      "max_turns": 15
+    },
+    "codex": {
+      "sandbox": "read-only"
+    }
+  },
+  "repo-edit": {
+    "claude": {
+      "permission_mode": "acceptEdits",
+      "allowed": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Edit",
+        "Write",
+        "Bash(git status:*)",
+        "Bash(git diff:*)",
+        "Bash(git log:*)",
+        "Bash(ls:*)",
+        "Bash(python tools/:*)",
+        "Bash(python -m pytest:*)"
+      ],
+      "disallowed": [
+        "Bash(git push:*)",
+        "Bash(git commit:*)",
+        "Bash(git reset:*)",
+        "Bash(git checkout:*)",
+        "Bash(git clean:*)",
+        "Bash(git stash:*)",
+        "Bash(rm:*)",
+        "Bash(del:*)",
+        "Bash(curl:*)",
+        "Bash(powershell:*)",
+        "Bash(python -c:*)"
+      ],
+      "max_turns": 40
+    },
+    "codex": {
+      "sandbox": "workspace-write"
+    }
+  }
+}

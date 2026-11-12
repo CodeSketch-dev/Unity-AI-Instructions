@@ -55,3 +55,15 @@ class PytestMissingTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("pip install pytest", report)
         self.assertNotIn("lint tests failed", report)
+
+
+class HarnessGateTests(unittest.TestCase):
+    def test_failing_harness_test_blocks_publish(self):
+        root = Path(tempfile.mkdtemp())
+        (root / "AGENTS.md").write_text("x")
+        t = root / "tools" / "tests"
+        t.mkdir(parents=True)
+        (t / "test_harness_bad.py").write_text("def test_x():\n    assert False\n")
+        ok, report = pg.check_gate(root, run_tests=True)
+        self.assertFalse(ok)
+        self.assertIn("tests failed", report)

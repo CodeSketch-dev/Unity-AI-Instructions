@@ -38,6 +38,24 @@ def hook_files():
     return [p] if p and p.endswith(".cs") else []
 
 
+def log_hits(violations):
+    """Append one JSON line per violation (rule frequency feeds the harness miner). Size-capped; never raises."""
+    if not violations:
+        return
+    try:
+        import json
+        import time
+        path = os.environ.get("STUDIO_LINT_HITS") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "hits.jsonl")
+        cap = int(os.environ.get("STUDIO_LINT_HITS_MAX", "524288"))
+        if os.path.isfile(path) and os.path.getsize(path) >= cap:
+            return
+        with open(path, "a", encoding="utf-8", newline="\n") as fh:
+            for v in violations:
+                fh.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "file": v.path, "rule": v.rule_id}) + "\n")
+    except Exception:
+        pass
+
+
 def main(argv):
     try:
         if hasattr(sys.stderr, "reconfigure"):
@@ -55,6 +73,7 @@ def main(argv):
                 bad.extend(engine.lint_text(f, fh.read()))
         for v in bad:
             sys.stderr.write("%s:%d: %s\n" % (v.path, v.line, v.message))
+        log_hits(bad)
         return 2 if bad else 0
     except Exception as e:  # engine bug must not block the agent
         sys.stderr.write("lint engine error (ignored): %r\n" % (e,))

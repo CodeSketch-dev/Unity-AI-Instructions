@@ -12,7 +12,7 @@ $cl = Join-Path $Project '.claude'
 $dst = Join-Path $cl 'lint'
 if (-not (Test-Path -LiteralPath $src)) { Write-Host 'lint source missing'; exit 1 }
 New-Item -ItemType Directory -Force -Path $dst | Out-Null
-& robocopy $src $dst /MIR /XD tests __pycache__ /R:1 /W:1 /NFL /NDL /NJH /NJS /NP | Out-Null
+& robocopy $src $dst /MIR /XD tests __pycache__ /XF hits.jsonl /R:1 /W:1 /NFL /NDL /NJH /NJS /NP | Out-Null
 if ($LASTEXITCODE -ge 8) { Write-Host 'robocopy failed'; exit 1 }
 
 $settingsPath = Join-Path $cl 'settings.local.json'

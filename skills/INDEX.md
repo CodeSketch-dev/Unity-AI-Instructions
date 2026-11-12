@@ -497,6 +497,7 @@
 
 ## studio
 - studio-boss-quality-bar - Boss-level quality gate: judge every result harshly with superpowers skills, never accept mediocre art/feel/perf, replan and redo until excellent. Use before reporting done, when reviewing agent output, when a result looks average, or for any polish, juice, game feel task.
+- studio-harness - Use when running or extending unattended agent work: pick a backlog task, run it through the harness (limits, scope check, verifiers), read or update the progress file, or feed repeated failures into new skills and lint rules.
 - studio-hook-factory - Turn any manual reminder the owner repeats into automation: a data/studio_rules.json rule, a hook, an audit script or a loop, proven with a dry run. Use when the owner corrects you twice, says 'always / every time / I have to ask', or asks to automate the studio.
 - studio-loop-runbook - Run an autonomous multi-hour studio session: cron wake every minute, backlog file as the single source of truth, code-only subagents + main agent owns the Editor, compile/test/commit gates, no-op while agents run. Use when the owner is away and work must continue until a backlog is done.
 - studio-night-loop - Use when the owner leaves the agent running unattended (cron loop, asleep, cannot confirm permissions): how to run a per-minute director loop safely, split work with Codex by file ownership, keep hard limits, and stop only on evidence.

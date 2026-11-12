@@ -19,15 +19,16 @@ def check_gate(repo, run_tests=True):
     msgs = repo_layout_lint.check_layout(repo)
     report.extend(msgs)
     ok = not msgs
-    tests = repo / "tools" / "lint" / "tests"
-    if run_tests and tests.is_dir() and _pytest_missing():
+    targets = [str(p) for p in [repo / "tools" / "lint" / "tests"] if p.is_dir()]
+    targets += [str(p) for p in sorted((repo / "tools" / "tests").glob("test_harness_*.py"))]
+    if run_tests and targets and _pytest_missing():
         ok = False
-        report.append("[GATE] pytest is not installed on this machine, so the lint tests cannot run: pip install pytest, then publish again.")
-    elif run_tests and tests.is_dir():
-        r = subprocess.run([sys.executable, "-m", "pytest", str(tests), "-q", "-p", "no:cacheprovider"], capture_output=True, text=True, cwd=str(repo))
+        report.append("[GATE] pytest is not installed on this machine, so the lint and harness tests cannot run: pip install pytest, then publish again.")
+    elif run_tests and targets:
+        r = subprocess.run([sys.executable, "-m", "pytest", *targets, "-q", "-p", "no:cacheprovider"], capture_output=True, text=True, cwd=str(repo))
         if r.returncode != 0:
             ok = False
-            report.append("[GATE] lint tests failed (python -m pytest tools/lint/tests -q); fix the rule or its fixtures before publishing.\n" + r.stdout[-800:])
+            report.append("[GATE] lint tests and harness tests failed (python -m pytest tools/lint/tests tools/tests/test_harness_*.py -q); fix the rule, harness code or fixtures before publishing.\n" + r.stdout[-800:])
     return ok, "\n".join(report)
 
 

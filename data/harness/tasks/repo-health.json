@@ -1,0 +1,32 @@
+{
+  "id": "repo-health",
+  "kind": "work",
+  "title": "Count the skills and groups in this repo and write a health report",
+  "brief": "Count how many skill folders exist under skills/ (a skill is a folder holding SKILL.md, found at skills/<group>/<skill>) and how many groups there are. Write a short markdown report to docs/log/harness/repo-health.md with the exact total number of skills and the number of groups. Use read-only commands to count; do not guess.",
+  "owns": [
+    "docs/log/harness/repo-health.md"
+  ],
+  "permission": "repo-edit",
+  "max_attempts": 2,
+  "verify": [
+    {
+      "name": "report-has-the-true-skill-count",
+      "cmd": [
+        "python",
+        "-c",
+        "import pathlib,re,sys; sys.path.insert(0,'tools/skillkit'); import skill_paths; n=len(list(skill_paths.iter_skills('skills'))); t=pathlib.Path('docs/log/harness/repo-health.md').read_text(encoding='utf-8'); sys.exit(0 if re.search(r'(?<!\\d)%d(?!\\d)' % n, t) else 1)"
+      ],
+      "timeout": 60
+    },
+    {
+      "name": "skill-lint",
+      "cmd": [
+        "python",
+        "tools/skillkit/skill_lint.py",
+        "skills"
+      ],
+      "timeout": 120
+    }
+  ],
+  "agent_timeout": 300
+}

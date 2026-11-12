@@ -9,19 +9,20 @@ AGENTS.md  README.txt  STUDIO-BRAIN-DIGEST.md  publish.bat  sync.bat      (root 
 skills/<group>/<skill>/   308 skills in 10 groups (ui, gameplay, studio-process, unity-editor, world-art, perf-build, clone-reference, economy-monetization, qa-testing, general); installs FLAT into Claude, Codex and projects
 agents/ commands/   Claude plugin definitions (loaded one level deep)
 hooks/       hooks.json + scripts/ (plugin, do not move) + ps1/ (PowerShell hook scripts)
-data/        skill_router.json (generated), studio_rules.json, projects.txt, skill-overrides.snippet.json, templates/
+data/        skill_router.json (generated), studio_rules.json, projects.txt, skill-overrides.snippet.json, templates/, harness/ (permissions.json, tasks/)
 tools/
   publish/   publish.ps1, publish_gate.py, repo_layout_lint.py
   sync/      sync_claude_setup.ps1, install_project_lint.ps1, install_hooks.py
   skillkit/  new_skill.py, skill_paths.py, skill_lint.py, skill_index.py, build_skill_router.py, skill_loop.py, skill_budget.py, hubs.txt
   lint/      Lint-Triggered Skills engine: engine.py, run_lint.py, rules/, tests/
   evals/     triggers/ (one case per skill), skill-architect/, skill-specs/, adaptive/
+  harness/   unattended-work runner: tasks, progress, scope, verify, agents, miner, cli
   adaptive/  adaptive-task-intelligence tooling
   packages/  self-contained helper apps
   tests/     pytest suite for the repo tooling (flat on purpose)
 docs/
   owner-requests.md  feedback-notes.md  agent-handoff.md  REPO-LAYOUT.md   (conventional ledgers + this file)
-  guides/ log/ catalog/ research/ skill-scenarios/<group>/ superpowers/{plans,specs}/
+  guides/ log/ (harness/progress.jsonl) catalog/ research/ skill-scenarios/<group>/ superpowers/{plans,specs}/
 ```
 
 ## Where things go
