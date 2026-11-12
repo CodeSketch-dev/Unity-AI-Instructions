@@ -8,6 +8,7 @@ description: "Find why imported or cloned models look worse than in the referenc
 Fix only the divergent path; do not re-author materials blindly.
 
 1. **Same inputs?** Compare material asset, shader, keywords and every texture by GUID/hash with the reference (`asset-transfer-closure`). Different import settings (sRGB flag, compression) count.
+   Inspect shader source for `DummyShaderTextExporter` across all imported paths, including lowercase `Resources/shaders`. Keep dummy exports outside active Assets/Packages. `Shader.Find` can select a broken duplicate with the same name: bind the verified shader asset path and read back material.shader. Serialized material values cannot reconstruct missing Shader Graph math; glyph quads, a gray palette or flattened depth require shader-path and color-space checks plus a fresh Play capture.
 2. **Per-renderer MaterialPropertyBlock**: the reference may always write a block (colour, tint); a renderer with no block, or a cleared one, exposes the raw texture/overlay and looks different. Write the same block on the same path, or compare `GetPropertyBlock` dumps of both.
 3. **Vertex colours**: check the colour-space pairing (mesh vertex colours linear vs sRGB; shader converts once). Double conversion looks washed out or too dark: bake once (`vertex-color-baking`).
 4. **Lighting parity**: compare ambient mode/colour, fog, directional light, shadow settings, post volume and Color Space between projects before blaming the material.
