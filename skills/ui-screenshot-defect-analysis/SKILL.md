@@ -1,6 +1,6 @@
 ---
 name: ui-screenshot-defect-analysis
-description: Use whenever the owner sends a UI screenshot or says something looks wrong/ugly/dirty: produce a numbered defect table from the image BEFORE touching code (overlap, padding, alignment, missing text, outline family, words-vs-icons, clipping, contrast), fix every row, re-capture, compare.
+description: "Use whenever the owner sends a UI screenshot or says something looks wrong/ugly/dirty: produce a numbered defect table from the image BEFORE touching code (overlap, padding, alignment, missing text, outline family, words-vs-icons, clipping, contrast), fix every row, re-capture, compare."
 triggers: screenshot, anh chup, nhin xau, ban mat, lech, de len nhau, mat text, khong align, padding, ui xau, senior review, defect table, sai o dau
 ---
 # Screenshot defect analysis (owner 2026-11-10: "I sent you the picture and you still do not know what is wrong")

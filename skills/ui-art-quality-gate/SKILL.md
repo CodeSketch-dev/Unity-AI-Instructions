@@ -1,6 +1,6 @@
 ---
 name: ui-art-quality-gate
-description: Use when generating, replacing or reviewing UI sprites (buttons, boards, tags, icons) with an image model or script: strict art-director review checklist, measurable pass criteria, the pipeline that produced smooth uniform-outline 9-slice buttons, and the traps that cost hours.
+description: "Use when generating, replacing or reviewing UI sprites (buttons, boards, tags, icons) with an image model or script: strict art-director review checklist, measurable pass criteria, the pipeline that produced smooth uniform-outline 9-slice buttons, and the traps that cost hours."
 triggers: ui art, button sprite, 9 slice, outline, texture quality, codex image gen, blurry button, rang cua, vien deu, bo goc, nut, texture ui, art director review
 ---
 # UI art quality gate (owner-approved conclusions, 2026-11-10)

@@ -1,6 +1,6 @@
 ---
 name: ui-sprite-audit
-description: Use before importing ANY generated or edited UI sprite: run sprite_audit.py (outline uniformity/thickness, exact rounded rectangle, corner cap, size cap, clipping, magenta fringe) and reject on FAIL; a hook-style gate so bad Codex art never reaches the game.
+description: "Use before importing ANY generated or edited UI sprite: run sprite_audit.py (outline uniformity/thickness, exact rounded rectangle, corner cap, size cap, clipping, magenta fringe) and reject on FAIL; a hook-style gate so bad Codex art never reaches the game."
 triggers: sprite audit, kiem tra sprite, outline deu, bo goc, 9 slice, texture ui, button sprite, codex art, image gen, vien mong, rang cua
 ---
 # UI sprite audit (run before import, every batch)

@@ -1,6 +1,6 @@
 ---
 name: codex-ui-sprite-brief
-description: Use when asking Codex (or any image model) to generate UI sprites: the ready brief template with the binding quality rules (image_generation only, constant outline, rounded rect, corner-cap 9-slice, size cap, no clipping, name-colour match) and the acceptance loop with sprite_audit.py.
+description: "Use when asking Codex (or any image model) to generate UI sprites: the ready brief template with the binding quality rules (image_generation only, constant outline, rounded rect, corner-cap 9-slice, size cap, no clipping, name-colour match) and the acceptance loop with sprite_audit.py."
 triggers: codex gen, gen art, generate sprite, image generation, brief codex, texture ui, button icon art, tao anh ui, gen texture
 ---
 # Brief template (paste, fill the list)

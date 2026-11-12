@@ -1,6 +1,6 @@
 ---
 name: ui-popup-build-checklist
-description: Use when building or restyling ANY popup, modal, list popup or its buttons: copy the reference prefab (compact, not a full page), original Knife Tower button sprites and colour roles, BIG text, lit-face centring measured by a Play test, baked-sprite trap. Run it before the first edit.
+description: "Use when building or restyling ANY popup, modal, list popup or its buttons: copy the reference prefab (compact, not a full page), original Knife Tower button sprites and colour roles, BIG text, lit-face centring measured by a Play test, baked-sprite trap. Run it before the first edit."
 triggers: popup, modal, list popup, cage popup, button style, knife tower button, text too small, icon not centred, nut lech style, popup nho, chu be, icon lech, can giua, giong knife tower, giong sae
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: tmp-shader-alpha-clip-fix
-description: Use for ANY TextMeshPro work (new project, package update, text looks smeared/dark behind glyphs, outline artefacts): patch the TMP SDF shaders' alpha clip line, guard it with a test, and follow the careful-TMP checklist.
+description: "Use for ANY TextMeshPro work (new project, package update, text looks smeared/dark behind glyphs, outline artefacts): patch the TMP SDF shaders' alpha clip line, guard it with a test, and follow the careful-TMP checklist."
 triggers: textmeshpro, tmp, text mesh pro, alpha clip, clip shader, vet den sau chu, text bi den, outline text, tmp shader, font sdf, chu mo
 ---
 # TextMeshPro: careful checklist (owner 2026-11-10)

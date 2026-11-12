@@ -9,7 +9,7 @@ MCP is the only way to know the real Editor state. File edits do not prove that 
 
 ## Session start
 1. List the available Unity MCP tools and check connection status; prefer the team's default server (ivanmurzak) and do not mix servers for one operation. Never invent a tool name.
-2. Confirm the Editor has the intended project and scene open (name/path) before touching anything.
+2. Read `Application.dataPath` through a read-only call FIRST and require the exact expected project path, then confirm the target scene. A connected global MCP endpoint can belong to another live Editor. Before ANY mutation, including stop/start Play, compare the returned path; mismatch means no mutation. Prefer the project-scoped endpoint from the project's MCP config over a global endpoint, and revalidate identity after reconnect.
 3. Read the Console first to know the baseline errors. Record the latest sequence/timestamp and classify existing entries as baseline before any mutation; never clear the Console before preserving that baseline.
 
 ## Stale-state guard

@@ -1,6 +1,6 @@
 ---
 name: ui-icon-outline-bake
-description: Use when UI icons look thin/inconsistent next to the plates: bake one thick uniform navy outline into every icon PNG (idempotent ledger, layouts do not move, generated C# skip-list for any runtime outline ring).
+description: "Use when UI icons look thin/inconsistent next to the plates: bake one thick uniform navy outline into every icon PNG (idempotent ledger, layouts do not move, generated C# skip-list for any runtime outline ring)."
 triggers: icon outline, vien icon, outline icon, icon mong, bake outline, icon dong bo, outline dong nhat
 ---
 # Bake a uniform outline into icons
