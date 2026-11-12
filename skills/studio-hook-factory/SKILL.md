@@ -32,3 +32,8 @@ Rule of the house: **a reminder that had to be typed twice becomes a mechanism, 
 
 ## Toward a fully automatic studio (roadmap the director keeps advancing)
 Intake (owner message -> ledger row, automatic) -> plan (superpowers, automatic) -> parallel delegation with owned files (Codex / subagents) -> compile + bake + Play capture -> audits (layout, ink, text M/D/X, press sweep, lit-face scan) -> review -> commit/push -> retro (skills upgraded by the Stop gate). Every manual step the owner still performs is a backlog item for this skill.
+
+## Moving or restructuring hook files (trap, learned 2026-11-12)
+- Installed `settings.json` hooks point at the FLAT folder `%USERPROFILE%\.claude\pipeline-hooks\hooks\<name>.ps1` (and read `skill_router.json` / `studio_rules.json` next to the script via `$PSScriptRoot`). Repo-side moves must keep that installed layout: have `sync.bat` copy the moved scripts and data files flat into it, then parse-check. Never move a hook file and assume the installed copy follows.
+- `hooks/hooks.json` + `hooks/scripts/` is a Claude plugin (`${CLAUDE_PLUGIN_ROOT}` paths): do not rename it.
+- Before moving: snapshot installed file hashes and the `settings.json` hook command list; after: run sync, pipe a sample prompt into the installed hook, compare test pass/skip counts.
