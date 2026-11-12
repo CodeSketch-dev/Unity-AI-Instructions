@@ -306,6 +306,7 @@
 - night-lighting-mobile - Readable, pretty night for mobile scenes: moonlit ambient and fog, sun kept above horizon at low intensity, fake glow lights, tier-gated fireflies, no extra realtime lights. Use when a day/night cycle looks too dark or flat.
 
 ## no
+- no-find-in-update - Use when a C# file with Update, FixedUpdate or LateUpdate calls FindObjectOfType, FindObjectsOfType, FindFirstObjectByType, FindAnyObjectByType or GameObject.Find: cache the reference once, never scan the scene per frame (low-end Android hitch).
 - no-runtime-manager-gameobject - Use when the linter flags [RULE no-runtime-manager-gameobject] or code builds a manager/system with new GameObject + AddComponent at runtime: replace it with a scene-authored prefab reference.
 
 ## npc
