@@ -65,6 +65,12 @@
       "event": "UserPromptSubmit",
       "match": "knife tower|speed keyboard|speedkeyboard|giong y chang|100% nhu|che linh tinh|ref chuan|nhu knife",
       "inject": "NO INVENTION: Knife Tower Speed Keyboard is the owner's hand-written 100% reference (code style, structure, UI). Read its prefab YAML/scripts directly (read-only), list EVERY KT element (sprites, fonts, sizes, positions, which screen holds which button, e.g. Shop/Skins entry), reproduce exactly, add and move nothing. Your report MUST contain a KT-vs-ours element diff table and a Play capture next to the KT reference; otherwise REWORK. Skill: ui-exact-clone-workflow (NO-INVENTION LAW)."
+    },
+    {
+      "id": "landscape_only",
+      "event": "UserPromptSubmit",
+      "match": "man ngang|man doc|portrait|landscape|orientation|xoay man",
+      "inject": "ORIENTATION RULE: read the project's orientation (AGENTS.md / ProjectSettings) first. Glass Together is LANDSCAPE ONLY: never design, build, capture or QA portrait layouts; use 16:9, 19.5:9, 20:9. If a tool or builder would set portrait, stop and fix it. Guard: EditMode test Orientation_Landscape_Tests."
     }
   ]
 }
