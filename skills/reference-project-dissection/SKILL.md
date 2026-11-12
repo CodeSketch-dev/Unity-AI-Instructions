@@ -35,3 +35,5 @@ Whenever the owner names a project, pack, SDK or minigame to learn from (Break a
 ## Recover unreadable serialized assets
 
 For ripped ScriptableObjects with missing scripts, restore only inert Editor-only data schemas first: original MonoScript GUIDs, type/field names, enum integers and serialized private fields. Read dependency metadata without executing ripped SDK assemblies. Compare native loaded values and object-reference GUIDs against raw serialized data and hash source assets before/after. Successful type binding does not recover stripped methods or absent graph payloads; defaults introduced by a schema are not recovered values. Do not bulk-import SDK/runtime code merely to inspect data.
+
+Shared serialized fields do not establish a component subtype. Resolve the original MonoScript identity before rebuilding layout groups; preserve horizontal/vertical direction, padding and child-control flags. Verify the opened menu, since a closed panel can conceal a wrong layout axis. A source-data type audit is required; field-name regexes alone cannot establish the orientation.
