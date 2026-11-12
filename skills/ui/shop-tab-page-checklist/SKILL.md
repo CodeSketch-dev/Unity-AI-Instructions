@@ -23,3 +23,9 @@ Check these BEFORE reporting a shop done; verify in Play with a real screenshot,
 ## Card tag chips (BEST VALUE / MOST POPULAR / SALE): keep clear of hero art and title
 - A tag pinned to the card's top-left must not cover the hero icon (icon top usually ~90 px below the card top) nor the centred title. Use the header-band slot: top ~40 px, height ~44, max width ~150 (autofit shrinks the text), tilt ~6 deg. Verify on the card with the LONGEST tag text and the SHORTEST title; a gap under ~8 px to the title is the limit.
 - Pure layout maths (rect for tag and sticker) lives in one math class with a test that bounds the width; change constants there, not per card, and re-capture the page in Play (the Editor shows store prices as N/A, that is expected without a store).
+
+## One secondary route per card (owner rule, 2026-11-13)
+- A card is sold with cash and/or ONE secondary route: gems XOR reward ads, never both on the same card.
+- Reward-only item: ONE long reward CTA (ad icon + "watched/needed"); its tap plays the ad. Gem-only item: ONE long gem CTA (always yellow + tappable, red price when short, tap opens the gem top-up).
+- Cash + reward: both on the CTA row as two halves (reward left, cash right); when the reward is unavailable the cash CTA takes the full row.
+- Value lines are centred in the gap between the hero icon and the button row, never stuck to either.
