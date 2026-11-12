@@ -1,0 +1,14 @@
+{
+  "must_contain": [
+    "exact workload and source hash",
+    "cache.{0,20}delegates",
+    "reflection out of the per.sample path",
+    "case once per Editor update",
+    "Time.frameCount.{0,50}(may not|does not).{0,30}(advance|change)",
+    "warm.up",
+    "median.{0,50}P95.{0,50}max",
+    "outliers",
+    "isolated CPU.{0,80}(scene|GPU|device FPS)"
+  ],
+  "triggers_any": ["microbenchmark", "Editor benchmark", "P95", "Time.frameCount"]
+}

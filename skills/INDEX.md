@@ -362,7 +362,7 @@
 - procedural-stud-shader-recipes - Shader recipes for procedural brick/stud and bevel surface layers, vertex-colour glow and saturation boosts, SRP Batcher safe. Use when giving models a Lego or toy-brick look with a shader instead of geometry.
 
 ## profiling
-- profiling-evidence - Rules and report format for claiming a performance change with evidence (what was measured, where, before and after). Use before reporting any FPS, draw-call, GC or memory improvement.
+- profiling-evidence - Rules and report format for claiming a performance change with evidence (what was measured, where, before and after). Use before reporting any FPS, draw-call, GC or memory improvement, including Editor microbenchmarks.
 
 ## project
 - project-auditor-triage - Run Unity Project Auditor and fix its findings in reviewable batches with a smoke test and step-by-step commits. Use when asked for a project audit, static analysis cleanup, settings diagnostics or a pre-release health pass.
