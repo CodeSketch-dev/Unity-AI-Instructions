@@ -17,6 +17,8 @@
 - Hook `.ps1` files are ASCII only (PowerShell 5.1); `sync_claude_setup.ps1` parse-checks them.
 - Skill folder names are not renamed (305 folders, referenced by name everywhere).
 - English for all files. No commits to Unity projects from this repo. No `git reset --hard`/clean. Publish only via `publish.bat`.
+- Lint messages name the skill path as it exists INSIDE the target Unity project: `.claude/skills/<name>/SKILL.md` (sync installs skills there; Codex reads the same file via its terminal tool). Never a repo-relative `skills/...` path in a message. One engine, one message format for Claude Code and Codex: no per-platform config.
+- Zero startup context: lint skills are NOT added to always-on text (AGENTS.md, digest). Only the linter output loads them, at the moment of violation. Rule messages stay under ~300 chars.
 - `skills/INDEX.md`, `skill_router.json` are generated files; never hand-edit.
 
 ## Review Focus
@@ -71,7 +73,7 @@ lint/  engine.py  run_lint.py  rules/*.py  tests/
 **Files:** Create `lint/engine.py`, `lint/run_lint.py`, `lint/rules/__init__.py`, `lint/tests/test_engine.py`
 
 **Interfaces:**
-- Produces: `@dataclass Rule(id, pattern, why, skill, paths=("**/*.cs",), exclude=("**/Editor/**","**/Tests/**"))`; `lint_text(path: str, text: str) -> list[Violation]`; message format `[RULE <id>] <why> MANDATORY: read skills/<skill>/SKILL.md before fixing this line. (line N) Opt out only with // lint-ok:<id> <reason>`. CLI `run_lint.py <file>...` prints violations, exit 2 if any (hook contract), exit 0 on engine error.
+- Produces: `@dataclass Rule(id, pattern, why, skill, paths=("**/*.cs",), exclude=("**/Editor/**","**/Tests/**"))`; `lint_text(path: str, text: str) -> list[Violation]`; message format `[RULE <id>] <why> MANDATORY: read .claude/skills/<skill>/SKILL.md before fixing this line. (line N) Opt out only with // lint-ok:<id> <reason>`. CLI `run_lint.py <file>...` prints violations, exit 2 if any (hook contract), exit 0 on engine error.
 
 - [ ] **Step 1:** Failing tests: match yields message with skill path; `lint-ok:<id>` suppresses; excluded Editor path ignored; unknown file type ignored; engine exception returns 0.
 - [ ] **Step 2:** Run, expect FAIL. **Step 3:** Implement. **Step 4:** Run, expect PASS.
@@ -81,6 +83,8 @@ lint/  engine.py  run_lint.py  rules/*.py  tests/
 **Files:** Create `hooks/ps1/lint_on_edit.ps1`; Modify `tools/sync_claude_setup.ps1` (register `PostToolUse` matcher `Edit|Write|MultiEdit`, same pattern as the ink hook); `hooks/hooks.json` (plugin entry).
 
 **Interfaces:** Consumes `lint/run_lint.py`. Hook reads tool JSON from stdin, takes `tool_input.file_path`, runs lint on that one file, writes violations to stderr, exit 2.
+
+**Per-project install (owner confirmed: agents only work well after sync into the Unity project):** `sync_claude_setup.ps1` also copies `lint/` to `<project>\.claude\lint\` and writes the PostToolUse hook into the project's `.claude\settings.json` (idempotent, command uses a project-relative path so it survives other machines). Codex in that project runs `python .claude/lint/run_lint.py <file>` (documented in the project `.claude/ai-instructions.md` block and the hub preamble). Skills already land in `<project>\.claude\skills`, matching the message path.
 
 - [ ] **Step 1:** Test: pipe `{"tool_input":{"file_path":"<fixture .cs with new GameObject>"}}` to the hook, expect exit 2 and the micro-prompt on stderr; non-`.cs` file expect exit 0 and no output.
 - [ ] **Step 2:** Implement hook (ASCII, 5 s budget, `python` missing -> exit 0). **Step 3:** register in sync; run sync; expect `settings.json` contains exactly one lint hook entry (idempotent on second run).

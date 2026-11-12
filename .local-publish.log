@@ -1,0 +1,21 @@
+== lint, index, router
+skill_router.json: 303 skills, 75098 bytes
+WARN trigger-collision [ui-validator,unity-ui] descriptions share 1 phrase(s), e.g. 'part of the ui always set'
+WARN trigger-collision [ui-visual-qa,unity-ui] descriptions share 1 phrase(s), e.g. 'part of the ui always set'
+0 error(s), 129 warning(s)
+== sync.bat
+project synced: D:\GitProject\thunder-break-2\break-and-steal-unity
+  ignore block updated: D:\GitProject\pixel-smash\.gitignore
+project synced: D:\GitProject\pixel-smash\ReferenceSource~\PixelDemolish
+
+Sync complete: instructions + skills + agents/commands + UI-gate hook + Unity projects.
+Open a new session to reload.
+== commit
+warning: in the working copy of 'skills/studio-hook-factory/SKILL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/owner-requests.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/superpowers/plans/2026-11-12-repo-restructure-and-lint-triggered-skills.md', LF will be replaced by CRLF the next time Git touches it
+committed: Document hook-restructure install-path trap; add restructure plan and request ledger; foundation no
+== pull
+ahead=1 behind=0
+== push
+pushed
