@@ -12,16 +12,17 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import skill_paths  # noqa: E402
+
 CHARS_PER_TOKEN = 4
 ENTRY_OVERHEAD = 4   # "- name: " plus newline
 
 
 def read_skills(skills_dir):
     out = {}
-    for d in sorted(os.listdir(skills_dir)):
-        p = os.path.join(skills_dir, d, "SKILL.md")
-        if not os.path.isfile(p):
-            continue
+    for d, sdir in skill_paths.iter_skills(skills_dir):
+        p = os.path.join(sdir, "SKILL.md")
         with open(p, encoding="utf-8") as f:
             m = re.search(r"^description:\s*(.+)$", f.read(), re.M)
         out[d] = len(m.group(1).strip()) if m else 0

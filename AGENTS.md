@@ -141,7 +141,7 @@ Goal: the studio gets faster, cheaper (fewer tokens) and better with every task;
 - **Quality gates stay**: never skip verification (compiled, Play-tested, measured) to save tokens; save tokens by reusing skills, narrow searches, compact outputs and batched calls.
 
 ### Repo layout and lint-triggered skills (always on, every agent: Claude Code and Codex)
-- This repo has a fixed layout (`docs/REPO-LAYOUT.md`): skills in `skills/`, hook scripts in `hooks/ps1/`, hook data in `data/`, lint rules in `tools/lint/rules/`. Put new files where that table says; `publish.bat` is blocked by `tools/publish/publish_gate.py` when the root is messy or `tools/lint/tests` fail.
+- This repo has a fixed layout (`docs/REPO-LAYOUT.md`): skills in `skills/<group>/<name>/` (create with `python tools/skillkit/new_skill.py`; installs stay flat), hook scripts in `hooks/ps1/`, hook data in `data/`, lint rules in `tools/lint/rules/`. Put new files where that table says; `publish.bat` is blocked by `tools/publish/publish_gate.py` when the root is messy or `tools/lint/tests` fail.
 - A code anti-pattern a regex can catch is not saved as prose: use skill `capture-pattern-with-lint` (short skill + `tools/lint/rules/<name>.py` whose message names `.claude/skills/<name>/SKILL.md` + fixtures/test + publish). Synced Unity projects get the linter in `.claude/lint/`: Claude Code is hooked per edit (PostToolUse); Codex runs `python .claude/lint/run_lint.py --changed` before reporting done. On a `[RULE <id>]` message, read the named skill first, then fix; opt out only with `// lint-ok:<id> <reason>`.
 
 ### Graphify and skill auto-load (always on)

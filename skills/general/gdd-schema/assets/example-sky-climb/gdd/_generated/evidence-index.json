@@ -1,0 +1,35 @@
+{
+ "schema": 1,
+ "root": ".",
+ "files": [
+  "00-index.md",
+  "assets/assets.csv",
+  "assets/style.md",
+  "captures/index.md",
+  "decisions.md",
+  "economy/prices.csv",
+  "glossary.md",
+  "qa/golden-path.md",
+  "systems/S-01-character.md",
+  "systems/S-02-camera.md",
+  "systems/S-03-input.md",
+  "systems/S-04-world.md",
+  "systems/S-05-interactables.md",
+  "systems/S-06-economy.md",
+  "systems/S-07-skin-shop.md",
+  "systems/S-08-monetization.md",
+  "systems/S-09-tutorial.md",
+  "systems/S-10-audio.md",
+  "systems/S-11-vfx.md",
+  "systems/S-12-retention.md",
+  "ui/UI-00-hud.md",
+  "ui/UI-10-skin-shop.md",
+  "ui/UI-11-revive.md",
+  "ui/UI-12-settings.md"
+ ],
+ "images": [],
+ "image_count": 0,
+ "unknowns": [
+  "no reference images found; visual fidelity is unverified"
+ ]
+}

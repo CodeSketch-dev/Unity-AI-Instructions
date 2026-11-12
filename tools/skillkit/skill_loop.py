@@ -20,6 +20,12 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import skill_lint  # noqa: E402
+import skill_paths  # noqa: E402
+
+
+def sdir(skills_dir, name):
+    """Skill folder by name in the grouped or the flat layout."""
+    return skill_paths.skill_dir(skills_dir, name) or os.path.join(skills_dir, name)
 
 
 def spec_path(skills_dir, name):
@@ -53,7 +59,7 @@ def spec_failures(text, fm, spec):
 
 
 def score(skills_dir, name):
-    path = os.path.join(skills_dir, name, "SKILL.md")
+    path = os.path.join(sdir(skills_dir, name), "SKILL.md")
     if not os.path.isfile(path):
         return {"skill": name, "score": 0, "errors": ["SKILL.md missing"], "warnings": [], "spec": []}
     findings = [f for f in skill_lint.lint_dir(skills_dir) if name in f.skill.split(",")]
@@ -74,7 +80,7 @@ def base_dir(skills_dir, name):
 def snapshot(skills_dir, name):
     d = base_dir(skills_dir, name)
     os.makedirs(d, exist_ok=True)
-    shutil.copyfile(os.path.join(skills_dir, name, "SKILL.md"), os.path.join(d, "SKILL.md"))
+    shutil.copyfile(os.path.join(sdir(skills_dir, name), "SKILL.md"), os.path.join(d, "SKILL.md"))
     res = score(skills_dir, name)
     with open(os.path.join(d, "score.json"), "w", encoding="utf-8") as f:
         json.dump(res, f)
@@ -91,7 +97,7 @@ def decide(skills_dir, name, apply=False):
     after = score(skills_dir, name)["score"]
     verdict = "KEEP" if after >= before else "REVERT"
     if verdict == "REVERT" and apply:
-        shutil.copyfile(os.path.join(d, "SKILL.md"), os.path.join(skills_dir, name, "SKILL.md"))
+        shutil.copyfile(os.path.join(d, "SKILL.md"), os.path.join(sdir(skills_dir, name), "SKILL.md"))
         verdict = "REVERTED"
     return {"verdict": verdict, "before": before, "after": after}
 

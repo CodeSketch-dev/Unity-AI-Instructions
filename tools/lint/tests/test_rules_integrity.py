@@ -8,6 +8,8 @@ REPO = os.path.abspath(os.path.join(LINT, "..", ".."))
 sys.path.insert(0, LINT)
 
 import engine  # noqa: E402
+sys.path.insert(0, os.path.join(REPO, "tools", "skillkit"))
+import skill_paths  # noqa: E402
 
 FIX = os.path.join(HERE, "fixtures")
 CS = os.path.join("Assets", "_Game", "Scripts", "Logic", "Bootstrap.cs")
@@ -16,7 +18,7 @@ CS = os.path.join("Assets", "_Game", "Scripts", "Logic", "Bootstrap.cs")
 class RuleIntegrityTests(unittest.TestCase):
     def test_every_rule_points_to_an_existing_skill(self):
         for r in engine.load_rules():
-            self.assertTrue(os.path.isfile(os.path.join(REPO, "skills", r.skill, "SKILL.md")), "%s -> missing skill %s" % (r.id, r.skill))
+            self.assertIsNotNone(skill_paths.skill_dir(os.path.join(REPO, "skills"), r.skill), "%s -> missing skill %s" % (r.id, r.skill))
 
     def test_manager_rule_flags_bad_fixture_at_new_gameobject_line(self):
         v = engine.lint_text(CS, open(os.path.join(FIX, "bad_manager.cs")).read())

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui-visual-qa", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui", "ui-visual-qa", "scripts"))
 sys.path.insert(0, HERE)
 
 import image_diff as idf  # noqa: E402

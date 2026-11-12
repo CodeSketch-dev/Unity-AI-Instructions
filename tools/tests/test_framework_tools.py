@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "framework-version-map", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "studio-process", "framework-version-map", "scripts"))
 
 import framework_api_grep as grep_tool  # noqa: E402
 import framework_inventory as inv  # noqa: E402

@@ -5,9 +5,9 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA = ROOT / "skills" / "roblox-shader-kit" / "assets" / "map-spec.schema.json"
-REFERENCE = ROOT / "skills" / "roblox-shader-kit" / "references" / "map-spec.md"
-sys.path.insert(0, os.fspath(ROOT / "skills" / "roblox-shader-kit" / "scripts"))
+SCHEMA = ROOT / "skills" / "world-art" / "roblox-shader-kit" / "assets" / "map-spec.schema.json"
+REFERENCE = ROOT / "skills" / "world-art" / "roblox-shader-kit" / "references" / "map-spec.md"
+sys.path.insert(0, os.fspath(ROOT / "skills" / "world-art" / "roblox-shader-kit" / "scripts"))
 import validate_contract as contract  # noqa: E402
 
 

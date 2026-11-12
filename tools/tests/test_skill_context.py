@@ -5,7 +5,7 @@ import unittest
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 import sys
-sys.path.insert(0, os.path.join(ROOT, "skills", "game-orchestrator", "scripts"))
+sys.path.insert(0, os.path.join(ROOT, "skills", "gameplay", "game-orchestrator", "scripts"))
 import skill_context  # noqa: E402
 
 

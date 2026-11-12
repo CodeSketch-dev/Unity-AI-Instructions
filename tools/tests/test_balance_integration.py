@@ -3,7 +3,7 @@ import sys
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SCRIPTS = os.path.join(HERE, "..", "..", "skills", "game-orchestrator", "scripts")
+SCRIPTS = os.path.join(HERE, "..", "..", "skills", "gameplay", "game-orchestrator", "scripts")
 SKILLS = os.path.join(HERE, "..", "..", "skills")
 sys.path.insert(0, SCRIPTS)
 
@@ -11,7 +11,7 @@ import gdd_lint  # noqa: E402
 import gen_task_graph  # noqa: E402
 
 
-EXAMPLE = os.path.join(SKILLS, "gdd-schema", "assets", "example-sky-climb", "gdd")
+EXAMPLE = os.path.join(SKILLS, "general", "gdd-schema", "assets", "example-sky-climb", "gdd")
 
 
 class BalanceIntegrationTests(unittest.TestCase):

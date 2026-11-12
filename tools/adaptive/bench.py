@@ -22,16 +22,16 @@ CAT, ENV = "bench.count_skills", "os=windows|app=repo|ver=bench1"
 
 
 def m_glob(ctx):
-    return len(glob.glob(os.path.join(REPO, "skills", "*", "SKILL.md")))
+    return len(glob.glob(os.path.join(REPO, "skills", "*", "*", "SKILL.md")))
 
 
 def m_git(ctx):
-    r = subprocess.run(["git", "-C", REPO, "ls-files", "skills/*/SKILL.md"], capture_output=True, text=True, timeout=30)
-    return len([ln for ln in r.stdout.splitlines() if ln.count("/") == 2])
+    r = subprocess.run(["git", "-C", REPO, "ls-files", "skills/*/*/SKILL.md"], capture_output=True, text=True, timeout=30)
+    return len([ln for ln in r.stdout.splitlines() if ln.count("/") == 3])
 
 
 def m_powershell(ctx):
-    cmd = "(Get-ChildItem -Directory '%s' | Where-Object { Test-Path (Join-Path $_.FullName 'SKILL.md') }).Count" % os.path.join(REPO, "skills")
+    cmd = "(Get-ChildItem -Recurse -Filter SKILL.md '%s').Count" % os.path.join(REPO, "skills")
     r = subprocess.run(["powershell", "-NoProfile", "-Command", cmd], capture_output=True, text=True, timeout=60)
     return int(r.stdout.strip())
 
@@ -44,7 +44,7 @@ def main():
     ap.add_argument("--runs", type=int, default=15)
     ap.add_argument("--persist", action="store_true")
     a = ap.parse_args()
-    truth = len(glob.glob(os.path.join(REPO, "skills", "*", "SKILL.md")))
+    truth = len(glob.glob(os.path.join(REPO, "skills", "*", "*", "SKILL.md")))
     tmp = None
     if not a.persist:
         tmp = tempfile.mkdtemp(prefix="adaptive-bench-")

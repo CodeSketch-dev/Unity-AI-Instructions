@@ -4,8 +4,8 @@ import sys
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-LIB = os.path.join(HERE, "..", "..", "skills", "ui-pattern-library")
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui-builder", "scripts"))
+LIB = os.path.join(HERE, "..", "..", "skills", "ui", "ui-pattern-library")
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui", "ui-builder", "scripts"))
 
 import ui_spec_tool as ust  # noqa: E402
 

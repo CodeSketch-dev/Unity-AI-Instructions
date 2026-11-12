@@ -13,7 +13,11 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "qa-batch-and-fallbacks", "scripts"))
+for _cand in (os.path.join(HERE, "..", "..", "qa-batch-and-fallbacks", "scripts"),                    # installed flat
+              os.path.join(HERE, "..", "..", "..", "qa-testing", "qa-batch-and-fallbacks", "scripts")):  # repo, grouped
+    if os.path.isdir(_cand):
+        sys.path.insert(0, _cand)
+        break
 import qa_unity_batch as batch  # noqa: E402
 
 SIGNING_VARS = ("KEYSTORE_PATH", "KEYSTORE_PASS", "KEY_ALIAS", "KEY_PASS")

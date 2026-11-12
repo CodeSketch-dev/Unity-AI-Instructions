@@ -261,7 +261,9 @@ foreach ($p in $projects) {
       else { [IO.File]::WriteAllText($shared, $snew, $utf8); Write-Host ('  moved managed block from CLAUDE.md to CLAUDE.local.md: ' + $p) }
     }
   }
-  & robocopy $skills (Join-Path $cl 'skills') /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP | Out-Null
+  # repo layout skills\<group>\<skill>; the project install stays FLAT (.claude\skills\<skill>)
+  $skillDest = Join-Path $cl 'skills'
+  foreach ($g in @(Get-ChildItem -Directory -LiteralPath $skills)) { foreach ($s in @(Get-ChildItem -Directory -LiteralPath $g.FullName)) { if (Test-Path -LiteralPath (Join-Path $s.FullName 'SKILL.md')) { & robocopy $s.FullName (Join-Path $skillDest $s.Name) /E /XD __pycache__ /NFL /NDL /NJH /NJS /NP | Out-Null } } }
   # Automatic UI audit tooling (skill ui-ink-audit): Editor-only scripts go to Assets/_AiQa/Editor of every Unity project that has uGUI/TMP; nobody copies files by hand.
   $qaSrc = Join-Path $Repo 'data\templates\unity-editor\AiQa'
   $manifest = Join-Path $p 'Packages\manifest.json'

@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "config-and-factory-authoring", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "unity-editor", "config-and-factory-authoring", "scripts"))
 
 import config_registry_audit as audit  # noqa: E402
 

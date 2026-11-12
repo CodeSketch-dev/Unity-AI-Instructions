@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "auto-balance-game", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "economy-monetization", "auto-balance-game", "scripts"))
 
 import auto_balance_game as balance  # noqa: E402
 import econ_sim  # noqa: E402

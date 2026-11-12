@@ -1,10 +1,13 @@
 import os
 import re
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
-SKILLS = set(os.listdir(os.path.join(ROOT, "skills")))
+sys.path.insert(0, os.path.join(ROOT, "tools", "skillkit"))
+import skill_paths  # noqa: E402
+SKILLS = {n for n, _ in skill_paths.iter_skills(os.path.join(ROOT, "skills"))}
 
 
 class EvalSuiteTests(unittest.TestCase):

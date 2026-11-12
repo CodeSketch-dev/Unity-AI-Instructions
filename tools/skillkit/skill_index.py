@@ -8,14 +8,13 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from skill_lint import parse_frontmatter  # noqa: E402
+import skill_paths  # noqa: E402
 
 
 def build_index(root):
     groups = defaultdict(list)
-    for folder in sorted(os.listdir(root)):
-        path = os.path.join(root, folder, "SKILL.md")
-        if not os.path.isfile(path):
-            continue
+    for folder, sdir in skill_paths.iter_skills(root):
+        path = os.path.join(sdir, "SKILL.md")
         with open(path, encoding="utf-8") as f:
             fm, _ = parse_frontmatter(f.read())
         desc = (fm or {}).get("description", "").strip()

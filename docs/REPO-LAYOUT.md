@@ -6,14 +6,14 @@ This repo is the studio brain: instructions, skills, hooks and lint rules that `
 
 ```
 AGENTS.md  README.txt  STUDIO-BRAIN-DIGEST.md  publish.bat  sync.bat      (root files)
-skills/      one folder per skill (Claude/Codex discover skills one level deep)
+skills/<group>/<skill>/   308 skills in 10 groups (ui, gameplay, studio-process, unity-editor, world-art, perf-build, clone-reference, economy-monetization, qa-testing, general); installs FLAT into Claude, Codex and projects
 agents/ commands/   Claude plugin definitions (loaded one level deep)
 hooks/       hooks.json + scripts/ (plugin, do not move) + ps1/ (PowerShell hook scripts)
 data/        skill_router.json (generated), studio_rules.json, projects.txt, skill-overrides.snippet.json, templates/
 tools/
   publish/   publish.ps1, publish_gate.py, repo_layout_lint.py
   sync/      sync_claude_setup.ps1, install_project_lint.ps1, install_hooks.py
-  skillkit/  skill_lint.py, skill_index.py, build_skill_router.py, skill_loop.py, skill_budget.py, hubs.txt
+  skillkit/  new_skill.py, skill_paths.py, skill_lint.py, skill_index.py, build_skill_router.py, skill_loop.py, skill_budget.py, hubs.txt
   lint/      Lint-Triggered Skills engine: engine.py, run_lint.py, rules/, tests/
   evals/     triggers/ (one case per skill), skill-architect/, skill-specs/, adaptive/
   adaptive/  adaptive-task-intelligence tooling
@@ -29,7 +29,7 @@ docs/
 | Kind | Location | Rule |
 |---|---|---|
 | Always-on instructions | `AGENTS.md`, `STUDIO-BRAIN-DIGEST.md` | Short standing rules only. Detail goes into a skill. |
-| Skill | `skills/<kebab-name>/SKILL.md` (+ `scripts/`, `references/`) | Frontmatter `name`, `description` starting `Use when`, `triggers:` incl. Vietnamese without accents. Generic, no game names. |
+| Skill | `skills/<group>/<kebab-name>/SKILL.md` (+ `scripts/`, `references/`); create it with `python tools/skillkit/new_skill.py <name> --group <group> --desc "Use when ..."` | Pick the closest group; max 60 skills per group (lint). Frontmatter `name`, `description` starting `Use when`, `triggers:` incl. Vietnamese without accents. Generic, no game names. |
 | Lint rule (code anti-pattern) | `tools/lint/rules/<snake_name>.py` + `tools/lint/tests/fixtures/bad_/good_*.cs` + test | The message must name `.claude/skills/<skill>/SKILL.md`. See skill `capture-pattern-with-lint`. |
 | PowerShell hook script | `hooks/ps1/` | ASCII only. Installed FLAT into `~/.claude/pipeline-hooks/hooks/` by `sync.bat`; never rename. |
 | Plugin hooks (Python) | `hooks/hooks.json`, `hooks/scripts/` | Claude plugin contract, do not move. |
@@ -43,6 +43,7 @@ docs/
 3. `publish.bat "<message>"` (lint, index, router, gate, sync, commit, push). Never edit generated `skills/INDEX.md` or `data/skill_router.json` by hand.
 
 ## Rules that save you a day
+- Skills are grouped only in this repo. Installs (`~/.claude/skills`, `~/.codex/skills`, `<project>/.claude/skills`) stay flat `<skill>/`, so skill scripts that find sibling skills must work in both layouts (see `skills/gameplay/game-orchestrator/scripts/skill_layout.py`) and tools must list skills through `tools/skillkit/skill_paths.py`, never `os.listdir(skills)`.
 - Synced Unity projects get skills in `.claude/skills/`, lint in `.claude/lint/`; all of `.claude/` is git-ignored there. Lint messages therefore use `.claude/skills/...` paths.
 - Hook installs are flat; moving a hook file needs `sync.bat` to copy it (see skill `studio-hook-factory`, "Moving or restructuring hook files").
 - After moving scripts, fix the repo-root computation (`parent.parent...`, `$PSScriptRoot`), test `sys.path` inserts and `.bat` callers: textual search-and-replace misses `%REPO%\tools\...` and `%~dp0...` forms.

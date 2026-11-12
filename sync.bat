@@ -129,7 +129,8 @@ exit /b 0
 :install_skills
 set "SK_DEST=%~1"
 if not exist "%SK_DEST%" mkdir "%SK_DEST%"
-for /d %%S in ("%REPO%\skills\*") do call :install_one_skill "%%~fS" "%SK_DEST%\%%~nxS" "%%~nxS" "%SK_DEST%"
+rem repo layout is skills\<group>\<skill>; the installed layout stays FLAT (<dest>\<skill>) because Claude and Codex discover skills one level deep
+for /d %%G in ("%REPO%\skills\*") do for /d %%S in ("%%~fG\*") do call :install_one_skill "%%~fS" "%SK_DEST%\%%~nxS" "%%~nxS" "%SK_DEST%"
 exit /b 0
 
 :install_tree

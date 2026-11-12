@@ -1,0 +1,978 @@
+{
+ "index": {
+  "game": "Sky Climb",
+  "genre": "obby-tower-climb",
+  "orientation": "portrait",
+  "reference_game": "example Roblox tower-climb game",
+  "platform": "android-low-mid",
+  "loop": "Climb floors, collect coins at checkpoints, buy skins, climb higher",
+  "systems": [
+   "S-01-character",
+   "S-02-camera",
+   "S-03-input",
+   "S-04-world",
+   "S-05-interactables",
+   "S-06-economy",
+   "S-07-skin-shop",
+   "S-08-monetization",
+   "S-09-tutorial",
+   "S-10-audio",
+   "S-11-vfx",
+   "S-12-retention"
+  ],
+  "priorities": {
+   "P0": [
+    "S-01-character",
+    "S-02-camera",
+    "S-03-input",
+    "S-04-world",
+    "S-05-interactables",
+    "S-06-economy",
+    "S-07-skin-shop"
+   ],
+   "P1": [
+    "S-08-monetization",
+    "S-09-tutorial",
+    "S-10-audio"
+   ],
+   "P2": [
+    "S-11-vfx",
+    "S-12-retention"
+   ]
+  },
+  "fidelity_default": "faithful",
+  "ui_default": "exact",
+  "locales": [
+   "en"
+  ],
+  "local_only": true,
+  "budget": {
+   "day_h": 16,
+   "tokens_cap": 8000000
+  }
+ },
+ "systems": {
+  "S-01-character": {
+   "id": "S-01-character",
+   "type": "character",
+   "title": "Player character",
+   "priority": "P0",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-003@00:12"
+   ],
+   "depends_on": [
+    "S-03-input"
+   ],
+   "recipe": "kcc-character-controller",
+   "rig": "humanoid-r15",
+   "speed_mps": 4.5,
+   "jump_height_m": 2.0,
+   "states": [
+    "idle",
+    "run",
+    "jump",
+    "fall",
+    "land",
+    "dead"
+   ],
+   "health": {
+    "max": 1,
+    "respawn": "checkpoint"
+   },
+   "death_causes": [
+    "fall_below_y",
+    "kill_brick"
+   ],
+   "features": [
+    {
+     "id": "F-01.1",
+     "name": "Walk, run and jump",
+     "priority": "P0",
+     "acceptance": [
+      "[play] character reaches the first platform in at most 3 jumps from spawn",
+      "[edit] jump apex between 1.8 and 2.2 m"
+     ]
+    },
+    {
+     "id": "F-01.2",
+     "name": "Death and respawn at checkpoint",
+     "priority": "P0",
+     "evidence": [
+      "CAP-005@00:20"
+     ],
+     "acceptance": [
+      "[play] falling below the kill plane respawns at the last checkpoint after 2 s"
+     ]
+    }
+   ]
+  },
+  "S-02-camera": {
+   "id": "S-02-camera",
+   "type": "camera",
+   "title": "Third person camera",
+   "priority": "P0",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-003@00:30"
+   ],
+   "depends_on": [
+    "S-01-character"
+   ],
+   "recipe": "freelook-third-person-camera",
+   "mode": "third_person_orbit",
+   "distance_m": {
+    "default": 7,
+    "min": 4,
+    "max": 12
+   },
+   "fov": {
+    "default": 50
+   },
+   "features": [
+    {
+     "id": "F-02.1",
+     "name": "Orbit with drag",
+     "priority": "P0",
+     "acceptance": [
+      "[play] dragging the right half orbits the camera without moving the character"
+     ]
+    }
+   ]
+  },
+  "S-03-input": {
+   "id": "S-03-input",
+   "type": "input",
+   "title": "Touch input",
+   "priority": "P0",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-002@00:08"
+   ],
+   "recipe": "mobile-input-controls",
+   "scheme": {
+    "move": "virtual_joystick_left",
+    "look": "drag_right_half",
+    "buttons": [
+     "jump",
+     "interact"
+    ]
+   },
+   "joystick": {
+    "region": "left 0.35w x 0.6h",
+    "type": "floating"
+   },
+   "features": [
+    {
+     "id": "F-03.1",
+     "name": "Joystick, look drag, jump button",
+     "priority": "P0",
+     "acceptance": [
+      "[play] joystick moves the character and jump is one jump per press",
+      "[shot] HUD controls do not overlap at 3 aspect ratios"
+     ]
+    }
+   ]
+  },
+  "S-04-world": {
+   "id": "S-04-world",
+   "type": "world",
+   "title": "Tower zones",
+   "priority": "P0",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-006@00:05",
+    "CAP-007@00:10"
+   ],
+   "depends_on": [
+    "S-01-character",
+    "S-05-interactables"
+   ],
+   "recipe": "zone-level-design",
+   "zones": [
+    {
+     "id": "Z1",
+     "name": "Meadow",
+     "index": 0,
+     "floors": 12,
+     "checkpoints": 3,
+     "hazards": [
+      "kill_brick",
+      "moving_platform"
+     ]
+    },
+    {
+     "id": "Z2",
+     "name": "Cloud",
+     "index": 1,
+     "floors": 12,
+     "checkpoints": 3,
+     "hazards": [
+      "kill_brick",
+      "spinner"
+     ]
+    },
+    {
+     "id": "Z3",
+     "name": "Sun",
+     "index": 2,
+     "floors": 12,
+     "checkpoints": 3,
+     "hazards": [
+      "spinner",
+      "moving_platform"
+     ]
+    }
+   ],
+   "size_budget": {
+    "renderers_max": 350,
+    "materials": 1
+   },
+   "features": [
+    {
+     "id": "F-04.1",
+     "name": "Zone 1 greybox with checkpoints",
+     "priority": "P0",
+     "acceptance": [
+      "[play] the path from spawn to floor 12 is reachable",
+      "[inspect] renderers within the size budget"
+     ]
+    },
+    {
+     "id": "F-04.2",
+     "name": "Zones 2 and 3",
+     "priority": "P1",
+     "acceptance": [
+      "[play] floor 36 is reachable"
+     ]
+    }
+   ]
+  },
+  "S-05-interactables": {
+   "id": "S-05-interactables",
+   "type": "interactable",
+   "title": "Pickups and hazards",
+   "priority": "P0",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-008@00:03"
+   ],
+   "recipe": "platform-kit",
+   "kinds": [
+    {
+     "id": "coin",
+     "trigger": "touch",
+     "effect": {
+      "currency": "coins",
+      "amount": 1
+     }
+    },
+    {
+     "id": "checkpoint",
+     "trigger": "touch",
+     "effect": {
+      "set_respawn": true
+     }
+    },
+    {
+     "id": "kill_brick",
+     "trigger": "touch",
+     "effect": {
+      "kill": true
+     }
+    },
+    {
+     "id": "moving_platform",
+     "trigger": "stand",
+     "effect": {
+      "carry": true
+     }
+    },
+    {
+     "id": "spinner",
+     "trigger": "touch",
+     "effect": {
+      "knockback": true
+     }
+    }
+   ],
+   "placement_rule": "coins every 4-6 m along the path",
+   "features": [
+    {
+     "id": "F-05.1",
+     "name": "Coin, checkpoint, kill brick",
+     "priority": "P0",
+     "acceptance": [
+      "[edit] a coin trigger fires once per pickup",
+      "[play] touching a checkpoint changes the respawn point"
+     ]
+    },
+    {
+     "id": "F-05.2",
+     "name": "Moving platform and spinner",
+     "priority": "P1",
+     "acceptance": [
+      "[play] a moving platform carries the character without sliding"
+     ]
+    }
+   ]
+  },
+  "S-06-economy": {
+   "id": "S-06-economy",
+   "type": "economy",
+   "title": "Currencies and prices",
+   "priority": "P0",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-009@00:15"
+   ],
+   "recipe": "economy-progression-design",
+   "currencies": [
+    {
+     "id": "coins",
+     "display": "Coins",
+     "icon": "A-021",
+     "start": 0,
+     "sources": [
+      "coin",
+      "floor_bonus",
+      "ad_reward"
+     ],
+     "sinks": [
+      "skin_shop"
+     ]
+    },
+    {
+     "id": "gems",
+     "display": "Gems",
+     "icon": "A-022",
+     "start": 0,
+     "sources": [
+      "iap",
+      "daily"
+     ],
+     "sinks": [
+      "premium_skins",
+      "revive"
+     ]
+    }
+   ],
+   "tables": [
+    "economy/prices.csv"
+   ],
+   "balance_targets": {
+    "first_purchase_s": 90
+   },
+   "income_per_s": 1.2,
+   "features": [
+    {
+     "id": "F-06.1",
+     "name": "Wallet and events",
+     "priority": "P0",
+     "acceptance": [
+      "[edit] wallet add and spend raise one event each",
+      "[sim] first purchase happens within 90 s of play"
+     ]
+    }
+   ]
+  },
+  "S-07-skin-shop": {
+   "id": "S-07-skin-shop",
+   "type": "shop",
+   "title": "Skin shop",
+   "priority": "P0",
+   "fidelity": "exact",
+   "evidence": [
+    "CAP-010@00:05",
+    "CAP-011@00:05",
+    "CAP-012@00:05",
+    "CAP-013@00:05"
+   ],
+   "depends_on": [
+    "S-06-economy"
+   ],
+   "pattern": "skin-shop",
+   "catalog_table": "economy/prices.csv",
+   "item_states": [
+    "locked",
+    "owned",
+    "selected",
+    "equipped"
+   ],
+   "preview": "2d_image",
+   "ui": "UI-10-skin-shop",
+   "persists": "Data_Skins",
+   "features": [
+    {
+     "id": "F-07.1",
+     "name": "Buy, equip and persist",
+     "priority": "P0",
+     "acceptance": [
+      "[edit] insufficient funds leaves state unchanged",
+      "[play] a bought skin stays equipped after restart",
+      "[shot] the shop matches the reference at 3 aspect ratios"
+     ]
+    }
+   ]
+  },
+  "S-08-monetization": {
+   "id": "S-08-monetization",
+   "type": "monetization",
+   "title": "Ads and purchases",
+   "priority": "P1",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-014@00:10"
+   ],
+   "recipe": "monetization-integration",
+   "ads": {
+    "rewarded": [
+     {
+      "id": "ad_revive",
+      "placement": "revive_popup",
+      "reward": "revive",
+      "ui": "UI-11-revive"
+     },
+     {
+      "id": "ad_double",
+      "placement": "floor_bonus",
+      "reward": "x2 coins",
+      "ui": "UI-00-hud"
+     }
+    ],
+    "interstitial": {
+     "every_n_deaths": 4,
+     "min_interval_s": 120
+    }
+   },
+   "iap": [
+    {
+     "id": "gems_100",
+     "price_usd": 0.99,
+     "grants": {
+      "gems": 100
+     }
+    }
+   ],
+   "consent": {
+    "gdpr_flow": true
+   },
+   "features": [
+    {
+     "id": "F-08.1",
+     "name": "Rewarded revive and mock SDK",
+     "priority": "P1",
+     "acceptance": [
+      "[play] a mock rewarded ad grants a revive and a failed ad never blocks play"
+     ]
+    }
+   ]
+  },
+  "S-09-tutorial": {
+   "id": "S-09-tutorial",
+   "type": "tutorial",
+   "title": "First-time tutorial",
+   "priority": "P1",
+   "fidelity": "faithful",
+   "evidence": [
+    "CAP-002@00:08"
+   ],
+   "steps": [
+    {
+     "id": "T1",
+     "trigger": "first_spawn",
+     "text": "Drag to move",
+     "advance": "moved_3m",
+     "forced": true
+    },
+    {
+     "id": "T2",
+     "trigger": "coins_ge_50",
+     "text": "Open the shop",
+     "advance": "shop_opened",
+     "forced": false
+    }
+   ],
+   "features": [
+    {
+     "id": "F-09.1",
+     "name": "Three step tutorial",
+     "priority": "P1",
+     "acceptance": [
+      "[play] the tutorial completes and does not show again after restart"
+     ]
+    }
+   ]
+  },
+  "S-10-audio": {
+   "id": "S-10-audio",
+   "type": "audio",
+   "title": "Music and sfx",
+   "priority": "P1",
+   "fidelity": "free",
+   "evidence": [],
+   "bgm": [
+    {
+     "id": "bgm_main",
+     "scope": "global",
+     "source": "free-pack"
+    }
+   ],
+   "sfx": [
+    {
+     "id": "sfx_coin",
+     "event": "coin_collected"
+    },
+    {
+     "id": "sfx_buy",
+     "event": "purchase_ok"
+    }
+   ],
+   "features": [
+    {
+     "id": "F-10.1",
+     "name": "Audio events",
+     "priority": "P1",
+     "acceptance": [
+      "[inspect] every GDD event has an sfx"
+     ]
+    }
+   ]
+  },
+  "S-11-vfx": {
+   "id": "S-11-vfx",
+   "type": "vfx",
+   "title": "Effects",
+   "priority": "P2",
+   "fidelity": "free",
+   "evidence": [],
+   "effects": [
+    {
+     "id": "fx_checkpoint",
+     "trigger": "checkpoint_reached",
+     "kind": "particle",
+     "budget_particles": 40,
+     "pooled": true
+    }
+   ],
+   "features": [
+    {
+     "id": "F-11.1",
+     "name": "Checkpoint effect",
+     "priority": "P2",
+     "acceptance": [
+      "[inspect] effects are pooled and within the particle budget"
+     ]
+    }
+   ]
+  },
+  "S-12-retention": {
+   "id": "S-12-retention",
+   "type": "retention",
+   "title": "Daily reward",
+   "priority": "P2",
+   "fidelity": "free",
+   "evidence": [],
+   "daily_reward": {
+    "days": 7,
+    "reset": "local midnight",
+    "ui": "UI-12-settings"
+   },
+   "features": [
+    {
+     "id": "F-12.1",
+     "name": "Daily reward",
+     "priority": "P2",
+     "acceptance": [
+      "[play] the reward can be claimed once per day"
+     ]
+    }
+   ]
+  }
+ },
+ "ui": {
+  "UI-00-hud": {
+   "id": "UI-00-hud",
+   "type": "ui_screen",
+   "kind": "hud",
+   "fidelity": "exact",
+   "priority": "P0",
+   "captures": [
+    "CAP-004@00:02"
+   ],
+   "reference_canvas": {
+    "w": 1080,
+    "h": 1920,
+    "match": 0.5
+   },
+   "states": [
+    "default"
+   ],
+   "elements": [
+    {
+     "n": 1,
+     "name": "Joystick_Zone",
+     "anchor": "bottom-left",
+     "pos": [
+      200,
+      440
+     ],
+     "size": [
+      360,
+      360
+     ],
+     "zone": "bottom-left"
+    },
+    {
+     "n": 2,
+     "name": "Btn_Jump",
+     "anchor": "bottom-right",
+     "pos": [
+      -170,
+      440
+     ],
+     "size": [
+      200,
+      200
+     ],
+     "zone": "bottom-right",
+     "behaviour": "jump"
+    },
+    {
+     "n": 3,
+     "name": "Coins",
+     "anchor": "top-right",
+     "pos": [
+      -190,
+      -110
+     ],
+     "size": [
+      320,
+      90
+     ],
+     "zone": "top-right",
+     "text": {
+      "key": "hud.coins"
+     }
+    },
+    {
+     "n": 4,
+     "name": "Floor",
+     "anchor": "top-center",
+     "pos": [
+      0,
+      -110
+     ],
+     "size": [
+      300,
+      90
+     ],
+     "zone": "top-center",
+     "text": {
+      "key": "hud.floor"
+     }
+    },
+    {
+     "n": 5,
+     "name": "Btn_Shop",
+     "anchor": "mid-right",
+     "pos": [
+      -100,
+      100
+     ],
+     "size": [
+      160,
+      160
+     ],
+     "zone": "right-mid",
+     "behaviour": "open_shop"
+    }
+   ]
+  },
+  "UI-10-skin-shop": {
+   "id": "UI-10-skin-shop",
+   "type": "ui_screen",
+   "kind": "popup_fullscreen",
+   "fidelity": "exact",
+   "priority": "P0",
+   "pattern": "skin-shop",
+   "opened_by": [
+    "Btn_Shop@UI-00-hud"
+   ],
+   "captures": [
+    "CAP-010@00:05",
+    "CAP-011@00:05",
+    "CAP-012@00:05",
+    "CAP-013@00:05"
+   ],
+   "reference_canvas": {
+    "w": 1080,
+    "h": 1920,
+    "match": 0.5
+   },
+   "states": [
+    "default",
+    "item_owned",
+    "item_selected",
+    "item_equipped"
+   ],
+   "elements": [
+    {
+     "n": 1,
+     "name": "Btn_Back",
+     "anchor": "top-left",
+     "pos": [
+      92,
+      -87
+     ],
+     "size": [
+      179,
+      161
+     ],
+     "behaviour": "close"
+    },
+    {
+     "n": 2,
+     "name": "Item_List",
+     "anchor": "stretch-bottom",
+     "rect": {
+      "top": 400,
+      "bottom": 300
+     },
+     "container": true
+    },
+    {
+     "n": 3,
+     "name": "Preview",
+     "anchor": "top-center",
+     "pos": [
+      0,
+      -420
+     ],
+     "size": [
+      500,
+      500
+     ]
+    },
+    {
+     "n": 4,
+     "name": "Btn_Buy",
+     "anchor": "bottom-center",
+     "pos": [
+      0,
+      150
+     ],
+     "size": [
+      600,
+      140
+     ],
+     "text": {
+      "key": "ui.buy",
+      "auto_size": true
+     }
+    }
+   ]
+  },
+  "UI-11-revive": {
+   "id": "UI-11-revive",
+   "type": "ui_screen",
+   "kind": "popup_modal",
+   "fidelity": "faithful",
+   "priority": "P1",
+   "opened_by": [
+    "event:character_dead"
+   ],
+   "captures": [
+    "CAP-015@00:03"
+   ],
+   "reference_canvas": {
+    "w": 1080,
+    "h": 1920,
+    "match": 0.5
+   },
+   "states": [
+    "default"
+   ],
+   "elements": [
+    {
+     "n": 1,
+     "name": "Board",
+     "anchor": "center",
+     "pos": [
+      0,
+      0
+     ],
+     "size": [
+      800,
+      600
+     ],
+     "container": true
+    },
+    {
+     "n": 2,
+     "name": "Btn_Revive",
+     "anchor": "center",
+     "pos": [
+      0,
+      -60
+     ],
+     "size": [
+      500,
+      130
+     ],
+     "text": {
+      "key": "ui.revive"
+     },
+     "behaviour": "revive"
+    },
+    {
+     "n": 3,
+     "name": "Btn_NoThanks",
+     "anchor": "center",
+     "pos": [
+      0,
+      -240
+     ],
+     "size": [
+      400,
+      100
+     ],
+     "text": {
+      "key": "ui.no_thanks"
+     },
+     "behaviour": "decline"
+    }
+   ]
+  },
+  "UI-12-settings": {
+   "id": "UI-12-settings",
+   "type": "ui_screen",
+   "kind": "popup_modal",
+   "fidelity": "faithful",
+   "priority": "P2",
+   "opened_by": [
+    "event:settings_requested"
+   ],
+   "captures": [],
+   "reference_canvas": {
+    "w": 1080,
+    "h": 1920,
+    "match": 0.5
+   },
+   "states": [
+    "default"
+   ],
+   "elements": [
+    {
+     "n": 1,
+     "name": "Board",
+     "anchor": "center",
+     "pos": [
+      0,
+      0
+     ],
+     "size": [
+      800,
+      650
+     ],
+     "container": true
+    },
+    {
+     "n": 2,
+     "name": "Row_Music",
+     "anchor": "center",
+     "pos": [
+      0,
+      100
+     ],
+     "size": [
+      635,
+      80
+     ],
+     "text": {
+      "key": "ui.music"
+     }
+    },
+    {
+     "n": 3,
+     "name": "Row_Sound",
+     "anchor": "center",
+     "pos": [
+      0,
+      -8
+     ],
+     "size": [
+      635,
+      80
+     ],
+     "text": {
+      "key": "ui.sound"
+     }
+    }
+   ]
+  }
+ },
+ "prices": [
+  {
+   "id": "skin_01",
+   "name": "Classic",
+   "kind": "skin",
+   "currency": "coins",
+   "price": "0",
+   "unlock": "free",
+   "evidence": "CAP-010@00:05",
+   "order": "1"
+  },
+  {
+   "id": "skin_02",
+   "name": "Ninja",
+   "kind": "skin",
+   "currency": "coins",
+   "price": "60",
+   "unlock": "free",
+   "evidence": "CAP-010@00:05",
+   "order": "2"
+  },
+  {
+   "id": "skin_03",
+   "name": "Knight",
+   "kind": "skin",
+   "currency": "coins",
+   "price": "400",
+   "unlock": "free",
+   "evidence": "CAP-010@00:05",
+   "order": "3"
+  },
+  {
+   "id": "skin_09",
+   "name": "Golden",
+   "kind": "skin",
+   "currency": "gems",
+   "price": "150",
+   "unlock": "iap_or_ad",
+   "evidence": "CAP-011@00:05",
+   "order": "9"
+  }
+ ],
+ "assets": [
+  {
+   "id": "A-021",
+   "kind": "icon",
+   "name": "coin_icon",
+   "source": "own",
+   "path_or_prompt": "Assets/_Game/Art/UI/coin.png",
+   "used_by": "UI-00-hud",
+   "license": "internal"
+  },
+  {
+   "id": "A-022",
+   "kind": "icon",
+   "name": "gem_icon",
+   "source": "own",
+   "path_or_prompt": "Assets/_Game/Art/UI/gem.png",
+   "used_by": "UI-00-hud",
+   "license": "internal"
+  }
+ ],
+ "gdd_hash": "29718da95a2ba41b"
+}

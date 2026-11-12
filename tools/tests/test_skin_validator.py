@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SK = os.path.join(HERE, "..", "..", "skills", "character-skin-importer")
+SK = os.path.join(HERE, "..", "..", "skills", "gameplay", "character-skin-importer")
 sys.path.insert(0, os.path.join(SK, "scripts"))
 
 import skin_validator as sv  # noqa: E402

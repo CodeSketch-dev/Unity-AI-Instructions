@@ -6,6 +6,9 @@ Exit 0 when there are no errors (and no warnings with --strict), else 1.
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import skill_paths  # noqa: E402
 from collections import defaultdict, namedtuple
 
 Finding = namedtuple("Finding", "severity code skill message")
@@ -74,14 +77,10 @@ def lint_dir(root):
     findings = []
     names = defaultdict(list)
     descs = {}
-    for folder in sorted(os.listdir(root)):
-        sdir = os.path.join(root, folder)
-        if not os.path.isdir(sdir):
-            continue
+    for orphan in skill_paths.orphans(root):
+        findings.append(Finding("error", "no-skill-md", orphan, "SKILL.md missing"))
+    for folder, sdir in skill_paths.iter_skills(root):
         path = os.path.join(sdir, "SKILL.md")
-        if not os.path.isfile(path):
-            findings.append(Finding("error", "no-skill-md", folder, "SKILL.md missing"))
-            continue
         with open(path, encoding="utf-8") as f:
             text = f.read()
         fm, body = parse_frontmatter(text)

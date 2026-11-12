@@ -9,7 +9,7 @@ MeshyAIStudio.exe. Google Chrome is used if installed; otherwise the app downloa
    credential store of THIS machine; the file is then renamed accounts.imported.txt - delete it afterwards).
 3. Drop an image into the window: it is queued and processed automatically (login, generate, texture,
    remesh 10K, download). Finished GLB files are in the Export folder.
-4. Claude Code / Codex: register the MCP server, see tools/packages\meshy-studio\README.md in the
+4. Claude Code / Codex: register the MCP server, see tools/packages/meshy-studio/README.md in the
    Unity-AI-Instructions repo (skill meshy-model-gen).
 
 accounts.txt / accounts.imported.txt contain passwords: do not share them outside the team.

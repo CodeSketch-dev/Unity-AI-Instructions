@@ -57,8 +57,15 @@ def learned_text(p):
                                                   p["evidence"][p["winner"]]["n_eff"], p["evidence"][p["hierarchy_first"]]["n_eff"], END))
 
 
+def _sdir(skills_dir, name):
+    """Skill folder by name in the grouped (skills/<group>/<name>) or flat layout."""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "skillkit"))
+    import skill_paths  # noqa: E402
+    return skill_paths.skill_dir(skills_dir, name) or os.path.join(skills_dir, name)
+
+
 def backup_skill(skills_dir, name):
-    src = os.path.join(skills_dir, name)
+    src = _sdir(skills_dir, name)
     dst = os.path.join(store.home(), "skill-backups", time.strftime("%Y%m%d-%H%M%S-") + "%06d" % int((time.time() % 1) * 1e6), name)
     shutil.copytree(src, dst)
     return dst
@@ -66,7 +73,7 @@ def backup_skill(skills_dir, name):
 
 def _score(skills_dir, name):
     here = os.path.dirname(os.path.abspath(__file__))
-    sys.path.insert(0, os.path.join(here, ".."))
+    sys.path.insert(0, os.path.join(here, "..", "skillkit"))
     import skill_loop  # noqa: E402
     return skill_loop.score(skills_dir, name)["score"]
 
@@ -74,7 +81,7 @@ def _score(skills_dir, name):
 def apply(proposal, skills_dir, skill, allow_skill_edit=False, score_fn=None):
     if not allow_skill_edit:
         return {"applied": False, "reason": "explicit permission flag missing (--allow-skill-edit)"}
-    md = os.path.join(skills_dir, skill, "SKILL.md")
+    md = os.path.join(_sdir(skills_dir, skill), "SKILL.md")
     if not os.path.isfile(md):
         return {"applied": False, "reason": "skill not found: %s" % skill}
     bak = backup_skill(skills_dir, skill)
@@ -85,8 +92,8 @@ def apply(proposal, skills_dir, skill, allow_skill_edit=False, score_fn=None):
     open(md, "w", encoding="utf-8").write(text)
     after = score_fn(skills_dir, skill)
     if after < before:
-        shutil.rmtree(os.path.join(skills_dir, skill))
-        shutil.copytree(os.path.join(bak), os.path.join(skills_dir, skill))
+        shutil.rmtree(_sdir(skills_dir, skill))
+        shutil.copytree(os.path.join(bak), _sdir(skills_dir, skill))
         return {"applied": False, "reason": "score dropped %s -> %s; restored from backup" % (before, after), "backup": bak}
     return {"applied": True, "backup": bak, "score": [before, after]}
 
@@ -98,7 +105,7 @@ def rollback(skills_dir, skill):
     for ts in sorted(os.listdir(root), reverse=True):
         cand = os.path.join(root, ts, skill)
         if os.path.isdir(cand):
-            dst = os.path.join(skills_dir, skill)
+            dst = _sdir(skills_dir, skill)
             shutil.rmtree(dst, ignore_errors=True)
             shutil.copytree(cand, dst)
             return {"restored": True, "from": cand}

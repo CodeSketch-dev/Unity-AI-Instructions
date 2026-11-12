@@ -37,6 +37,15 @@ class LoopTests(unittest.TestCase):
         self.assertEqual(r["score"], 90)
         self.assertEqual(len(r["spec"]), 1)
 
+    def test_grouped_skill_layout_is_scored_and_snapshotted(self):
+        grouped = os.path.join(self.root, "grouped")
+        os.makedirs(os.path.join(grouped, "ui", "demo"))
+        with open(os.path.join(grouped, "ui", "demo", "SKILL.md"), "w", encoding="utf-8") as f:
+            f.write(GOOD)
+        self.assertEqual(skill_loop.score(grouped, "demo")["score"], 100)
+        skill_loop.snapshot(grouped, "demo")
+        self.assertTrue(os.path.isfile(os.path.join(self.root, ".skill-loop", "demo", "SKILL.md")))
+
     def test_keep_revert_cycle(self):
         skill_loop.snapshot(self.skills, "demo")
         self.write(GOOD + "more text\n")

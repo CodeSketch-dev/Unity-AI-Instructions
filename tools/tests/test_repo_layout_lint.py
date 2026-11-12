@@ -23,7 +23,7 @@ def make_repo(files=(), dirs=()):
 
 class LayoutLintTests(unittest.TestCase):
     def test_clean_tree_passes(self):
-        root = make_repo(files=["AGENTS.md", "sync.bat", "skills/a/SKILL.md", "hooks/ps1/x.ps1", "data/skill_router.json"])
+        root = make_repo(files=["AGENTS.md", "sync.bat", "skills/ui/a/SKILL.md", "hooks/ps1/x.ps1", "data/skill_router.json"])
         self.assertEqual(rl.check_layout(root), [])
 
     def test_stray_ps1_at_root_is_flagged(self):
@@ -70,6 +70,29 @@ class WidthTests(unittest.TestCase):
     def test_projects_txt_must_live_in_data(self):
         root = make_repo(files=["AGENTS.md", "projects.txt"])
         self.assertTrue(any("projects.txt" in m for m in rl.check_layout(root)))
+
+
+class GroupedSkillTests(unittest.TestCase):
+    def test_flat_skill_is_flagged_with_allowed_groups(self):
+        root = make_repo(files=["AGENTS.md", "skills/foo/SKILL.md"])
+        msgs = rl.check_layout(root)
+        self.assertTrue(any("skills/foo" in m and "skills/<group>/" in m and "ui" in m for m in msgs), msgs)
+
+    def test_unknown_group_is_flagged(self):
+        root = make_repo(files=["AGENTS.md", "skills/zzz/foo/SKILL.md"])
+        self.assertTrue(any("zzz" in m and "group" in m for m in rl.check_layout(root)))
+
+    def test_valid_grouped_skill_passes(self):
+        root = make_repo(files=["AGENTS.md", "skills/gameplay/kcc-x/SKILL.md", "skills/ui/ui-y/SKILL.md"])
+        self.assertEqual(rl.check_layout(root), [])
+
+    def test_group_over_limit_is_flagged(self):
+        root = make_repo(files=["AGENTS.md"] + ["skills/ui/s%d/SKILL.md" % i for i in range(rl.SKILL_GROUP_MAX + 1)])
+        self.assertTrue(any("skills/ui" in m and "entries" in m for m in rl.check_layout(root)))
+
+    def test_same_skill_name_in_two_groups_is_flagged(self):
+        root = make_repo(files=["AGENTS.md", "skills/ui/dup/SKILL.md", "skills/gameplay/dup/SKILL.md"])
+        self.assertTrue(any("dup" in m and "twice" in m for m in rl.check_layout(root)))
 
 
 if __name__ == "__main__":

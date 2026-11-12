@@ -7,8 +7,8 @@ import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..", "..")
-SCRIPTS = os.path.join(ROOT, "skills", "game-orchestrator", "scripts")
-EXAMPLE = os.path.join(ROOT, "skills", "gdd-schema", "assets", "example-sky-climb", "gdd")
+SCRIPTS = os.path.join(ROOT, "skills", "gameplay", "game-orchestrator", "scripts")
+EXAMPLE = os.path.join(ROOT, "skills", "general", "gdd-schema", "assets", "example-sky-climb", "gdd")
 sys.path.insert(0, SCRIPTS)
 
 import pipeline_loop  # noqa: E402

@@ -23,6 +23,7 @@ import gdd_lint  # noqa: E402
 import evidence_index  # noqa: E402
 import gen_task_graph  # noqa: E402
 import skill_context  # noqa: E402
+import skill_layout  # noqa: E402
 
 MAX_ATTEMPTS = 3
 FILE_LANE = ("P", "D", "T")
@@ -214,9 +215,7 @@ def dispatch_payload(project, max_file=4):
             previous = json.load(stream).get("active", [])
     except (OSError, ValueError):
         pass
-    skills_root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
-    available = [name for name in os.listdir(skills_root)
-                 if os.path.isdir(os.path.join(skills_root, name))]
+    available = skill_layout.skill_names(__file__)
     payload = []
     for task in ready(state, max_file):
         context = skill_context.select(task.get("skills", []), always_on, previous=previous, available=available)

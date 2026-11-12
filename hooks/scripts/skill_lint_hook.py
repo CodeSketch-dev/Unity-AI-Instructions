@@ -17,6 +17,8 @@ def main():
     if not path.endswith("/SKILL.md"):
         return 0
     skills_dir = os.path.dirname(os.path.dirname(path))
+    while os.path.basename(skills_dir) != "skills" and os.path.dirname(skills_dir) != skills_dir:  # grouped layout: skills/<group>/<skill>/SKILL.md
+        skills_dir = os.path.dirname(skills_dir)
     plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT") or hooklib.project_dir(event)
     lint = os.path.join(plugin_root, "tools", "skillkit", "skill_lint.py")
     if not os.path.isfile(lint):

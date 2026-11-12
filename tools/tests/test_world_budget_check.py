@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SK = os.path.join(HERE, "..", "..", "skills", "mobile-urp-lighting-baseline")
+SK = os.path.join(HERE, "..", "..", "skills", "perf-build", "mobile-urp-lighting-baseline")
 sys.path.insert(0, os.path.join(SK, "scripts"))
 
 import world_budget_check as wb  # noqa: E402

@@ -3,7 +3,7 @@ import sys
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SK = os.path.join(HERE, "..", "..", "skills", "roblox-shader-kit")
+SK = os.path.join(HERE, "..", "..", "skills", "world-art", "roblox-shader-kit")
 sys.path.insert(0, os.path.join(SK, "scripts"))
 
 import validate_contract as contract  # noqa: E402

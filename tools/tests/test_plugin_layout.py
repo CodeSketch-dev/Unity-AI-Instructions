@@ -6,10 +6,12 @@ import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..", "..")
-sys.path.insert(0, os.path.join(ROOT, "skills", "game-orchestrator", "scripts"))
+sys.path.insert(0, os.path.join(ROOT, "skills", "gameplay", "game-orchestrator", "scripts"))
 import miniyaml  # noqa: E402
 
-SKILLS = set(os.listdir(os.path.join(ROOT, "skills")))
+sys.path.insert(0, os.path.join(ROOT, "tools", "skillkit"))
+import skill_paths  # noqa: E402
+SKILLS = {n for n, _ in skill_paths.iter_skills(os.path.join(ROOT, "skills"))}
 ROSTER = {"orchestrator", "game-designer", "tech-lead", "gameplay-dev", "ui-dev", "art-tech", "economy-balancer", "qa-tester",
           "perf-auditor", "release-engineer", "reviewer", "creative-director", "technical-director", "producer",
           "performance-analyst", "monetization-designer", "localization-lead", "analytics-engineer"}
@@ -133,13 +135,13 @@ class ListingBudgetTests(unittest.TestCase):
 
 class LocalBatchTerminologyTests(unittest.TestCase):
     def test_qa_and_build_entrypoints_use_local_batch_names(self):
-        self.assertTrue(os.path.isdir(os.path.join(ROOT, "skills", "qa-batch-and-fallbacks")))
+        self.assertTrue(os.path.isdir(os.path.join(ROOT, "skills", "qa-testing", "qa-batch-and-fallbacks")))
         legacy_qa = "qa" + "-ci-and-fallbacks"
         legacy_workflow = "ci" + ".yml.template"
         self.assertFalse(os.path.exists(os.path.join(ROOT, "skills", legacy_qa)))
-        self.assertFalse(os.path.exists(os.path.join(ROOT, "skills", "unity-batch-build", "assets", legacy_workflow)))
-        self.assertTrue(os.path.isfile(os.path.join(ROOT, "skills", "unity-batch-build", "assets", "local-build.ps1.template")))
-        self.assertFalse(os.path.exists(os.path.join(ROOT, "skills", "unity-batch-build", "assets", "here sync installed the skills; scripts are stdlib Python#")))
+        self.assertFalse(os.path.exists(os.path.join(ROOT, "skills", "perf-build", "unity-batch-build", "assets", legacy_workflow)))
+        self.assertTrue(os.path.isfile(os.path.join(ROOT, "skills", "perf-build", "unity-batch-build", "assets", "local-build.ps1.template")))
+        self.assertFalse(os.path.exists(os.path.join(ROOT, "skills", "perf-build", "unity-batch-build", "assets", "here sync installed the skills; scripts are stdlib Python#")))
 
 
 if __name__ == "__main__":

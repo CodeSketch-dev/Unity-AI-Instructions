@@ -12,6 +12,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from skill_lint import parse_frontmatter  # noqa: E402
+import skill_paths  # noqa: E402
 
 STOP = set("""a an and any are as at be by for from has have how in into is it its of on or per so that the their them then this to use used uses using when where which while with without within your you all each every more most not only also but can may must should will one two new via vs etc such than too out off over under after before during both other another same still just like make makes made get gets set sets add adds adding added build builds building create creates creating need needs needed instead rather work works working
 skill skills rule rules template templates recipe recipes system systems basic common generic general project projects game games unity mobile android low end per task tasks step steps file files code asset assets data
@@ -40,10 +41,8 @@ def main():
     root = sys.argv[1] if len(sys.argv) > 1 else "skills"
     out = sys.argv[2] if len(sys.argv) > 2 else "data/skill_router.json"
     skills = []
-    for folder in sorted(os.listdir(root)):
-        p = os.path.join(root, folder, "SKILL.md")
-        if not os.path.isfile(p):
-            continue
+    for folder, sdir in skill_paths.iter_skills(root):
+        p = os.path.join(sdir, "SKILL.md")
         with open(p, encoding="utf-8") as f:
             fm, _ = parse_frontmatter(f.read())
         fm = fm or {}

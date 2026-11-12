@@ -6,7 +6,7 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui-builder", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui", "ui-builder", "scripts"))
 
 import ui_spec_tool as ust  # noqa: E402
 

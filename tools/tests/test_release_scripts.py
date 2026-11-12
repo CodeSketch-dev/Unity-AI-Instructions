@@ -10,8 +10,8 @@ from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SK = os.path.join(HERE, "..", "..", "skills")
-sys.path.insert(0, os.path.join(SK, "new-game-bootstrap", "scripts"))
-sys.path.insert(0, os.path.join(SK, "unity-batch-build", "scripts"))
+sys.path.insert(0, os.path.join(SK, "unity-editor", "new-game-bootstrap", "scripts"))
+sys.path.insert(0, os.path.join(SK, "perf-build", "unity-batch-build", "scripts"))
 
 import build_cmd  # noqa: E402
 try:
@@ -87,7 +87,7 @@ class NewGameTests(Proj):
 class PilotTemplateTests(Proj):
     def test_copier_dry_run_copies_template_and_refuses_nonempty_destination(self):
         self.assertIsNotNone(create_pilot)
-        source = os.path.join(SK, "new-game-bootstrap", "assets", "game-template-unity")
+        source = os.path.join(SK, "unity-editor", "new-game-bootstrap", "assets", "game-template-unity")
         dest = os.path.join(self.d, "pilot")
         self.assertEqual(create_pilot.main(["--source", source, "--destination", dest, "--dry-run"]), 0)
         self.assertFalse(os.path.exists(dest))
@@ -104,7 +104,7 @@ class PreflightTests(Proj):
             "com.sketchengine": "https://github.com/x/SketchEngine.git#v1.0.1", "com.unity.ugui": "2.0.0"}}))
         self.w("Packages/packages-lock.json", "{}")
         self.w("ProjectSettings/ProjectVersion.txt", "m_EditorVersion: 6000.3.22f1\n")
-        gi = open(os.path.join(HERE, "..", "..", "skills", "new-game-bootstrap", "assets", "gitignore.template"), encoding="utf-8").read()
+        gi = open(os.path.join(HERE, "..", "..", "skills", "unity-editor", "new-game-bootstrap", "assets", "gitignore.template"), encoding="utf-8").read()
         self.w(".gitignore", gi)
         self.w("project.config.json", json.dumps(GOOD_CFG))
         self.w("qa/gates.json", "{}")
@@ -172,7 +172,7 @@ class SizeTests(Proj):
 
 class BuildCmdTests(unittest.TestCase):
     def test_batch_build_assets_are_local_only(self):
-        skill_root = os.path.join(SK, "unity-batch-build")
+        skill_root = os.path.join(SK, "perf-build", "unity-batch-build")
         skill_text = Path(skill_root, "SKILL.md").read_text(encoding="utf-8").lower()
         local_template = os.path.join(skill_root, "assets", "local-build.ps1.template")
         retired_template = os.path.join(skill_root, "assets", "ci" + ".yml.template")

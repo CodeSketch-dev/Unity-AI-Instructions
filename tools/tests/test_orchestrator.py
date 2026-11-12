@@ -9,8 +9,8 @@ from io import StringIO
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SK = os.path.join(HERE, "..", "..", "skills")
-sys.path.insert(0, os.path.join(SK, "game-orchestrator", "scripts"))
-EXAMPLE = os.path.join(SK, "gdd-schema", "assets", "example-sky-climb", "gdd")
+sys.path.insert(0, os.path.join(SK, "gameplay", "game-orchestrator", "scripts"))
+EXAMPLE = os.path.join(SK, "general", "gdd-schema", "assets", "example-sky-climb", "gdd")
 
 import gdd_lint as gl  # noqa: E402
 import gen_task_graph as gt  # noqa: E402

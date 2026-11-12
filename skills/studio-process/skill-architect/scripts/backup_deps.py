@@ -10,15 +10,22 @@ import shutil
 import sys
 import time
 
-REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".."))
 SCAN = ["skills", "agents", "hooks", "commands", "tools", "data/templates", "AGENTS.md", "data",
         "STUDIO-BRAIN-DIGEST.md"]
 EXT = {".md", ".json", ".ps1", ".py", ".bat", ".txt", ".mjs", ".yaml", ".yml"}
 
 
+def _own_dir(name):
+    """repo skills/<group>/<name> (grouped) or skills/<name> (flat)"""
+    import glob
+    hits = glob.glob(os.path.join(REPO, "skills", "*", name, "SKILL.md")) or glob.glob(os.path.join(REPO, "skills", name, "SKILL.md"))
+    return os.path.normpath(os.path.dirname(hits[0])) if hits else os.path.normpath(os.path.join(REPO, "skills", name))
+
+
 def deps(name):
     pat = re.compile(r"(?<![\w-])%s(?![\w-])" % re.escape(name))
-    own = os.path.normpath(os.path.join(REPO, "skills", name)) + os.sep
+    own = _own_dir(name) + os.sep
     hits = {}
     for entry in SCAN:
         root = os.path.join(REPO, entry)

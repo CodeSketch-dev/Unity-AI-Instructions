@@ -25,7 +25,9 @@ import evidence_index  # noqa: E402
 import orchestrator  # noqa: E402
 import skill_context  # noqa: E402
 
-BALANCE = os.path.normpath(os.path.join(HERE, "..", "..", "auto-balance-game", "scripts"))
+import skill_layout  # noqa: E402
+
+BALANCE = skill_layout.sibling_scripts(__file__, "auto-balance-game")
 sys.path.insert(0, BALANCE)
 import econ_sim  # noqa: E402
 
@@ -139,8 +141,7 @@ def _write_active_context(project, state):
     ready = orchestrator.ready(state, max_file=1)
     requested = ready[0].get("skills", []) if ready else []
     always_on = ["game-orchestrator", "multi-agent-coexistence", "token-efficient-workflow"]
-    available = [name for name in os.listdir(os.path.normpath(os.path.join(HERE, "..", "..")))
-                 if os.path.isdir(os.path.join(os.path.normpath(os.path.join(HERE, "..", "..")), name))]
+    available = skill_layout.skill_names(__file__)
     path = os.path.join(project, "docs", "orchestrator", "active-skills.json")
     previous = []
     if os.path.isfile(path):

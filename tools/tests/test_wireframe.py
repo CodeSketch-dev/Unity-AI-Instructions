@@ -5,9 +5,9 @@ import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui-pattern-library", "scripts"))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui-visual-qa", "scripts"))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui-builder", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui", "ui-pattern-library", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui", "ui-visual-qa", "scripts"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "skills", "ui", "ui-builder", "scripts"))
 
 import wireframe as wf  # noqa: E402
 import image_diff as idf  # noqa: E402

@@ -39,7 +39,7 @@ The checklist of cross-cutting services a mobile game needs. Use it at project s
 - Airplane-mode run: internet popup, Try Again, ad calls fail safe, IAP does not grant.
 - Remove-ads purchase hides the banner at once; VIP/ads-removed bypasses the internet gate.
 - Language switch persists; settings persist; kill the app during a scene load and re-open (volume not stuck at 0).
-- Ads and consent paths tested on a real device, not only the Editor mock ([ads gate matrix](../ads-layer-generic/references/ads-gate-matrix.md)).
+- Ads and consent paths tested on a real device, not only the Editor mock (skill `ads-layer-generic`, references/ads-gate-matrix.md).
 
 ## Pitfalls
 - The same service twice: a vendor SDK popup AND a game popup (two no-internet popups). Disable one.

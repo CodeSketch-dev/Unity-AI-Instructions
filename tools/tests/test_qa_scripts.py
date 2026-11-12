@@ -8,7 +8,7 @@ import unittest
 HERE = os.path.dirname(os.path.abspath(__file__))
 SK = os.path.join(HERE, "..", "..", "skills")
 for p in ("qa-static-checks", "qa-batch-and-fallbacks", "qa-playmode-smoke"):
-    sys.path.insert(0, os.path.join(SK, p, "scripts"))
+    sys.path.insert(0, os.path.join(SK, "qa-testing", p, "scripts"))
 
 import qa_asmdef  # noqa: E402
 import qa_banned_api  # noqa: E402

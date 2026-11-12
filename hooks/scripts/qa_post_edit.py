@@ -13,7 +13,7 @@ import hooklib  # noqa: E402
 
 CANDIDATES = [
     os.environ.get("QA_STATIC_SCRIPTS", ""),
-    os.path.join(HERE, "..", "..", "skills", "qa-static-checks", "scripts"),                # repo or plugin layout
+    os.path.join(HERE, "..", "..", "skills", "qa-testing", "qa-static-checks", "scripts"),                # repo or plugin layout
     os.path.join(os.path.expanduser("~"), ".claude", "skills", "qa-static-checks", "scripts"),  # synced user-level install
 ]
 
