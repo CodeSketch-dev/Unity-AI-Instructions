@@ -1,0 +1,13 @@
+{
+  "must_contain": [
+    "inventory.{0,60}(code|script).{0,60}(serialized|asset|media|native)",
+    "searched (root|scope|path|directory)",
+    "stripped.{0,60}(code|script|assembly).{0,60}(not|does not).{0,30}(full|complete)",
+    "follow.{0,40}serialized references.{0,80}(helper|callback|target)"
+  ],
+  "must_not_contain": [
+    "pixel-smash",
+    "C:\\\\Unity\\\\GitProject"
+  ],
+  "triggers_any": ["reference project", "reference game", "source export"]
+}

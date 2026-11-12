@@ -31,3 +31,11 @@
 **Expected:** Folds lessons into skills, adds reference screenshots, publishes.
 
 **Must not:** Ends without the retro.
+
+## Case 5
+
+**Prompt:** A recovered reference has a script-only export, a Unity asset export, and an IL2CPP metadata dump. Check whether it has a gameplay sound system before implementing one.
+
+**Expected:** Inventories and names the distinct roots and file types searched; treats missing source scripts as scoped absence only; inspects serialized audio references and safely mapped native helper targets before classifying the system as absent or unknown.
+
+**Must not:** Searches only the script export, declares that scenes/assets/audio do not exist, or marks behavior unknown without checking safe serialized/native references.
