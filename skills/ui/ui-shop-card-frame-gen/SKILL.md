@@ -19,7 +19,7 @@ Why: flat rarity cards with an inner frame or header band read as "old junk" and
 ## Steps
 1. Copy `prompt_template.txt`, replace the doodle list with the game's items, attach 1-2 reference pack frames (the owner's own reference game) with `-i`.
 2. Run Codex on stdin: `cat prompt.txt | codex exec -m <luna slug> -c model_reasoning_effort=low --disable hooks --disable codex_hooks --skip-git-repo-check -C <raw dir> -s workspace-write -i ref1.png -i ref2.png -`. Take the exact slug from `~/.codex/models_cache.json` (`"slug"`): bare `luna` and invented versions are rejected on a ChatGPT account (400 model_not_found).
-3. Cut with `cut_cards.py` (dry run first): the key is the colour distance to pure #FF00FF, not "min(r,b)-g" (that deletes purple and pink cards); the crop bbox uses alpha > 200 so stray soft pixels never shrink the card.
+3. Cut cards with `cut_cards.py`, icons with `cut_icon.py src dst size [--holes]` (dry run first): the key is the colour distance to pure #FF00FF, not "min(r,b)-g" (that deletes purple and pink cards); the crop bbox uses alpha > 200 so stray soft pixels never shrink the card.
 4. Look at a contact sheet and an 8x corner crop. Then `ui-sprite-audit/sprite_audit.py --kind board --max-long 600`.
 5. Import through the kit manifest (border all sides ~44 at 404 wide, L,B,R,T), swap the WHOLE card family in one pass, Play screenshot at real size.
 
@@ -30,3 +30,7 @@ Why: flat rarity cards with an inner frame or header band read as "old junk" and
 
 ## Exceptions
 Landscape / wide offer banners and tab plates are other families: keep the outline and palette, not the portrait sunburst layout.
+
+## Hero art on the cards (owner 2026-11-13: "top games have their own artists")
+- The frame alone does not sell: every pack card needs a premium hero icon (glossy 3-tone shading, rim light, specular on gems / metal, sparkles, ONE thick navy outline, no background), and tiered packs grow visibly (small pile -> bowl -> overflowing chest).
+- Generate the whole family in one brief so the style matches; replace dull currency icons in the same pass.

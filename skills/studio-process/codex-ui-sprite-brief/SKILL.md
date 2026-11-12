@@ -17,5 +17,5 @@ Rules: 1 exact rounded rectangle, radius ~30% of height (Knife Tower look), neve
 
 ## Traps (measured 2026-11-13)
 - Model name: pass the exact slug from `~/.codex/models_cache.json` ("slug"); bare `luna` or an invented version returns 400 model_not_found on a ChatGPT account. Cheap art run: `-m <luna slug> -c model_reasoning_effort=low --disable hooks --disable codex_hooks`.
-- Magenta cut: key by colour distance to pure #FF00FF ((255-r)+g+(255-b) < 70 clear, < 150 fade); "min(r,b)-g" erases purple / pink sprites. Crop the bbox on alpha > 200.
+- Magenta cut: FLOOD-FILL from the canvas edges (distance to #FF00FF (255-r)+g+(255-b) < 70 clear, < 200 edge fade); never key the whole image: pink gems / purple plates sit at distance 60-110 and get holes (owner saw the background through a gem). Enclosed pockets (inside a ring): clear only regions >= 400 px under distance 30. Crop the bbox on alpha > 200. Check every cut on a contrasting background (blue) before import.
 - Shop / pack card frames: follow `ui-shop-card-frame-gen` (owner-approved sunburst family).
