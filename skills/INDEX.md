@@ -209,6 +209,9 @@
 ## input
 - input-reader-asset - Input Reader asset: one ScriptableObject wraps generated Input System actions and exposes C# events, with action-map switching for gameplay vs UI. Use when input is read in many scripts or must switch between gameplay, menu and tutorial.
 
+## intent
+- intent-clarifier - Use ONLY when the owner asks to be questioned ('hoi toi', 'help me think', 'I cannot explain it') or a wrong guess would waste a day: build a written Intent Document through short question rounds, then confirm.
+
 ## internet
 - internet-gate-popup - Use when adding or fixing the no-internet popup and connectivity check: adapter check plus ping with fallback, check before ads, Try Again, remote switch, bypass for paid users. Covers the framework Internet module versus a custom manager.
 
@@ -232,6 +235,9 @@
 
 ## ladder
 - ladder-climb - Ladder climbing for the KCC character: ladder collider and cache, BoxCast probe, enter/middle/exit states, jump-off and a bot nav link. Use when a map needs ladders or vertical climbs.
+
+## lcom4
+- lcom4-cohesion-check - Use when a class feels too big, mixes responsibilities, or is under review for splitting: compute LCOM4 (connected components of methods linked by shared instance fields) and split when it is above 1.
 
 ## lean
 - lean-asset-audit - Use when a Unity project feels heavy or before a cleanup: measure size by folder, oversized text-serialized meshes, duplicates by hash, GUID-unreferenced assets, import settings, unused packages and tracked generated folders; ranked proof-backed delete list.
@@ -598,6 +604,7 @@
 - unity-qa-playtest - Plan and run QA for a feature or build: test matrix, Play Mode via MCP, aspect ratios, fresh/saved data, interruptions, perf sanity, bug reports. Use on \"test it\", \"QA this\", before milestones or human playtests.
 - unity-safe-refresh-play-stop - Use when any agent refreshes assets, waits for compile, edits prefabs/scenes or runs tests through Unity MCP: always stop Play Mode first, use the project's own MCP, and know the unfocused-editor pause. Prevents stuck MCP tasks.
 - unity-script-migration - Use when mass-renaming, splitting or moving Unity C# scripts into the feature layout (Logic/<Feature>/<Prefix>_<Part>.cs, Logic/Minigame/<Name>/<XXX>_<Part>.cs), converting events to StaticBus, or fixing asmdef placement, without breaking scenes, prefabs, tests or saves. GUID-safe tools.
+- unity-test-quality-review - Use when writing or reviewing Unity EditMode/PlayMode tests: checklist for tests that can fail, assert on the unit not mocks, stay isolated, and cover five categories per system.
 - unity-ui - Canvas/popup structure for mobile uGUI: root canvas, SafeArea, PopupRoot, anchors, banner clearance, layout validation. Use when creating or changing any Canvas, HUD, popup or panel prefab. Part of the ui-always set: read skills/ui-always first for any UI task.
 
 ## urp

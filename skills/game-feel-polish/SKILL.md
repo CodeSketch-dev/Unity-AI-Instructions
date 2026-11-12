@@ -56,3 +56,9 @@ Source: third-party example. Inspired by: gamedev-skills/awesome-gamedev-agent-s
 ## Every grant is announced (owner rule)
 Anything the player receives or buys (currency, items, pets, eggs, boosters, skins, packs, popup rewards) shows a short notification text line, and currencies also fly to their bar. Implement ONE central facade fed from the grant choke points (save Add* methods, IAP payout sink) via an event, not per-call-site code; coalesce high-frequency grants (e.g. per-dig cash) so the lane never spams; pooled prefab-authored notice; stack lane outside protected HUD slots.
 Retrofit tip: when many call sites already fly currency by hand, do not edit them. Record the amounts they flew inside the one fly entry point and let the central notice fly only the unflown remainder (no double fly, no Suppress at 28 sites). Transient notices live in the existing notice lane (a single row of chips), buffered while a toast owns the lane.
+
+## Juice guardrails (measured by others, FakeMG game-juice)
+- Tier every player action: constant, minor, major, milestone; bigger events get more channels (visual, motion, camera, time, audio, UI). Major events hit at least 3 channels.
+- Hit-stop 40-70 ms for major, never above ~100 ms, never continuous, never blocking input. Shake 0.2-0.4 major, 0.6-0.8 milestone, capped near 1-2% of screen size; HUD stays steady.
+- Rate-limit identical sounds to about one per 40 ms; at most ~3 flashes per second; clamp the time delta; cap particle counts.
+- Route every effect through ONE feedback module gameplay calls; world effects use game time, shake/flash/UI use real time; one intensity setting plus mute (intensity 0 keeps the hooks).

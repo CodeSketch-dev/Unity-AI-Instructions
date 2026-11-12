@@ -39,3 +39,6 @@ Run the acceptance criteria, report verified vs unverified, update the plan stat
 ## Right-sizing
 Keep the process cheap as well as rigorous (`token-efficient-workflow`): query indexes instead of exploring, reuse recipes (`clone-feature-recipes`), and write the spec to the size of the decision, not the size of the feature.
 Tiny fix: act directly. Single-system change: short spec (half a page) + checklist plan. New system or pipeline stage: full documents. The rigor should match the cost of being wrong.
+
+## Unity architecture plan deliverable (idea: FakeMG architecturing-game-feature)
+For a new Unity feature the plan, before any logic: (1) list each real design tradeoff (communication: StaticBus vs direct reference; config: ScriptableObject vs runtime data; logic owner: MonoBehaviour vs plain class; granularity; state owner) and resolve them one at a time with a `Ruling:` line (ask the owner only for gameplay/public-API decisions); (2) a class breakdown grouped by folder: responsibility, dependencies, events; add an interface only with at least 2 implementations; audit it for single responsibility, duplication, coupling, premature abstraction (`lcom4-cohesion-check` on the big ones); (3) C# skeletons with empty or one-line bodies as the implementation guide. No logic until the breakdown is recorded.
