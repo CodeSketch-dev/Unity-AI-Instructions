@@ -77,6 +77,12 @@
       "event": "UserPromptSubmit",
       "match": "rut kinh nghiem|luu pattern|luu lai pattern|save this pattern|capture this pattern|learn from this mistake|learn from this bug|luu loi nay|tao lint rule|lint rule",
       "inject": "CAPTURE PATTERN: follow skill capture-pattern-with-lint in this session: (1) short skill skills/<name>/SKILL.md, (2) tools/lint/rules/<name>.py whose message points to .claude/skills/<name>/SKILL.md, (3) bad/good fixtures + pytest tools/lint/tests (RED first), run python tools/lint/run_lint.py on the bad fixture to prove it fires, (4) publish.bat. Do not ask; decide and record a Ruling."
+    },
+    {
+      "id": "core_flow_first",
+      "event": "UserPromptSubmit",
+      "match": "core.?flow|core.?loop|spawn.{0,32}stop|gameplay.{0,32}stop|player.?journey|basic.?gameplay",
+      "inject": "CORE-FLOW FIRST: Before expanding optional SDK, monetization, or polish, establish the active game's natural critical journey from its GDD/reference. Require uninterrupted Play evidence for boot, meaningful input/feedback, repeatable core content, earned progression, application/placement where applicable, resumed play, win/next, and save/reload. Seeded wallets, forced completion, and synthetic tests help isolate logic but do not prove the end-to-end path. Record starting conditions and each transition/state in docs/reports/core-flow-evidence.md; mark a milestone not applicable only with a game-specific reason. If the core path is blocked, return the plan to it first."
     }
   ]
 }
