@@ -1,7 +1,7 @@
 ---
 name: reference-project-dissection
 description: "Use when the owner points to a reference project/game as the standard: dissect it exhaustively (structure, scenes, prefabs, singleton, services, cameras, UI, code patterns), build a pass/fail rubric, then write skills and a bootstrap so later agents reproduce it."
-triggers: reference project, knife tower, giong, chuan, kien truc, mo xe, phan tich, rubric, bootstrap, game studio, self game studio
+triggers: reference project, knife tower, giong, chuan, kien truc, mo xe, phan tich, rubric, bootstrap, game studio, self game studio, native method, receiver, field offset, object ownership, branch reachability
 ---
 
 # Reference project dissection (self-directed, exhaustive)
@@ -41,3 +41,7 @@ Shared serialized fields do not establish a component subtype. Resolve the origi
 ## Inventory source roots before claiming something is absent
 
 Before reporting that a source system, asset, or behavior is missing, inventory the distinct code, serialized scenes/prefabs/assets, native metadata/binaries, and media roots available for the reference. State which roots and file types you actually searched. A stripped script/assembly export is not the complete project export; missing code in that subset does not prove that serialized assets, native behavior, or media are absent. Follow serialized references to their helper, callback, or target when safely inspectable before marking behavior unknown. Stop at unsafe execution or bypasses, and label the remaining uncertainty instead of generalizing beyond the searched scope.
+
+## Prove native receiver ownership and control flow
+
+Before assigning a timer, state, or API behavior to an owner, trace the receiver to its defining object and field offset, then follow the relevant branches and early returns to the side effect. A familiar method or shared type does not prove that two references are the same instance; keep separate instances distinct. If receiver identity or branch reachability is not established, label ownership or behavior unknown.

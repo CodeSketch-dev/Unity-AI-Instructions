@@ -3,7 +3,10 @@
     "inventory.{0,60}(code|script).{0,60}(serialized|asset|media|native)",
     "searched (root|scope|path|directory)",
     "stripped.{0,60}(code|script|assembly).{0,60}(not|does not).{0,30}(full|complete)",
-    "follow.{0,40}serialized references.{0,80}(helper|callback|target)"
+    "follow.{0,40}serialized references.{0,80}(helper|callback|target)",
+    "receiver.{0,100}(field offset|defining object|object owner)",
+    "(branch|control.flow).{0,100}(return|reachability|side effect)",
+    "separate instances"
   ],
   "must_not_contain": [
     "pixel-smash",
