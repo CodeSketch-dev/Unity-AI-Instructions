@@ -1,0 +1,12 @@
+{
+  "must_contain": [
+    "(?is)outline file.{0,100}not a backup.{0,30}FaceInfo",
+    "(?is)complete.{0,20}FaceInfo.{0,20}field set",
+    "(?is)unit-bearing metrics.{0,80}generatedPointSize / sourcePointSize",
+    "(?is)atlas sampling/resolution and padding",
+    "(?is)wrapped text.{0,100}adjacent line baselines",
+    "(?is)(do not|never).{0,40}(copy|apply|reuse).{0,30}metric.{0,40}different font"
+  ],
+  "must_not_contain": ["PixelDemolish", "Demolition", "Baloo"],
+  "triggers_any": ["font rebake", "FaceInfo", "SDF metrics"]
+}

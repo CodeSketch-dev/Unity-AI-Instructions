@@ -1,6 +1,7 @@
 ---
 name: ui-text-tmp
-description: "TextMeshPro conventions: fonts, outline materials, autosize, colors, raycast, number formats, optical vertical centring. Use when creating labels or titles, or when text overflows or sits high/low in its button. Part of the ui-always set."
+description: "Use when creating or rebaking TextMeshPro font assets, creating labels or titles, or diagnosing text fit, line spacing, font metrics, outline, or optical centring. Part of the ui-always set."
+triggers: TMP, TextMeshPro, font rebake, rebake font, TTF, OTF, SDF metrics, FaceInfo, font line spacing, font baseline, tao font, font chu
 ---
 
 # UI text (TMP)
@@ -16,6 +17,16 @@ Facts from the studio evidence notes (KT 451 TMPs, VERIFIED); defaults, not law.
 - **Numbers**: compact K/M/B via the project `BigNumber` over `DataValue<double>`; set text only when the value changes; count-up tween 0.7 s OutCubic unscaled (`ui-feedback-toasts`).
 - Fonts: one display font plus per-locale fonts (`ui-localization`).
 - Long names: autosize, never wrap into the neighbouring control. TMP inset about 10 px per side inside its box (`ui-design-tokens`).
+
+## Rebaking a TMP SDF font from source outlines
+
+Use this only when a TMP SDF asset is being regenerated from a TTF/OTF or another outline source.
+
+1. Treat the outline file as glyph outlines, not a backup of the TMP asset's SDF `FaceInfo`. When the original TMP asset exists, capture and compare its complete `FaceInfo` field set and glyph/atlas generation settings before rebaking.
+2. Keep the intended glyph set, atlas sampling/resolution and padding consistent with the source asset. Record the generated sampling `pointSize`; do not tune atlas padding or glyph sampling to correct line spacing.
+3. Compare every `FaceInfo` field. Set `pointSize` to the generated sampling size and scale only unit-bearing metrics by `generatedPointSize / sourcePointSize`; preserve dimensionless values. Do not copy metrics from a different font or locale font.
+4. Validate the actual wrapped text at the same text, width and size as the reference. Compare line count and adjacent line baselines after layout settles, then inspect a Play screenshot for matching line advance, clipping and overlap.
+5. If the original SDF metrics are unavailable, record them as unknown and validate against a native rendered reference; do not claim the outline file preserved them.
 
 ## Optical centring (label looks high or low)
 
