@@ -1,0 +1,18 @@
+# Task: GENERATE 7 shop card frame sprites with the image_generation tool (one image per call; never resample or edit an old PNG; if image_generation is unavailable STOP and say so).
+Owned output: this working directory only. Save as PNG files named exactly:
+  card_burst_gold.png, card_burst_purple.png, card_burst_blue.png, card_burst_green.png, card_burst_coral.png, card_burst_teal.png, card_burst_rainbow.png
+Write report.txt listing which generation call made each file.
+
+Reference (attached): two Knife Tower shop pack frames. Match that style exactly (flat cartoon mobile UI, bright, clean), but for <GAME THEME>.
+
+Each card:
+1. Portrait rounded rectangle, aspect 404:562 (about 0.72), corner radius about 8% of the width, exact clean shape (no pill, no chamfer, no notch, no tab).
+2. ONE thin constant near-black navy outline (#151a2a), about 1.5% of the width, identical on all four sides and on every card.
+3. Body: rich saturated vertical gradient in the card colour (lighter top, a little deeper bottom) and a slightly darker 3-4 % tall bottom lip following the rounded shape.
+4. A soft glowing SUNBURST: 16-20 bright rays radiating from a white-hot glow centred at 40 % of the height (this is where the item art will sit). Rays fade toward the edges. This must make the card eye-catching like a premium shop pack.
+5. Very faint tone-on-tone doodle pattern over the body (<3-4 small items of the game>, stars), low contrast (about 8 %), never busy.
+6. A couple of small white sparkle stars near the top corners.
+7. NO text, NO icons in the centre, NO header band, NO inner frame, NO second border, NO drop shadow outside the outline.
+8. Colours: gold = warm yellow-orange (#FFC31F -> #F08A00); purple = #B45CFF -> #8A2BE2; blue = #4FA8FF -> #2F6BFF; green = #6EE05A -> #2FAE3A; coral = #FF7A6B -> #F0435A; teal = #3FE0E0 -> #13A9C9; rainbow = soft rainbow gradient top-to-bottom (pink, gold, mint, sky) with white rays.
+9. Canvas: flat pure magenta #FF00FF background with at least 40 px empty margin around the card; nothing cut at the edges; no magenta inside the card; vector-smooth anti-aliased edges.
+10. Verify every saved file's main colour matches its name.

@@ -14,3 +14,8 @@ Rules: 1 exact rounded rectangle, radius ~30% of height (Knife Tower look), neve
 1. Run `ui-sprite-audit/sprite_audit.py` on every output; FAIL -> send back the failing lines with numbers (max 2 rounds), then rebuild the silhouette/outline analytically with `art-direction-asset-pipeline/ideal_rounded_button.py` (the model supplies fill/gloss only).
 2. Derive variants (pressed x0.88, disabled desaturate), import through the project's kit manifest (per-sprite ppu + border), Play screenshot at real size, look at an 8x crop of a corner.
 3. Update this skill when a new failure class appears.
+
+## Traps (measured 2026-11-13)
+- Model name: pass the exact slug from `~/.codex/models_cache.json` ("slug"); bare `luna` or an invented version returns 400 model_not_found on a ChatGPT account. Cheap art run: `-m <luna slug> -c model_reasoning_effort=low --disable hooks --disable codex_hooks`.
+- Magenta cut: key by colour distance to pure #FF00FF ((255-r)+g+(255-b) < 70 clear, < 150 fade); "min(r,b)-g" erases purple / pink sprites. Crop the bbox on alpha > 200.
+- Shop / pack card frames: follow `ui-shop-card-frame-gen` (owner-approved sunburst family).
