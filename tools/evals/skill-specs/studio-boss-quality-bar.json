@@ -1,0 +1,10 @@
+{
+  "must_contain": [
+    "effective contact contract",
+    "component flags alone",
+    "with/without.{0,60}damage volume",
+    "positive damage.{0,60}authored support",
+    "live projected ratio"
+  ],
+  "must_not_contain": ["pixel-smash", "Pixel Demolish", "all weapons must be triggers"]
+}

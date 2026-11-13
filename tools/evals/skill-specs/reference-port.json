@@ -1,0 +1,13 @@
+{
+  "must_contain": [
+    "component flags alone do not establish effective collision response",
+    "layer.{0,40}query.{0,40}native ownership",
+    "owner contract",
+    "with and without.{0,40}damage volume",
+    "unwanted displacement.{0,80}positive damage.{0,80}authored support",
+    "source config.{0,60}TRS.{0,80}live projected ratio",
+    "never guess.{0,40}resize"
+  ],
+  "must_not_contain": ["pixel-smash", "Pixel Demolish", "all weapons must be triggers"],
+  "triggers_any": ["reference", "collision response", "sai kich thuoc"]
+}

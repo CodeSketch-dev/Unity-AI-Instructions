@@ -1,6 +1,7 @@
 ---
 name: reference-port
-description: "Port or match a feature from a reference project/screenshot faithfully: inspect first, compare side by side, adapt not blind-copy. Use on \"like the reference\", \"match 100%\", or \"ours looks different\"."
+description: "Use when porting or matching a reference feature: inspect source contracts, effective collision response and projected size, then compare behavior and visuals directly."
+triggers: reference, match 100%, port source, collision response, damage volume, projected ratio, giong game goc, va cham, sai kich thuoc
 ---
 
 # Reference port
@@ -32,3 +33,8 @@ State which reference files were consulted, which values were copied vs adapted 
 - Mirrored/back-facing text: check face direction and the sign of the scale.
 - **Original-flow gate:** when parity is requested, verify the complete original interaction order (tutorial, upgrades, completion/tap gate, loading, next stage, restart) before enhancements. Do not replace a missing step with automatic progression; label unrecovered behavior unknown and record the chosen reconstruction separately.
 - Don't "improve" the design while porting. Do improvements as a separate, labelled step after parity is confirmed.
+
+## Effective contact and size acceptance
+- Component flags alone do not establish effective collision response. Trace layer masks, query filters and native ownership against the owner contract before deciding which objects provide solid support or damage overlap. Never invent solid contact for a mechanism specified as damage-overlap; solid weapons in other references remain valid when evidenced.
+- Compare otherwise identical runs with and without the damage volume: prove no unwanted displacement, positive damage, and preserved authored support. A test that only confirms the newly written collision formula does not establish parity.
+- Size acceptance needs source config and complete TRS plus a live projected ratio at matched camera/aspect. An unchanged mesh or matching serialized scale cannot close a visible size complaint; never guess a resize.

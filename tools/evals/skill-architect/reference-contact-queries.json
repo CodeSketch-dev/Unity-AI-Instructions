@@ -1,0 +1,8 @@
+[
+  {"q":"Match the reference collision response; component is nontrigger but owner says damage overlap only", "should":["reference-port"]},
+  {"q":"Port source damage volume without inventing solid contact or unwanted displacement", "should":["reference-port"]},
+  {"q":"Reference model wrong size: compare source config TRS and live projected ratio", "should":["reference-port"]},
+  {"q":"giong game goc, va cham day vat the sai, kiem tra collision response", "should":["reference-port"]},
+  {"q":"Model goc sai kich thuoc, match the reference 100%", "should":["reference-port"]},
+  {"q":"Write a birthday greeting in English", "not":["reference-port"]}
+]
