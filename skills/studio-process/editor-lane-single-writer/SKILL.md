@@ -16,3 +16,6 @@ Why: one Unity Editor instance controls one project directory and the Unity MCP 
 7. Idempotent generators only; one stage per MCP call; save after each stage (`rule-editor-tool-safety`).
 
 Enforced by tooling where possible: the orchestrator lane limits, the PreToolUse protect hook and the claims check (plugin hooks, `hooks/`).
+
+## The owner may be playing in the same Editor (2026-11-13)
+- Before any Play probe that teleports, drives input or stops Play, take a Game-view screenshot: a running timer / moving HUD means the owner is playing. Probes then move their character and stopping Play for a refresh ends their session. Prefer Edit Mode probes, or tell the owner first and keep probes short.
