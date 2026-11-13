@@ -23,4 +23,4 @@ Ruling: foundation = **no**. This is a narrow reverse-reference technique, so ke
 - [ ] Extend the existing spec and add a trigger-eval prompt/grader first; verify RED against current guidance.
 - [ ] Add the concise cross-reference method under native receiver ownership.
 - [ ] Re-run skill score/lint and repo lint/tests.
-- [ ] Publish from this isolated clone and verify the remote SHA.
+- [x] Publish from this isolated clone and verify the remote SHA (`df5f97933a3be50a81dce1c42161d6eee39b5343`).
