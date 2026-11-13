@@ -44,3 +44,6 @@ Create `Button/Content/IconLabelGroup` rather than placing the icon and TMP dire
 In every icon + label / icon + number row the icon height is >= the label font size (visible line height): prefer 1.05-1.25 x the font size, capped to ~70% of the button's short side. A smaller icon sinks next to the text and the label dominates. If space is tight, shrink the TEXT through autofit first. Audit: icon rect height >= text font size for every row (script), then look at the screenshot.
 
 - Icon + TMP caption drifting off the face: measure the caption width on the TMP child at its MAX font size with auto-size off (not legacy Text metrics, not the already-shrunk preferredWidth), cap it to the face gap, then rebuild the layout. A too-narrow label slot makes autosize shrink the text and the pair drift.
+
+## Hugging rows (owner 2026-11-13)
+An icon beside a value only hugs the text if the value TMP has NO fixed width: no LayoutElement, no 520 px rect, HLG childControlWidth on, childForceExpandWidth off. A wide text box makes the HLG centre a huge box and the icon floats away. Guard it with a prefab test (HLG present, expand off, text has no LayoutElement) and measure group centre dx <= 1 px. A fake-ad overlay can hide the Game view in Play: say so and report measured numbers instead of claiming a screenshot.
