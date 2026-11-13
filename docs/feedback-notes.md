@@ -127,3 +127,5 @@
 - 2026-10-16 | user | Fake leaderboard and restock-shop systems are also uncommon for the user's new projects; remove their dedicated skills rather than routing them by default.
 
 - 2026-11-13 | Mobile input: existing touch-ID/UI blocking guidance is incomplete unless discrete action taps also consume an edge when down and up occur in one input update. Keep hold/repeat behavior separate; require one dispatch and zero on the next no-input update, plus device gesture evidence when available. Synthetic Input System tests are not hardware proof.
+
+- 2026-11-13 | Clone research coverage: explicitly inventory foreground/midground/background actors and separate output emitters; observe each visible autonomous or reward sequence through its natural transitions and sound cues. Do not infer secondary behavior from the main mechanism's source; tag unseen steps unknown and capture the missing sequence.
