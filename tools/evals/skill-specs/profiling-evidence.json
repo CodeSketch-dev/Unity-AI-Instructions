@@ -8,7 +8,12 @@
     "warm.up",
     "median.{0,50}P95.{0,50}max",
     "outliers",
-    "isolated CPU.{0,80}(scene|GPU|device FPS)"
+    "isolated CPU.{0,80}(scene|GPU|device FPS)",
+    "allocated pool capacity.{0,60}live count",
+    "per.frame graph rebuild count",
+    "proven unchanged logical inputs",
+    "epoch/reset.{0,40}query reorder.{0,40}late.carry tests",
+    "relocating a wait.{0,50}(not|never).{0,25}(work removal|improvement)"
   ],
   "triggers_any": ["microbenchmark", "Editor benchmark", "P95", "Time.frameCount"]
 }

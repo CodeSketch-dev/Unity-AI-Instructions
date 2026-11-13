@@ -26,3 +26,9 @@ Metrics: frame ms (CPU/GPU), GC alloc per frame, batches/set-pass, vertices, phy
 - Cache delegates before timing and keep reflection out of the per-sample path. In EditMode, do not use `Time.frameCount` as the sample clock: it may not advance between editor-driven invocations.
 - Report warm-up policy and sample count, plus median, P95, and maximum. Preserve unfavorable outliers and repeat results; explain them instead of deleting them.
 - An isolated CPU microbenchmark is not scene performance, GPU timing, or device FPS. Keep those claims separate and measure the scene/device workload directly before drawing them.
+
+## Pooled workloads and derived graph caches
+- Record allocated pool capacity separately from live count, per-frame graph rebuild count and fixed-step count for matched windows; a small visible set may still pay full-capacity work.
+- Skip rebuilding only for proven unchanged logical inputs: cover every authoritative input the graph reads, not merely unchanged population or topology. Keep dirty rebuilds and publication ordering.
+- Require epoch/reset, query reorder and late-carry tests, plus same-count/different-content cases. Late-arriving phase work must invalidate reuse before its consumer runs; cached identity/order must not hide changes.
+- Inspect child-job/worker markers and whole-frame median/P95 before/after; relocating a wait is not work removal or an improvement. Keep adverse results and separate Editor evidence from device performance.

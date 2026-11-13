@@ -133,3 +133,5 @@
 - 2026-11-13 | Video analysis: periodic or symmetric motion can alias to the same apparent pose in coarse samples. Inspect the source clip and use dense samples at multiple non-commensurate offsets across repeated cycles; treat coarse sheets as discovery only and keep runtime speed/direction unknown unless the clip supports them.
 
 - 2026-11-14 | Reference migration: after a backend/component cutover, enumerate every metadata consumer and require missing required authored bindings to fail closed. Transform splitting/reparenting must preserve full local position and rotation; validate asymmetric basis/corner points, not only the center. Source-level guidance does not replace runtime natural-flow proof.
+
+- 2026-11-14 | Pooled-workload profiling: report allocated capacity separately from live population and per-frame derived-graph rebuilds. A cache skip needs the complete authoritative logical input set and epoch/reset, reorder, late-carry and same-count/content-change regressions; moving a wait is not work removal. Keep whole-frame and worker evidence separate.
