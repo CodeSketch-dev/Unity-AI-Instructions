@@ -1,7 +1,7 @@
 ---
 name: clone-research-autonomy
 description: "Autonomous research to build or clone a game from a name or link: YouTube/wiki/community sources, yt-dlp, ffmpeg sheets then dense frames on UI, FX, camera, audio, feel; specs, parity checklist, Claude+Codex delegation. Use for any new game, clone, or make it like the original."
-triggers: clone game, lam game, game moi, giong game goc, youtube, wiki, community, ffmpeg, sheet, frame, tach frame, video reference, fx, audio, feel, parity, reference game, nghien cuu
+triggers: clone game, lam game, game moi, giong game goc, youtube, wiki, community, ffmpeg, sheet, frame, tach frame, video reference, fx, audio, feel, parity, reference game, nghien cuu, background actor, secondary actor, autonomous motion, reward emitter, whole-scene coverage, nhan vat phu, chuyen dong nen, phat vat pham
 ---
 
 # Clone research autonomy (owner standing permission: do all of this without asking)
@@ -31,11 +31,13 @@ Trigger: the task says clone / like the original / same as X / fix a flow, FX, c
 ## 4. Focus passes (repeat per important moment, tighter each time)
 - Cut the segment (`-ss/-to`), extract dense frames (10-30 fps) into `frames/<moment>/`, view them one by one (never skim); crop and zoom UI/FX/text (`-vf crop=w:h:x:y,scale=...`).
 - Micro pass (60 fps, few seconds) for FX shape/colour/timing, camera easing, hit stop, squash, number pop-ups. Measure: positions as screen fractions, colours by pixel sampling (PIL), timings in frames, then seconds.
+- **Sweep the whole scene, not only the primary mechanism:** inventory foreground, midground and background layers, including secondary actors, passive objects with autonomous motion, and independent output/reward emitters. Follow each visible actor/emitter through its complete natural sequence (idle/start, motion or trigger, output/travel/collection, then stop/reset/replenish/transition when shown); record timestamps and associated sound cues.
+- Do not infer a secondary actor's motion, emission or sound from the main weapon/collector implementation. Mark unseen steps inferred or unknown and capture a targeted source segment before claiming coverage.
 - Audio: `ffmpeg -vn -ac 1 -ar 22050 a.wav`, `silencedetect` / `showspectrumpic` to list cue timestamps (SFX per action, music loops, ducking); write a cue map; use royalty-free replacements, never copy audio (`clone-ip-safety`).
 
 ## 5. Specs and coverage
 - One `docs/research/<game>/SPEC_<system>.md` per system: flow, UI, camera, FX, audio, feel, economy/numbers, edge cases; each claim tagged seen / inferred / unknown with the frame or timestamp.
-- `COVERAGE.md`: every screen, popup, FX, sound, camera move, animation seen -> status (not started / built / verified with side-by-side). Open questions go to the owner as one short list.
+- `COVERAGE.md`: every screen, popup, FX, sound, camera move, animation, secondary actor, autonomous motion and output/reward sequence seen -> status (not started / built / verified with side-by-side). Open questions go to the owner as one short list.
 
 ## 6. Build with all agents
 - Split by system with disjoint file ownership. Codex (via the hub, `agent-hub-codex-workflow`) gets SPEC + frame paths and does code/shader/doc work; Claude subagents or the main agent do Editor wiring, Play, screenshots. Prefer prefab-first scene authoring (`scene-authored-prefabs`).

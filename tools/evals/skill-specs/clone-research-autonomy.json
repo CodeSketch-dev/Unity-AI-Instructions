@@ -1,0 +1,13 @@
+{
+  "must_contain": [
+    "(?is)(inventory|sweep|list).*(background|secondary).*(actor|object|layer)",
+    "(?is)(autonomous|self-driven).*(motion|movement|rotation)",
+    "(?is)(emitter|emission|output).*(reward|pickup|collect|sequence)",
+    "(?is)(observe|verify|capture).*(complete|full).*sequence",
+    "(?is)(do not|never|don't).*infer.*(main|primary|mechanism|weapon)"
+  ],
+  "must_not_contain": [
+    "(?i)pixel-smash|pixel demolish|demolition|saw-bank"
+  ],
+  "triggers_any": ["background actor", "autonomous motion", "reward emitter", "whole-scene coverage"]
+}
