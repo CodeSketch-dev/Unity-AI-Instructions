@@ -129,3 +129,5 @@
 - 2026-11-13 | Mobile input: existing touch-ID/UI blocking guidance is incomplete unless discrete action taps also consume an edge when down and up occur in one input update. Keep hold/repeat behavior separate; require one dispatch and zero on the next no-input update, plus device gesture evidence when available. Synthetic Input System tests are not hardware proof.
 
 - 2026-11-13 | Clone research coverage: explicitly inventory foreground/midground/background actors and separate output emitters; observe each visible autonomous or reward sequence through its natural transitions and sound cues. Do not infer secondary behavior from the main mechanism's source; tag unseen steps unknown and capture the missing sequence.
+
+- 2026-11-13 | Video analysis: periodic or symmetric motion can alias to the same apparent pose in coarse samples. Inspect the source clip and use dense samples at multiple non-commensurate offsets across repeated cycles; treat coarse sheets as discovery only and keep runtime speed/direction unknown unless the clip supports them.
