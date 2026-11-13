@@ -32,3 +32,9 @@ triggers: unreal, ue4ss, live dump, blueprint scale, wrong scale, ported map, cl
 - Remove art-only statues and teaser props from the mobile map by an explicit rule in the rebuild step (log it), never by deleting source data.
 - One capture key only; the mod takes sample B itself 1 s after A and runs the slow full serialize last.
 
+## Re-rip of a map that was already tuned (owner correction: "it was optimized before, why is it black now?")
+- The previously shipped map is the source of truth for look and budget. Before rebuilding, read its optimizer/bake tool and git log (atlas, vertex-colour bake, cell size, water merge, restored hero meshes) and reuse every decision.
+- Raw UE material vectors are graph multipliers, not final colours (a 0.015 grey rendered near-black; the tuned map had navy). Map every ripped material by UE short name to the tuned material (`<name>_vc` first) and take its colour/texture; report the count.
+- Landscape: CUE4Parse exports it (Landscape actor -> glb + 16-bit heightmap + layer weightmaps); build a Unity Terrain from the glb vertices. The landscape glb is yawed 180 deg vs static-mesh glbs: verify placement by foliage-on-ground (median dy ~0, most within 1.5 m) before reporting.
+- Never report a rebuilt map without a side-by-side capture against the previous shipped map and the original game screenshot.
+
