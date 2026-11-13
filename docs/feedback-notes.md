@@ -125,3 +125,5 @@
 - 2026-10-16 | user | Gacha box, jackpot slot and spin-wheel systems are uncommon in new projects; remove their dedicated skills rather than routing them by default.
 - 2026-10-16 | user | Daily-login reward is also uncommon for the user's new projects; remove its dedicated skill rather than routing it by default.
 - 2026-10-16 | user | Fake leaderboard and restock-shop systems are also uncommon for the user's new projects; remove their dedicated skills rather than routing them by default.
+
+- 2026-11-13 | Mobile input: existing touch-ID/UI blocking guidance is incomplete unless discrete action taps also consume an edge when down and up occur in one input update. Keep hold/repeat behavior separate; require one dispatch and zero on the next no-input update, plus device gesture evidence when available. Synthetic Input System tests are not hardware proof.
