@@ -2,6 +2,11 @@
   "must_contain": [
     "component flags alone do not establish effective collision response",
     "layer.{0,40}query.{0,40}native ownership",
+    "semantic role and physical response separate",
+    "source trigger flag and layer independently",
+    "query-visible colliders can still be solid",
+    "final published collider and material for every builder/role path",
+    "both query visibility and support/contact against a real control pair",
     "owner contract",
     "with and without.{0,40}damage volume",
     "unwanted displacement.{0,80}positive damage.{0,80}authored support",
@@ -20,6 +25,9 @@
   "triggers_any": [
     "reference",
     "collision response",
+    "query-visible collider",
+    "source trigger flag",
+    "solid support",
     "sai kich thuoc",
     "backend cutover",
     "metadata consumer",
