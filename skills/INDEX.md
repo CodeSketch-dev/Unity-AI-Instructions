@@ -276,7 +276,7 @@
 - mobile-budget-checklist-for-systems - Per-system mobile budget checklist: CPU ticks, allocations, draw calls, particles, UI rebuilds, memory, pooling. Use when designing or reviewing any new system for low-end Android.
 - mobile-build-release - Build and release checks for Android (APK/AAB) and iOS: versioning, signing safety, size, permissions, store checklist. Use when building, testing on device, uploading to stores, or a build fails/is too large.
 - mobile-hud-layout - Single source for mobile HUD zone map and sizes (joystick, action cluster, rails, safe area, thumb reach, touch targets, popups). Use when placing or changing any HUD element or on overlap/unreachable-button reports.
-- mobile-input-controls - Touch input for Unity mobile: floating joystick, camera drag, action buttons, multi-touch separation, UI-vs-world blocking. Use when adding/fixing movement or camera controls or porting PC/Roblox controls.
+- mobile-input-controls - Touch input for Unity mobile: finger ownership, discrete tap edges, hold actions, UI-vs-world blocking, joystick and camera controls. Use when adding/fixing mobile input or debugging short taps.
 - mobile-perf-audit - Audit a Unity mobile game for CPU, GC, physics, rendering, UI and memory issues with measurable fixes by impact. Use on FPS/lag/heat/draw-call questions or before a milestone build.
 - mobile-urp-lighting-baseline - URP mobile lighting, fog and post preset for a Roblox-look scene plus per-tier world budgets and a budget checker. Use when setting up scene lighting or checking a render-stats report against a device tier.
 

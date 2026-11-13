@@ -1,0 +1,13 @@
+{
+  "must_contain": [
+    "(?is)discrete.*(press|down).*(edge|this frame|began)",
+    "(?is)(press.*release|down.*up|began.*ended).*(same|one).*update",
+    "(?is)(exactly once|one command).*(next|following).*update.*(zero|no|without|stale)",
+    "(?is)(UI|EventSystem).*(touch|finger|pointer).*(identity|id)",
+    "(?is)(held|continuous).*(hold|repeat)"
+  ],
+  "must_not_contain": [
+    "(?i)pixel-smash|pixel demolish|demolition scene|saw placement"
+  ],
+  "triggers_any": ["tap edge", "short tap", "coalesced touch", "wasPressedThisFrame"]
+}

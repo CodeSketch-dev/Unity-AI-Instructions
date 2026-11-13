@@ -345,6 +345,10 @@ Assume low-end Android (weak CPU, little RAM, tile-based GPU) unless the project
 - When something does not need to run every frame, throttle by interval or stagger by index, and set `enabled = false` on idle or out-of-range components instead of early-returning inside `Update`.
 - Avoid `Camera.main` in hot paths (cache it), per-call `new WaitForSeconds` (use `UniTask` delays or a cached instance), string building, LINQ and boxing.
 
+**Mobile action input**
+
+- For discrete taps, consume a press/down edge as well as held state so a down+up inside one input update dispatches exactly once; the next input update without new input must dispatch zero. Preserve the owning touch ID and UI-vs-world exclusion for that same edge, and keep continuous hold/repeat actions held-state driven. Verify with a coalesced-input regression and a real short device gesture when available; synthetic tests are not device proof.
+
 **Visibility, culling and batching**
 
 - Use event-driven distance culling with `CullingGroup`: set bounding spheres and distance bands once, subscribe to `onStateChanged`, and toggle `Renderer.enabled`/`TMP_Text.enabled` there. Do not loop over objects every frame measuring distance. Use this for sprites, world-space text and small props, and exclude indicators that must always be visible (for example countdown text). Dispose the group and unsubscribe in `OnDestroy`.

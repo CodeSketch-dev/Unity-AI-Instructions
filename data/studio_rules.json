@@ -83,6 +83,12 @@
       "event": "UserPromptSubmit",
       "match": "core.?flow|core.?loop|spawn.{0,32}stop|gameplay.{0,32}stop|player.?journey|basic.?gameplay",
       "inject": "CORE-FLOW FIRST: Before expanding optional SDK, monetization, or polish, establish the active game's natural critical journey from its GDD/reference. Require uninterrupted Play evidence for boot, meaningful input/feedback, repeatable core content, earned progression, application/placement where applicable, resumed play, win/next, and save/reload. Seeded wallets, forced completion, and synthetic tests help isolate logic but do not prove the end-to-end path. Record starting conditions and each transition/state in docs/reports/core-flow-evidence.md; mark a milestone not applicable only with a game-specific reason. If the core path is blocked, return the plan to it first."
+    },
+    {
+      "id": "mobile_tap_edge_contract",
+      "event": "UserPromptSubmit",
+      "match": "mobile input|touch|tap|short press|press edge|waspressedthisframe|coalesced|finger id|fingerid|gesture|joystick|input system|cam cham|cham ngan|nut bam|cham man hinh|ngon tay",
+      "inject": "MOBILE ACTION INPUT: Keep discrete taps distinct from held/repeated actions. Consume a down/press edge as well as held state so down+up within one input update is not lost; preserve the same touch identity and UI-vs-world exclusion. Require a coalesced down+up test (one command, then zero on the next input update), a hold-semantics check, and real short-device-gesture evidence when available. Synthetic tests are not device proof."
     }
   ]
 }
