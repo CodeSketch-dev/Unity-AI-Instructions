@@ -49,3 +49,6 @@ Before assigning a timer, state, or API behavior to an owner, trace the receiver
 If the type-usage index is absent, cross-check the exact PC-relative global/GOT slot against an independently identified typed accessor or static initializer. Verify the address arithmetic and relevant field offsets. Pointer-slot identity is not proved by a coincidental matching layout. Keep the owner unknown if the exact slot-to-accessor/initializer link is missing.
 
 Trace initialization before calling a value the normal runtime default: constructor state may be overwritten in `Awake`, subsystem registration, scene bootstrap, or load paths. When a dump exposes integer state values, resolve available nested enum/constant definitions before labeling them unknown; if those definitions are unavailable, keep the mapping unknown rather than guessing.
+
+## Owner correction 2026-11-13: research tasks use the full loop
+When the owner says "research / study / proportions / nghien cuu", never send ONE thin Explore agent. Invoke superpowers brainstorming + this skill yourself, then run 2-3 parallel read-only study agents (original evidence, our current numbers, options scorecard), each told to invoke superpowers skills and write a STUDY file with file:line evidence; synthesise a plan with rulings before any edit.
