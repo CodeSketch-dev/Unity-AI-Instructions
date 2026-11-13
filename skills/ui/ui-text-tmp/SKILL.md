@@ -67,3 +67,6 @@ Every TextMeshPro text, UGUI and world, ships with an outlined material (outline
 2. Fix at the source prefab: assign the outlined material of the SAME font asset (same atlas); never a different font. If the font has none, make one outlined material for that font and reuse it.
 3. Keep the TMP_SDF shaders patched with `max(alphaClip..., 0.01)` (`tmp-shader-alpha-clip-fix`).
 4. Report counts before/after and what was left (fonts without an outlined material).
+
+## Thin/pale text right after a popup opens (owner 2026-11-13)
+TMP bakes scale-dependent SDF data (outline width, softness) into the mesh. A popup that opens by scaling (0.3 -> 1) keeps the small-scale mesh, so labels look thin and pale for a while until something rebuilds them. Fix: a component on the popup root that waits for the scale to settle, then calls `SetVerticesDirty()` on every child TMP once; guard with a test over all popup prefabs. Do not guess (glyph preload, material swaps did nothing): reproduce by saving frames with `ScreenCapture.CaptureScreenshot` from an `EditorApplication.update` callback and compare crops. Material/outline values read back constant, so numbers alone hide this bug.
