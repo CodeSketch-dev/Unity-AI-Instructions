@@ -1,0 +1,13 @@
+{
+  "must_contain": [
+    "(?is)(periodic|repetitive|symmetric).*motion.*(alias|same pose|same silhouette|static)",
+    "(?is)(coarse|contact sheet).*(discovery only|not proof|not evidence.*static)",
+    "(?is)source clip",
+    "(?is)dense samples at multiple non.commensurate time offsets",
+    "(?is)(do not|never|don't).*infer.*(runtime )?(speed|direction).*silhouette"
+  ],
+  "must_not_contain": [
+    "(?i)pixel-smash|pixel demolish|demolition|saw-bank|180 ?deg/s"
+  ],
+  "triggers_any": ["periodic motion", "motion aliasing", "repetitive animation", "looks static in contact sheet"]
+}

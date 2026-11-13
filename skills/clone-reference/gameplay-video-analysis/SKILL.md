@@ -1,6 +1,7 @@
 ---
 name: gameplay-video-analysis
 description: Turn gameplay videos, play notes and screenshots into a structured flow/UI/economy/FTUE analysis. Use when given a YouTube link, "I played it and noticed...", or timestamps of a reference game.
+triggers: gameplay video, reference video, periodic motion, motion aliasing, repetitive animation, looks static in contact sheet, clip sampling, frame rate, phan tich video game, chuyen dong lap, alias video
 ---
 
 # Gameplay video analysis
@@ -30,5 +31,6 @@ Write `docs/gameplay-analysis.md` with the sections above plus an evidence index
 
 ## Cautions
 - Videos are edited/sped-up; don't infer real pacing from cuts. Prefer the user's own play timing.
+- Periodic or highly symmetric motion can alias: sparse samples may repeatedly show the same pose. Contact sheets and coarse samples are discovery only, not proof that motion is static. Inspect the source clip and take dense samples at multiple non-commensurate time offsets across more than one apparent cycle. Do not infer game runtime speed or direction from repeated silhouettes; report only observed frame-to-frame motion with timestamps, and keep true runtime speed unknown unless clip timing is trustworthy.
 - Different device/version/event modes change UI and numbers; note the version/date of the evidence.
 - Don't transcribe copyrighted audio/music into the repo; note it for replacement (`clone-ip-safety`).
