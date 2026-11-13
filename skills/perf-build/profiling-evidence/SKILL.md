@@ -38,3 +38,8 @@ Metrics: frame ms (CPU/GPU), GC alloc per frame, batches/set-pass, vertices, phy
 - Label each policy with an inline runtime ProfilerMarker and read that marker from the same raw CPU frame. Editor callbacks can observe state adjacent to the last completed profiler frame; never use callback order alone as the mode label.
 - Predeclare balanced assignments, warmup, population/progress checks, and acceptance criteria. Compare fixed-tick strata as well as all frames; keep outliers and rejected paused/completed or mismatched-wave windows. Sum repeated same-name PlayerLoop samples instead of taking the last sample.
 - When the reference disables multiple caches, prove that unrelated caches would not skip work in every compared frame. Record actual stage counts, live population and gameplay progress, plus the environment and raw artifact hash.
+
+## Bounded Profiler export
+- After the measured window ends, freeze its receipt and stop the owned QA Play session before expensive raw-frame analysis. Preserve profiler data separately; analysis must not leave live simulation accumulating time while the Editor main thread is blocked.
+- Export bounded frame ranges, verify row counts/counter identities, then join them offline. Keep profile save/load and analysis as separate calls with checked receipts; a timed-out MCP call may have completed its mutation, so inspect artifacts and Editor state before retrying.
+- A boundary wait is not its system's exclusive CPU work. Retain same-frame fixed-step counts and per-invocation samples; trace the producing job/worker before attributing a wait or changing the simulation clock.
