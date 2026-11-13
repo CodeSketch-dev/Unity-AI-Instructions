@@ -46,3 +46,7 @@ button, text, label, popup, shop, tab, HUD, icon, price plate, currency bar, pre
 When delegating UI work, put in the brief: "Read skills/ui-always/SKILL.md first and the skills it lists, then apply its gate." Paste file paths, not summaries. Reject a subagent report that has no skill list and no dx/dy numbers.
 
 - Toasts, notifications, cash/currency values and any meaningful text: ICON LEFT + TextMeshPro RIGHT (UI = TextMeshProUGUI, world text = TextMeshPro + TMP sprite tag). See `ui-icon-text-everywhere`.
+
+## Resize loop: measure, never eyeball (owner 2026-11-13: "I have the skill, why do I still have to prompt?")
+- Changing a label's size, strip, anchors or max font is NOT one edit: after it, measure `textBounds` against the owner-visible FACE (cell/button/plate inner rect, outline and lip are border) in Play, and require >= 8 px on each side and >= 18 px above a bottom lip. Bigger text that touches or crosses the frame is a failure of this step, not a "next round".
+- Fix the CLASS in one pass: the same label exists in every cell/card family (Index cells of all minigames, shop cards, price plates). Apply and measure all of them, and leave an EditMode test that asserts the padding on the source prefabs (template: an Index-cell padding test over the prefab list). No test or measured numbers in the report = not done.
