@@ -28,6 +28,10 @@ Use before saying "verified". A claim needs proof that would FAIL if the claim w
 - Measured the wrong object (prefab asset instead of scene instance, rect instead of rendered bounds).
 - Results older than the last code change.
 
+## Differential tests across independent contexts
+- Runtime handles belong to their owning World/session/database. Equal logical fixtures can have different raw handles; diagnose fields before calling that a behavior regression.
+- Assert the exact expected owner handle independently in EACH context, then compare logical identity and lifetime metadata. Do not merely remove handle assertions or normalize everything to an unchecked slot: null, stale, recycled and wrong-owner targets must still fail.
+
 ## Output
 Claim | evidence | strength (strong / weak / none) | action taken. The final report wording must match the strongest proof obtained and name what was not verified.
 
