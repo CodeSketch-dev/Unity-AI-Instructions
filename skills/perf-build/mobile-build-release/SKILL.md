@@ -1,6 +1,7 @@
 ---
 name: mobile-build-release
 description: "Build and release checks for Android (APK/AAB) and iOS: versioning, signing safety, size, permissions, store checklist. Use when building, testing on device, uploading to stores, or a build fails/is too large."
+triggers: build profile, effective playersettings, android build, build settings, release build, cau hinh build, build android
 ---
 
 # Mobile build and release
@@ -15,6 +16,12 @@ Builds and uploads are outward-facing and hard to undo. Do not start a store sub
 5. Scenes in build settings, correct order; Boot scene first.
 6. Quality tiers and graphics API as set in `unity-project-bootstrap`.
 7. Permissions: only what is used; ad/analytics SDK manifests reviewed for extra permissions.
+
+### Effective settings in Unity Build Profiles
+
+Before a build on Unity versions with Build Profiles, inspect the active profile and target overrides, then read the effective `PlayerSettings` from the profile's global settings plus the applicable override. Generic `PlayerSettings` singleton values and serialized `ProjectSettings` can describe a different settings object. If no profile is active, verify which settings object the build will consume; a null active profile does not prove that a generic singleton or disk value is effective. Record the active profile and effective value for settings that affect the build.
+
+If the effective value appears correct but Unity's build still reports the old value, do not treat the accessor readback as proof that the build pipeline consumed it. Perform a fresh Editor restart or profile reload as indicated by the installed package's lifecycle, reread the active/effective settings, and run an actual Player build for the target. Confirm its contradictory warning is gone and inspect the built artifact's relevant setting. If the warning remains, keep the build blocked and investigate cached Editor/backend state; do not report the setting fixed or ship based on the API value alone.
 
 ## Android
 - Debug: APK for device tests. Release: AAB for Google Play.

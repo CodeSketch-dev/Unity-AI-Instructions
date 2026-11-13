@@ -1,0 +1,9 @@
+{
+  "must_contain": [
+    "Build Profiles?.{0,120}(effective|profile-specific|override)",
+    "active profile.{0,100}(global settings|effective PlayerSettings)",
+    "fresh Editor.{0,100}(restart|reload)",
+    "actual Player build.{0,100}(warning|artifact)"
+  ],
+  "triggers_any": ["Build Profile", "effective PlayerSettings", "Android build"]
+}
