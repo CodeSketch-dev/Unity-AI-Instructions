@@ -131,3 +131,5 @@
 - 2026-11-13 | Clone research coverage: explicitly inventory foreground/midground/background actors and separate output emitters; observe each visible autonomous or reward sequence through its natural transitions and sound cues. Do not infer secondary behavior from the main mechanism's source; tag unseen steps unknown and capture the missing sequence.
 
 - 2026-11-13 | Video analysis: periodic or symmetric motion can alias to the same apparent pose in coarse samples. Inspect the source clip and use dense samples at multiple non-commensurate offsets across repeated cycles; treat coarse sheets as discovery only and keep runtime speed/direction unknown unless the clip supports them.
+
+- 2026-11-14 | Reference migration: after a backend/component cutover, enumerate every metadata consumer and require missing required authored bindings to fail closed. Transform splitting/reparenting must preserve full local position and rotation; validate asymmetric basis/corner points, not only the center. Source-level guidance does not replace runtime natural-flow proof.

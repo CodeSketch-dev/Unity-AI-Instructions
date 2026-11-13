@@ -38,3 +38,7 @@ State which reference files were consulted, which values were copied vs adapted 
 - Component flags alone do not establish effective collision response. Trace layer masks, query filters and native ownership against the owner contract before deciding which objects provide solid support or damage overlap. Never invent solid contact for a mechanism specified as damage-overlap; solid weapons in other references remain valid when evidenced.
 - Compare otherwise identical runs with and without the damage volume: prove no unwanted displacement, positive damage, and preserved authored support. A test that only confirms the newly written collision formula does not establish parity.
 - Size acceptance needs source config and complete TRS plus a live projected ratio at matched camera/aspect. An unchanged mesh or matching serialized scale cannot close a visible size complaint; never guess a resize.
+## Migration invariants
+
+- After a backend or component cutover, inventory and update **every consumer** of the old metadata and binding. Required authored/serialized bindings must fail closed with an actionable error; never silently substitute an empty array, zero, or another default for missing required data.
+- When splitting, reparenting, or rebasing chunks, preserve full local position and rotation, plus scale where applicable, through export/import. Verify world orientation with asymmetric basis and corner points on both sides, not only the center; center-only checks can hide a lost rotation.

@@ -6,8 +6,25 @@
     "with and without.{0,40}damage volume",
     "unwanted displacement.{0,80}positive damage.{0,80}authored support",
     "source config.{0,60}TRS.{0,80}live projected ratio",
-    "never guess.{0,40}resize"
+    "never guess.{0,40}resize",
+    "after.{0,60}(backend|implementation).{0,60}(cutover|migration).{0,80}(all|every).{0,60}consumer",
+    "required.{0,50}(authored|serialized).{0,40}(binding|reference).{0,80}(fail.closed|error)",
+    "full local (position|translation).{0,100}rotation",
+    "(asymmetric basis|asymmetric corners).{0,100}(not only|rather than|instead of).{0,40}center"
   ],
-  "must_not_contain": ["pixel-smash", "Pixel Demolish", "all weapons must be triggers"],
-  "triggers_any": ["reference", "collision response", "sai kich thuoc"]
+  "must_not_contain": [
+    "pixel-smash",
+    "Pixel Demolish",
+    "all weapons must be triggers"
+  ],
+  "triggers_any": [
+    "reference",
+    "collision response",
+    "sai kich thuoc",
+    "backend cutover",
+    "metadata consumer",
+    "missing binding migration",
+    "local pose split",
+    "reparent rotation"
+  ]
 }
