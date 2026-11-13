@@ -17,6 +17,8 @@ class Rule:
     require: str = None
     ext: tuple = (".cs",)
     exclude_dirs: tuple = ("Editor", "Tests", "Test")
+    # Optional lexical scanner: text -> iterable of 1-based violation lines.
+    scan: object = None
 
 
 @dataclass
@@ -57,11 +59,16 @@ def lint_text(path, text, rules=None):
             continue
         if r.require and not re.search(r.require, text):
             continue
-        rx = re.compile(r.pattern)
-        for i, line in enumerate(lines, 1):
+        if r.scan is None:
+            rx = re.compile(r.pattern)
+            matches = [i for i, line in enumerate(lines, 1) if rx.search(line)]
+        else:
+            matches = sorted({i for i in r.scan(text) if type(i) is int and 1 <= i <= len(lines)})
+        for i in matches:
+            line = lines[i - 1]
             if line.lstrip().startswith("//"):
                 continue
-            if rx.search(line) and ("lint-ok:" + r.id) not in line:
+            if ("lint-ok:" + r.id) not in line:
                 msg = "[RULE %s] %s MANDATORY: read .claude/skills/%s/SKILL.md before fixing this line. Opt out only with // lint-ok:%s <reason>." % (r.id, r.why, r.skill, r.id)
                 found.append(Violation(path, i, r.id, msg))
     return found

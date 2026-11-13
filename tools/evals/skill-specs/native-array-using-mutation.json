@@ -1,0 +1,5 @@
+{
+  "must_contain": ["CS1654", "mutable NativeArray local", "try", "finally", "complete jobs", "read-only", "Factory|factory", "Foundation: no"],
+  "must_not_contain": ["[A-Za-z]:[/\\\\]", "pixel-smash", "Demolition"],
+  "triggers_any": ["CS1654", "bien using chi doc"]
+}

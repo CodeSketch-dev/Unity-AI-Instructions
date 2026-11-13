@@ -1,0 +1,6 @@
+[
+  {"prompt":"CS1654 after using var NativeArray indexed assignment","skill":"native-array-using-mutation","expect":["Identify readonly value-type binding","Use mutable local plus try/finally","Compile and run scheduled test"]},
+  {"prompt":"Typed using NativeArray is mutated inside an Editor fixture","skill":"native-array-using-mutation","expect":["Apply rule to Editor code too","Preserve allocation and job lifetime","Dispose after completion"]},
+  {"prompt":"Two methods use the same NativeArray local name, only one uses using","skill":"native-array-using-mutation","expect":["Resolve lexical binding","Change only readonly mutated binding","Leave ordinary mutable array alone"]},
+  {"prompt":"A using NativeArray is only read","skill":null,"expect":["No rewrite or warning solely for using","Keep correct disposal"]}
+]
