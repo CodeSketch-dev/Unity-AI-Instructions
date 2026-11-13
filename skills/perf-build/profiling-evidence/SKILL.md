@@ -32,6 +32,7 @@ Metrics: frame ms (CPU/GPU), GC alloc per frame, batches/set-pass, vertices, phy
 - Skip rebuilding only for proven unchanged logical inputs: cover every authoritative input the graph reads, not merely unchanged population or topology. Keep dirty rebuilds and publication ordering.
 - Require epoch/reset, query reorder and late-carry tests, plus same-count/different-content cases. Late-arriving phase work must invalidate reuse before its consumer runs; cached identity/order must not hide changes.
 - Inspect child-job/worker markers and whole-frame median/P95 before/after; relocating a wait is not work removal or an improvement. Keep adverse results and separate Editor evidence from device performance.
+- Review dependency changes using the complete branch's Schedule/Complete sequence for steady-state AND resize, not only a diff hunk or allocation helper. An existing unconditional fence may sit outside the quoted hunk; compare actual scheduled work between fences before declaring drift.
 
 ## Interleaved live-frame comparisons
 - Label each policy with an inline runtime ProfilerMarker and read that marker from the same raw CPU frame. Editor callbacks can observe state adjacent to the last completed profiler frame; never use callback order alone as the mode label.
