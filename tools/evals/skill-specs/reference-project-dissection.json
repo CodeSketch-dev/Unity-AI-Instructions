@@ -8,11 +8,16 @@
     "(branch|control.flow).{0,100}(return|reachability|side effect)",
     "separate instances",
     "constructor.{0,120}(Awake|initialization)",
-    "integer state.{0,120}(nested constants|enum|constant definitions)"
+    "integer state.{0,120}(nested constants|enum|constant definitions)",
+    "type.usage index.{0,100}(missing|absent|unavailable)",
+    "PC.relative.{0,120}(global|GOT).{0,80}slot.{0,160}(typed accessor|initializer)",
+    "(verify|check).{0,80}(address arithmetic|PC.relative address)",
+    "(pointer.slot identity|slot identity).{0,120}(coincidental|similar|matching) layout",
+    "unknown.{0,100}(no exact|exact.{0,40}link|exact correspondence)"
   ],
   "must_not_contain": [
     "pixel-smash",
     "C:\\\\Unity\\\\GitProject"
   ],
-  "triggers_any": ["reference project", "reference game", "source export"]
+  "triggers_any": ["reference project", "reference game", "source export", "static receiver", "GOT slot", "type usage index missing"]
 }
