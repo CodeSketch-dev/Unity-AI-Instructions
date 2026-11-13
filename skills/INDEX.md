@@ -295,7 +295,7 @@
 
 ## native
 - native-ad-beside-popup - Fit native ads beside popups and inside fixed loading slots. Use when adding native half/rect ads or debugging wrong native size, empty gaps, or covered content.
-- native-array-using-mutation - Use when C# CS1654 occurs after indexed mutation of a NativeArray declared with using, or the matching lint rule fires.
+- native-array-using-mutation - Use when CS1654 or CS1612 occurs while mutating a NativeArray using variable or a struct-valued property, or the matching lint rule fires.
 
 ## nav
 - nav-traversal-link-tool - Editor tool and runtime rules for NavMesh traversal links: two-click authoring with snap, scripted parabola traversal, agent-body sync, ladder links. Use when bots must cross gaps, jumps or ladders that the baked navmesh does not connect.

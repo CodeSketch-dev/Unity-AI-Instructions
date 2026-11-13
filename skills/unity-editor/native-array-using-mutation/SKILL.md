@@ -1,7 +1,7 @@
 ---
 name: native-array-using-mutation
-description: "Use when C# CS1654 occurs after indexed mutation of a NativeArray declared with using, or the matching lint rule fires."
-triggers: CS1654, NativeArray using, readonly using variable, sua mang using, bien using chi doc
+description: "Use when CS1654 or CS1612 occurs while mutating a NativeArray using variable or a struct-valued property, or the matching lint rule fires."
+triggers: CS1654, CS1612, NativeArray using, readonly using variable, sua mang using, bien using chi doc
 ---
 
 # Mutable NativeArray lifetime
@@ -12,6 +12,8 @@ A NativeArray is a value type. A variable declared by `using` is readonly; index
 2. For mutation, declare an ordinary mutable NativeArray local. Put its work in `try` and `Dispose()` in `finally`; complete jobs that use it before disposal.
 3. Preserve existing allocation, ownership, scheduling and exception cleanup. Do not bypass the compiler with unsafe writes or copy an owning array just to silence the error.
 4. Verify the relevant assembly compiles and the actual scheduled test passes; lint success alone is not compile/runtime evidence.
+
+CS1612 on an indexed write through a NativeArray-valued property needs a mutable local view of that same storage, then the indexed write through the view. This borrowed view does not acquire disposal ownership; keep disposal with its existing owner. Do not replace the storage or dispose the alias. Run changed-file lint before an expensive Editor refresh.
 
 ## Lint boundary and exceptions
 
