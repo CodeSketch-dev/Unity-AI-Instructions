@@ -32,3 +32,8 @@ Metrics: frame ms (CPU/GPU), GC alloc per frame, batches/set-pass, vertices, phy
 - Skip rebuilding only for proven unchanged logical inputs: cover every authoritative input the graph reads, not merely unchanged population or topology. Keep dirty rebuilds and publication ordering.
 - Require epoch/reset, query reorder and late-carry tests, plus same-count/different-content cases. Late-arriving phase work must invalidate reuse before its consumer runs; cached identity/order must not hide changes.
 - Inspect child-job/worker markers and whole-frame median/P95 before/after; relocating a wait is not work removal or an improvement. Keep adverse results and separate Editor evidence from device performance.
+
+## Interleaved live-frame comparisons
+- Label each policy with an inline runtime ProfilerMarker and read that marker from the same raw CPU frame. Editor callbacks can observe state adjacent to the last completed profiler frame; never use callback order alone as the mode label.
+- Predeclare balanced assignments, warmup, population/progress checks, and acceptance criteria. Compare fixed-tick strata as well as all frames; keep outliers and rejected paused/completed or mismatched-wave windows. Sum repeated same-name PlayerLoop samples instead of taking the last sample.
+- When the reference disables multiple caches, prove that unrelated caches would not skip work in every compared frame. Record actual stage counts, live population and gameplay progress, plus the environment and raw artifact hash.
