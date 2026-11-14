@@ -38,3 +38,10 @@ triggers: unreal, ue4ss, live dump, blueprint scale, wrong scale, ported map, cl
 - Landscape: CUE4Parse exports it (Landscape actor -> glb + 16-bit heightmap + layer weightmaps); build a Unity Terrain from the glb vertices. The landscape glb is yawed 180 deg vs static-mesh glbs: verify placement by foliage-on-ground (median dy ~0, most within 1.5 m) before reporting.
 - Never report a rebuilt map without a side-by-side capture against the previous shipped map and the original game screenshot.
 
+
+## Fidelity traps (owner: "many objects are pure white", 2026-11-14)
+- Order is fixed: look parity (audit + side-by-side) -> mobile optimization that keeps the look -> player playtest -> NPCs. Never wire gameplay on a map that still shows white/grey objects.
+- glTF import splits a multi-material UE mesh into one child renderer per section, each with ONE slot, in UE slot order: run ONE slot counter across all child renderers. Restarting per renderer gives every section material 0 (lighthouse all white, no red bands).
+- Hide what the original never shows: /Engine/BasicShapes placeholders (WorldGridMaterial hazard/blocking boxes), *collision* helper meshes, the UE sky dome (its colour is a time-of-day curve atlas; use a scene skybox). Deactivate the GameObject: optimizers often re-enable renderers.
+- Audit by script: visible renderers whose material has no texture and colour >= 0.9 white or the 0.7 default grey; list by screen area; target 0 before reporting.
+- Checkpoints from UE actors float ~2.4 m above the floor: ground the spawn points and extend trigger boxes down to the floor, and never spawn inside checkpoint 0 (enter never fires). Teleport tests hide both bugs: verify with a walking character.
