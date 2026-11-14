@@ -38,3 +38,9 @@ Origin inside the target collider misses it; inactive objects and disabled colli
 
 ## Verify
 Reproduce in a minimal Play test (EditMode cannot step physics), log the pair and the fixed rule, re-run, Console clean. Report which check confirmed the cause.
+
+## Collider vs render mismatch reports (owner says "collider is rotated / offset from the model")
+
+- Verify the EXACT object the owner named. A check on a different object with a similar name (a collector instead of a weapon) is not evidence and costs a repeated complaint.
+- Measure, do not eyeball: in Play, compute the collider's world direction (or the query segment the damage system really submits) and the renderer's world direction (pivot to renderer-bounds centre) for every instance and print the signed angle. Expect 0; a constant 90 or 180 means an axis convention bug (mesh forward axis vs transform up), not a tuning value.
+- Fix the side that is derived (usually the view's constant rotation offset), keep the gameplay rule that tests pin, then re-run the same probe: every instance must read 0.0 before reporting done.
