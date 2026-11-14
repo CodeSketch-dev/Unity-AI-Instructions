@@ -22,6 +22,8 @@ Metrics: frame ms (CPU/GPU), GC alloc per frame, batches/set-pass, vertices, phy
 7. Population benchmarks must assert the intended live population and relationships remain throughout the measured window; objects falling out, expiring or being collected can turn a full-pool test into an empty-loop result. Report active counts, warmup, step count and conditions. Allocate timing/report helpers before the GC baseline, and label calling-thread allocations separately from job-worker or whole-frame allocations.
 
 ## Editor microbenchmarks
+- Record Burst enabled, Native Debug Mode, safety and synchronous compilation settings before an Editor comparison. Native Debug Mode disables Burst optimizations across jobs. Keep safety and compile settings matched; report a configuration change separately from an algorithm change or device result.
+- Separate collider construction, publication and step costs. A fast step that requires a costly rebuild can lose on the full frame. Count actual generated contacts separately from conservative overlap candidates; collision event counts depend on material response.
 - Pin the exact workload and source hash for before/after runs. Invoke a case once per Editor update; do not batch many `Temp` allocation samples into one update and call that repeated evidence.
 - Cache delegates before timing and keep reflection out of the per-sample path. In EditMode, do not use `Time.frameCount` as the sample clock: it may not advance between editor-driven invocations.
 - Report warm-up policy and sample count, plus median, P95, and maximum. Preserve unfavorable outliers and repeat results; explain them instead of deleting them.
