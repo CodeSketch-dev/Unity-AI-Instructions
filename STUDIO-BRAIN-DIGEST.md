@@ -40,3 +40,5 @@ HARNESS (owner 2026-11-12): unattended work = python tools/harness/cli.py (statu
 LAYOUT LIMIT (owner 2026-11-12, repeat correction): no folder holds more than 15 entries (tools/publish/repo_layout_lint.py, exemptions listed there with a reason); new scripts go into the matching tools/<group>/ folder; new skills via tools/skillkit/new_skill.py into skills/<group>/ (flat installs); publish is blocked otherwise.
 
 PORTED MAP FIDELITY FIRST (owner 2026-11-14, angry correction): a ported/ripped map must look 100% like the original BEFORE optimizing further or wiring gameplay/NPCs. Gate: white/untextured/default-grey material audit = 0 on visible renderers, placeholders and collision meshes hidden, side-by-side capture vs the original; then optimize for low-end mobile without changing the look; then the player playtest (walk, jump, no stuck, KCC ok). NPCs are optional variety, last. Skill ue-map-live-fit.
+
+EXACT PORT: implementation autonomy is backend-only. Preserve source lifecycle/content/behavior and authorized assets; require source-to-target evidence and differential verification. A fixture or inferred stub implementation is not parity (reference-port).

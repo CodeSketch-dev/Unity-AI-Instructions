@@ -43,3 +43,10 @@ State which reference files were consulted, which values were copied vs adapted 
 
 - After a backend or component cutover, inventory and update **every consumer** of the old metadata and binding. Required authored/serialized bindings must fail closed with an actionable error; never silently substitute an empty array, zero, or another default for missing required data.
 - When splitting, reparenting, or rebasing chunks, preserve full local position and rotation, plus scale where applicable, through export/import. Verify world orientation with asymmetric basis and corner points on both sides, not only the center; center-only checks can hide a lost rotation.
+
+## Backend-only autonomy gate
+- For exact reverse engineering, implementation autonomy never authorizes redesign. Before migrating, write a source-to-target table for level loading/unloading, prefab ownership, input, damage/cascade, progression, UI routes and asset/audio bindings. Every row cites source evidence, target consumer and verification; unknown and mismatched rows remain open.
+- ECS, Burst, Jobs, pooling and batching may change execution, not content, tables, event order, timing or player-visible behavior. Generic house rules cannot override the reference lifecycle or an explicit owner exception.
+- A benchmark fixture is not the production architecture. Do not multiply scenes, duplicate shared rigs or replace runtime prefab loading because a fixture was easier to author.
+- Stripped methods are unknown, not permission to invent. Preserve hypotheses separately; tests derived solely from a hypothesis cannot establish parity. Require independent source/native/recorded behavior evidence before accepting it.
+- Inventory original assets and dependencies before generating replacements; use the owner-authorized source assets, with generated work confined to explicitly authorized exceptions. Verify live bindings and audio cues, not only file presence.

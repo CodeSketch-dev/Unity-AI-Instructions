@@ -2,6 +2,12 @@
   "_doc": "Data-driven rules for studio_rules_hook.ps1. Add a rule = add one object, then run sync.bat (no hook code). Fields: id; event (UserPromptSubmit | PreToolUse | PostToolUse | Stop); match (regex on the diacritics-stripped lowercase prompt, or on tool name + file path for tool events); inject (text added to the agent context); flag (state flag to set); once (inject only once per session). Special rule ids: correction (detects owner corrections and arms the retro gate), retro_gate (Stop: blocks finishing until skills/AGENTS/digest changed and published).",
   "rules": [
     {
+      "id": "reference_backend_only",
+      "event": "UserPromptSubmit",
+      "match": "reverse engineer|reverse engen|game goc|clone 100|100%|reference port",
+      "inject": "EXACT PORT: load reference-port. Autonomy chooses implementation, not game design. Before backend migration require source-to-target lifecycle/content/behavior/asset evidence. Preserve source prefab loading and complete tables; generic house rules cannot override reference behavior. Stripped methods remain unknown; fixtures and hypothesis-only tests cannot prove parity. Sweep all related mismatches proactively."
+    },
+    {
       "id": "correction",
       "event": "UserPromptSubmit",
       "match": "toi da bao|toi bao|toi noi roi|lan sau|luon luon phai|sao lai|van bi|lai bi|van chua|chua dung|chua ngon|sai roi|i told you|you keep|stop doing|again and again",
